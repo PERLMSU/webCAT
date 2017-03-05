@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load widget_tweaks profile_tags %}
+
+{% block content %} 
+<title> Kudo - My Profile </title>   
+<div class="row">
+    
+    <div class="box">
+        <div class="container" style="padding-top: 20px;">
+            <h1 class="page-header">Profile</h1>
+            <div class="row">
+                <!-- left column -->
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="text-center">
+                        <div class="upload-btn">
+                            <a data-toggle="modal" href='#update-photo-modal'>
+                                <span class="fa fa-camera fa-2x"><span>
+                                <label>Update Photo</label>
+                            </a>
+                        </div>
+                        <div class="profile-avatar" 
+                        style="background:linear-gradient(rgba(66, 66, 66, 0.15),rgba(66, 66, 66, 0.15)), 
+                            url('{{ user.image|get_image }}');">
+                        </div>
+                    </div>
+                </div>
+                <!-- edit form column -->
+                <div class="col-md-8 col-sm-6 col-xs-12 personal-info">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+      
+                    <h3>Personal info</h3>
+      
+                    <form method="post" class="form-horizontal" role="form">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">{{ field.label }}:</label>
+                            <div class="col-lg-8">
+                                {{ field|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        {% endfor %}
+        
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-8">
+                                <input class="btn btn-primary" value="Save Changes" type="submit">
+                                <span></span>
+                                <input class="btn btn-default" value="Cancel" type="reset">
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="update-photo-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Update Photo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="profile-photo" action="{% url 'goats-profile-upload' %}"
+                    method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="image-editor">
+                        <input type="file" accept="image/*" id="fileupload" class="cropit-image-input">
+                        <input type="hidden" name="image" class="image-input">
+                        <input type="hidden" name="filename" class="filename">
+                        <input type="hidden" name="image-default" value="{{ user.image|get_image }}" class="image-default">
+
+                        <div class="cropit-preview"></div>
+
+                        <div class="select-wrapper">
+                            <div class="select-image-btn text-center">Select image</div>
+                        </div>
+                        <div class="controls-wrapper">
+                            <div class="rotation-btns">
+                                <button type="button" id="rotate-ccw-btn"><span class="fa fa-undo"></span></button>
+                                <button type="button" id="rotate-cw-btn"><span class="fa fa-repeat"></span></button>
+                            </div>
+
+                            <div class="slider-wrapper">
+                                <span class="fa fa-picture-o"></span>
+                                <input type="range" class="cropit-image-zoom-input input-range">
+                                <span class="fa fa-picture-o icon-picture"></span>
+                            </div>
+                        </div>
+                        <div class="btn-wrapper text-right">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <input type="submit" class="btn btn-primary" id="submitphoto" value="Save Changes"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 
+{% endblock %}  

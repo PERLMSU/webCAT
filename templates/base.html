@@ -1,4 +1,7 @@
+
+
 <!DOCTYPE html>
+
 
 <html lang="en">
     <head>
@@ -9,19 +12,12 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-	<link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
-	<link href="/static/bootstrap/css/goats.css" rel="stylesheet">
-	<link href="/static/Hover-master/css/hover.css" rel="stylesheet" media="all">
-	<!-- Custom CSS -->
-	<link href="/static/bootstrap/css/scrolling-nav.css" rel="stylesheet">
-	<!-- 
-	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet"> -->
+        {% load static %}
 
-	<link href="/static/bootstrap/css/landing-page.css" rel="stylesheet">
-
-	<link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <link rel="stylesheet" href="/static/jquery-ui-1.12.1/jquery-ui.min.css">
+        <link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/sb-admin.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/plugins/morris.css' %}" />
 
 </head>
 
@@ -29,17 +25,14 @@
 {% block content %}
 {% endblock %}
 	</body>
+    <script src="/static/js/jquery.js"></script>
 
-        <!-- Bootstrap Core JavaScript -->
-        <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/static/js/bootstrap.min.js"></script>
 
-        <!-- Scrolling Nav JavaScript -->
-        <script src="/static/bootstrap/js/jquery.easing.min.js"></script>
-        <script src="/static/bootstrap/js/scrolling-nav.js"></script>
-        <script src="/static/bootstrap/js/goats-custom.js"></script>
+    <!-- Morris Charts JavaScript -->
+    <script src="/static/js/plugins/morris/raphael.min.js"></script>
+    <script src="/static/js/plugins/morris/morris.min.js"></script>
+    <script src="/static/js/plugins/morris/morris-data.js"></script>
 
-        <script src="/static/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-        <script src="/static/js/jquery.form.min.js"></script>
-
-        <script src="/static/node_modules/cropit/dist/jquery.cropit.js"></script>
-	</html
+	</html>
