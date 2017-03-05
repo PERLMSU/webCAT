@@ -68,7 +68,6 @@ class ResendActivationView(View):
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)
 
-
 class DashboardView(TemplateView):
 	""" dashboard page, manage users
 	"""
