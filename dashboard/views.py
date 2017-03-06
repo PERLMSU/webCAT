@@ -1,9 +1,8 @@
-from braces.views import LoginRequiredMixin
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, View
 from django.conf import settings
@@ -11,6 +10,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
+
+import django_excel as excel
 
 from .forms import(
                # ProfileForm,
@@ -26,6 +27,10 @@ from userprofile.models import (
                                 Profile, 
                                 ConfirmationKey
                             )
+
+
+class UploadFileForm(forms.Form):
+    file = forms.FileField()
 
 class EmailConfirmationView(LoginRequiredMixin, TemplateView):
     template_name = 'account_email.html'
@@ -180,7 +185,7 @@ class ResendActivationView(View):
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)
 
-class ManageUsersView(TemplateView):
+class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     """ dashboard page, manage users
     """
     template_name = 'manage.html'
@@ -216,18 +221,22 @@ class ManageUsersView(TemplateView):
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text) 
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
 	""" dashboard page, manage users
 	"""
 	template_name = 'index.html'
 	context = {}
 
 	def get(self, *args, **kwargs):
-		self.context['form'] = AddInstructorForm()
-		users = Profile.objects.all()
-		self.context['users'] = users
-		#raise Exception("test")
-		return render(self.request, self.template_name, self.context)
+
+		if self.request.user.is_authenticated():
+			self.context['form'] = AddInstructorForm()
+			users = Profile.objects.all()
+			self.context['users'] = users
+			return render(self.request, self.template_name, self.context)
+
+		form = LoginForm()
+		return render(self.request, 'registration/login.html', {'form': form})        
 
 	def post(self, *args, **kwargs):
 		form = AddInstructorForm(self.request.POST)

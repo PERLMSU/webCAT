@@ -118,7 +118,19 @@
 
 <div class="row">
     <div class="box">
+    {% if form_2.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form_2.errors|pluralize }} below.
+        </p>
+    {% endif %}
 
+    <form action="" enctype="multipart/form-data"  method="post">
+        <table>
+            {{ form_2.as_table }}
+        </table>
+        {% csrf_token %}
+        <input type="submit" value="Submit">
+    </form>
     </div>
 </div>
     </div>
