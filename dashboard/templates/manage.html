@@ -1,6 +1,30 @@
+<link href="/static/css/add-instructor.css" rel="stylesheet">
+{% extends "base.html" %}
 {% load i18n %}
 {% load widget_tweaks profile_tags %}
 {% load crispy_forms_tags %}
+
+{% block content %}
+
+        <div id="page-wrapper">
+
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Dashboard <small>Manage Users</small>
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li class="active">
+                                <i class="fa fa-dashboard"></i> Dashboard - Admin
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+
 <div class="container-fluid">
     <div class="row">
 <!--         <h2>Add Instructor</h2>    -->
@@ -21,7 +45,7 @@
 
             </div>       
 
-               <div class="col-lg-3">
+               <div class="col-lg-4">
             <h3> All Users</h3>
             <div class="row">
                 <div class="col-md-8 col-md-offset-2 col-xs-12">
@@ -29,7 +53,12 @@
                     {% for user in users %}
                         <li class="user-list">
                             <a href="{% url 'user-details' user.id %}"> {{ user.email }}</a>
-                            <span>Permission level: {{user.permission_level}}</span>
+                            <span>Permission level: </span>
+                            {% if user.permission_level %}
+                            Professor
+                            {% else %}
+                            Learning Assistant
+                            {% endif %}
                         </li>
                     {% endfor %}
                     </ul>
@@ -92,3 +121,7 @@
 
     </div>
 </div>
+    </div>
+</div>
+
+    {% endblock %}

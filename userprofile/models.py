@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
+from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
@@ -14,18 +16,20 @@ class ProfileManager(BaseUserManager):
     """ Manager that contains methods used
         by the profile
     """
-    def create_user(self, email, password=None, **kwargs):
+    def create_user(self, email, permission = 0, password=None, **kwargs):
         if not email:
             raise ValueError("Email address is required.")
 
+        ct = ContentType.objects.get_for_model(Profile)
         profile = self.model(email=self.normalize_email(email), username=email)
         profile.set_password(password)
+        profile.permission_level = permission
         profile.save()
 
         return profile
 
     def create_superuser(self, email, password, **kwargs):
-        profile = self.create_user(email, password, **kwargs)
+        profile = self.create_user(email, password, 1, **kwargs)
         profile.is_admin = True
         profile.is_staff = True
         profile.is_superuser = True
@@ -56,7 +60,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     is_verified = models.BooleanField(default=False)
     is_activated = models.BooleanField(default=False)
 
-    permission_level = models.IntegerField(default=False, blank=True)
+    permission_level = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False, help_text=_('Designates whether the user can log into this admin '
                     'dashboard.'))

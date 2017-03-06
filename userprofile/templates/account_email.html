@@ -2,12 +2,24 @@
 {% load widget_tweaks profile_tags %}
 
 {% block content %} 
+        <div id="page-wrapper">
 
-
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Dashboard <small>Account Settings</small>
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li class="active">
+                                <i class="fa fa-dashboard"></i> Dashboard
+                            </li>
+                        </ol>
+                    </div>
+                </div>                
 <div class="row">
     <div class="box">
         <div class="container" style="padding-top: 20px;">
-            <h2 class="page-header">Account Settings</h2>
             <div class="row"> 
                 <div class="col-md-12">
                 {% if messages %}
@@ -21,7 +33,7 @@
                 </div>
                 <div class="row"> 
                     <div class="col-md-6 well well-md">
-                        <form action="{% url 'goats-change-password' %}" method="post">
+                        <form action="{% url 'dash-change-password' %}" method="post">
                             {% csrf_token %}
                         <div class="form-group col-md-12">
                             <label class="col-md-3 control-label">Old Password:</label>
@@ -64,9 +76,11 @@
                             </div>
                         </form>
                     </div>
+
                 </div>
         </div>
     </div>
 </div>
-
+    </div>
+</div>
 {% endblock %}  

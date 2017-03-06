@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load i18n %}
 {% load crispy_forms_tags %}
@@ -11,7 +12,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Dashboard <small>Statistics Overview</small>
+                            Dashboard <small>Account Settings</small>
                         </h1>
                         <ol class="breadcrumb">
                             <li class="active">
@@ -30,6 +31,16 @@
                         </div>
                     </div>
                 </div>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <p class="text-center">{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+
 
                 <div class="row">
                     <div class="col-lg-3 col-md-6">

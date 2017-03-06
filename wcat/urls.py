@@ -19,6 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    url(r'^', include('dashboard.urls')),
 	url(r'^dashboard/', include('dashboard.urls')),
 	url(r'^profile/', include('userprofile.urls')),
     url(r'^admin/', admin.site.urls),
