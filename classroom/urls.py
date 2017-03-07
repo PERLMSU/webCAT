@@ -2,7 +2,9 @@ from django.conf.urls import url
 from classroom import views
 
 urlpatterns = [
-    url(r'^$', views.upload, name='uplink'),
+    url(r'^$', views.ClassroomView.as_view(), name='classroom-home'),
+    url(r'^upload/student/$', views.UploadStudentsView.as_view(), name='classroom-upload-students'),
+    url(r'^upload/group/$', views.UploadGroupsView.as_view(), name='classroom-upload-groups'),
     url(r'^download/(.*)', views.download, name="download"),
     url(r'^download_attachment/(.*)/(.*)', views.download_as_attachment,
         name="download_attachment"),

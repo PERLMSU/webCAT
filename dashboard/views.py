@@ -28,10 +28,6 @@ from userprofile.models import (
                                 ConfirmationKey
                             )
 
-
-class UploadFileForm(forms.Form):
-    file = forms.FileField()
-
 class EmailConfirmationView(LoginRequiredMixin, TemplateView):
     template_name = 'account_email.html'
     context = {}

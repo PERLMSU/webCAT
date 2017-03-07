@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Classroom <small>Overview</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li class="active">
+                <i class="fa fa-dashboard"></i> Dashboard
+            </li>
+        </ol>
+    </div>
+</div>
+<!-- /.row -->
+
+<a href="{% url "classroom-upload-students" %}">upload students </a>
+<a href="{% url "classroom-upload-groups" %}">upload groups </a>
+
+<div class="container">
+    <h3> Course </h3>
+    <p><strong> {{classroom.course}} </strong> <span> {{classroom.description}} </span> </p>
+    <p> Professor: {{classroom.instructor.email}} </p>
+</div>
+
+<div class="container">
+    <h3> Students </h3>
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Group Number</th>
+          <th>Student Id</th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for student in students %}        
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{student.first_name }} </td>
+          <td>{{student.last_name }}</td>
+          <td> {{student.group_number}}</td>
+          <td> {{student.student_id}}</td>
+        </tr>
+    {% endfor %}    
+      </tbody>
+    </table>    
+    
+</div>
+
+<div class="container">
+    <h3> Groups </h3>
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Group Number</th>
+          <th>Student</th>
+          <th>Student</th>
+          <th>Student</th>
+          <th>Student</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for group in groups %}        
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{group.group_number }} </td>
+
+          <td>student 1</td>
+          <td> student 2</td>
+          <td> student 3</td>
+          <td> student 4</td>
+
+          <td> {{ group.description }} </td>
+        </tr>
+    {% endfor %}    
+      </tbody>
+    </table>    
+    
+</div>
+
+
+<div class="container">
+    <div class="row">
+        <h1>{{header}}</h1>
+
+        {% if form.errors %}
+            <p style="color: red;">
+                Please correct the error{{ form.errors|pluralize }} below.
+            </p>
+        {% endif %}
+
+        <form action="" name="add_students" enctype="multipart/form-data"  method="post">
+            <table>
+                {{ form.as_table }}
+            </table>
+            
+            {% csrf_token %}
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+{% endblock %}

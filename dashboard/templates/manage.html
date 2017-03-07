@@ -6,23 +6,21 @@
 
 {% block content %}
 
-        <div id="page-wrapper">
 
-            <div class="container-fluid">
 
-                <!-- Page Heading -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <h1 class="page-header">
-                            Dashboard <small>Manage Users</small>
-                        </h1>
-                        <ol class="breadcrumb">
-                            <li class="active">
-                                <i class="fa fa-dashboard"></i> Dashboard - Admin
-                            </li>
-                        </ol>
-                    </div>
-                </div>
+<!-- Page Heading -->
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Dashboard <small>Manage Users</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li class="active">
+                <i class="fa fa-dashboard"></i> Dashboard - Admin
+            </li>
+        </ol>
+    </div>
+</div>
 
 
 <div class="container-fluid">
@@ -116,24 +114,7 @@
         </div>
     </div>
 
-<div class="row">
-    <div class="box">
-    {% if form_2.errors %}
-        <p style="color: red;">
-            Please correct the error{{ form_2.errors|pluralize }} below.
-        </p>
-    {% endif %}
 
-    <form action="" enctype="multipart/form-data"  method="post">
-        <table>
-            {{ form_2.as_table }}
-        </table>
-        {% csrf_token %}
-        <input type="submit" value="Submit">
-    </form>
-    </div>
-</div>
-    </div>
-</div>
+
 
     {% endblock %}

@@ -15,8 +15,8 @@ class Classroom(models.Model):
         return self.course
 
 class Group(models.Model):
-    classroom = models.ForeignKey(Classroom)
-    group_number = models.IntegerField(default=0)
+    classroom = models.ForeignKey(Classroom,null=True, default=None)
+    group_number = models.IntegerField(unique=True, null=True)
     description = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -25,13 +25,14 @@ class Group(models.Model):
         return self.description
 
 class Student(models.Model):
-    group = models.ForeignKey(Group)
-    classroom = models.ForeignKey(Classroom)
+    group = models.ForeignKey(Group, null=True, default=None)
+    classroom = models.ForeignKey(Classroom, null=True, default=None)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     notes = models.CharField(max_length=200)
+    student_id = models.IntegerField(unique=True, null=True)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)

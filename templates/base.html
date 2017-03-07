@@ -131,7 +131,7 @@
                             <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
                         </li>
                         <li>
-                            <a href="#"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                            <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
                         </li>
                         <li class="divider"></li>
                         <li>
@@ -150,13 +150,16 @@
                     <li>
                         <a href="{% url "dash-manage-users" %}"><i class="fa fa-fw fa-user"></i> Manage Users</a>
                     </li>
-                    {% endif %}
                     <li>
-                        <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-table"></i> Settings</a>
+                        <a href="{% url "classroom-home" %}"><i class="fa fa-fw fa-university"></i> Classroom</a>
                     </li>
+                    {% endif %}
                     <li>
                         <a href="{% url "dash-feedback"}"><i class="fa fa-fw fa-edit"></i> Feedback</a>
                     </li>
+                    <li>
+                        <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                    </li>                    
                     <li>
                         <a href="bootstrap-elements.html"><i class="fa fa-fw fa-desktop"></i> Bootstrap Elements</a>
                     </li>
@@ -184,20 +187,29 @@
             </div>
             <!-- /.navbar-collapse -->
         </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissable">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <p class="text-center">{{ message }}</p>
+   
+    <div id="page-wrapper">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <p class="text-center">{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}     
+        <div class="container-fluid">
+         
+            {% block content %}
+
+
+
+            {% endblock %}
+
             </div>
-        {% endfor %}
-    {% endif %}        
-{% block content %}
+            <!-- /.container-fluid -->
 
-
-
-{% endblock %}
-
+        </div>
+        <!-- /#page-wrapper -->
     </div>
     <!-- /#wrapper -->
 
