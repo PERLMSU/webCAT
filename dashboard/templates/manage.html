@@ -21,14 +21,45 @@
         </ol>
     </div>
 </div>
+<div class="container-fluid">
+    <div class="row">
+         <h3> All Users</h3>
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name </th>
+          <th>Email</th>
+          <th>Permission Level</th>
+          <th>Verified Email</th>
+        </tr>
+      </thead>
+      <tbody>                    
+                    {% for user in users %}
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{user.first_name }} {{user.last_name }}</td>
+          <td><a href="{% url 'user-details' user.id %}"> {{user.email }}</a></td>
+          <td>
+            {% if user.permission_level %}
+                Professor
+            {% else %}
+                Learning Assistant
+            {% endif %}
+          </td>
+          <td> {{user.is_verified}}</td>
 
-
+        </tr>
+    {% endfor %}    
+      </tbody>
+    </table>   
+    </div>
+</div>
 <div class="container-fluid">
     <div class="row">
 <!--         <h2>Add Instructor</h2>    -->
 
             <!-- <div class="login-page"> -->
-            <div class="col-lg-4">
+            <div class="col-lg-6">
               <div class="form">
                 <h3> Add Instructor</h3>
                 <form class="register-form" method="post" action=".">
@@ -43,44 +74,6 @@
 
             </div>       
 
-               <div class="col-lg-4">
-            <h3> All Users</h3>
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2 col-xs-12">
-                    <ul>
-                    {% for user in users %}
-                        <li class="user-list">
-                            <a href="{% url 'user-details' user.id %}"> {{ user.email }}</a>
-                            <span>Permission level: </span>
-                            {% if user.permission_level %}
-                            Professor
-                            {% else %}
-                            Learning Assistant
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                    </ul>
-
-                    {% if users.has_other_pages %}
-                    <div class="pagination users-pagination">
-                        <span class="step-links">
-                            {% if users.has_previous %}
-                                <a href="?page={{ users.previous_page_number }}">previous</a>
-                            {% endif %}
-
-                            <span class="current">
-                                Page {{ users.number }} of {{ users.paginator.num_pages }}.
-                            </span>
-
-                            {% if users.has_next %}
-                                <a href="?page={{ users.next_page_number }}">next</a>
-                            {% endif %}
-                        </span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
              <!--     
                 <form>
                     <div class="col-sm-12">

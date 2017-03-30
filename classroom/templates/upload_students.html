@@ -37,32 +37,7 @@
     </div>
 </div>
 
-<div class="container">
-    <h3> Students </h3>
-    <table class="table table-striped table-hover table-bordered">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Group Number</th>
-          <th>Student Id</th>
-        </tr>
-      </thead>
-      <tbody>
-    {% for student in students %}        
-        <tr>
-          <th scope="row">{{forloop.counter}}</th>
-          <td>{{student.first_name }} </td>
-          <td>{{student.last_name }}</td>
-          <td> {{student.group_number}}</td>
-          <td> {{student.student_id}}</td>
-        </tr>
-    {% endfor %}    
-      </tbody>
-    </table>    
-    
-</div>
+{% include "_student_partial.html" %}
 
 <!-- <div class="container">
     <h3> Groups </h3>

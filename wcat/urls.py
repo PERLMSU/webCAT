@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^', include('dashboard.urls')),
+    url(r'^feedback/', include('feedback.urls')),
 	url(r'^dashboard/', include('dashboard.urls')),
 	url(r'^profile/', include('userprofile.urls')),
     url(r'^classroom/', include('classroom.urls')),

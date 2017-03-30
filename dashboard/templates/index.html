@@ -21,6 +21,24 @@
 
 <div class="row">
     <div class="col-lg-12">
+        {% if classrooms %}
+            <h3> Current Classroom</h3>
+            {% for classroom in classrooms %}
+
+                <span>{{classroom.course}}</span>
+                <span>{{classroom.description}}</span>
+            {% endfor %}
+        {% else %}
+        <h3> No classroom registered. </h3>
+
+      
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-12">
         <div class="alert alert-info alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <i class="fa fa-info-circle"></i>  <strong>Like SB Admin?</strong> Try out <a href="http://startbootstrap.com/template-overviews/sb-admin-2" class="alert-link">SB Admin 2</a> for additional features!

@@ -9,18 +9,18 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-
+from django.contrib.messages import constants as message_constants
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
-#                 message_constants.INFO: 'info',
-#                 message_constants.SUCCESS: 'success',
-#                 message_constants.WARNING: 'warning',
-#                 message_constants.ERROR: 'danger',}
+MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
+                message_constants.INFO: 'info',
+                message_constants.SUCCESS: 'success',
+                message_constants.WARNING: 'warning',
+                message_constants.ERROR: 'danger',}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'dashboard',
     'classroom',
     'userprofile',
+    'feedback',
 ]
 
 DEBUG_TOOLBAR_PANELS = [

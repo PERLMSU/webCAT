@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import ModelForm
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,8 +16,6 @@ from django.core.files.base import ContentFile
 import base64
 
 from userprofile.models import Profile
-
-
 
 
 class LoginForm(forms.Form):
@@ -48,6 +47,15 @@ class AddInstructorForm(forms.Form):
 
     CHOICES=[(0,'Learning Assistant'),
          (1, 'Admin')]
+
+    first_name = forms.CharField(
+                            widget=forms.TextInput(attrs=dict(required=True,
+                            max_length=30, render_value=False)),
+                            label=_("First Name"))
+    last_name = forms.CharField(
+                            widget=forms.TextInput(attrs=dict(required=True,
+                            max_length=30, render_value=False)),
+                            label=_("Last Name"))
 
     email = forms.EmailField(
                             widget=forms.TextInput(attrs=dict(required=True,

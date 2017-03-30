@@ -1,0 +1,99 @@
+{% load crispy_forms_tags %}
+<div class="container">
+    <h3> Groups </h3>
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Group Number</th>
+          <th>Description</th>
+          <th>Student</th>
+          <th>Student</th>
+          <th>Student</th>
+          <th>Student</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+    {% for group in groups %}    
+
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{group.group_number }} </td>
+          <td> {{ group.description }} </td>
+          {% with students|get_students_by_group:group.id as group_students %}
+          {% if group_students %}
+            {% for student in group_students %}
+              {% if student != None %}
+              <td>{{student.first_name}} {{student.last_name}}</td>
+              {% else %}
+                <td></td>
+              {% endif %}
+            {% endfor %}
+
+          {% else %}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          {% endif %}
+          {% endwith %}
+        </tr>
+    {% endfor %}    
+      </tbody>
+    </table>    
+    
+</div>
+
+
+<a class="btn btn-primary" data-toggle="modal" data-target="#createGroup" role="button"><span class="fa fa-group"></span> Add Group  </a>
+
+<div class="modal fade" id="createGroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Add New Group</h4>
+      </div>
+      <div class="modal-body">
+        <h5> Add Group: </h5>
+        <form class="form-horizontal" id="createGroupForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
+
+          {{add_group_form | crispy}}
+<!--           <div class="form-group">
+            <div class="col-sm-3">
+              <label for="first_name">First Name: </label>
+            </div>
+            <div class="col-sm-6">
+              <input id="first_name" type="text" name="first_name" value="{{ first_name }}">
+            </div>
+            <div class="col-sm-3">
+              <label for="first_name">Last Name: </label>
+            </div>
+            <div class="col-sm-6">
+              <input id="last_name" type="text" name="last_name" value="{{ last_name }}">
+            </div>      
+            <div class="col-sm-3">
+              <label for="group_num">Group Number </label>
+            </div>
+            <div class="col-sm-6">
+              <input id="group_num" type="text" name="group_num" value="{{ group_number }}">
+            </div>
+            <div class="col-sm-3">
+              <label for="student_id">Student ID </label>
+            </div>
+            <div class="col-sm-6">
+              <input id="student_id" type="text" name="student_id" value="{{ student_id  }}">
+            </div>                                        
+          </div> -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <input type="submit" value="Save" class="btn btn-primary"/>      
+        </form>
+      </div>
+    </div>
+  </div>
+</div>     

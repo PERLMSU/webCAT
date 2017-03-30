@@ -1,0 +1,45 @@
+<div class="container">
+    <h3> Learning Assistants </h3>
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Groups Assigned </th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for la in learning_assistants %}        
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{la.email }} </td>
+          <td> </td>
+        </tr>
+    {% endfor %}    
+      </tbody>
+    </table>    
+    
+</div>
+
+<div class="container">
+    <h3> Professors </h3>
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Groups Assigned </th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for instructor in instructors %}        
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{instructor.email }} </td>
+          <td> </td>
+        </tr>
+    {% endfor %}    
+      </tbody>
+    </table>    
+    
+</div>

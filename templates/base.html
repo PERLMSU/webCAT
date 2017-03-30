@@ -36,7 +36,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{% url "dash-home" %}">SB Admin</a>
+                <a class="navbar-brand" href="{% url "dash-home" %}">WebCAT</a>
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
@@ -155,8 +155,19 @@
                     </li>
                     {% endif %}
                     <li>
-                        <a href="{% url "dash-feedback"}"><i class="fa fa-fw fa-edit"></i> Feedback</a>
-                    </li>
+                        <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-edit"></i> Feedback <i class="fa fa-fw fa-caret-down"></i></a>
+                        <ul id="demo" class="collapse">
+                            <li>
+                                <a href="{% url "feedback-home" %}">Editor</a>
+                            </li>                            
+                            <li>
+                                <a href="{% url "feedback-categories" %}">Categories</a>
+                            </li>
+                        </ul>
+                    </li>                    
+<!--                     <li>
+                        <a href="{% url "dash-feedback"}"><i class="fa fa-fw fa-edit"></i> Feedback <i class="fa fa-fw fa-caret-down"></i></a>
+                    </li> -->
                     <li>
                         <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
                     </li>                    
@@ -166,17 +177,7 @@
                     <li>
                         <a href="bootstrap-grid.html"><i class="fa fa-fw fa-wrench"></i> Bootstrap Grid</a>
                     </li>
-                    <li>
-                        <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
-                        <ul id="demo" class="collapse">
-                            <li>
-                                <a href="#">Dropdown Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Dropdown Item</a>
-                            </li>
-                        </ul>
-                    </li>
+
                     <li>
                         <a href="blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
                     </li>
@@ -189,15 +190,17 @@
         </nav>
    
     <div id="page-wrapper">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissable">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    <p class="text-center">{{ message }}</p>
-                </div>
-            {% endfor %}
-        {% endif %}     
+ 
         <div class="container-fluid">
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <p class="text-center">{{ message }}</p>
+        </div>
+    {% endfor %}
+{% endif %}
+
          
             {% block content %}
 

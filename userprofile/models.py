@@ -16,7 +16,7 @@ class ProfileManager(BaseUserManager):
     """ Manager that contains methods used
         by the profile
     """
-    def create_user(self, email, permission = 0, password=None, **kwargs):
+    def create_user(self, first_name, last_name, email, permission = 0, password=None, **kwargs):
         if not email:
             raise ValueError("Email address is required.")
 
@@ -24,12 +24,14 @@ class ProfileManager(BaseUserManager):
         profile = self.model(email=self.normalize_email(email), username=email)
         profile.set_password(password)
         profile.permission_level = permission
+        profile.first_name = first_name
+        profile.last_name = last_name
         profile.save()
 
         return profile
 
-    def create_superuser(self, email, password, **kwargs):
-        profile = self.create_user(email, password, 1, **kwargs)
+    def create_superuser(self, first_name, last_name, email, password, **kwargs):
+        profile = self.create_user(first_name, last_name, email, 1,password, **kwargs)
         profile.is_admin = True
         profile.is_staff = True
         profile.is_superuser = True
@@ -41,6 +43,9 @@ class ProfileManager(BaseUserManager):
 class Profile(AbstractBaseUser, PermissionsMixin):
     """ User's model
     """
+    class Meta:
+       ordering = ['permission_level', 'last_name', 'first_name']
+
     email = models.EmailField(max_length=150, unique=True)
     username = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=80, null=True, blank=True)
@@ -69,6 +74,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     objects = ProfileManager()
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS  = ['first_name', 'last_name']
 
     def get_full_name(self):
         return "{} {}".format(self.first_name, self.last_name).strip()

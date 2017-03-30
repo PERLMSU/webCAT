@@ -12,6 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
 
 import django_excel as excel
+from django.db import IntegrityError
 
 from .forms import(
                # ProfileForm,
@@ -27,6 +28,8 @@ from userprofile.models import (
                                 Profile, 
                                 ConfirmationKey
                             )
+
+from classroom.models import Classroom
 
 class EmailConfirmationView(LoginRequiredMixin, TemplateView):
     template_name = 'account_email.html'
@@ -197,21 +200,23 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     def post(self, *args, **kwargs):
         form = AddInstructorForm(self.request.POST)
         if form.is_valid():
-            # register user
-            #permission = form.cleaned_data['permission_level']
-       # raise Exception("test")
-            user = Profile.objects.create_user(
-                       password=form.cleaned_data['password'],
-                       email=form.cleaned_data['email'],
-                       permission = form.cleaned_data['permission_level']
-                       )
-            user.send_confirmation_email(self.request)   
-            self.add_message("User successfully created")   
-            return HttpResponseRedirect(reverse('dash-home'))
+            try:
+                user = Profile.objects.create_user(
+                            first_name=form.cleaned_data['first_name'],
+                            last_name=form.cleaned_data['last_name'],
+                           password=form.cleaned_data['password'],
+                           email=form.cleaned_data['email'],
+                           permission = form.cleaned_data['permission_level']
+                           )
+                user.send_confirmation_email(self.request)   
+                self.add_message("User successfully created!!")   
+                return HttpResponseRedirect(reverse('dash-manage-users'))
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, "Could not create user: "+e)
         self.context['form'] = form
         users = Profile.objects.all()
         self.context['users'] = users
-        self.add_message("Form not valid, failed to create user.")          
+        messages.add_message(self.request, messages.ERROR, "Form not valid, failed to create user.")          
         return render(self.request, self.template_name, self.context)
 
     def add_message(self, text, mtype=25):
@@ -229,6 +234,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 			self.context['form'] = AddInstructorForm()
 			users = Profile.objects.all()
 			self.context['users'] = users
+			self.context['classrooms'] = Classroom.objects.filter(instructor = self.request.user)
 			return render(self.request, self.template_name, self.context)
 
 		form = LoginForm()
