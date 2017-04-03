@@ -19,3 +19,17 @@ class AddCategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name','description']
+
+class AddSubCategoryForm(forms.ModelForm):
+
+    name = forms.CharField()
+    description = forms.CharField(required=False)
+
+    class Meta:
+        model = SubCategory
+        fields = ['name','description']
+
+
+class EditCategoryForm(forms.Form):
+    category_name = forms.CharField()
+    category_description = forms.CharField()	

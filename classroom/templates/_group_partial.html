@@ -1,16 +1,24 @@
 {% load crispy_forms_tags %}
 <div class="container">
-    <h3> Groups </h3>
+    <h3> Groups
+<a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup" role="button"><span class="fa fa-group"></span> Add Group  </a>
+{% if not upload_view %} 
+<a class="btn btn-success float-right-button" href="{% url "classroom-upload-groups" %}"><span class="fa fa-cloud-upload"></span> Upload</a>
+{% endif %}
+     </h3>
     <table class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
           <th>#</th>
           <th>Group Number</th>
           <th>Description</th>
-          <th>Student</th>
-          <th>Student</th>
-          <th>Student</th>
-          <th>Student</th>
+          <th>LA</th>
+          <th>Student 1</th>
+          <th>Student 2</th>
+          <th>Student 3</th>
+          <th>Student 4</th>
+          <th></th>
+          <th></th>
           
         </tr>
       </thead>
@@ -21,6 +29,10 @@
           <th scope="row">{{forloop.counter}}</th>
           <td>{{group.group_number }} </td>
           <td> {{ group.description }} </td>
+          <td>{% with group.current_instructor as instructor %}
+              {{instructor.get_full_name}}
+            {% endwith %}
+          </td>          
           {% with students|get_students_by_group:group.id as group_students %}
           {% if group_students %}
             {% for student in group_students %}
@@ -37,7 +49,13 @@
             <td></td>
             <td></td>
           {% endif %}
-          {% endwith %}
+          
+
+          <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a> 
+          <td>
+            <a href="#" class="assigngroup" data-toggle="modal" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups"><span class="fa fa-edit"></span></a>
+          </td>  
+          {% endwith %}        
         </tr>
     {% endfor %}    
       </tbody>
@@ -46,7 +64,40 @@
 </div>
 
 
-<a class="btn btn-primary" data-toggle="modal" data-target="#createGroup" role="button"><span class="fa fa-group"></span> Add Group  </a>
+<div class="modal fade" id="assignGroups" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Assign Group</h4>
+      </div>
+      <div class="modal-body">
+        <h4>Group <span id="assign-group-num"></span></h4>
+        <h5> Please select the instructor you would like to assign to this group: </h5>
+        <form class="form-horizontal" id="createStudentForm" action="{% url "classroom-assign-groups" %}" method="POST">{% csrf_token %}
+        <input name="group_num" type="hidden" class="hidden-group-num">
+        <select name="instructor_id">
+          {% for instructor in instructors %}
+            <option value="{{ instructor.id }}">{{ instructor.get_full_name }}</option>
+          {% endfor %}
+        </select>
+        <label for="group_description">Description:</label>
+        <input type="text" name="group_description"/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <input type="submit" value="Save" class="btn btn-primary"/>      
+        </form>
+      </div>
+    </div>
+  </div>
+</div>  
+
+
+
+
 
 <div class="modal fade" id="createGroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -62,32 +113,6 @@
         <form class="form-horizontal" id="createGroupForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
 
           {{add_group_form | crispy}}
-<!--           <div class="form-group">
-            <div class="col-sm-3">
-              <label for="first_name">First Name: </label>
-            </div>
-            <div class="col-sm-6">
-              <input id="first_name" type="text" name="first_name" value="{{ first_name }}">
-            </div>
-            <div class="col-sm-3">
-              <label for="first_name">Last Name: </label>
-            </div>
-            <div class="col-sm-6">
-              <input id="last_name" type="text" name="last_name" value="{{ last_name }}">
-            </div>      
-            <div class="col-sm-3">
-              <label for="group_num">Group Number </label>
-            </div>
-            <div class="col-sm-6">
-              <input id="group_num" type="text" name="group_num" value="{{ group_number }}">
-            </div>
-            <div class="col-sm-3">
-              <label for="student_id">Student ID </label>
-            </div>
-            <div class="col-sm-6">
-              <input id="student_id" type="text" name="student_id" value="{{ student_id  }}">
-            </div>                                        
-          </div> -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -12,7 +12,13 @@ from models import Student, Group, Classroom
 
 from userprofile.models import Profile
 
-from .forms import AddStudentForm, AddGroupForm, AddClassroomForm
+from .forms import AddStudentForm, AddGroupForm, AddClassroomForm, AssignInstructorForm, AssignMultipleGroupsForm
+
+
+@register.filter
+def get_groups_by_instructor(groups, instructor_pk):
+    return groups.filter(current_instructor = instructor_pk)
+
 
 @register.filter
 def get_students_by_group(students, group_pk):
@@ -72,7 +78,7 @@ def add_student(request):
                 group = Group.objects.get(group_number=group_num)
                 student.group = group
             except Group.DoesNotExist:
-                messages.add_message(request, messages.WARNING, 'Group number ' + group_num + ' was not found. Please create group before assigning to students.')                
+                messages.add_message(request, messages.WARNING, 'Group number ' + str(group_num) + ' was not found. Please create group before assigning to students.')                
                 student.group = None
         student.save()
         messages.add_message(request, messages.SUCCESS, 'Student successfully added!')
@@ -86,13 +92,74 @@ class UploadFileForm(forms.Form):
     classroom = forms.CharField(widget=forms.HiddenInput())
 
 
+
+
+
+
+
+class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
+    """ assign groups to LA's
+    """
+    context = {} 
+
+    def post(self, *args, **kwargs):
+        form = AssignMultipleGroupsForm(self.request.POST or None)
+        if form.is_valid():
+            checked_groups = form.cleaned_data['group_numbers']
+            try:
+                instructor = Profile.objects.get(id=kwargs['pk'])
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
+                return HttpResponseRedirect('/classroom/')
+
+            for group_pk in checked_groups:
+                try:
+                    group = Group.objects.get(id = group_pk)
+                    group.current_instructor = instructor
+                    group.save()
+                except Exception as e:
+                    messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
+            return HttpResponseRedirect('/classroom/')
+        else:
+            messages.error(request, form.errors)
+            return HttpResponseRedirect('/classroom/')                 
+
+
 class AssignGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     """ assign groups to LA's
     """
-    template_name = 'assign_groups.html'
+    #template_name = 'assign_groups.html'
     context = {}    
 
-    def get(self, *args, **kwargs):
+    def post(self, *args, **kwargs):
+        form = AssignInstructorForm(self.request.POST or None)
+
+        if form.is_valid():
+            instructor_pk = form.cleaned_data['instructor_id']
+            group_num = form.cleaned_data['group_num']
+            group_description = form.cleaned_data['group_description']
+
+            try:
+                group = Group.objects.get(group_number = group_num)
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, 'Unable to access this group %s' % e)
+                return HttpResponseRedirect('/classroom/')   
+
+            try:
+                instructor = Profile.objects.get(id=instructor_pk)
+                group.current_instructor = instructor
+                group.description = group_description
+                group.save()
+                messages.add_message(self.request, messages.SUCCESS, 'Successfully edited group!')                
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, 'Unable to assign this group to this instructor %s' % e)      
+            return HttpResponseRedirect('/classroom/')                
+        else:
+            messages.error(request, form.errors)
+            return HttpResponseRedirect('/classroom/')              
+
+
+
         # form = UploadFileForm()
         students = Student.objects.all()
         groups = Group.objects.all()
@@ -119,6 +186,7 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
         students = Student.objects.all()
         groups = Group.objects.all()
         classroom = Classroom.objects.get(instructor = self.request.user)
+        add_student_form = AddStudentForm()
         return render(self.request, self.template_name,
         {
             'form': form,
@@ -127,6 +195,8 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
                        'from your cloned repository:'),
             'students': students,
             'classroom': classroom,
+            'add_student_form': add_student_form,
+            'upload_view': True,
         }) 
 
     def post(self, *args, **kwargs):
@@ -166,6 +236,35 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text) 
 
+
+class DeleteStudent(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
+    """ delete student view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            student = Student.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this student %s' % e)
+        finally:
+            student.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Student successfully deleted!')
+        return HttpResponseRedirect('/classroom/') 
+
+class DeleteGroup(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
+    """ delete group view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            group = Group.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this group %s' % e)
+        finally:
+            group.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Group successfully deleted!')
+        return HttpResponseRedirect('/classroom/') 
+
+
+
 class UploadGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     """ upload groups
     """
@@ -180,12 +279,14 @@ class UploadGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
         return render(self.request, self.template_name,
         {
             'form': form,
+            'add_group_form': AddGroupForm(),
             'title': 'Excel file upload and download example',
             'header': ('Please choose any excel file ' +
                        'from your cloned repository:'),
             'groups': groups,
             'classroom': classroom,
             'students': students,
+            'upload_view': True,
         }) 
 
     def post(self, *args, **kwargs):
@@ -224,19 +325,15 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     context = {}
 
     def get(self, *args, **kwargs):
-        # form = UploadFileForm()
-        add_student_form = AddStudentForm()
-        add_group_form = AddGroupForm()
-        add_classroom_form = AddClassroomForm()
-        groupform = AddGroupForm()
         students = Student.objects.all()
         groups = Group.objects.all()
         try:
             classroom = Classroom.objects.get(instructor = self.request.user)
         except Classroom.DoesNotExist:
             classroom = None
-        learning_assistants = Profile.objects.all().filter(permission_level=0)
-        instructors = Profile.objects.all().filter(permission_level=1)
+        learning_assistants = Profile.objects.all()
+        # learning_assistants = Profile.objects.all().filter(permission_level=0)
+        instructors = Profile.objects.all()
         return render(self.request, self.template_name,
         {
             'students': students,
@@ -244,9 +341,11 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             'instructors':instructors,
             'groups': groups,
             'classroom': classroom,
-            'add_student_form': add_student_form,
-            'add_group_form': add_group_form,
-            'add_classroom_form': add_classroom_form,
+            'add_student_form': AddStudentForm(),
+            'add_group_form': AddGroupForm(),
+            'add_classroom_form': AddClassroomForm(),
+            'assign_multiple_groups_form': AssignMultipleGroupsForm(),
+            'upload_view': False,
         })
 
     # def post(self, *args, **kwargs):

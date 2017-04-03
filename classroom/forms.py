@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from .models import *
 from datetime import date
 
+
+
 class AddStudentForm(forms.ModelForm):
 
     first_name = forms.CharField()
@@ -56,4 +58,19 @@ class AddClassroomForm(forms.ModelForm):
     def clean_first_name(self):
         if len(self.cleaned_data['course']) > 20:
             raise forms.ValidationError("Course must not be longer than %d characters." % 20)          
-        return self.cleaned_data['course']        
+        return self.cleaned_data['course'] 
+
+class AssignInstructorForm(forms.Form):
+    instructor_id = forms.IntegerField()
+    group_description = forms.CharField()
+    group_num = forms.IntegerField()
+
+
+class AssignMultipleGroupsForm(forms.Form):
+    CHOICES = tuple(Group.objects.all().values_list('id','group_number').order_by('group_number'))
+    #raise Exception("wutt")
+    group_numbers = forms.MultipleChoiceField(
+        required=True,
+        widget=forms.CheckboxSelectMultiple,
+        choices=CHOICES,
+    )

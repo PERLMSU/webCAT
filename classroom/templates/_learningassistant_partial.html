@@ -1,20 +1,57 @@
+{% load crispy_forms_tags %}
 <div class="container">
-    <h3> Learning Assistants </h3>
+    <h3> Learning Assistants
+<a class="btn btn-warning float-right-button" href="{% url "dash-manage-users" %}"><span class="fa fa-child"></span> Manage</a>
+     </h3>
     <table class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
           <th>#</th>
+          <th>Name</th>
           <th>Email</th>
-          <th>Groups Assigned </th>
+          <th>Groups</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
     {% for la in learning_assistants %}        
         <tr>
           <th scope="row">{{forloop.counter}}</th>
+          <td>{{la.get_full_name}}
           <td>{{la.email }} </td>
-          <td> </td>
+          <td>
+            <ul>{% for group in groups|get_groups_by_instructor:la.id %} 
+              <li>{{group.group_number}} : {{group.description}}</li>
+            {% endfor %}
+          </ul>
+          </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#assignMultipleGroups_{{la.id}}"><span class="fa fa-rocket"></span></a>
+           </td>
         </tr>
+<div class="modal fade" id="assignMultipleGroups_{{la.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Assign Multiple Groups</h4>
+      </div>
+      <div class="modal-body">
+        <h4>Group <span id="assign-group-num"></span></h4>
+        <h5> Please select the groups you would like to assign to {{la.get_full_name}} </h5>
+        <form class="form-horizontal" action="{% url "classroom-assign-multiple-groups" la.id %}" method="POST">{% csrf_token %}
+        {{ assign_multiple_groups_form.as_p }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <input type="submit" value="Assign" class="btn btn-primary"/>      
+        </form>
+      </div>
+    </div>
+  </div>
+</div>          
     {% endfor %}    
       </tbody>
     </table>    
@@ -28,7 +65,8 @@
         <tr>
           <th>#</th>
           <th>Email</th>
-          <th>Groups Assigned </th>
+          <th>Groups</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -37,9 +75,18 @@
           <th scope="row">{{forloop.counter}}</th>
           <td>{{instructor.email }} </td>
           <td> </td>
+          <td>
+            <a href="#" data-toggle="modal" data-id="{{student.id}}" data-target="#editstudentmodal"><span class="fa fa-rocket"></span></a>
+           </td>
         </tr>
     {% endfor %}    
       </tbody>
     </table>    
     
 </div>
+
+
+
+
+
+

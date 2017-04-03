@@ -10,11 +10,19 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
-
-from .forms import AddCategoryForm
+from django.template.defaulttags import register
+from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm
 # Create your views here.
 from django.db import IntegrityError
 from classroom.models import Classroom
+
+from models import Category, SubCategory
+
+@register.filter
+def get_subcategories(category_pk):
+    sub_categories = SubCategory.objects.filter(main_category=category_pk)
+    return sub_categories
+
 
 class FeedbackView(LoginRequiredMixin, TemplateView):
     template_name = "feedback.html"
@@ -34,13 +42,35 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 	context = {}
 
 	def get(self, *args, **kwargs):
-		form = AddCategoryForm()
-		self.context['create_main_category_form'] = form
-
+		try:
+			classroom = Classroom.objects.get(instructor = self.request.user)
+		except Classroom.DoesNotExist:
+			classroom = None
+		self.context['create_main_category_form'] = AddCategoryForm()
+		self.context['create_sub_category_form'] = AddSubCategoryForm()
+		self.context['main_categories'] = Category.objects.filter(classroom=classroom)
 		return render(self.request, self.template_name, self.context)
 
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text)	
+
+def create_subcategory(request, pk):
+	form = AddSubCategoryForm(request.POST or None)
+	if form.is_valid():
+		name = form.cleaned_data['name']
+		description = form.cleaned_data['description']
+		sub_category = form.save(commit=False)
+		try:
+			sub_category.main_category = Category.objects.get(id = pk)
+			sub_category.save()
+			messages.add_message(request, messages.SUCCESS, 'Subcategory sucessfully created.')
+		except Exception as e:
+			messages.add_message(request, messages.ERROR, 'Error when adding subcategory: '+e)
+		return HttpResponseRedirect('/feedback/categories/')
+	else: 
+		messages.error(request, form.errors)
+		return HttpResponseRedirect('/feedback/categories/') 
+
 
 def create_category(request):
 	form = AddCategoryForm(request.POST or None)
@@ -49,7 +79,7 @@ def create_category(request):
 		description = form.cleaned_data['description']
 		category = form.save(commit=False)
 		try:
-			category.classroom = Classroom.objects.get(instructor = self.request.user)
+			category.classroom = Classroom.objects.get(instructor = request.user)
 			category.save()
 			messages.add_message(request, messages.SUCCESS, 'Category sucessfully created.')
 		except IntegrityError as e:
@@ -58,3 +88,70 @@ def create_category(request):
 	else: 
 		messages.error(request, form.errors)
 		return HttpResponseRedirect('/feedback/categories/') 
+
+
+class DeleteCategoryView(LoginRequiredMixin, View):
+    """ delete category view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            category = Category.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this category %s' % e)
+        finally:
+            category.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Category successfully deleted!')
+        return HttpResponseRedirect('/feedback/categories/') 
+
+class DeleteSubCategoryView(LoginRequiredMixin, View):
+    """ delete category view
+    """
+    def get(self, *args, **kwargs):
+    	#raise Exception("got here?")
+        try:
+            subcategory = SubCategory.objects.get(id=kwargs['pk'])
+            #raise Exception("whaatt")
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this subcategory %s' % e)
+        finally:
+            subcategory.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Subcategory successfully deleted!')
+        return HttpResponseRedirect('/feedback/categories/') 
+
+
+def edit_subcategory(request, pk):
+	form = EditCategoryForm(request.POST or None)
+	if form.is_valid():
+		name = form.cleaned_data['category_name']
+		description = form.cleaned_data['category_description']			
+		try:
+			subcategory = SubCategory.objects.get(id=pk)
+			subcategory.name = name
+			subcategory.description = description
+			subcategory.save()
+			messages.add_message(request, messages.SUCCESS, 'Category saved.')				
+		except SubCategory.DoesNotExist:
+			messages.add_message(request, messages.ERROR, 'Error - failed to save.')				
+			return HttpResponseRedirect('/feedback/categories/')
+		return HttpResponseRedirect('/feedback/categories/')
+	else: 
+		messages.error(request, form.errors)
+		return HttpResponseRedirect('/feedback/categories/') 
+
+def edit_category(request, pk):
+	form = EditCategoryForm(request.POST or None)
+	if form.is_valid():
+		name = form.cleaned_data['category_name']
+		description = form.cleaned_data['category_description']			
+		try:
+			category = Category.objects.get(id=pk)
+			category.name = name
+			category.description = description
+			category.save()
+			messages.add_message(request, messages.SUCCESS, 'Category saved.')				
+		except Category.DoesNotExist:
+			messages.add_message(request, messages.ERROR, 'Error - failed to save.')							
+		return HttpResponseRedirect('/feedback/categories/')
+	else: 
+		messages.error(request, form.errors)
+		return HttpResponseRedirect('/feedback/categories/') 	
