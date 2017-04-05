@@ -45,3 +45,17 @@ $(document).on("click", ".assigngroup", function () {
 });
 
 
+$(document).on("click", ".main-category-btn", function () {
+     var category_pk = this.id;
+     $("#sub_categories_"+category_pk).show();
+     $('#main_categories').hide();
+     // $(".modal-body #categoryName").html( categoryName );
+});
+
+
+$(document).on("click", ".sub-category-btn", function () {
+     var category_pk = this.id;
+     $("#note_taker_"+category_pk).show();
+     $('#main_categories').hide();
+     // $(".modal-body #categoryName").html( categoryName );
+});

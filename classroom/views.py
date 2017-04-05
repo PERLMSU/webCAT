@@ -12,8 +12,8 @@ from models import Student, Group, Classroom
 
 from userprofile.models import Profile
 
-from .forms import AddStudentForm, AddGroupForm, AddClassroomForm, AssignInstructorForm, AssignMultipleGroupsForm
-
+from .forms import AddStudentForm, AddGroupForm, AddClassroomForm, AssignInstructorForm, AssignMultipleGroupsForm,AssignMultipleStudentsForm
+MAX_STUDENTS = 4
 
 @register.filter
 def get_groups_by_instructor(groups, instructor_pk):
@@ -95,6 +95,33 @@ class UploadFileForm(forms.Form):
 
 
 
+class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
+    """ assign students to groups
+    """
+    context = {} 
+
+    def post(self, *args, **kwargs):
+        form = AssignMultipleStudentsForm(self.request.POST or None)
+        if form.is_valid():
+            checked_groups = form.cleaned_data['group_numbers']
+            try:
+                instructor = Profile.objects.get(id=kwargs['pk'])
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
+                return HttpResponseRedirect('/classroom/')
+
+            for group_pk in checked_groups:
+                try:
+                    group = Group.objects.get(id = group_pk)
+                    group.current_instructor = instructor
+                    group.save()
+                except Exception as e:
+                    messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
+            return HttpResponseRedirect('/classroom/')
+        else:
+            messages.error(self.request, form.errors)
+            return HttpResponseRedirect('/classroom/')  
+
 
 
 class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
@@ -121,8 +148,46 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
                     messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
             return HttpResponseRedirect('/classroom/')
         else:
-            messages.error(request, form.errors)
+            messages.error(self.request, form.errors)
             return HttpResponseRedirect('/classroom/')                 
+
+
+class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
+    """ assign groups to LA's
+    """
+    context = {} 
+
+    def post(self, *args, **kwargs):
+        form = AssignMultipleStudentsForm(self.request.POST or None)
+        if form.is_valid():
+            checked_students = form.cleaned_data['students']
+            try:
+                group = Group.objects.get(id=kwargs['pk'])
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, 'Unable to assign to this group %s' % e)  
+                return HttpResponseRedirect('/classroom/')
+
+            count = Student.objects.filter(group=group).count()
+            for student_pk in checked_students:
+                
+                    try:
+                        student = Student.objects.get(id = student_pk)
+                        if count != MAX_STUDENTS:
+                            student.group = group
+                            student.save()
+                            messages.add_message(self.request, messages.SUCCESS, 'Successfully added '+ student.first_name + ' ' + student.last_name + ' to group!') 
+                        else:
+                            messages.add_message(self.request, messages.WARNING, 'Could not add '+ student.first_name + ' ' + student.last_name + ' to group - already 4 members') 
+                    except Exception as e:
+                        messages.add_message(self.request, messages.ERROR, 'Unable to assign student ' + student.first_name + ' ' + student.last_name + ' %s' % e) 
+
+                    count = Student.objects.filter(group=group).count()
+
+            return HttpResponseRedirect('/classroom/')
+        else:
+            messages.error(self.request, form.errors)
+            return HttpResponseRedirect('/classroom/')     
+
 
 
 class AssignGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
@@ -155,25 +220,9 @@ class AssignGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
                 messages.add_message(self.request, messages.ERROR, 'Unable to assign this group to this instructor %s' % e)      
             return HttpResponseRedirect('/classroom/')                
         else:
-            messages.error(request, form.errors)
+            messages.error(self.request, form.errors)
             return HttpResponseRedirect('/classroom/')              
 
-
-
-        # form = UploadFileForm()
-        students = Student.objects.all()
-        groups = Group.objects.all()
-        classroom = Classroom.objects.get(instructor = self.request.user)
-        learning_assistants = Profile.objects.all().filter(permission_level=0)
-        instructors = Profile.objects.all().filter(permission_level=1)
-        return render(self.request, self.template_name,
-        {
-            'students': students,
-            'learning_assistants':learning_assistants,
-            'instructors':instructors,
-            'groups': groups,
-            'classroom': classroom,
-        })
 
 class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     """ upload students
@@ -345,23 +394,9 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             'add_group_form': AddGroupForm(),
             'add_classroom_form': AddClassroomForm(),
             'assign_multiple_groups_form': AssignMultipleGroupsForm(),
+            'assign_multiple_students_form': AssignMultipleStudentsForm(),
             'upload_view': False,
         })
-
-    # def post(self, *args, **kwargs):
-    #     form = UploadFileForm(self.request.POST, self.request.FILES)
-
-    #     if form.is_valid():
-    #         raise Exception("test")
-    #         self.request.FILES['file'].save_to_database(
-    #             model=Student,
-    #             mapdict=['first_name', 'last_name', 'group_number', 'student_id'])
-    #         self.add_message("Students successfully added!") 
-
-    #         return HttpResponseRedirect(reverse('classroom-home'))
-    #     else:
-    #         self.add_message("Form not valid, failed to add students.")          
-    #         return render(self.request, self.template_name, self.context)
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text) 

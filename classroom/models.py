@@ -35,5 +35,8 @@ class Student(models.Model):
     notes = models.CharField(max_length=200)
     student_id = models.IntegerField(unique=True, null=True)
 
+    def get_full_name(self):
+        return "{} {}".format(self.first_name, self.last_name).strip()
+
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)

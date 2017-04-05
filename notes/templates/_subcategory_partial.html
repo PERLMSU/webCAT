@@ -1,0 +1,49 @@
+
+
+{% for main_category_pk, categories in sub_categories.items %}
+    <div class="row no-display" id="sub_categories_{{main_category_pk}}">
+        <a href="{% url "notes-home" %}"> Back </a>
+    {% if categories %}
+    
+        
+        <div class="container sub-category-container">
+
+            <div class="col-lg-12">
+            {% for category in categories %}   
+                    <div class="col-lg-5">
+                        <a href="#" id="{{category.id}}" class="sub-category-btn btn-default"><span>{{category.name}}</span></a>
+                    </div> 
+
+            <div class="no-display note-container" id="note_taker_{{category.id}}">
+                <div class="col-lg-5">
+                    <h2> Note for: {{category.name}}</h2>
+                    <form method="post" action="#">
+                        <input type="hidden" value="{{category.id}}" name="category_pk">
+                        <label for="note">Note: </label>
+                            <input type="text" name="note">
+
+                        <input type="submit" value="Save">
+                    </form>
+                </div>
+            </div>        
+
+                {% if forloop.counter|divisibleby:"2" %}
+                </div>
+            </div>
+            <div class="container category-container">
+                <div class="col-lg-12">
+                {% endif %}
+
+
+
+           {% endfor %}  
+
+            </div>
+        </div>
+
+    
+    {% else %}
+        <h3>No subcategories found. Click <a href="{% url "feedback-categories" %}">here</a> to add.</h3>
+    {% endif %}
+    </div>
+{% endfor %}

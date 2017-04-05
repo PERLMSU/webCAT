@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^upload/group/$', views.UploadGroupsView.as_view(), name='classroom-upload-groups'),
     url(r'^assign/$', views.AssignGroupsView.as_view(), name='classroom-assign-groups'),
     url(r'^assign/(?P<pk>\d+)/$', views.AssignMultipleGroupsView.as_view(), name='classroom-assign-multiple-groups'),
+    url(r'^assign_students/(?P<pk>\d+)/$', views.AssignMultipleStudentsView.as_view(), name='classroom-assign-multiple-students'),
     url(r'^students/delete/(?P<pk>\d+)/$', views.DeleteStudent.as_view(), name="delete-student"),
     url(r'^groups/delete/(?P<pk>\d+)/$', views.DeleteGroup.as_view(), name="delete-group"),
     url(r'^download/(.*)', views.download, name="download"),

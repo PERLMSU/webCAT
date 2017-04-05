@@ -1,0 +1,17 @@
+<div class="row" id="main_categories">
+    <div class="container category-container">
+        <div class="col-lg-12">
+            {% for category in main_categories %}       
+                <div class="col-lg-5">
+                    <a href="#" id="{{category.id}}" class="main-category-btn btn-default "><span>{{category.name}}</span></a>
+                </div>  
+            {% if forloop.counter|divisibleby:"2" %}
+            </div>
+        </div>
+        <div class="container category-container">
+            <div class="col-lg-12">
+            {% endif %}
+                {% endfor %}
+        </div>
+    </div>
+</div>

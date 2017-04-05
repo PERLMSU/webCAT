@@ -74,3 +74,22 @@ class AssignMultipleGroupsForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         choices=CHOICES,
     )
+
+class AssignMultipleStudentsForm(forms.Form):
+    all_students = Student.objects.all().values_list('id','first_name','last_name').order_by('last_name')
+
+    students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
+
+    CHOICES = tuple(students_full_name)
+    #raise Exception("wutt")
+    students = forms.MultipleChoiceField(
+        required=True,
+        widget=forms.CheckboxSelectMultiple,
+        choices=CHOICES,
+    )
+
+    def clean_students(self):
+        value = self.cleaned_data['students']
+        if len(value) > 4:
+            raise forms.ValidationError("You can't select more than 4 students.")
+        return value    

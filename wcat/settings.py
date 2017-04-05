@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'classroom',
     'userprofile',
     'feedback',
+    'notes',
 ]
 
 DEBUG_TOOLBAR_PANELS = [
