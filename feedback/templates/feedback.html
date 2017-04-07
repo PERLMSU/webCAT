@@ -14,7 +14,33 @@
         </ol>
     </div>
 </div>
-
-
+<div class="row">
+<!--     <div class="container"> -->
+        <div class="col-lg-3">
+            <div class="panel panel-info">
+            {% for group, students in groups_to_students.items %}
+               <div class="panel-heading"> <h5> Group # {{group.group_number}}</h5> </div>
+               <div class="panel-body">
+               {% if students %}
+                   {% for student in students %}
+                        <p>{{student.first_name}} {{student.last_name}}</p>
+                   {% endfor %}
+              {% else %}
+                No students in this group.
+              {% endif %}
+               </div>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h1>Write Feedback</h1>
+            <div class="form-group">
+                <textarea class="form-control" rows="10"></textarea>
+            </div>
+            <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-send"></span> Send</button>
+        </div>
+<!--     </div>   --> 
+</div> 
 
 {% endblock %}

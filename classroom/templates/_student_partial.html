@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
 <div class="container">
+ <div class="panel panel-success">
+    <div class="panel-heading">
     <h3> Students
      
 <a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createStudent" role="button"><span class="fa fa-group"></span> Add Student  </a>   
@@ -7,7 +9,8 @@
 <a class="btn btn-success float-right-button" href="{% url "classroom-upload-students" %}"><span class="fa fa-cloud-upload"></span> Upload</a>
 {% endif %}
     </h3>
-
+  </div>
+  <div class="panel-body">
     <table class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
@@ -38,6 +41,8 @@
     {% endfor %}    
       </tbody>
     </table>    
+    </div>
+    </div>
     
 </div>
 

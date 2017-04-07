@@ -11,18 +11,23 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
 from django.template.defaulttags import register
-from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm
+from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm, AddCommonFeedbackForm
 # Create your views here.
 from django.db import IntegrityError
 from classroom.models import Classroom
 
-from models import Category, SubCategory
+from models import Category, SubCategory, CommonFeedback
+from classroom.models import Student, Group
 
 @register.filter
 def get_subcategories(category_pk):
     sub_categories = SubCategory.objects.filter(main_category=category_pk)
     return sub_categories
 
+@register.filter
+def get_common_feedbacks(subcategory_pk):
+	feedback_collection = CommonFeedback.objects.filter(sub_category=subcategory_pk)
+	return feedback_collection
 
 class FeedbackView(LoginRequiredMixin, TemplateView):
     template_name = "feedback.html"
@@ -31,6 +36,11 @@ class FeedbackView(LoginRequiredMixin, TemplateView):
     def get(self, *args, **kwargs):
         #form = AccountSettingsForm(instance=self.request.user)
         #self.context['form'] = form
+        groups = Group.objects.filter(current_instructor = self.request.user)
+        groups_to_students = {}
+        for group in groups:
+        	groups_to_students[group] = Student.objects.filter(group=group)
+        self.context['groups_to_students'] = groups_to_students
         return render(self.request, self.template_name, self.context)
 
     def add_message(self, text, mtype=25):
@@ -48,7 +58,9 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 			classroom = None
 		self.context['create_main_category_form'] = AddCategoryForm()
 		self.context['create_sub_category_form'] = AddSubCategoryForm()
+		self.context['create_feedback_form'] = AddCommonFeedbackForm()
 		self.context['main_categories'] = Category.objects.filter(classroom=classroom)
+
 		return render(self.request, self.template_name, self.context)
 
 	def add_message(self, text, mtype=25):
@@ -70,6 +82,24 @@ def create_subcategory(request, pk):
 	else: 
 		messages.error(request, form.errors)
 		return HttpResponseRedirect('/feedback/categories/') 
+
+def create_common_feedback(request, pk):
+
+	form = AddCommonFeedbackForm(request.POST or None)
+	if form.is_valid():
+		feedback = form.cleaned_data['feedback']
+		common_feedback = form.save(commit=False)
+		try:
+			common_feedback.sub_category = SubCategory.objects.get(id = pk)
+			common_feedback.save()
+			messages.add_message(request, messages.SUCCESS, 'Feedback sucessfully created.')
+		except Exception as e:
+			messages.add_message(request, messages.ERROR, 'Error when adding feedback: '+e)
+		return HttpResponseRedirect('/feedback/categories/')
+	else: 
+		messages.error(request, form.errors)
+		return HttpResponseRedirect('/feedback/categories/') 
+
 
 
 def create_category(request):
@@ -122,8 +152,8 @@ class DeleteSubCategoryView(LoginRequiredMixin, View):
 def edit_subcategory(request, pk):
 	form = EditCategoryForm(request.POST or None)
 	if form.is_valid():
-		name = form.cleaned_data['category_name']
-		description = form.cleaned_data['category_description']			
+		name = form.cleaned_data['name']
+		description = form.cleaned_data['description']			
 		try:
 			subcategory = SubCategory.objects.get(id=pk)
 			subcategory.name = name
@@ -141,8 +171,8 @@ def edit_subcategory(request, pk):
 def edit_category(request, pk):
 	form = EditCategoryForm(request.POST or None)
 	if form.is_valid():
-		name = form.cleaned_data['category_name']
-		description = form.cleaned_data['category_description']			
+		name = form.cleaned_data['name']
+		description = form.cleaned_data['description']			
 		try:
 			category = Category.objects.get(id=pk)
 			category.name = name

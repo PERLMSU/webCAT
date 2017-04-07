@@ -37,102 +37,33 @@
         {% if subcategories %}
         <ul>
           {% for subcategory in subcategories %}
-            <li><a data-toggle="modal" data-target="#edit_subcategory_{{subcategory.id}}"
-          role="button"> {{subcategory.name }} </a>
-          <a href="#" data-href="{% url "delete-subcategory" subcategory.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{subcategory.name}}" value="Delete" class="deletecategory"><span class="fa fa-remove red-icon"></span></a>   
+            <li>
+              <a data-toggle="modal" data-target="#edit_subcategory_{{subcategory.id}}"
+                role="button"> {{subcategory.name }} </a>
+            <a class="addcommonfeedback" data-toggle="modal" data-target="#createCommonFeedback_{{subcategory.id}}" role="button"><span class="fa fa-plus green-icon"></span></a>
+              <a href="#" data-href="{% url "delete-subcategory" subcategory.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{subcategory.name}}" value="Delete" class="deletecategory"><span class="fa fa-remove red-icon"></span></a>   
+              {% with subcategory.id|get_common_feedbacks as feedback_collection %}
+                {% for feedback in feedback_collection %}
+                  <p>{{feedback.feedback}}</p>
+                {% endfor %}
+              {% endwith %}
+            </li>
 
-        </li>
+            {% include '_edit_subcategory_partial.html' %}   
+            {% include '_create_common_feedback_partial.html' %}
 
-
-
-
-
-  <div class="modal fade" id="edit_subcategory_{{subcategory.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title" id="myModalLabel">Edit Sub-Category</h4>
-        </div>
-        <div class="modal-body">
-          <h3> {{subcategory.name }} </h3>
-            <form class="form-horizontal" action="{% url "edit-subcategory" subcategory.id %}" method="POST">{% csrf_token %}
-            <label for="category_name">Name: </label>
-            <input type="text" name="category_name" value="{{subcategory.name}}"/>
-            <label for="category_name">Description: </label>
-            <input type="text" name="category_description" value="{{subcategory.description}}"/>
-
-        </div>
-        <div class="modal-footer">
-       
-<!--           <a style="float: left;" href="#" class="btn btn-danger deletecategory" data-id="{{subcategory.name }} ">Delete</a> -->
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <input type="submit" value="Save" class="btn btn-success"/>      
-          </form>
-        </div>
-      </div>
-    </div>
-
-      </div>            
           {% endfor %}
         </ul>
         {% else %}
           <span> No subcategories found for this category. </span>
         {% endif %}
       {% endwith %}
-  <div class="modal fade" id="createSubCategory_{{category.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title" id="myModalLabel">Add Subcategory</h4>
-        </div>
-        <div class="modal-body">
-          <h5> Subcategory: </h5>
-          <form class="form-horizontal" id="createSubCategoryForm" action="{% url "category-create-subcategory" category.id %}" method="POST">{% csrf_token %}        
-        {{create_sub_category_form | crispy}}
 
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <input type="submit" value="Create" class="btn btn-primary"/>      
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+      {% include '_create_subcategory_partial.html' %}
 
-  <div class="modal fade" id="edit_category_{{category.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title" id="myModalLabel">Edit Category</h4>
-        </div>
-        <div class="modal-body">
-          <h3> {{category.name }} </h3>
-            <form class="form-horizontal" action="{% url "edit-category" category.id %}" method="POST">{% csrf_token %}
-            <label for="category_name">Name: </label>
-            <input type="text" name="category_name" value="{{category.name}}"/>
-            <label for="category_name">Description: </label>
-            <input type="text" name="category_description" value="{{category.description}}"/>
+   
+      {% include '_edit_main_category_partial.html' %}
 
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <input type="submit" value="Save" class="btn btn-success"/>      
-          </form>
-        </div>
-      </div>
-    </div>
-
-      </div>  
     </div>
   </div>
 

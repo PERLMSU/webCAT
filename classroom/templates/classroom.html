@@ -52,10 +52,23 @@
 <!-- /.row --> 
 
 <div class="container">
-    <h3> Course </h3>
-    <p><strong> {{classroom.course}} </strong> <span> {{classroom.description}} </span> </p>
-    <p> Professor: {{classroom.instructor.email}} </p>
+ <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3> Course </h3>
+    </div>
+    <div class="panel-body">
+        <p><strong> {{classroom.course}} </strong> <span> {{classroom.description}} </span> </p>
+        <p> <strong>Professor:</strong> {{classroom.instructor.get_full_name}} </p>
+        <span><strong>Learning Assistants:</strong> </span>
+        <ul>
+        {% for la in learning_assistants %}
+            <li>{{la.get_full_name}}</li>
+        {% endfor %}
+        </ul>
+    </div>
+  </div>
 </div>
+
 
 {% include "_student_partial.html" %}
 

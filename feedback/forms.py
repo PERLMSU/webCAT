@@ -20,6 +20,14 @@ class AddCategoryForm(forms.ModelForm):
         model = Category
         fields = ['name','description']
 
+class AddCommonFeedbackForm(forms.ModelForm):
+
+    feedback = forms.CharField()
+
+    class Meta:
+        model = CommonFeedback
+        fields = ['feedback']
+
 class AddSubCategoryForm(forms.ModelForm):
 
     name = forms.CharField()
@@ -31,5 +39,6 @@ class AddSubCategoryForm(forms.ModelForm):
 
 
 class EditCategoryForm(forms.Form):
-    category_name = forms.CharField()
-    category_description = forms.CharField()	
+    name = forms.CharField()
+    description = forms.CharField(required=False)	
+
