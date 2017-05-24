@@ -73,7 +73,7 @@
                 <h4 class="modal-title">Update Photo</h4>
             </div>
             <div class="modal-body">
-                <form id="profile-photo" action="{% url 'goats-profile-upload' %}"
+                <form id="profile-photo" action="{% url 'user-profile-upload' %}"
                     method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="image-editor">

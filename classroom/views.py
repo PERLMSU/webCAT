@@ -8,7 +8,7 @@ from django.template.defaulttags import register
 from django import forms
 import django_excel as excel
 
-from models import Student, Group, Classroom
+from classroom.models import Student, Group, Classroom
 
 from userprofile.models import Profile
 

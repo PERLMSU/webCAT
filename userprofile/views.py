@@ -47,7 +47,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 
             self.add_message("Profile has been updated.")
 
-            return HttpResponseRedirect(reverse('goats-profile'))
+            return HttpResponseRedirect(reverse('user-profile'))
         return render(self.request, self.template_name, self.context)
 
     def add_message(self, text, mtype=25):
@@ -67,10 +67,10 @@ class ProfileImageView(LoginRequiredMixin, View):
             form.save()   
 
             self.add_message("Profile image has been updated")
-            return HttpResponseRedirect(reverse('goats-profile'))
+            return HttpResponseRedirect(reverse('user-profile'))
 
         self.add_message(form.errors, 40)
-        return HttpResponseRedirect(reverse('goats-profile'))
+        return HttpResponseRedirect(reverse('user-profile'))
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)
@@ -128,7 +128,7 @@ class ConfirmationView(View):
             activate.is_used = True
             activate.save()
             ConfirmationKey.objects.filter(user=activate.user, is_used=False).delete()
-            return HttpResponseRedirect(reverse('goats-email-settings'))
+            return HttpResponseRedirect(reverse('user-email-settings'))
 
 
 class UpdateEmailView(LoginRequiredMixin, TemplateView):
@@ -166,7 +166,7 @@ class ChangePasswordView(LoginRequiredMixin, View):
             self.add_message("Password has been updated")
        
         self.add_message(form.errors, 40)
-        return HttpResponseRedirect(reverse('goats-account-settings'))
+        return HttpResponseRedirect(reverse('user-account-settings'))
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)

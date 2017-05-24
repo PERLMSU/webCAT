@@ -16,7 +16,7 @@ from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm, AddCom
 from django.db import IntegrityError
 from classroom.models import Classroom
 
-from models import Category, SubCategory, CommonFeedback
+from feedback.models import Category, SubCategory, CommonFeedback
 from classroom.models import Student, Group
 
 @register.filter
