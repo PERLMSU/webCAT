@@ -5,6 +5,6 @@ from .models import *
 from datetime import date
 
 
-class AddNoteForm(forms.Form):
-    category_pk = forms.IntegerField()
-    note = forms.CharField()
+class AddFeedbackForm(forms.Form):
+    # category_pk = forms.IntegerField()
+    note = forms.CharField()   

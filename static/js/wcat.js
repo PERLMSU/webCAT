@@ -1,3 +1,26 @@
+
+
+$('.noteForm').submit(function() {
+  // your code here
+     var that = this;
+     var selected = [];
+     var index = 0;
+     $('.student-checkboxes input:checked').each(function() {
+          $(that).append('<input type="hidden" name="student_name'+index.toString()+'" value="'+($(this).attr('value'))+'" /> ');
+         selected.push($(this).attr('value'));
+         index += 1;
+     });
+      // $('<input />').attr('type', 'hidden')
+      //     .attr('name', "something")
+      //     .attr('value', "something")
+      //     .appendTo(that);
+      return true;  
+    // alert(selected);
+     //return false;
+});
+
+
+
 $(document).on("click", ".editstudentrow", function () {
      var studentId = $(this).data('id');
      $(".modal-body #studentId").val( studentId );
@@ -52,6 +75,12 @@ $(document).on("click", ".main-category-btn", function () {
      // $(".modal-body #categoryName").html( categoryName );
 });
 
+
+$(document).on("click", ".back-to-main-categories", function () {
+     $('#main_categories').show();
+     $('[id^="sub_categories_"]').hide();
+     // $(".modal-body #categoryName").html( categoryName );
+});
 
 $(document).on("click", ".sub-category-btn", function () {
      var category_pk = this.id;

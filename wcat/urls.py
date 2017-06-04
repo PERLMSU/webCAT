@@ -25,6 +25,7 @@ urlpatterns = [
 	url(r'^dashboard/', include('dashboard.urls')),
 	url(r'^profile/', include('userprofile.urls')),
     url(r'^classroom/', include('classroom.urls')),
+    url(r'^ratings/', include('star_ratings.urls', namespace='ratings', app_name='ratings')),
     url(r'^admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
