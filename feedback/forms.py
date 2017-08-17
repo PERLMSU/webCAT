@@ -42,3 +42,6 @@ class EditCategoryForm(forms.Form):
     name = forms.CharField()
     description = forms.CharField(required=False)	
 
+class EditDraftForm(forms.Form):
+    draft_text = forms.CharField()
+    student_pk = forms.IntegerField()

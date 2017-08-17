@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 
 from uuid import uuid4
 
+from classroom.models import Classroom
 
 class ProfileManager(BaseUserManager):
     """ Manager that contains methods used
@@ -71,10 +72,20 @@ class Profile(AbstractBaseUser, PermissionsMixin):
                     'dashboard.'))
     is_active = models.BooleanField(_('active'), default=True)
 
+    current_classroom = models.ForeignKey(Classroom, blank=True, null=True)
+
     objects = ProfileManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS  = ['first_name', 'last_name']
+
+
+    def get_current_classroom_instructor(self):
+        if not self.current_classroom:
+            return None
+        else:
+            return self.current_classroom.instructor
+
 
     def get_full_name(self):
         return "{} {}".format(self.first_name, self.last_name).strip()

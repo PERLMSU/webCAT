@@ -1,0 +1,21 @@
+{% for group, students in groups_to_students.items %}
+   {% if students %}
+       {% for student in students %}
+	     <div style="display: block;" id="feedback_{{student.id}}">
+			<div class="col-lg-6">
+			    <h1>Write Feedback - {{student.first_name}} {{student.last_name}}</h1>
+			    {% with student.id|get_student_draft as draft %}
+			    	<form class="draft-form" action="{% url 'feedback-home' %}" method="POST">{% csrf_token %}
+			    		<div class="form-group">
+				        	<textarea name="draft_text" class="form-control" rows="10">{{draft.text}}</textarea>					      
+			    		</div>
+			    		<input type="hidden" name="student_pk" value="{{student.id}}">
+			    	<button type="submit" name="save" value="save" class="btn btn-info"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+			    	<button type="submit" name="send" value="send" class="btn btn-success"><span class="glyphicon glyphicon-send"></span> Send</button>
+				</form>
+				{% endwith %}
+			</div>
+		</div>
+ 		{% endfor %}
+	{% endif %}
+{% endfor %}
