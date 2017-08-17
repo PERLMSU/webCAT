@@ -113,6 +113,9 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
 
+$('#confirm-modal').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
 
 $(document).on("click", ".deletestudent", function () {
      var studentName = $(this).data('id');

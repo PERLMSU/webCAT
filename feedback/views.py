@@ -81,7 +81,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
     		elif self.request.POST.get("send"):
     			draft.status = 1
     			draft.send_to_instructor()
-    			messages.add_message(self.request, messages.INFO, 'Draft has been saved and sent to instructor for approval.')
+    			messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')
     		#raise Exception("gefegeg")
     		draft.text = draft_text
     		draft.save()
@@ -91,6 +91,18 @@ class FeedbackView(LoginRequiredMixin, FormView):
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)
+
+
+class InboxView(LoginRequiredMixin,TemplateView):
+	template_name = "inbox.html"
+	context = {}
+
+	def get(self, *args, **kwargs):
+		self.context['notifications'] = Notification.objects.filter(user=self.request.user)
+		return render(self.request, self.template_name, self.context)
+
+	def add_message(self, text, mtype=25):
+		messages.add_message(self.request, mtype, text)	
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):

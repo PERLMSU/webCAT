@@ -54,17 +54,26 @@
 <div class="container">
  <div class="panel panel-default">
     <div class="panel-heading">
-        <h3> Course </h3>
+        <h3><strong> {{classroom.course}} </strong> <span> {{classroom.description}} </span></h3>
     </div>
     <div class="panel-body">
-        <p><strong> {{classroom.course}} </strong> <span> {{classroom.description}} </span> </p>
-        <p> <strong>Professor:</strong> {{classroom.instructor.get_full_name}} </p>
-        <span><strong>Learning Assistants:</strong> </span>
-        <ul>
-        {% for la in learning_assistants %}
-            <li>{{la.get_full_name}}</li>
-        {% endfor %}
-        </ul>
+        <div class="col-lg-12">
+            <div class="col-lg-4">
+                <p><strong> {{classroom.course}} </strong> <span> {{classroom.description}} </span> </p>
+                <p> <strong>Professor:</strong> {{classroom.instructor.get_full_name}} </p>
+            </div>
+            <div class="col-lg-4">
+                <span><strong>Learning Assistants:</strong> </span>
+                <ul>
+                {% for la in learning_assistants %}
+                    <li>{{la.get_full_name}}</li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <p> <strong>Other info goes here </strong> </p>
+            </div>
+        </div>
     </div>
   </div>
 </div>

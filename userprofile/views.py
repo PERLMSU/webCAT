@@ -7,7 +7,7 @@ from django.views.generic import TemplateView, View
 from braces.views import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-
+from django.template.defaulttags import register
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -27,6 +27,13 @@ from .forms import (
                 ChangePasswordForm,
             )
 
+from feedback.models import Notification
+
+
+
+@register.filter
+def get_user_notifications(user_pk):
+    return Notification.objects.filter(user = user_pk)
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     """ profile page

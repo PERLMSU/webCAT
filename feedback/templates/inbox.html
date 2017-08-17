@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Inbox <small>:)</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li class="active">
+                <i class="fa fa-dashboard"></i> Inbox
+            </li>
+        </ol>
+    </div>
+</div>
+
+
+<div class="row">
+  
+  {% for noti in notifications %}
+  <ul>
+    <li>{{noti.notification }} </li>
+    <li>{{noti.draft_to_approve.text}} </li>
+    <li>{{noti.draft_to_approve.owner}} </li>
+    <li>{{noti.draft_to_approve.student}} </li>
+  </ul>
+  {% endfor %}
+
+</div>
+
+
+{% endblock %}
