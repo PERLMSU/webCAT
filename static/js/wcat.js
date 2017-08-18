@@ -91,12 +91,22 @@ $('.noteForm').submit(function() {
 });
 
 
+$(document).on("click", ".student-feedback", function () {
+     var studentId = $(this).data('id');
+     $(".feedback-student-writer").hide();
+     $("#"+studentId).show();
+});
 
 $(document).on("click", ".editstudentrow", function () {
      var studentId = $(this).data('id');
      $(".modal-body #studentId").val( studentId );
 });
 
+
+$(document).on("click", ".create-revision-notes", function () {
+     var draft_id = $(this).data('id');
+     $(".modal-body #draft_id").val( draft_id );
+});
 
 $(document).on("click", ".addsubcategory", function () {
      var main_category_id = $(this).data('id');
@@ -110,6 +120,10 @@ $(document).on("click", ".deletecategory", function () {
 });
 
 $('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
+
+$('#confirm-approve').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
 

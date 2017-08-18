@@ -11,6 +11,10 @@ from django.forms import ModelForm
 
 from .models import *
 
+class AddRevisionNotesForm(forms.Form):
+    revision_notes = forms.CharField()
+    draft_pk = forms.IntegerField()
+
 class AddCategoryForm(forms.ModelForm):
 
     name = forms.CharField()

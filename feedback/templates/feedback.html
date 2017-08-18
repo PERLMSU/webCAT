@@ -15,8 +15,9 @@
     </div>
 </div>
 <div class="row">
+  <div class="col-lg-12">
 <!--     <div class="container"> -->
-        <div class="col-lg-3">
+        <div class="col-lg-2">
             <div class="panel panel-info">
             {% for group, students in groups_to_students.items %}
               {% if students %}
@@ -24,7 +25,7 @@
                <div class="panel-body">
                
                    {% for student in students %}
-                        <a href="#"><p>{{student.first_name}} {{student.last_name}}</p></a>
+                        <a class="student-feedback" data-id="feedback_{{student.id}}" href="#"><p>{{student.first_name}} {{student.last_name}}</p></a>
                    {% endfor %}
               
                </div>
@@ -33,7 +34,7 @@
             </div>
         </div>
           {% include '_edit_feedback_partial.html' %}
-<!--     </div>   --> 
+    </div>   
 </div> 
 
 {% endblock %}

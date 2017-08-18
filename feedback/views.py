@@ -11,14 +11,28 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
 from django.template.defaulttags import register
-from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm, AddCommonFeedbackForm, EditDraftForm
+from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm, AddCommonFeedbackForm, EditDraftForm, AddRevisionNotesForm
 # Create your views here.
 from django.db import IntegrityError
 from classroom.models import Classroom
 
 from feedback.models import Category, SubCategory, CommonFeedback, Draft, Notification
 from classroom.models import Student, Group
+from notes.models import Feedback
 from django.views.decorators.csrf import csrf_exempt
+
+
+
+@register.filter
+def get_revision_notifications(draft):
+    revision_notifications = Notification.objects.filter(draft_to_approve=draft)
+    return revision_notifications
+
+
+@register.filter
+def get_student_feedback(student_pk):
+    feedback_notes = Feedback.objects.filter(student=student_pk)
+    return feedback_notes
 
 @register.filter
 def get_subcategories(category_pk):
@@ -76,7 +90,6 @@ class FeedbackView(LoginRequiredMixin, FormView):
     			draft = Draft.objects.create(owner = self.request.user, student = student, status=0)
 
     		if self.request.POST.get("save"):
-    			draft.status = 0
     			messages.add_message(self.request, messages.SUCCESS, 'Draft saved.')
     		elif self.request.POST.get("send"):
     			draft.status = 1
@@ -159,6 +172,34 @@ def create_common_feedback(request, pk):
 		return HttpResponseRedirect('/feedback/categories/') 
 
 
+def approve_draft(request, pk):
+	try:
+		draft = Draft.objects.get(id=pk)
+		draft.status = 3
+		draft.save()
+		messages.add_message(request, messages.SUCCESS, 'Draft sucessfully approved.')		
+	except Draft.DoesNotExist:
+		messages.add_message(request, messages.ERROR, 'Error when approving feedback draft.')
+	return HttpResponseRedirect('/feedback/inbox/') 	
+
+def send_draft_revision(request):
+	form = AddRevisionNotesForm(request.POST or None)
+	#raise Exception("wuht")
+	if form.is_valid():	
+		draft_pk = form.cleaned_data['draft_pk']
+		revision_notes = form.cleaned_data['revision_notes']		
+		try:
+			draft = Draft.objects.get(id=draft_pk)
+			draft.status = 2
+			draft.save()
+			draft.add_revision_notes(revision_notes)
+			messages.add_message(request, messages.INFO, 'Draft revision notes sent.')		
+		except Draft.DoesNotExist:
+			messages.add_message(request, messages.ERROR, 'Error when sending feedback draft revision notes.')
+		return HttpResponseRedirect('/feedback/inbox/') 
+	else:
+		messages.add_message(request, messages.ERROR, 'Form not valid. Please check your inputs.')
+		return HttpResponseRedirect('/feedback/inbox/') 
 
 def create_category(request):
 	form = AddCategoryForm(request.POST or None)

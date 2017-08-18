@@ -68,6 +68,14 @@ class Draft(models.Model):
                 notification="This draft has been submitted for approval. Please review."
             )
 
+    def add_revision_notes(self, notes):
+        notification = Notification.objects.create(
+            draft_to_approve = self,
+            user = self.owner,
+            notification="This draft has revision notes: " + notes 
+        )
+
+
 class Notification(models.Model):
     notification = models.CharField(max_length=500)
     draft_to_approve = models.ForeignKey(Draft, blank=True, null=True)

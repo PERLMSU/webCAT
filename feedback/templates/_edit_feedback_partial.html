@@ -1,22 +1,73 @@
 {% for group, students in groups_to_students.items %}
    {% if students %}
        {% for student in students %}
-	     <div style="display: block;" id="feedback_{{student.id}}">
-			<div class="col-lg-6">
-			    <h1>Write Feedback - {{student.first_name}} {{student.last_name}}</h1>
-			    {% with student.id|get_student_draft as draft %}
-			    	<form class="draft-form" action="{% url 'feedback-home' %}" method="POST">{% csrf_token %}
-			    		<div class="form-group">
-				        	<textarea name="draft_text" class="form-control" rows="10">{{draft.text}}</textarea>					      
-			    		</div>
-			    		<input type="hidden" name="student_pk" value="{{student.id}}">
-			    	<button type="submit" name="save" value="save" class="btn btn-info"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
-			    	<a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a>
-			    	<button type="submit" name="send" value="send" class="btn btn-success"><span class="glyphicon glyphicon-send"></span> Send</button>
-				</form>
-				{% endwith %}
+       <div class="col-lg-10">
+		<div class="feedback-student-writer" style="display: none;" id="feedback_{{student.id}}">       
+			<div class="panel panel-default">
+				<div class="panel-heading"><h2>{{student.first_name}} {{student.last_name}}</h2></div>
+	  			<div class="panel-body">
+			<!--   <div class="panel-footer">Panel footer</div> -->
+
+					 {% with student.id|get_student_draft as draft %}
+						<div class="col-lg-9">
+							
+						    
+						    
+						    	<form class="draft-form" action="{% url 'feedback-home' %}" method="POST">{% csrf_token %}
+						    		{% if draft.status == 1 %}
+						    		<div class="alert alert-warning" role="alert">
+						    			<span class="glyphicon glyphicon-exclamation-sign"></span> This feedback draft is currently awaiting approval from the instructor.
+					    			</div>
+					    			{% elif draft.status == 2 %}
+						    		<div class="alert alert-danger" role="alert">
+						    			<span class="glyphicon glyphicon-exclamation-sign"></span> This feedback draft needs revision. See notes from instructor.
+					    			</div>
+
+					    			{% elif draft.status == 3 %}
+					    			<div class="alert alert-success" role="alert">
+					    				<span class="glyphicon glyphicon-ok-sign"></span> This feedback draft has been approved.
+					    			</div>
+						    		{% endif %}
+						    		<div class="form-group">
+						    			{% if draft.status == 3 or draft.status == 1 %}
+						    				<textarea disabled name="draft_text" class="form-control" rows="10">{{draft.text}}</textarea>	
+						    			{% else %}
+							        	<textarea name="draft_text" class="form-control" rows="10">{{draft.text}}</textarea>	
+							        	{% endif %}				      
+						    		</div>
+					    		<input type="hidden" name="student_pk" value="{{student.id}}">
+
+					    		{% if draft.status != 1 and draft.status != 3 %}
+						    	<button type="submit" name="save" value="save" class="btn btn-info"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+						    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
+						    	<button type="submit" name="send" value="send" class="btn btn-success"><span class="glyphicon glyphicon-send"></span> Send</button>
+						    	{% endif %}
+								</form>
+							
+						</div>
+						<div class="col-lg-3">
+							
+							{% with student.id|get_student_feedback as notes %}
+							<h3>Notes ({{notes.count}})</h3>
+								{% for note in notes %}
+									<span>{{note.sub_category.name}} - {{note.note}}</span>
+								{% endfor %}
+							{% endwith %}
+
+							<hr>
+
+							{% with draft|get_revision_notifications as revision_notifications %}
+							<h3>Notifications: ({{revision_notifications.count}})</h3>
+								{% for r_notification in revision_notifications %}
+									{{r_notification.notification}}
+								{% endfor %}
+							{% endwith %}
+						</div>
+						{% endwith %}
+					</div>
+				</div>
 			</div>
-		</div>
+			</div>
  		{% endfor %}
 	{% endif %}
 {% endfor %}

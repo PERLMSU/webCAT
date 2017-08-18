@@ -5,6 +5,8 @@ from .views import *
 urlpatterns = [
   url(r'^$', FeedbackView.as_view(), name="feedback-home"),
   url(r'^inbox/$', InboxView.as_view(), name="feedback-inbox"),
+  url(r'^inbox/approve/(?P<pk>\d+)/$', approve_draft, name="inbox-approve-draft"),
+  url(r'^inbox/revision/$', send_draft_revision, name="send-revision-notes"),
   url(r'^categories/$', CategoryView.as_view(), name="feedback-categories"),
   url(r'^categories/create/$', create_category, name="category-create-main"),
   url(r'^categories/addsubcategory/(?P<pk>\d+)/$', create_subcategory, name="category-create-subcategory"),

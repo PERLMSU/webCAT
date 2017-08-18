@@ -17,17 +17,74 @@
 
 
 <div class="row">
-  
-  {% for noti in notifications %}
-  <ul>
-    <li>{{noti.notification }} </li>
-    <li>{{noti.draft_to_approve.text}} </li>
-    <li>{{noti.draft_to_approve.owner}} </li>
-    <li>{{noti.draft_to_approve.student}} </li>
-  </ul>
-  {% endfor %}
+  <div class="container">
+    <div class="panel panel-default">
+      <div class="panel-heading"><h3>Drafts to Review</h3></div>
+      <div class="panel-body">
+        {% for noti in notifications %}
+        <div class="col-lg-10">
+          <span> <p> Notification: {{noti.notification}} </p></span>
+          <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
+          <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
+          <p> Feedback: {{noti.draft_to_approve.text}} </p>
+          <p> Status: {{noti.draft_to_approve.status}} </p>
 
+          {% if noti.draft_to_approve.status == 1 %}
+          <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
+          {% endif %}
+          <hr>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </div>
+
+  <div class="modal fade" id="CreateDraftRevisionNotification" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Draft Revision Notes</h4>
+        </div>
+
+        <div class="modal-body">
+          <form action="{% url "send-revision-notes" %}" method="POST">{% csrf_token %}
+          <input type="hidden" name="draft_pk" id="draft_id">
+          Revision Notes:
+          <textarea name="revision_notes" class="form-control" rows="10"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <input type="submit" value="Send" class="btn btn-primary"/>      
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="confirm-approve" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Approve Draft
+            </div>
+            <div class="modal-body">
+                Are you sure you want to approve this draft?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-success btn-ok">Approve</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 {% endblock %}
