@@ -194,7 +194,7 @@ body {
     padding-top: 15px;
     padding-bottom: 15px;
     line-height: 20px;
-    color: #999;
+    color: #555;
 }
 
 .top-nav>li>a:hover,
@@ -203,7 +203,7 @@ body {
 .top-nav>.open>a:hover,
 .top-nav>.open>a:focus {
     color: #fff;
-    background-color: #000;
+    background-color: #222e51;
 }
 
 .top-nav>.open>.dropdown-menu {
