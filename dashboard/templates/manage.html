@@ -56,7 +56,30 @@
               {% endif %}
             </td>
             <td> {{user.is_verified}}</td>
-            <td> </td>
+           <td><a href="#" data-toggle="modal" data-target="#EditUser_{{user.id}}"><span class="fa fa-edit"></span></a></td>  
+
+<div class="modal fade" id="EditUser_{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Edit User</h4>
+      </div>
+      <div class="modal-body">
+        <h4> {{user.first_name}} {{user.last_name}} </h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <input type="submit" value="Save" class="btn btn-primary"/>      
+        </form>
+      </div>
+    </div>
+  </div>
+</div>  
+
+
           </tr>
       {% endfor %}    
         </tbody>
@@ -65,37 +88,6 @@
       </div>
     </div>
 </div>
-<!-- <div class="container-fluid">
-
-
-    <div class="row">
-      <div class="panel panel-warning">
-        <div class="panel-heading">
-          <h3> Manage Users </h3>
-        </div>
-        <div class="panel-body">
-            <div class="col-lg-6">
-            <div> 
-              <div class="form">
-
-                <h3> Add Instructor</h3>
-                <form class="register-form" method="post" action=".">
-
-                  {% csrf_token %} 
-                    {{form|crispy}}
-                  <button>Add</button>
-                  
-                </form>
-
-              </div>
-
-            </div>     
-             </div>  
-
-            </div>
-        </div>
-    </div>
-</div>  -->   
 
 <div id="AddInstructorModal" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg">
