@@ -26,8 +26,8 @@ def get_subcategories(category_pk):
     return sub_categories
 
 @register.filter
-def get_feedback_notes(student_pk):
-    feedback_notes = Feedback.objects.filter(student=student_pk)
+def get_feedback_notes(student_pk,week):
+    feedback_notes = Feedback.objects.filter(student=student_pk,week_num=week)
     return feedback_notes
 
 class AddFeedback(LoginRequiredMixin, TemplateView):
@@ -86,9 +86,13 @@ class NotesView(LoginRequiredMixin, TemplateView):
     template_name = "notes.html"
     context = {}
 
-    def get(self, *args, **kwargs):
-        #form = AccountSettingsForm(instance=self.request.user)
-        #self.context['form'] = form
+    def get(self, request, *args, **kwargs):
+
+        if 'weekDropDown' in self.request.GET:
+            week = int(self.request.GET['weekDropDown'].encode('ascii','ignore'))
+        else:
+            week = 1
+
         group_to_student_dict = {}
         groups_assigned = Group.objects.filter(current_instructor = self.request.user)
         for group in groups_assigned:
@@ -101,7 +105,8 @@ class NotesView(LoginRequiredMixin, TemplateView):
         for category in main_categories:
         	sub_categories[category.id] = SubCategory.objects.filter(main_category = category)
 
-        #raise Exception("whassup")
+        self.context['loop_times'] = range(1, 13)
+        self.context['week'] = week
         self.context['student_groups'] = group_to_student_dict
         self.context['main_categories'] = Category.objects.all()
         self.context['sub_categories'] = sub_categories

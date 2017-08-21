@@ -49,3 +49,4 @@ class EditCategoryForm(forms.Form):
 class EditDraftForm(forms.Form):
     draft_text = forms.CharField()
     student_pk = forms.IntegerField()
+    week_num = forms.IntegerField()

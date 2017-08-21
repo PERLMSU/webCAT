@@ -17,6 +17,7 @@ class Feedback(models.Model):
     student = models.ForeignKey(Student)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    week_num = models.IntegerField()
     
     def __str__(self):
         return self.note    

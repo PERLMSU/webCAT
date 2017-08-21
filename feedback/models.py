@@ -51,6 +51,7 @@ class Draft(models.Model):
     text = models.CharField(max_length=4096)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+    week_num = models.IntegerField()
     student = models.ForeignKey(Student)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
     status = models.PositiveSmallIntegerField(choices=DRAFT_STATUS)
@@ -69,12 +70,30 @@ class Draft(models.Model):
             )
 
     def add_revision_notes(self, notes):
-        notification = Notification.objects.create(
-            draft_to_approve = self,
-            user = self.owner,
-            notification="This draft has revision notes: " + notes 
-        )
+        try:
+            notification = Notification.objects.get(draft_to_approve = self)
+            notification.notification = "This draft has revision notes: " + notes 
+            notification.updated_ts = datetime.datetime.now()
+            notification.save()
+        except (Notification.DoesNotExist):
+            notification = Notification.objects.create(
+                draft_to_approve = self,
+                user = self.owner,
+                notification="This draft has revision notes: " + notes 
+            )
 
+    def send_approval_notification(self):
+        try: 
+            notification = Notification.objects.get(draft_to_approve = self)
+            notification.notification = "This draft has been approved"
+            notification.updated_ts = datetime.datetime.now()
+            notification.save()            
+        except (Notification.DoesNotExist):
+            notification = Notification.objects.create(
+                draft_to_approve = self,
+                user = self.owner,
+                notification="This draft has been approved"
+            )            
 
 class Notification(models.Model):
     notification = models.CharField(max_length=500)

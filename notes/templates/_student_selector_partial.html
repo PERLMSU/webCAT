@@ -1,6 +1,28 @@
 <div class="col-lg-3">
  <!--    <div class="container"> -->
 
+<div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading"> 
+
+          <form class="week-form" action="{% url 'notes-home' %}" method="GET">{% csrf_token %}
+            <label for="weekDropDown">Week </label>
+            <select id="weekDropDown" name="weekDropDown">
+
+              {% for i in loop_times %}
+                {% if i == week %}
+                   <option selected value='{{i}}'>{{i}}</option>
+                {% else %}
+                  <option value='{{i}}'>{{i}}</option>
+                {% endif %}
+              {% endfor %}
+            </select> 
+          </form>      
+        </div>
+      </div>
+  </div>
+
+
     	{% for group, students in student_groups.items %}
     		{% if students %}
 	    		<div class="row">
@@ -20,7 +42,7 @@
 						    			</div>					    			
 										<div class="col-md-10">						    			
 						    				<span> {{student}} </span>
-						    				{% with student.id|get_feedback_notes as notes %}
+						    				{% with student.id|get_feedback_notes:week as notes %}
 						    				<ul>
 						    					{% for note in notes %}
 						    						<li><strong>{{note.sub_category.name}} - </strong>{{note.note}}</li>

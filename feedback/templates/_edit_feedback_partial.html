@@ -8,7 +8,7 @@
 	  			<div class="panel-body">
 			<!--   <div class="panel-footer">Panel footer</div> -->
 
-					 {% with student.id|get_student_draft as draft %}
+					 {% with student.id|get_student_draft:week as draft %}
 						<div class="col-lg-9">
 							
 						    
@@ -36,18 +36,19 @@
 							        	{% endif %}				      
 						    		</div>
 					    		<input type="hidden" name="student_pk" value="{{student.id}}">
-
+					    		<input type="hidden" name="week_num" id="week_number">
 					    		{% if draft.status != 1 and draft.status != 3 %}
 						    	<button type="submit" name="save" value="save" class="btn btn-info"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
 						    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
 						    	<button type="submit" name="send" value="send" class="btn btn-success"><span class="glyphicon glyphicon-send"></span> Send</button>
+						    	Last Updated: {{draft.date_updated}}
 						    	{% endif %}
 								</form>
 							
 						</div>
 						<div class="col-lg-3">
 							
-							{% with student.id|get_student_feedback as notes %}
+							{% with student.id|get_student_feedback:week as notes %}
 							<h3>Notes ({{notes.count}})</h3>
 								{% for note in notes %}
 									<span>{{note.sub_category.name}} - {{note.note}}</span>
@@ -57,9 +58,10 @@
 							<hr>
 
 							{% with draft|get_revision_notifications as revision_notifications %}
-							<h3>Notifications: ({{revision_notifications.count}})</h3>
+							<h3>Status: ({{revision_notifications.count}})</h3>
 								{% for r_notification in revision_notifications %}
 									{{r_notification.notification}}
+									{{r_notification.created_ts}}
 								{% endfor %}
 							{% endwith %}
 						</div>

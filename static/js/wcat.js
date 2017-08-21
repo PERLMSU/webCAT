@@ -1,4 +1,19 @@
+$(function() {
+    $('#weekDropDown').change(function() {
+        this.form.submit();
+    });
+});
+
+
 $(document).ready(function(){
+$(".feedback-student-writer:first").show();
+
+
+
+    $('.draft-form').submit(function(e){
+        $('#week_number').val($('#weekDropDown').val());
+
+    });
 
     $('.draft-formm').submit(function(e){
         e.preventDefault();
@@ -96,6 +111,8 @@ $(document).on("click", ".student-feedback", function () {
      $(".feedback-student-writer").hide();
      $("#"+studentId).show();
 });
+
+
 
 $(document).on("click", ".editstudentrow", function () {
      var studentId = $(this).data('id');

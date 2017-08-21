@@ -20,8 +20,8 @@ from feedback.models import Category, SubCategory, CommonFeedback, Draft, Notifi
 from classroom.models import Student, Group
 from notes.models import Feedback
 from django.views.decorators.csrf import csrf_exempt
-
-
+import datetime
+from datetime import date, timedelta
 
 @register.filter
 def get_revision_notifications(draft):
@@ -30,8 +30,8 @@ def get_revision_notifications(draft):
 
 
 @register.filter
-def get_student_feedback(student_pk):
-    feedback_notes = Feedback.objects.filter(student=student_pk)
+def get_student_feedback(student_pk,week):
+    feedback_notes = Feedback.objects.filter(student=student_pk,week_num=week)
     return feedback_notes
 
 @register.filter
@@ -45,8 +45,8 @@ def get_common_feedbacks(subcategory_pk):
 	return feedback_collection
 
 @register.filter
-def get_student_draft(student_pk):
-	draft = Draft.objects.filter(student = student_pk).first()
+def get_student_draft(student_pk, week):
+	draft = Draft.objects.filter(student = student_pk, week_num = week).first()
 	return draft
 
 class FeedbackView(LoginRequiredMixin, FormView):
@@ -55,21 +55,29 @@ class FeedbackView(LoginRequiredMixin, FormView):
 
     context = {}
 
-    def get(self, *args, **kwargs):
-        #form = AccountSettingsForm(instance=self.request.user)
-        #self.context['form'] = form
 
-        groups = Group.objects.filter(current_instructor = self.request.user)
-        groups_to_students = {}
-        student_to_feedback_draft = {}
-        for group in groups:
-        	groups_to_students[group] = Student.objects.filter(group=group)
+    def get(self, request, *args, **kwargs):
 
-        self.context['groups_to_students'] = groups_to_students
+		if 'weekDropDown' in self.request.GET:
+		    week = int(self.request.GET['weekDropDown'].encode('ascii','ignore'))
+		else:
+		    week = 1
 
-        self.context['notifications'] = Notification.objects.filter(user=self.request.user)
+	#	raise Exception("what")
+		groups = Group.objects.filter(current_instructor = self.request.user)
+		groups_to_students = {}
+		student_to_feedback_draft = {}
+		for group in groups:
+			groups_to_students[group] = Student.objects.filter(group=group)
 
-        return render(self.request, self.template_name, self.context)
+
+		self.context['week'] = week
+		self.context['loop_times'] = range(1, 13)
+		self.context['groups_to_students'] = groups_to_students
+		
+		self.context['notifications'] = Notification.objects.filter(user=self.request.user)
+
+		return render(self.request, self.template_name, self.context)
 
     def post(self,*args, **kwargs):
     	form = EditDraftForm(self.request.POST or None)
@@ -77,7 +85,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
     	if form.is_valid():
     		draft_text = form.cleaned_data['draft_text']
     		student_pk = form.cleaned_data['student_pk']
-
+    		week_num = form.cleaned_data['week_num']
     		try:
     			student = Student.objects.get(id=student_pk)
     		except Student.DoesNotExist:
@@ -87,7 +95,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
     		try:
     			draft = Draft.objects.get(owner=self.request.user, student = student)
     		except Draft.DoesNotExist:
-    			draft = Draft.objects.create(owner = self.request.user, student = student, status=0)
+    			draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)
 
     		if self.request.POST.get("save"):
     			messages.add_message(self.request, messages.SUCCESS, 'Draft saved.')
@@ -97,6 +105,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
     			messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')
     		#raise Exception("gefegeg")
     		draft.text = draft_text
+    		draft.updated_ts = datetime.datetime.now()
     		draft.save()
     		return HttpResponseRedirect('/feedback/')
     	messages.add_message(self.request, messages.ERROR, 'Draft could not be saved.')
@@ -110,8 +119,26 @@ class InboxView(LoginRequiredMixin,TemplateView):
 	template_name = "inbox.html"
 	context = {}
 
-	def get(self, *args, **kwargs):
-		self.context['notifications'] = Notification.objects.filter(user=self.request.user)
+	def get(self, request, *args, **kwargs):
+
+		if 'weekDropDown' in self.request.GET:
+		    week = int(self.request.GET['weekDropDown'].encode('ascii','ignore'))
+		else:
+		    week = 1
+
+		# today_date = date.today()
+		# current_day_of_week = today_date.weekday()
+		# week_start = today_date - timedelta(days = current_day_of_week)
+		# week_finish = today_date + timedelta(days = (6 - current_day_of_week))	
+
+
+		self.context['draft_notifications_need_approval'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 1, draft_to_approve__week_num=week)
+		self.context['draft_notifications_need_revision'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 2,draft_to_approve__week_num=week)
+		self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
+
+		self.context['week'] = week
+		self.context['loop_times'] = range(1, 13)
+		#	raise Exception("what")
 		return render(self.request, self.template_name, self.context)
 
 	def add_message(self, text, mtype=25):
@@ -176,6 +203,7 @@ def approve_draft(request, pk):
 	try:
 		draft = Draft.objects.get(id=pk)
 		draft.status = 3
+		draft.send_approval_notification()
 		draft.save()
 		messages.add_message(request, messages.SUCCESS, 'Draft sucessfully approved.')		
 	except Draft.DoesNotExist:

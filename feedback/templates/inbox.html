@@ -5,29 +5,95 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">
-            Inbox <small>:)</small>
+            Inbox <small></small>
         </h1>
         <ol class="breadcrumb">
             <li class="active">
-                <i class="fa fa-dashboard"></i> Inbox
+                <i class="fa fa-dashboard"></i> Inbox - Week {{week}}
             </li>
         </ol>
     </div>
 </div>
+          <div class="panel panel-default">
+            <div class="panel-heading"> 
 
+              <form class="week-form" action="{% url 'feedback-inbox' %}" method="GET">{% csrf_token %}
+                <label for="weekDropDown">Week </label>
+                <select id="weekDropDown" name="weekDropDown">
+
+                  {% for i in loop_times %}
+                    {% if i == week %}
+                       <option selected value='{{i}}'>{{i}}</option>
+                    {% else %}
+                      <option value='{{i}}'>{{i}}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select> 
+              </form>      
+            </div>
+          </div>
 
 <div class="row">
   <div class="container">
-    <div class="panel panel-default">
-      <div class="panel-heading"><h3>Drafts to Review</h3></div>
+    <div class="panel panel-warning">
+      <div class="panel-heading"><h3>Drafts to Review ({{draft_notifications_need_approval.count}})</h3></div>
       <div class="panel-body">
-        {% for noti in notifications %}
+        {% for noti in draft_notifications_need_approval %}
         <div class="col-lg-10">
           <span> <p> Notification: {{noti.notification}} </p></span>
           <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
           <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
           <p> Feedback: {{noti.draft_to_approve.text}} </p>
           <p> Status: {{noti.draft_to_approve.status}} </p>
+
+          {% if noti.draft_to_approve.status == 1 %}
+          <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
+          {% endif %}
+          <hr>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="container">
+    <div class="panel panel-danger">
+      <div class="panel-heading"><h3>Drafts - Need Revision ({{draft_notifications_need_revision.count}})</h3></div>
+      <div class="panel-body">
+        {% for noti in draft_notifications_need_revision %}
+        <div class="col-lg-10">
+          <span> <p> Notification: {{noti.notification}} </p></span>
+          <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
+          <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
+          <p> Feedback: {{noti.draft_to_approve.text}} </p>
+          <p> Status: {{noti.draft_to_approve.status}} </p>
+
+          {% if noti.draft_to_approve.status == 1 %}
+          <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
+          {% endif %}
+          <hr>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="container">
+    <div class="panel panel-success">
+      <div class="panel-heading"><h3>Drafts Approved ({{draft_notifications_approved.count}})</h3></div>
+      <div class="panel-body">
+        {% for noti in draft_notifications_approved %}
+        <div class="col-lg-10">
+         <!--  <span> <p> Notification: {{noti.notification}} </p></span> -->
+          <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
+          <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
+          <p> Feedback: {{noti.draft_to_approve.text}} </p>
+       <!--    <p> Status: {{noti.draft_to_approve.status}} </p> -->
 
           {% if noti.draft_to_approve.status == 1 %}
           <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>

@@ -33,7 +33,7 @@ from feedback.models import Notification
 
 @register.filter
 def get_user_notifications(user_pk):
-    return Notification.objects.filter(user = user_pk)
+    return Notification.objects.filter(user = user_pk, draft_to_approve__status__in =[1,2])
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     """ profile page
