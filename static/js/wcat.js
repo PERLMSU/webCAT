@@ -96,6 +96,12 @@ $('.noteForm').submit(function() {
          selected.push($(this).attr('value'));
          index += 1;
      });
+
+     if (index == 0)
+     {
+        $('#no-student-selected-error').show();       
+        return false;
+     }
       // $('<input />').attr('type', 'hidden')
       //     .attr('name', "something")
       //     .attr('value', "something")
@@ -172,17 +178,25 @@ $(document).on("click", ".assigngroup", function () {
      $(".modal-body #assign-group-num").html( groupNum );
 });
 
+$(document).on("click", ".all-notes-view", function () {
+     // var category_pk = this.id;
+     $('[id^="sub_categories_"]').hide();
+     $('#main_categories').hide();
+     $('#all_notes_view').show();
+});
 
 $(document).on("click", ".main-category-btn", function () {
      var category_pk = this.id;
      $("#sub_categories_"+category_pk).show();
      $('#main_categories').hide();
+     $('#all_notes_view').hide();
      // $(".modal-body #categoryName").html( categoryName );
 });
 
 
 $(document).on("click", ".back-to-main-categories", function () {
      $('#main_categories').show();
+     $('#all_notes_view').hide();
      $('[id^="sub_categories_"]').hide();
      // $(".modal-body #categoryName").html( categoryName );
 });
@@ -191,5 +205,6 @@ $(document).on("click", ".sub-category-btn", function () {
      var category_pk = this.id;
      $("#note_taker_"+category_pk).show();
      $('#main_categories').hide();
+     $('#all_notes_view').hide();
      // $(".modal-body #categoryName").html( categoryName );
 });

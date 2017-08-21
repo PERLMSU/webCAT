@@ -1,0 +1,25 @@
+
+
+<div id="all_notes_view" style="display: none;">
+	<div class="col-lg-9"> 
+		{% for group, students in student_groups.items %}
+			{% if students %}
+
+				<h5>Group {{group.group_number}}</h5>	
+
+				{% for student in students %}
+					<span> {{student}}</span> 
+					{% with student.id|get_feedback_notes:week as notes %}
+						<ul>
+							{% for note in notes %}
+								<li><strong>{{note.sub_category.name}} - </strong>{{note.note}}</li>
+							{% endfor %}	
+						</ul>
+					{% endwith %}	
+					
+				{% endfor %}	
+		    {% endif %}
+		    	<!-- 	</div> -->
+		{% endfor %}	
+	</div>
+</div>

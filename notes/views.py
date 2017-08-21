@@ -47,6 +47,10 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
 
             category_to_add_feedback = SubCategory.objects.get(id=kwargs['pk'])
             feedback_note = form.cleaned_data['note']
+            week = form.cleaned_data['week_num']
+
+            if not range(len(selected_students)):
+                messages.add_message(self.request, messages.WARNING, 'No notes were added because no students were selected.')
 
             for i in range(len(selected_students)):
                 #
@@ -56,7 +60,7 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
                # raise Exception("test")
                 try:
                     student = Student.objects.get(id=student_pk)
-                    new_feedback = Feedback.objects.create(note=feedback_note,student=student,sub_category=category_to_add_feedback)
+                    new_feedback = Feedback.objects.create(note=feedback_note,student=student,sub_category=category_to_add_feedback,week_num=week)
                     new_feedback.save()
                     messages.add_message(self.request, messages.SUCCESS, 'Note(s) successfully added.')
                 except Exception as e:

@@ -8,3 +8,4 @@ from datetime import date
 class AddFeedbackForm(forms.Form):
     # category_pk = forms.IntegerField()
     note = forms.CharField()   
+    week_num = forms.IntegerField()

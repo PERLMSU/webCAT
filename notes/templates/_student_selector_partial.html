@@ -1,4 +1,4 @@
-<div class="col-lg-3">
+<div class="col-lg-2">
  <!--    <div class="container"> -->
 
 <div class="row">
@@ -17,19 +17,25 @@
                 {% endif %}
               {% endfor %}
             </select> 
-          </form>      
+          </form>
+
+          <a class="all-notes-view" href='#'><span title="Activate Notes View" class="glyphicon glyphicon-duplicate"></span></a>
+          |
+          <a class="back-to-main-categories" href='#'><span title="Activate Categories View" class="glyphicon glyphicon-th-large"></span></a>
         </div>
       </div>
   </div>
 
-
-    	{% for group, students in student_groups.items %}
-    		{% if students %}
 	    		<div class="row">
 	    			
 			    	<div class="panel panel-info">
+    	{% for group, students in student_groups.items %}
+    		{% if students %}
+<!-- 	    		<div class="row">
+	    			
+			    	<div class="panel panel-info"> -->
 			      		<div class="panel-heading">
-			      			<h5>Group # {{group.group_number}}</h5>
+			      			<h5>Group {{group.group_number}}</h5>
 			      		</div> 			
 			      		<div class="panel-body">
 			      				<!-- <div class="col-md-12"> -->
@@ -41,13 +47,13 @@
 						    				<input type="checkbox" name="student_name_{{forloop.counter}}" value="{{student.id}}"> </input>
 						    			</div>					    			
 										<div class="col-md-10">						    			
-						    				<span> {{student}} </span>
+						    				<span> {{student}}</span> 
 						    				{% with student.id|get_feedback_notes:week as notes %}
-						    				<ul>
+<!-- 						    				<ul>
 						    					{% for note in notes %}
 						    						<li><strong>{{note.sub_category.name}} - </strong>{{note.note}}</li>
 						    					{% endfor %}	
-						    				</ul>
+						    				</ul> -->
 						    				{% endwith %}
 						    			</div>
 							    
@@ -55,10 +61,12 @@
 					    		{% endfor %}
 					    			<!-- 	</div> -->
 			    			</div>
-			    		</div>
-			    	</div>
+
+
 			    {% endif %}
     	<!-- 	</div> -->
 		{% endfor %}	    	
 <!-- 	</div> -->
+			    		</div>
+			    	</div>
 </div>
