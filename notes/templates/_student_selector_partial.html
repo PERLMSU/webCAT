@@ -5,7 +5,7 @@
       <div class="panel panel-default">
         <div class="panel-heading"> 
 
-          <form class="week-form" action="{% url 'notes-home' %}" method="GET">{% csrf_token %}
+          <form class="week-form" action="{% url 'notes-change-week' %}" method="POST">{% csrf_token %}
             <label for="weekDropDown">Week </label>
             <select id="weekDropDown" name="weekDropDown">
 

@@ -30,6 +30,7 @@ def get_feedback_notes(student_pk,week):
     feedback_notes = Feedback.objects.filter(student=student_pk,week_num=week)
     return feedback_notes
 
+
 class AddFeedback(LoginRequiredMixin, TemplateView):
     """ create a feedback note for student(s)
     """
@@ -92,8 +93,8 @@ class NotesView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        if 'weekDropDown' in self.request.GET:
-            week = int(self.request.GET['weekDropDown'].encode('ascii','ignore'))
+        if 'week' in self.kwargs:
+            week = int(self.kwargs['week'])
         else:
             week = 1
 
@@ -118,3 +119,10 @@ class NotesView(LoginRequiredMixin, TemplateView):
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)
+
+
+def change_week_notes(request):
+    form = request.POST or None
+    if 'weekDropDown' in request.POST:
+        week = int(request.POST['weekDropDown'].encode('ascii','ignore'))   
+        return HttpResponseRedirect('/notes/week/'+str(week))         

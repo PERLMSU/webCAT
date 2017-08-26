@@ -31,6 +31,11 @@ def compare_grade(grade,val):
 	else:
 		return False
 
+
+@register.filter
+def get_draft_grades(draft):
+	return Grade.objects.filter(draft=draft)
+
 @register.filter
 def get_grade_for_category(draft,category):
 	try:

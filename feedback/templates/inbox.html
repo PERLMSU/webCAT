@@ -44,6 +44,14 @@
           <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
           <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
           <p> Feedback: {{noti.draft_to_approve.text}} </p>
+          <p> Grades: 
+            {% with noti.draft_to_approve|get_draft_grades as grades %}
+              {% for gr in grades %}
+                <span>{{gr.category.name}}: {{gr.grade}}</span><br>
+              {% endfor %}
+            {% endwith %}
+
+          </p>          
           <p> Status: {{noti.draft_to_approve.status}} </p>
 
           {% if noti.draft_to_approve.status == 1 %}
@@ -68,6 +76,14 @@
           <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
           <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
           <p> Feedback: {{noti.draft_to_approve.text}} </p>
+          <p> Grades: 
+            {% with noti.draft_to_approve|get_draft_grades as grades %}
+              {% for gr in grades %}
+               <span>{{gr.category.name}}: {{gr.grade}}</span><br>
+              {% endfor %}
+            {% endwith %}
+
+          </p>
           <p> Status: {{noti.draft_to_approve.status}} </p>
 
           {% if noti.draft_to_approve.status == 1 %}
@@ -94,7 +110,14 @@
           <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
           <p> Feedback: {{noti.draft_to_approve.text}} </p>
        <!--    <p> Status: {{noti.draft_to_approve.status}} </p> -->
+          <p> Grades: 
+            {% with noti.draft_to_approve|get_draft_grades as grades %}
+              {% for gr in grades %}
+               <span>{{gr.category.name}}: {{gr.grade}}</span><br>
+              {% endfor %}
+            {% endwith %}
 
+          </p>
           {% if noti.draft_to_approve.status == 1 %}
           <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
           {% endif %}
