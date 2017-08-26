@@ -87,6 +87,26 @@ def add_student(request):
         messages.error(request, form.errors)
         return HttpResponseRedirect('/classroom/') 
 
+
+def edit_student(request, pk):
+    
+
+    try:
+        student = Student.objects.get(id=pk)
+    except Exception as e:
+        messages.add_message(request, messages.ERROR, 'something bad happened: '+ e)
+        return HttpResponseRedirect('/classroom/')
+
+    form = AddStudentForm(request.POST or None, instance=student)
+
+    if form.is_valid():
+        form.save()
+        messages.add_message(request, messages.SUCCESS, 'Student successfully saved!')
+        return HttpResponseRedirect('/classroom/')        
+    else: 
+        messages.error(request, form.errors)
+        return HttpResponseRedirect('/classroom/')         
+
 class UploadFileForm(forms.Form):
     file = forms.FileField()
     classroom = forms.CharField(widget=forms.HiddenInput())
@@ -374,20 +394,20 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     context = {}
 
     def get(self, *args, **kwargs):
-        students = Student.objects.all()
-        groups = Group.objects.all()
+        students = Student.objects.all().order_by('last_name')
+        groups = Group.objects.all().order_by('group_number')
         try:
             classroom = Classroom.objects.get(instructor = self.request.user)
         except Classroom.DoesNotExist:
             classroom = None
-        learning_assistants = Profile.objects.all()
+        learning_assistants = Profile.objects.all().order_by('last_name')
         # learning_assistants = Profile.objects.all().filter(permission_level=0)
-        instructors = Profile.objects.all()
+     #  instructors = Profile.objects.all()
         return render(self.request, self.template_name,
         {
             'students': students,
             'learning_assistants':learning_assistants,
-            'instructors':instructors,
+          #  'instructors':instructors,
             'groups': groups,
             'classroom': classroom,
             'add_student_form': AddStudentForm(),

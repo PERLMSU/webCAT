@@ -39,6 +39,22 @@ class LoginForm(forms.Form):
         return self.cleaned_data
 
 
+
+class EditInstructorForm(forms.Form):
+    CHOICES=[(0,'Learning Assistant'),
+         (1, 'Admin')]    
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    permission_level = forms.ChoiceField(choices = CHOICES,
+                            widget=forms.RadioSelect(attrs=dict(required=True,
+                            render_value=False)),
+                            label=_("Permission Level: "))
+    email = forms.EmailField(
+                            widget=forms.TextInput(attrs=dict(required=True,
+                            max_length=30, render_value=False)),
+                            label=_("Email"))
+   
+
 class AddInstructorForm(forms.Form):
     """ add instructor form
     """

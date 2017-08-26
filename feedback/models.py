@@ -20,6 +20,8 @@ DRAFT_STATUS = (
     (APPROVED, 'Approved')
 )
 
+
+
 class Category(models.Model):
     classroom = models.ForeignKey(Classroom,null=True, default=None)
     name = models.CharField(max_length=30, unique=True)
@@ -94,6 +96,11 @@ class Draft(models.Model):
                 user = self.owner,
                 notification="This draft has been approved"
             )            
+
+class Grade(models.Model):
+    grade = models.DecimalField(max_digits=3, decimal_places=2)
+    draft = models.ForeignKey(Draft)
+    category = models.ForeignKey(Category)
 
 class Notification(models.Model):
     notification = models.CharField(max_length=500)

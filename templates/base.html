@@ -51,12 +51,15 @@
                        <b class="caret"></b> 
                     </a>
                     <ul class="dropdown-menu message-dropdown">
-                        <li class="message-preview">
-                            <a href="{% url "feedback-inbox" %}">
-                                <div class="media">
+
                                   
 
                                   {% for noti in notifications %}
+                       
+                        <li class="message-preview">
+                             <a href="/feedback/inbox/week/{{noti.draft_to_approve.week_num}}">   
+                                <div class="media">   
+                                                            
                                     <span class="pull-left">
                                         <img class="media-object" src="http://placehold.it/50x50" alt="">
                                     </span>
@@ -68,7 +71,12 @@
                                             Updated: {{noti.updated_ts}}
                                         </p>
                                         <p>{{noti.notification }}</p>
-                                    </div>                 
+                                    </div> 
+                                     
+                                </div>
+                               </a> 
+                        </li>                                    
+                                                                                   
                                   {% endfor %}
                                   {% if notifications.count == 0 %}
 
@@ -77,9 +85,7 @@
                                   
 
 
-                                </div>
-                            </a>
-                        </li>
+
                         <li class="message-footer">
                             <a href="{% url "feedback-inbox" %}">Read All Messages</a>
                         </li>

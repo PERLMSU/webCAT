@@ -36,15 +36,49 @@
 							        	{% endif %}				      
 						    		</div>
 					    		<input type="hidden" name="student_pk" value="{{student.id}}">
-					    		<input type="hidden" name="week_num" id="week_number">
-					    		{% if draft.status != 1 and draft.status != 3 %}
-						    	<button type="submit" name="save" value="save" class="btn btn-info"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
-						    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
-						    	<button type="submit" name="send" value="send" class="btn btn-success"><span class="glyphicon glyphicon-send"></span> Send</button>
-						    	Last Updated: {{draft.date_updated}}
+					    		<input type="hidden" name="week_num" class="week_number_input">
+					    		
+
+					    		<div class="col-lg-7">
+					    		{% for category in main_categories %}
+					    			{% with draft|get_grade_for_category:category as category_grade %}
+					    			
+					    				<div class="col-sm-8">
+											<label for="grade_{{category.name}}">{{category.name}}</label>	
+										</div>	
+										<div class="col-sm-4">	    		
+										<select name="grade_{{category.id}}">
+
+											{% if draft.status == 3 or draft.status == 1 %}
+												<option disabled selected value="{{category_grade.grade}}">{{category_grade.grade}}</option>
+											{% else %}
+
+												{% for val in grade_scale %}
+													{% if category_grade.grade|compare_grade:val %}
+														<option selected value="{{val}}">{{val}}</option>
+													{% else %}
+														<option value="{{val}}">{{val}}</option>
+													{% endif %}
+												{% endfor %}
+											{% endif %}
+										</select>
+										</div>
+									{% endwith %}
+									<br>
+								{% endfor %}
+							</div>
+								Last Updated: {{draft.date_updated}} <br>
+								{% if draft.status != 1 and draft.status != 3 %}
+									<div style="padding-top:10px;">
+								    	<button data-toggle="tooltip" title="Save draft" type="submit" name="save" value="save" class="btn btn-success"> <span class="glyphicon glyphicon-floppy-disk"></span></button>
+								    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
+								    	<button data-toggle="tooltip" title="Send to instructor" type="submit" name="send" value="send" class="btn btn-info"><span class="glyphicon glyphicon-send"></span></button>
+								    </div>
 						    	{% endif %}
 								</form>
 							
+
+
 						</div>
 						<div class="col-lg-3">
 							
@@ -61,7 +95,8 @@
 							<h3>Status: ({{revision_notifications.count}})</h3>
 								{% for r_notification in revision_notifications %}
 									{{r_notification.notification}}
-									{{r_notification.created_ts}}
+									Created: {{r_notification.created_ts}}
+									Updated:  {{r_notification.updated_ts}}
 								{% endfor %}
 							{% endwith %}
 						</div>

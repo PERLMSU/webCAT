@@ -4,8 +4,11 @@ from .views import *
 
 urlpatterns = [
   url(r'^$', FeedbackView.as_view(), name="feedback-home"),
+  url(r'^week/(?P<week>\d+)/$', FeedbackView.as_view(), name="feedback-home"),
+  url(r'^week/change/$', change_week_feedback, name="feedback-change-week"),
   url(r'^inbox/$', InboxView.as_view(), name="feedback-inbox"),
-  url(r'^inbox/last/$', InboxView.as_view(), name="inbox-previous-week"),
+  url(r'^inbox/change/$', change_week, name="inbox-change-week"),
+  url(r'^inbox/week/(?P<week>\d+)/$', InboxView.as_view(), name="feedback-inbox"),
   url(r'^inbox/approve/(?P<pk>\d+)/$', approve_draft, name="inbox-approve-draft"),
   url(r'^inbox/revision/$', send_draft_revision, name="send-revision-notes"),
   url(r'^categories/$', CategoryView.as_view(), name="feedback-categories"),

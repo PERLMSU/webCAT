@@ -16,12 +16,28 @@ from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm, AddCom
 from django.db import IntegrityError
 from classroom.models import Classroom
 
-from feedback.models import Category, SubCategory, CommonFeedback, Draft, Notification
+from feedback.models import Category, SubCategory, CommonFeedback, Draft, Notification, Grade
 from classroom.models import Student, Group
 from notes.models import Feedback
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from datetime import date, timedelta
+from decimal import *
+
+@register.filter
+def compare_grade(grade,val):
+	if grade != None:
+		return Decimal(grade) == Decimal(val)
+	else:
+		return False
+
+@register.filter
+def get_grade_for_category(draft,category):
+	try:
+		grade = Grade.objects.get(draft=draft,category=category)
+		return grade
+	except Grade.DoesNotExist:
+		return None
 
 @register.filter
 def get_revision_notifications(draft):
@@ -58,8 +74,8 @@ class FeedbackView(LoginRequiredMixin, FormView):
 
     def get(self, request, *args, **kwargs):
 
-		if 'weekDropDown' in self.request.GET:
-		    week = int(self.request.GET['weekDropDown'].encode('ascii','ignore'))
+		if 'week' in self.kwargs:
+			week = int(self.kwargs['week'])
 		else:
 		    week = 1
 
@@ -70,46 +86,67 @@ class FeedbackView(LoginRequiredMixin, FormView):
 		for group in groups:
 			groups_to_students[group] = Student.objects.filter(group=group)
 
+	#	raise Exception("test!")
+		main_categories = Category.objects.all() #TODO - will have to filter on current classroom.
 
 		self.context['week'] = week
 		self.context['loop_times'] = range(1, 13)
+		self.context['grade_scale'] = [x*.25 for x in range(17)]
 		self.context['groups_to_students'] = groups_to_students
-		
+		self.context['main_categories'] = main_categories
 		self.context['notifications'] = Notification.objects.filter(user=self.request.user)
 
 		return render(self.request, self.template_name, self.context)
 
     def post(self,*args, **kwargs):
-    	form = EditDraftForm(self.request.POST or None)
-    #	raise Exception("test")
-    	if form.is_valid():
-    		draft_text = form.cleaned_data['draft_text']
-    		student_pk = form.cleaned_data['student_pk']
-    		week_num = form.cleaned_data['week_num']
-    		try:
-    			student = Student.objects.get(id=student_pk)
-    		except Student.DoesNotExist:
-    			messages.add_message(self.request, messages.ERROR, 'Draft could not be saved for this student.')
-    			return HttpResponseRedirect('/feedback/')
+		form = EditDraftForm(self.request.POST or None)
+		#raise Exception("test")
+		if form.is_valid():
+			draft_text = form.cleaned_data['draft_text']
+			student_pk = form.cleaned_data['student_pk']
+			week_num = form.cleaned_data['week_num']
 
-    		try:
-    			draft = Draft.objects.get(owner=self.request.user, student = student)
-    		except Draft.DoesNotExist:
-    			draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)
 
-    		if self.request.POST.get("save"):
-    			messages.add_message(self.request, messages.SUCCESS, 'Draft saved.')
-    		elif self.request.POST.get("send"):
-    			draft.status = 1
-    			draft.send_to_instructor()
-    			messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')
-    		#raise Exception("gefegeg")
-    		draft.text = draft_text
-    		draft.updated_ts = datetime.datetime.now()
-    		draft.save()
-    		return HttpResponseRedirect('/feedback/')
-    	messages.add_message(self.request, messages.ERROR, 'Draft could not be saved.')
-    	return HttpResponseRedirect('/feedback/')
+
+			try:
+				student = Student.objects.get(id=student_pk)
+			except Student.DoesNotExist:
+				messages.add_message(self.request, messages.ERROR, 'Draft could not be saved for this student.')
+				return HttpResponseRedirect('/feedback/')
+
+			try:
+				draft = Draft.objects.get(owner=self.request.user, student = student, week_num = week_num)
+			except Draft.DoesNotExist:
+				draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)
+
+
+			grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.iteritems()
+				if name.startswith('grade_')])
+
+		#	print(grades_values)
+			for category_pk,grade_val in grades_values.iteritems():
+				category = Category.objects.get(id=category_pk)
+				try:
+					grade = Grade.objects.get(draft=draft, category=category)
+					grade.grade = grade_val
+					grade.save()
+				except Grade.DoesNotExist:
+					grade = Grade.objects.create(draft=draft,category=category,grade=grade_val)
+				#print(category.name+ ": "+str(grade))
+
+			draft.text = draft_text
+			draft.updated_ts = datetime.datetime.now()
+			
+			if self.request.POST.get("save"):
+				messages.add_message(self.request, messages.SUCCESS, 'Draft saved.')
+			elif self.request.POST.get("send"):
+				draft.status = 1
+				draft.send_to_instructor()
+				messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')   
+	 		draft.save()
+			return HttpResponseRedirect('/feedback/week/'+str(week_num))
+		messages.add_message(self.request, messages.ERROR, 'Draft could not be saved.')
+		return HttpResponseRedirect('/feedback/')
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)
@@ -117,19 +154,14 @@ class FeedbackView(LoginRequiredMixin, FormView):
 
 class InboxView(LoginRequiredMixin,TemplateView):
 	template_name = "inbox.html"
-	context = {}
+	context = {}	
 
 	def get(self, request, *args, **kwargs):
 
-		if 'weekDropDown' in self.request.GET:
-		    week = int(self.request.GET['weekDropDown'].encode('ascii','ignore'))
+		if 'week' in self.kwargs:
+			week = int(self.kwargs['week'])
 		else:
 		    week = 1
-
-		# today_date = date.today()
-		# current_day_of_week = today_date.weekday()
-		# week_start = today_date - timedelta(days = current_day_of_week)
-		# week_finish = today_date + timedelta(days = (6 - current_day_of_week))	
 
 
 		self.context['draft_notifications_need_approval'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 1, draft_to_approve__week_num=week)
@@ -138,12 +170,23 @@ class InboxView(LoginRequiredMixin,TemplateView):
 
 		self.context['week'] = week
 		self.context['loop_times'] = range(1, 13)
-		#	raise Exception("what")
 		return render(self.request, self.template_name, self.context)
 
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text)	
 
+
+def change_week(request):
+	form = request.POST or None
+	if 'weekDropDown' in request.POST:
+		week = int(request.POST['weekDropDown'].encode('ascii','ignore'))	
+		return HttpResponseRedirect('/feedback/inbox/week/'+str(week)) 
+
+def change_week_feedback(request):
+	form = request.POST or None
+	if 'weekDropDown' in request.POST:
+		week = int(request.POST['weekDropDown'].encode('ascii','ignore'))	
+		return HttpResponseRedirect('/feedback/week/'+str(week)) 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
 	template_name = "categories.html"

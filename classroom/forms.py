@@ -9,13 +9,14 @@ from datetime import date
 class AddStudentForm(forms.ModelForm):
 
     first_name = forms.CharField()
+    notes = forms.CharField(required=False)
     last_name = forms.CharField()
     student_id = forms.CharField()
     group_number = forms.IntegerField(required=False)
 
     class Meta:
         model = Student
-        fields = ['first_name','last_name','student_id']
+        fields = ['first_name','last_name','student_id','notes']
 
     def clean_first_name(self):
         if len(self.cleaned_data['first_name']) > 30:

@@ -4,6 +4,9 @@ $(function() {
     });
 });
 
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip(); 
+});
 
 $(document).ready(function(){
 $(".feedback-student-writer:first").show();
@@ -11,7 +14,7 @@ $(".feedback-student-writer:first").show();
 
 
     $('.draft-form').submit(function(e){
-        $('#week_number').val($('#weekDropDown').val());
+        $('.week_number_input').val($('#weekDropDown').val());
 
     });
 

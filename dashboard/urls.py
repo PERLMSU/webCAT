@@ -12,12 +12,14 @@ from .views import (
     EmailConfirmationView,
     UpdateEmailView,
     ChangePasswordView,
+    edit_instructor,
 )
 
 
 urlpatterns = [
 	url(r'^$', DashboardView.as_view(), name='dash-home'),
   url(r'^manage/$', ManageUsersView.as_view(), name="dash-manage-users"),
+  url(r'^manage/edit/(?P<pk>\d+)/$', edit_instructor, name="dash-edit-user"),
     url(r'^settings/$', EmailConfirmationView.as_view(), name="dash-settings"),
     url(r'^settings/email/$', UpdateEmailView.as_view(), name="dash-email-settings"),
     #url(r'^activate/(?P<key>[0-9A-Za-z]+)/$', ConfirmationView.as_view(), name="account-activate"),

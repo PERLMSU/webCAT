@@ -22,6 +22,7 @@ from .forms import(
                 ChangePasswordForm,
                 LoginForm,
                 AddInstructorForm,
+                EditInstructorForm,
             ) 
 
 from userprofile.models import (
@@ -194,6 +195,7 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         self.context['form'] = AddInstructorForm()
         users = Profile.objects.all()
         self.context['users'] = users
+        self.context['edit_instructor_form'] = EditInstructorForm()
         #raise Exception("test")
         return render(self.request, self.template_name, self.context)
 
@@ -209,7 +211,7 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
                            permission = form.cleaned_data['permission_level']
                            )
                 user.send_confirmation_email(self.request)   
-                self.add_message("User successfully created!!")   
+                self.add_message("User successfully created!")   
                 return HttpResponseRedirect(reverse('dash-manage-users'))
             except Exception as e:
                 messages.add_message(self.request, messages.ERROR, "Could not create user: "+e)
@@ -221,6 +223,26 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text) 
+
+def edit_instructor(request, pk):
+    form = EditInstructorForm(request.POST or None)
+    if form.is_valid():
+        try:
+            instructor = Profile.objects.get(id = pk)
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, "Could not edit user: "+e)  
+            return HttpResponseRedirect(reverse('dash-manage-users'))
+
+        instructor.first_name = form.cleaned_data['first_name']
+        instructor.last_name = form.cleaned_data['last_name']
+        instructor.email = form.cleaned_data['email']
+        instructor.permission_level = form.cleaned_data['permission_level']
+        instructor.save()
+        messages.add_message(request, messages.SUCCESS, "User successfully edited!")   
+        return HttpResponseRedirect(reverse('dash-manage-users'))
+    else:
+        messages.add_message(request, messages.ERROR, "User not edited, form inputs not valid.")   
+        return HttpResponseRedirect(reverse('dash-manage-users'))  
 
 class DashboardView(LoginRequiredMixin, TemplateView):
 	""" dashboard page, manage users

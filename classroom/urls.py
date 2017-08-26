@@ -5,6 +5,7 @@ urlpatterns = [
     url(r'^$', views.ClassroomView.as_view(), name='classroom-home'),
     url(r'^register_class', views.register_class, name='classroom-register'),
     url(r'^add_student', views.add_student, name='classroom-create-student'),
+    url(r'^edit_student/(?P<pk>\d+)/$', views.edit_student, name='classroom-edit-student'),
     url(r'^add_group', views.add_group, name='classroom-create-group'),
     url(r'^upload/student/$', views.UploadStudentsView.as_view(), name='classroom-upload-students'),
     url(r'^upload/group/$', views.UploadGroupsView.as_view(), name='classroom-upload-groups'),
