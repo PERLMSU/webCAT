@@ -31,7 +31,7 @@ SECRET_KEY = '85ljgze!)at0xw=ql5ky*jh!#8&$oi**l=5=%@=xbflpzhavzs'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['webcat-p3.herokuapp.com']
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
@@ -135,6 +135,10 @@ DATABASES = {
 
     }
 }
+
+import dj_database_url
+db_from_env = dj_database_url.config()
+DATABASES['default'].update(db_from_env)
 
 FILE_UPLOAD_HANDLERS = ("django_excel.ExcelMemoryFileUploadHandler",
                         "django_excel.TemporaryExcelFileUploadHandler")
