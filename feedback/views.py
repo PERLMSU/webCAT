@@ -148,7 +148,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 				draft.status = 1
 				draft.send_to_instructor()
 				messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')   
-	 		draft.save()
+			draft.save()
 			return HttpResponseRedirect('/feedback/week/'+str(week_num))
 		messages.add_message(self.request, messages.ERROR, 'Draft could not be saved.')
 		return HttpResponseRedirect('/feedback/')
