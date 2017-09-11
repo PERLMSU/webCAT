@@ -71,13 +71,13 @@ def get_student_draft(student_pk, week):
 	return draft
 
 class FeedbackView(LoginRequiredMixin, FormView):
-    template_name = "feedback.html"
-    form_class = EditDraftForm
+	template_name = "feedback.html"
+	form_class = EditDraftForm
 
-    context = {}
+	context = {}
 
 
-    def get(self, request, *args, **kwargs):
+	def get(self, request, *args, **kwargs):
 
 		if 'week' in self.kwargs:
 			week = int(self.kwargs['week'])
