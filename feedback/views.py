@@ -103,7 +103,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 
 		return render(self.request, self.template_name, self.context)
 
-    def post(self,*args, **kwargs):
+	def post(self,*args, **kwargs):
 		form = EditDraftForm(self.request.POST or None)
 		#raise Exception("test")
 		if form.is_valid():
@@ -153,8 +153,8 @@ class FeedbackView(LoginRequiredMixin, FormView):
 		messages.add_message(self.request, messages.ERROR, 'Draft could not be saved.')
 		return HttpResponseRedirect('/feedback/')
 
-    def add_message(self, text, mtype=25):
-        messages.add_message(self.request, mtype, text)
+	def add_message(self, text, mtype=25):
+		messages.add_message(self.request, mtype, text)
 
 
 class InboxView(LoginRequiredMixin,TemplateView):

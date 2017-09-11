@@ -31,7 +31,7 @@ SECRET_KEY = '85ljgze!)at0xw=ql5ky*jh!#8&$oi**l=5=%@=xbflpzhavzs'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['webcat-p3.herokuapp.com']
+ALLOWED_HOSTS = ['webcat-p3.herokuapp.com','127.0.0.1']
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
