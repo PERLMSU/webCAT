@@ -26,11 +26,17 @@ class AddCategoryForm(forms.ModelForm):
 
 class AddCommonFeedbackForm(forms.ModelForm):
 
-    feedback = forms.CharField()
+    feedback = forms.CharField(required=False)
+    observation = forms.CharField(required=False)
+    problem = forms.CharField(required=False)
+    solution = forms.CharField(required=False)
+    solution_explanation = forms.CharField(required=False)
 
     class Meta:
         model = CommonFeedback
-        fields = ['feedback']
+        fields = ['feedback','observation','problem','solution','solution_explanation']
+
+
 
 class AddSubCategoryForm(forms.ModelForm):
 

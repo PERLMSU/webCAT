@@ -42,10 +42,10 @@ def register_class(request):
             messages.add_message(request, messages.SUCCESS, 'Classroom successfully registered!')
         except Exception as e:
             messages.add_message(request, messages.ERROR, "An error occurred when attempting to register the class: "+e)
-        return HttpResponseRedirect('/classroom/')
+        return HttpResponseRedirect('/dashboard/')
     else: 
         messages.error(request, form.errors)
-        return HttpResponseRedirect('/classroom/')     
+        return HttpResponseRedirect('/dashboard/')     
 
 def add_group(request):
     form = AddGroupForm(request.POST or None)
@@ -68,11 +68,14 @@ def add_group(request):
 
 def add_student(request):
     form = AddStudentForm(request.POST or None)
+
     userid = request.user.id
     user = request.user
     if form.is_valid():
-        group_num = form.cleaned_data['group_number']  
-        student = form.save(commit=False)
+        group_num = form.cleaned_data['group_number'] 
+        class_pk = form.cleaned_data['classroom_pk']  
+
+        student = form.save(commit=False)     
         if group_num:
             try:
                 group = Group.objects.get(group_number=group_num)
@@ -80,6 +83,14 @@ def add_student(request):
             except Group.DoesNotExist:
                 messages.add_message(request, messages.WARNING, 'Group number ' + str(group_num) + ' was not found. Please create group before assigning to students.')                
                 student.group = None
+
+        if class_pk:
+            try:
+                classroom = Classroom.objects.get(id=class_pk)
+                student.classroom = classroom
+            except Classroom.DoesNotExist:
+                messages.add_message(request, messages.WARNING, 'Classroom id: ' + str(class_pk) + ' was not found.')                
+                student.classroom = None                 
         student.save()
         messages.add_message(request, messages.SUCCESS, 'Student successfully added!')
         return HttpResponseRedirect('/classroom/')
@@ -250,11 +261,21 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
     template_name = 'upload_students.html'
     context = {}    
 
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         form = UploadFileForm()
         students = Student.objects.all()
         groups = Group.objects.all()
-        classroom = Classroom.objects.get(instructor = self.request.user)
+
+        current_classroom_pk = self.request.user.current_classroom_id
+        if current_classroom_pk:
+            try:
+                classroom = Classroom.objects.get(id=current_classroom_pk)
+            except Classroom.DoesNotExist:
+                classroom = None
+                self.add_message("Error when trying to load current classroom.")
+        else:
+            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")        
+       # classroom = Classroom.objects.get(instructor = self.request.user)
         add_student_form = AddStudentForm()
         return render(self.request, self.template_name,
         {
@@ -340,11 +361,21 @@ class UploadGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
     template_name = 'upload_groups.html'
     context = {}    
 
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         form = UploadFileForm()
         groups = Group.objects.all()
         students = Student.objects.all()
-        classroom = Classroom.objects.get(instructor = self.request.user)
+
+        current_classroom_pk = self.request.user.current_classroom_id
+        if current_classroom_pk:
+            try:
+                classroom = Classroom.objects.get(id=current_classroom_pk)
+            except Classroom.DoesNotExist:
+                classroom = None
+                self.add_message("Error when trying to load current classroom.")
+        else:
+            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")        
+       # classroom = Classroom.objects.get(instructor = self.request.user)
         return render(self.request, self.template_name,
         {
             'form': form,
@@ -396,10 +427,25 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     def get(self, *args, **kwargs):
         students = Student.objects.all().order_by('last_name')
         groups = Group.objects.all().order_by('group_number')
-        try:
-            classroom = Classroom.objects.get(instructor = self.request.user)
-        except Classroom.DoesNotExist:
-            classroom = None
+
+        current_classroom_pk = self.request.user.current_classroom_id
+        if current_classroom_pk:
+            try:
+                classroom = Classroom.objects.get(id=current_classroom_pk)
+            except Classroom.DoesNotExist:
+                classroom = None
+                self.add_message("Error when trying to load current classroom.")
+        else:
+            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")
+
+        # try:
+        #     classroom = Classroom.objects.get(instructor = self.request.user)
+        # except Classroom.DoesNotExist:
+        #     classroom = None
+
+        add_student_form1 = AddStudentForm()
+        add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
+
         learning_assistants = Profile.objects.all().order_by('last_name')
         # learning_assistants = Profile.objects.all().filter(permission_level=0)
      #  instructors = Profile.objects.all()
@@ -410,7 +456,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
           #  'instructors':instructors,
             'groups': groups,
             'classroom': classroom,
-            'add_student_form': AddStudentForm(),
+            'add_student_form': add_student_form1,
             'add_group_form': AddGroupForm(),
             'add_classroom_form': AddClassroomForm(),
             'assign_multiple_groups_form': AssignMultipleGroupsForm(),

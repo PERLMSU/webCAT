@@ -11,6 +11,7 @@ class Classroom(models.Model):
     description = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+    current_week = models.IntegerField(default=1)
     def __str__(self):
         return self.course
 

@@ -181,6 +181,33 @@ class InboxView(LoginRequiredMixin,TemplateView):
 		messages.add_message(self.request, mtype, text)	
 
 
+class CommonView(LoginRequiredMixin,TemplateView):
+	template_name = "common.html"
+	context = {}	
+
+	def get(self, request, *args, **kwargs):
+		try:
+			classroom = Classroom.objects.get(instructor = self.request.user)
+		except Classroom.DoesNotExist:
+			classroom = None
+
+		main_categories = Category.objects.filter(classroom=classroom)
+		
+
+		sub_categories = {}
+		for category in main_categories:
+			sub_categories[category.id] = SubCategory.objects.filter(main_category = category)		
+
+		self.context['main_categories'] = main_categories
+		self.context['sub_categories'] = sub_categories
+
+		return render(self.request, self.template_name, self.context)
+
+	def add_message(self, text, mtype=25):
+		messages.add_message(self.request, mtype, text)	
+
+
+
 def change_week(request):
 	form = request.POST or None
 	if 'weekDropDown' in request.POST:
@@ -198,10 +225,15 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 	context = {}
 
 	def get(self, *args, **kwargs):
-		try:
-			classroom = Classroom.objects.get(instructor = self.request.user)
-		except Classroom.DoesNotExist:
-			classroom = None
+		current_classroom_pk = self.request.user.current_classroom_id
+		if current_classroom_pk:
+			try:
+				classroom = Classroom.objects.get(id=current_classroom_pk)
+			except Classroom.DoesNotExist:
+				classroom = None
+				self.add_message("Error when trying to load current classroom.")
+		else:
+			self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")
 		self.context['create_main_category_form'] = AddCategoryForm()
 		self.context['create_sub_category_form'] = AddSubCategoryForm()
 		self.context['create_feedback_form'] = AddCommonFeedbackForm()

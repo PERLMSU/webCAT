@@ -43,9 +43,18 @@
             <a class="addcommonfeedback" data-toggle="modal" data-target="#createCommonFeedback_{{subcategory.id}}" role="button"><span class="fa fa-plus green-icon"></span></a>
               <a href="#" data-href="{% url "delete-subcategory" subcategory.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{subcategory.name}}" value="Delete" class="deletecategory"><span class="fa fa-remove red-icon"></span></a>   
               {% with subcategory.id|get_common_feedbacks as feedback_collection %}
+              <ul>
+                <hr>
                 {% for feedback in feedback_collection %}
-                  <p>{{feedback.feedback}}</p>
+                <h4> Feedback Piece </h4>
+                <li>
+                  <p><b>Problem:</b> {{feedback.problem}}</p>
+                  <p><b>Solution: </b> {{feedback.solution}}</p>
+                  <p><b>Why a good solution: </b> {{feedback.solution_explanation}}</p>
+                  <hr>
+                </li>
                 {% endfor %}
+              </ul>
               {% endwith %}
             </li>
 

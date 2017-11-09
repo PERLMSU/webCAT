@@ -1,21 +1,66 @@
 {% load crispy_forms_tags %}
   <div class="modal fade" id="createCommonFeedback_{{subcategory.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
 
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title">Add Common Feedback</h4>
+          <h4 class="modal-title">Subcategory: {{subcategory.name}} </h4>
         </div>
 
         <div class="modal-body">
-          <h5> Subcategory: {{subcategory.name}} </h5>
+          <h4> Add Common Feedback</h4>
           <form class="form-horizontal" id="createFeedbackForm" action="{% url "category-create-feedback" subcategory.id %}" method="POST">{% csrf_token %}        
-          
-          <label for="feedback">Feedback: </label>
-            <input type="text" name="feedback"></input>
+
+<div style="padding-left: 20px; padding-right: 20px;">
+  <div class="form-group">
+
+    <label for="feedback">Feedback</label>
+    <textarea name="feedback" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter common feedback"></textarea>
+    <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+  </div>     
+</div>        
+
+<div style="padding-left: 20px; padding-right: 20px;">
+  <div class="form-group">
+
+    <label for="observation">Observation </label>
+    <textarea name="observation" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter observation"></textarea>
+    <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+  </div>     
+</div>    
+
+
+<div style="padding-left: 20px; padding-right: 20px;">
+  <div class="form-group">
+
+    <label for="problem">Problem</label>
+    <textarea name="problem" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter the problem observed"></textarea>
+    <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+  </div>     
+</div>    
+
+<div style="padding-left: 20px; padding-right: 20px;">
+  <div class="form-group">
+
+    <label for="solution">Solution</label>
+    <textarea name="solution" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter the solution to the problem"></textarea>
+    <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+  </div>     
+</div>              
+
+<div style="padding-left: 20px; padding-right: 20px;">
+  <div class="form-group">
+
+    <label for="solution_explanation">Solution Explanation</label>
+    <textarea name="solution_explanation" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Why is this a good solution?"></textarea>
+    <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+  </div>     
+</div>   
+  
+
           <input type="hidden" value="{{subcategory.id}}">
 <!--             <div class="form-group">
                 <textarea name="feedback" class="form-control" rows="3"></textarea>

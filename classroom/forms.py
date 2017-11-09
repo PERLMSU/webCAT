@@ -13,6 +13,7 @@ class AddStudentForm(forms.ModelForm):
     last_name = forms.CharField()
     student_id = forms.CharField()
     group_number = forms.IntegerField(required=False)
+    classroom_pk = forms.IntegerField(required=False,widget=forms.HiddenInput())
 
     class Meta:
         model = Student

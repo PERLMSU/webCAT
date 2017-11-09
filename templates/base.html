@@ -68,9 +68,12 @@
                                         </h5>
                                         <p class="small text-muted"><i class="fa fa-clock-o"></i>
                                             Created: {{noti.created_ts}}
+                                            <br>
                                             Updated: {{noti.updated_ts}}
                                         </p>
-                                        <p>{{noti.notification }}</p>
+                                        <p>WEEK {{noti.draft_to_approve.week_num}}
+                                        <p>{{noti.notification }}
+                                            </p>
                                     </div> 
                                      
                                 </div>
@@ -159,13 +162,16 @@
                    
                     <li>
                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-edit"></i> Feedback <i class="fa fa-fw fa-caret-down"></i></a>
-                        <ul id="demo" class="collapse">
+                        <ul id="demo" class="show">
                             <li>
                                 <a href="{% url "feedback-home" %}">Editor</a>
                             </li>                            
                             <li>
                                 <a href="{% url "feedback-categories" %}">Categories</a>
                             </li>
+                            <li>
+                                <a href="{% url "feedback-common" %}">Common Feedback</a>
+                            </li>                            
                         </ul>
                     </li>                    
 <!--                     <li>
