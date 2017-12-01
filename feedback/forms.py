@@ -24,17 +24,37 @@ class AddCategoryForm(forms.ModelForm):
         model = Category
         fields = ['name','description']
 
-class AddCommonFeedbackForm(forms.ModelForm):
+# class AddCommonFeedbackForm(forms.ModelForm):
 
-    feedback = forms.CharField(required=False)
+#     # feedback = forms.CharField(required=False)
+#     # observation = forms.CharField(required=False)
+#     problem = forms.CharField(required=False)
+#     solution = forms.CharField(required=False)
+#     solution_explanation = forms.CharField(required=False)
+
+#     class Meta:
+#         model = CommonFeedback
+#         fields = ['problem','solution','solution_explanation']
+
+class AddFeedbackPieceForm(forms.Form):
+    #pull common observations that already exist
+
+    subcategory_pk = forms.IntegerField(required=True)
+
+    observation_pk = forms.IntegerField(required=False)
+
+    #or make a whole new one
     observation = forms.CharField(required=False)
-    problem = forms.CharField(required=False)
-    solution = forms.CharField(required=False)
-    solution_explanation = forms.CharField(required=False)
+    #positive, negative, neutral, other?
+    observation_type = forms.CharField(required=False)
 
-    class Meta:
-        model = CommonFeedback
-        fields = ['feedback','observation','problem','solution','solution_explanation']
+    #already exists, or make a new one (pick one or the other)
+    feedback_pk = forms.IntegerField(required=False)
+    feedback = forms.CharField(required=False)
+
+     #already exists, or make a new one (pick one or the other)
+    feedback_explanation_pk = forms.IntegerField(required=False)  
+    feedback_explanation = forms.CharField(required=False)
 
 
 

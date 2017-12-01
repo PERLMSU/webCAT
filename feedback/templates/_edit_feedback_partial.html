@@ -131,14 +131,14 @@
 	        </button>
 	      </div>
 	      <div class="modal-body">
-	      	{% with subcategory|get_common_feedbacks as feedback_pieces %}
+	      	{% with subcategory|get_feedback_pieces as feedback_pieces %}
 	      	<ul>
 	      		{% for feedback in feedback_pieces %}
                 <h4> Feedback Piece </h4>
                 <li>
-                  <p><b>Problem:</b> {{feedback.problem}}</p>
-                  <p><b>Solution: </b> {{feedback.solution}}</p>
-                  <p><b>Why a good solution: </b> {{feedback.solution_explanation}}</p>
+                  <p><b>Observation:</b> {{feedback_piece.observation.observation}}</p>
+                  <p><b>Feedback: </b> {{feedback_piece.feedback.feedback}}</p>
+                  <p><b>Why a good solution: </b> {{feedback_piece.feedback_explanation.feedback_explanation}}</p>
                   <hr>
                 </li>
 	      		{% endfor %}

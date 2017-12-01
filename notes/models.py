@@ -11,7 +11,7 @@ from feedback.models import SubCategory
 
 # Create your models here.
 
-class Feedback(models.Model):
+class Note(models.Model):
     sub_category = models.ForeignKey(SubCategory)
     note = models.CharField(max_length=200)
     student = models.ForeignKey(Student)

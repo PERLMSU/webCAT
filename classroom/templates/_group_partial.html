@@ -109,7 +109,7 @@
         <form class="form-horizontal" id="createStudentForm" action="{% url "classroom-assign-groups" %}" method="POST">{% csrf_token %}
         <input name="group_num" type="hidden" class="hidden-group-num">
         <select name="instructor_id">
-          {% for instructor in instructors %}
+          {% for instructor in learning_assistants %}
             <option value="{{ instructor.id }}">{{ instructor.get_full_name }}</option>
           {% endfor %}
         </select>

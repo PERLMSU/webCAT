@@ -14,7 +14,7 @@ from ast import literal_eval
 from feedback.models import Category, SubCategory
 from classroom.models import Classroom, Group, Student
 from notes.forms import AddFeedbackForm
-from notes.models import Feedback
+from notes.models import Note
 
 @register.filter
 def get_item(dictionary, key):
@@ -27,7 +27,7 @@ def get_subcategories(category_pk):
 
 @register.filter
 def get_feedback_notes(student_pk,week):
-    feedback_notes = Feedback.objects.filter(student=student_pk,week_num=week)
+    feedback_notes = Note.objects.filter(student=student_pk,week_num=week)
     return feedback_notes
 
 
@@ -61,7 +61,7 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
                # raise Exception("test")
                 try:
                     student = Student.objects.get(id=student_pk)
-                    new_feedback = Feedback.objects.create(note=feedback_note,student=student,sub_category=category_to_add_feedback,week_num=week)
+                    new_feedback = Note.objects.create(note=feedback_note,student=student,sub_category=category_to_add_feedback,week_num=week)
                     new_feedback.save()
                     messages.add_message(self.request, messages.SUCCESS, 'Note(s) successfully added.')
                 except Exception as e:
@@ -93,29 +93,37 @@ class NotesView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        if 'week' in self.kwargs:
-            week = int(self.kwargs['week'])
-        else:
-            week = 1
+		if 'week' in self.kwargs:
+		    week = int(self.kwargs['week'])
+		else:
+		    week = 1
 
-        group_to_student_dict = {}
-        groups_assigned = Group.objects.filter(current_instructor = self.request.user)
-        for group in groups_assigned:
-            students = Student.objects.filter(group=group)
-            group_to_student_dict[group] = students
+		current_classroom_pk = self.request.user.current_classroom_id
+		if current_classroom_pk:
+		    try:
+		        classroom = Classroom.objects.get(id=current_classroom_pk)
+		    except Classroom.DoesNotExist:
+		        classroom = None
+		        self.add_message("Error when trying to load current classroom.")
+		else:
+		    self.add_message("No current classroom is set. Please	 visit the dashboard to set a current classroom.") 
 
+		group_to_student_dict = {}
+		groups_assigned = Group.objects.filter(classroom=classroom,current_instructor = self.request.user)
+		for group in groups_assigned:
+		    students = Student.objects.filter(group=group)
+		    group_to_student_dict[group] = students
 
-        main_categories = Category.objects.all()
-        sub_categories = {}
-        for category in main_categories:
-        	sub_categories[category.id] = SubCategory.objects.filter(main_category = category)
-
-        self.context['loop_times'] = range(1, 13)
-        self.context['week'] = week
-        self.context['student_groups'] = group_to_student_dict
-        self.context['main_categories'] = Category.objects.all()
-        self.context['sub_categories'] = sub_categories
-        return render(self.request, self.template_name, self.context)
+		main_categories = Category.objects.filter(classroom=classroom)
+		sub_categories = {}
+		for category in main_categories:
+			sub_categories[category.id] = SubCategory.objects.filter(main_category = category)
+		self.context['loop_times'] = range(1, 13)
+		self.context['week'] = week
+		self.context['student_groups'] = group_to_student_dict
+		self.context['main_categories'] = main_categories
+		self.context['sub_categories'] = sub_categories
+		return render(self.request, self.template_name, self.context)
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text)

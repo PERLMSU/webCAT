@@ -11,14 +11,13 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
 from django.template.defaulttags import register
-from .forms import AddCategoryForm, AddSubCategoryForm, EditCategoryForm, AddCommonFeedbackForm, EditDraftForm, AddRevisionNotesForm
+from .forms import *
 # Create your views here.
 from django.db import IntegrityError
 from classroom.models import Classroom
-
-from feedback.models import Category, SubCategory, CommonFeedback, Draft, Notification, Grade
+from feedback.models import *
 from classroom.models import Student, Group
-from notes.models import Feedback
+from notes.models import Note
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from datetime import date, timedelta
@@ -36,6 +35,31 @@ def compare_grade(grade,val):
 def get_draft_grades(draft):
 	return Grade.objects.filter(draft=draft)
 
+
+
+
+@register.filter
+def get_subcategory_observations(subcategory):
+	return Observation.objects.filter(sub_category=subcategory)
+
+
+@register.filter
+def get_subcategory_feedbacks(subcategory):
+	return Feedback.objects.filter(sub_category=subcategory)	
+
+@register.filter
+def get_subcategory_feedback_explanations(subcategory):
+	return Explanation.objects.filter(sub_category=subcategory)	
+
+
+@register.filter
+def get_observation_feedbacks(observation):
+	return Feedback.objects.filter(observation=observation)
+
+@register.filter
+def get_feedback_explanations(feedback):
+	return Explanation.objects.filter(feedback=feedback)
+
 @register.filter
 def get_grade_for_category(draft,category):
 	try:
@@ -52,7 +76,7 @@ def get_revision_notifications(draft):
 
 @register.filter
 def get_student_feedback(student_pk,week):
-    feedback_notes = Feedback.objects.filter(student=student_pk,week_num=week)
+    feedback_notes = Note.objects.filter(student=student_pk,week_num=week)
     return feedback_notes
 
 @register.filter
@@ -61,9 +85,10 @@ def get_subcategories(category_pk):
     return sub_categories
 
 @register.filter
-def get_common_feedbacks(subcategory_pk):
-	feedback_collection = CommonFeedback.objects.filter(sub_category=subcategory_pk)
+def get_feedback_pieces(subcategory_pk):
+	feedback_collection = FeedbackPiece.objects.filter(sub_category=subcategory_pk)
 	return feedback_collection
+
 
 @register.filter
 def get_student_draft(student_pk, week):
@@ -82,17 +107,29 @@ class FeedbackView(LoginRequiredMixin, FormView):
 		if 'week' in self.kwargs:
 			week = int(self.kwargs['week'])
 		else:
-		    week = 1
+			week = 1
 
-	#	raise Exception("what")
-		groups = Group.objects.filter(current_instructor = self.request.user)
+		current_classroom_pk = self.request.user.current_classroom_id
+
+		if current_classroom_pk:
+			try:
+
+				classroom = Classroom.objects.get(id=current_classroom_pk)
+
+			except Classroom.DoesNotExist:
+				classroom = None
+				self.add_message("Error when trying to load current classroom.")
+		else:
+			self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
+
+		groups = Group.objects.filter(classroom=classroom,current_instructor = self.request.user)
 		groups_to_students = {}
 		student_to_feedback_draft = {}
 		for group in groups:
 			groups_to_students[group] = Student.objects.filter(group=group)
 
 	#	raise Exception("test!")
-		main_categories = Category.objects.all() #TODO - will have to filter on current classroom.
+		main_categories = Category.objects.filter(classroom=classroom)
 
 		self.context['week'] = week
 		self.context['loop_times'] = range(1, 13)
@@ -181,30 +218,30 @@ class InboxView(LoginRequiredMixin,TemplateView):
 		messages.add_message(self.request, mtype, text)	
 
 
-class CommonView(LoginRequiredMixin,TemplateView):
-	template_name = "common.html"
-	context = {}	
+# class CommonView(LoginRequiredMixin,TemplateView):
+# 	template_name = "common.html"
+# 	context = {}	
 
-	def get(self, request, *args, **kwargs):
-		try:
-			classroom = Classroom.objects.get(instructor = self.request.user)
-		except Classroom.DoesNotExist:
-			classroom = None
+# 	def get(self, request, *args, **kwargs):
+# 		try:
+# 			classroom = Classroom.objects.get(instructor = self.request.user)
+# 		except Classroom.DoesNotExist:
+# 			classroom = None
 
-		main_categories = Category.objects.filter(classroom=classroom)
+# 		main_categories = Category.objects.filter(classroom=classroom)
 		
 
-		sub_categories = {}
-		for category in main_categories:
-			sub_categories[category.id] = SubCategory.objects.filter(main_category = category)		
+# 		sub_categories = {}
+# 		for category in main_categories:
+# 			sub_categories[category.id] = SubCategory.objects.filter(main_category = category)		
 
-		self.context['main_categories'] = main_categories
-		self.context['sub_categories'] = sub_categories
+# 		self.context['main_categories'] = main_categories
+# 		self.context['sub_categories'] = sub_categories
 
-		return render(self.request, self.template_name, self.context)
+# 		return render(self.request, self.template_name, self.context)
 
-	def add_message(self, text, mtype=25):
-		messages.add_message(self.request, mtype, text)	
+# 	def add_message(self, text, mtype=25):
+# 		messages.add_message(self.request, mtype, text)	
 
 
 
@@ -236,7 +273,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 			self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")
 		self.context['create_main_category_form'] = AddCategoryForm()
 		self.context['create_sub_category_form'] = AddSubCategoryForm()
-		self.context['create_feedback_form'] = AddCommonFeedbackForm()
+		self.context['create_feedback_form'] = AddFeedbackPieceForm()
 		self.context['main_categories'] = Category.objects.filter(classroom=classroom)
 
 		return render(self.request, self.template_name, self.context)
@@ -263,20 +300,110 @@ def create_subcategory(request, pk):
 
 def create_common_feedback(request, pk):
 
-	form = AddCommonFeedbackForm(request.POST or None)
+	form = AddFeedbackPieceForm(request.POST or None)
+	#raise Exception("yay")
 	if form.is_valid():
 		feedback = form.cleaned_data['feedback']
-		common_feedback = form.save(commit=False)
+		observation = form.cleaned_data['observation']
+
+
+		if form.cleaned_data['observation_type']:
+			observation_type = int(form.cleaned_data['observation_type'])
+		else:
+			observation_type = None
+
+		if observation_type == -1:
+			observation_type = None
+		explanation = form.cleaned_data['feedback_explanation']
+
+		#If selected from prepopulated / preexisting
+		feedback_pk = form.cleaned_data['feedback_pk']
+		observation_pk = form.cleaned_data['observation_pk']
+		explanation_pk = form.cleaned_data['feedback_explanation_pk']
+
+		subcategory_pk = form.cleaned_data['subcategory_pk']
+
+		observation_object = None
+		feedback_object = None
+		explanation_object = None
+
+		#raise Exception("wtf")
 		try:
-			common_feedback.sub_category = SubCategory.objects.get(id = pk)
-			common_feedback.save()
-			messages.add_message(request, messages.SUCCESS, 'Feedback sucessfully created.')
+			subcategory = SubCategory.objects.get(id=subcategory_pk)
+		except SubCategory.DoesNotExist:
+			subcategory = None
+
+
+		if observation_pk == None:
+			#Create observation
+			try:
+				new_observation = Observation(sub_category=subcategory, observation = observation, observation_type = observation_type )
+				new_observation.save()	
+				observation_object = new_observation					
+				messages.add_message(request, messages.SUCCESS, 'Successfully added new observation')
+			except Exception as e:
+				messages.add_message(request, messages.ERROR, 'Unable to create this observation %s' % e)				
+		else:
+			try:
+				observation_object = Observation.objects.get(id=observation_pk)
+			except Observation.DoesNotExist:
+				observation_object = None			
+
+
+		if feedback_pk == None:
+			#Create observation
+			try:
+				new_feedback = Feedback(observation=observation_object, feedback = feedback,sub_category=subcategory)
+				new_feedback.save()	
+				feedback_object = new_feedback					
+				messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback')
+			except Exception as e:
+				messages.add_message(request, messages.ERROR, 'Unable to create this feedback %s' % e)		
+		else:
+			try:
+				feedback_object = Feedback.objects.get(id=feedback_pk)
+			except Feedback.DoesNotExist:
+				feedback_object = None					
+
+		if explanation_pk == None:
+			#Create observation
+			try:
+				new_explanation = Explanation(feedback=feedback_object, feedback_explanation = explanation,sub_category=subcategory)
+				new_explanation.save()	
+				explanation_object = new_explanation					
+				messages.add_message(request, messages.SUCCESS, 'Successfully added new explanation')
+			except Exception as e:
+				messages.add_message(request, messages.ERROR, 'Unable to create this explanation %s' % e)		
+		else:
+			try:
+				explanation_object = Explanation.objects.get(id=explanation_pk)
+			except Explanation.DoesNotExist:
+				explanation_object = None	
+
+
+		try:
+			new_fb_piece = FeedbackPiece(sub_category=subcategory, observation = observation_object, feedback = feedback_object, feedback_explanation = explanation_object)
+			new_fb_piece.save()
+			messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback piece playa!')
 		except Exception as e:
-			messages.add_message(request, messages.ERROR, 'Error when adding feedback: '+e)
+			messages.add_message(request, messages.ERROR, 'Unable to create this feedback piece %s' % e)				
 		return HttpResponseRedirect('/feedback/categories/')
-	else: 
-		messages.error(request, form.errors)
-		return HttpResponseRedirect('/feedback/categories/') 
+
+	messages.add_message(request, messages.ERROR, 'Form not valid')
+	return HttpResponseRedirect('/feedback/categories/')			
+			#new_feedback_piece = FeedbackPiece.create()
+
+	# 	common_feedback = form.save(commit=False)
+	# 	try:
+	# 		common_feedback.sub_category = SubCategory.objects.get(id = pk)
+	# 		common_feedback.save()
+	# 		messages.add_message(request, messages.SUCCESS, 'Feedback sucessfully created.')
+	# 	except Exception as e:
+	# 		messages.add_message(request, messages.ERROR, 'Error when adding feedback: '+e)
+	# 	return HttpResponseRedirect('/feedback/categories/')
+	# else: 
+	# 	messages.error(request, form.errors)
+	# 	return HttpResponseRedirect('/feedback/categories/') 
 
 
 def approve_draft(request, pk):
@@ -315,8 +442,20 @@ def create_category(request):
 		name = form.cleaned_data['name']
 		description = form.cleaned_data['description']
 		category = form.save(commit=False)
+
+		current_classroom_pk = request.user.current_classroom_id
+		classroom = None
+		if current_classroom_pk:
+			try:
+				classroom = Classroom.objects.get(id=current_classroom_pk)
+			except Classroom.DoesNotExist:
+				classroom = None
+				messages.add_message(request, messages.ERROR, "Error when trying to load current classroom.")
+		else:
+			messages.add_message(request, messages.ERROR, "No current classroom is set. Please visit the dashboard to set a current classroom.")
+
 		try:
-			category.classroom = Classroom.objects.get(instructor = request.user)
+			category.classroom = classroom
 			category.save()
 			messages.add_message(request, messages.SUCCESS, 'Category sucessfully created.')
 		except IntegrityError as e:

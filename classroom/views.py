@@ -12,7 +12,7 @@ from classroom.models import Student, Group, Classroom
 
 from userprofile.models import Profile
 
-from .forms import AddStudentForm, AddGroupForm, AddClassroomForm, AssignInstructorForm, AssignMultipleGroupsForm,AssignMultipleStudentsForm
+from .forms import *
 MAX_STUDENTS = 4
 
 @register.filter
@@ -46,6 +46,38 @@ def register_class(request):
     else: 
         messages.error(request, form.errors)
         return HttpResponseRedirect('/dashboard/')     
+
+
+def edit_classroom(request, pk):
+    form = EditClassroomForm(request.POST or None)
+    #raise Exception("hello")
+    if form.is_valid():
+
+        try:
+            classroom = Classroom.objects.get(id = pk)
+        except Exception as e:
+            messages.add_message(request, messages.ERROR, "Could not edit classroom: "+e)  
+            return HttpResponseRedirect(reverse('dash-manage-users'))
+
+        classroom.course = form.cleaned_data['course']
+        classroom.description = form.cleaned_data['description']
+
+        current_classroom_flag = form.cleaned_data['current_classroom']
+        classroom.num_weeks = form.cleaned_data['num_weeks']
+
+
+        if current_classroom_flag:
+            request.user.current_classroom_id = pk
+            request.user.save()
+            messages.add_message(request, messages.SUCCESS, "Set classroom as current. ")          
+
+        classroom.save()
+        messages.add_message(request, messages.SUCCESS, "Classroom successfully edited! ")  
+        return HttpResponseRedirect(reverse('dash-home'))
+    else:
+        messages.add_message(request, messages.ERROR, "User not edited, form inputs not valid.")   
+        return HttpResponseRedirect(reverse('dash-home'))
+
 
 def add_group(request):
     form = AddGroupForm(request.POST or None)
@@ -175,6 +207,7 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
                     group = Group.objects.get(id = group_pk)
                     group.current_instructor = instructor
                     group.save()
+                    messages.add_message(self.request, messages.SUCCESS, 'Successfully assigned group to %s' % instructor.get_full_name())
                 except Exception as e:
                     messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
             return HttpResponseRedirect('/classroom/')
@@ -263,8 +296,7 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
 
     def get(self, request, *args, **kwargs):
         form = UploadFileForm()
-        students = Student.objects.all()
-        groups = Group.objects.all()
+
 
         current_classroom_pk = self.request.user.current_classroom_id
         if current_classroom_pk:
@@ -274,7 +306,10 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
                 classroom = None
                 self.add_message("Error when trying to load current classroom.")
         else:
-            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")        
+            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
+
+        students = Student.objects.filter(classroom=classroom).order_by('last_name')
+        groups = Group.objects.filter(classroom=classroom).order_by('group_number')                   
        # classroom = Classroom.objects.get(instructor = self.request.user)
         add_student_form = AddStudentForm()
         return render(self.request, self.template_name,
@@ -363,8 +398,7 @@ class UploadGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
 
     def get(self, request, *args, **kwargs):
         form = UploadFileForm()
-        groups = Group.objects.all()
-        students = Student.objects.all()
+
 
         current_classroom_pk = self.request.user.current_classroom_id
         if current_classroom_pk:
@@ -374,7 +408,10 @@ class UploadGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
                 classroom = None
                 self.add_message("Error when trying to load current classroom.")
         else:
-            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")        
+            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")  
+
+        students = Student.objects.filter(classroom=classroom).order_by('last_name')
+        groups = Group.objects.filter(classroom=classroom).order_by('group_number')
        # classroom = Classroom.objects.get(instructor = self.request.user)
         return render(self.request, self.template_name,
         {
@@ -425,8 +462,6 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     context = {}
 
     def get(self, *args, **kwargs):
-        students = Student.objects.all().order_by('last_name')
-        groups = Group.objects.all().order_by('group_number')
 
         current_classroom_pk = self.request.user.current_classroom_id
         if current_classroom_pk:
@@ -435,8 +470,13 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             except Classroom.DoesNotExist:
                 classroom = None
                 self.add_message("Error when trying to load current classroom.")
+
+
         else:
             self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")
+
+        students = Student.objects.filter(classroom=classroom).order_by('last_name')
+        groups = Group.objects.filter(classroom=classroom).order_by('group_number')
 
         # try:
         #     classroom = Classroom.objects.get(instructor = self.request.user)
@@ -446,7 +486,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         add_student_form1 = AddStudentForm()
         add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
 
-        learning_assistants = Profile.objects.all().order_by('last_name')
+        learning_assistants = Profile.objects.filter(current_classroom = classroom).order_by('last_name')
         # learning_assistants = Profile.objects.all().filter(permission_level=0)
      #  instructors = Profile.objects.all()
         return render(self.request, self.template_name,

@@ -38,8 +38,10 @@
             <th>#</th>
             <th>Name </th>
             <th>Email</th>
+            <th>Current Classroom </th>
             <th>Permission Level</th>
             <th>Verified Email</th>
+
             <th></th>
           </tr>
         </thead>
@@ -48,6 +50,7 @@
             <th scope="row">{{forloop.counter}}</th>
             <td>{{user.first_name }} {{user.last_name }}</td>
             <td><a href="{% url 'user-details' user.id %}"> {{user.email }}</a></td>
+            <td>{{user.current_classroom.course}}</td>
             <td>
               {% if user.permission_level %}
                   Professor

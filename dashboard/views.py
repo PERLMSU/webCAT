@@ -16,17 +16,7 @@ from django.template.defaulttags import register
 import django_excel as excel
 from django.db import IntegrityError
 
-from .forms import(
-			   # ProfileForm,
-				#ProfileImageForm, 
-				AccountSettingsForm, 
-				AccountEmailForm, 
-				ChangePasswordForm,
-				LoginForm,
-				AddInstructorForm,
-				EditInstructorForm,
-				ClassroomRegistrationForm,
-			) 
+from .forms import *
 
 from userprofile.models import (
 								Profile, 
@@ -208,7 +198,7 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 
 	def get(self, *args, **kwargs):
 		self.context['form'] = AddInstructorForm()
-		users = Profile.objects.all()
+		users = Profile.objects.filter()
 		self.context['users'] = users
 		self.context['edit_instructor_form'] = EditInstructorForm()
 		#raise Exception("test")
@@ -245,7 +235,7 @@ def edit_instructor(request, pk):
 		try:
 			instructor = Profile.objects.get(id = pk)
 		except Exception as e:
-			messages.add_message(self.request, messages.ERROR, "Could not edit user: "+e)  
+			messages.add_message(request, messages.ERROR, "Could not edit user: "+e)  
 			return HttpResponseRedirect(reverse('dash-manage-users'))
 
 		instructor.first_name = form.cleaned_data['first_name']
@@ -258,6 +248,9 @@ def edit_instructor(request, pk):
 	else:
 		messages.add_message(request, messages.ERROR, "User not edited, form inputs not valid.")   
 		return HttpResponseRedirect(reverse('dash-manage-users'))  
+
+
+		
 
 class DashboardView(LoginRequiredMixin, TemplateView):
 	""" dashboard page, manage users

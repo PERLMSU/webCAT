@@ -64,8 +64,7 @@ class EditInstructorForm(forms.Form):
                             widget=forms.TextInput(attrs=dict(required=True,
                             max_length=30, render_value=False)),
                             label=_("Email"))
-   
-
+    
 class AddInstructorForm(forms.Form):
     """ add instructor form
     """

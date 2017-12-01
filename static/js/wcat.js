@@ -1,3 +1,68 @@
+
+  // $("#fb-piece-observation").click(function(){
+  //   $("#link").off("click");
+  // });
+
+$(':checkbox').checkboxpicker();
+
+
+$(document).on('change',".observation-dropdown", function(){
+ //alert($(this).val());  // will display selected option's value
+ //alert($(this).find('option:selected').text()); //will display selected option's text
+
+ if ($(this).find('option:selected').text() == "-")
+ {
+    $('.observation-new').prop('disabled', false); 
+    $(".radio-inline input[type=radio]").prop('disabled', false)
+
+   // $('.observation-new-type').prop('disabled', false); 
+ }
+ else 
+ {
+    $('.observation-new').prop('disabled', true); 
+    $(".radio-inline input[type=radio]").prop('disabled', true)
+ }
+ 
+});  
+
+
+$(document).on('change',".feedback-dropdown", function(){
+ //alert($(this).val());  // will display selected option's value
+ //alert($(this).find('option:selected').text()); //will display selected option's text
+
+ if ($(this).find('option:selected').text() == "-")
+ {
+    $('.feedback-new').prop('disabled', false); 
+
+   // $('.observation-new-type').prop('disabled', false); 
+ }
+ else 
+ {
+    $('.feedback-new').prop('disabled', true); 
+ }
+ 
+});  
+
+
+
+$(document).on('change',".explanation-dropdown", function(){
+ //alert($(this).val());  // will display selected option's value
+ //alert($(this).find('option:selected').text()); //will display selected option's text
+
+ if ($(this).find('option:selected').text() == "-")
+ {
+    $('.explanation-new').prop('disabled', false); 
+
+ }
+ else 
+ {
+    $('.explanation-new').prop('disabled', true); 
+ }
+ 
+});  
+
+
+
 $(function() {
     $('#weekDropDown').change(function() {
         this.form.submit();

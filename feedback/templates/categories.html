@@ -42,15 +42,25 @@
                 role="button"> {{subcategory.name }} </a>
             <a class="addcommonfeedback" data-toggle="modal" data-target="#createCommonFeedback_{{subcategory.id}}" role="button"><span class="fa fa-plus green-icon"></span></a>
               <a href="#" data-href="{% url "delete-subcategory" subcategory.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{subcategory.name}}" value="Delete" class="deletecategory"><span class="fa fa-remove red-icon"></span></a>   
-              {% with subcategory.id|get_common_feedbacks as feedback_collection %}
+              {% with subcategory.id|get_feedback_pieces as feedback_collection %}
               <ul>
                 <hr>
-                {% for feedback in feedback_collection %}
+                {% for feedback_piece in feedback_collection %}
                 <h4> Feedback Piece </h4>
                 <li>
-                  <p><b>Problem:</b> {{feedback.problem}}</p>
-                  <p><b>Solution: </b> {{feedback.solution}}</p>
-                  <p><b>Why a good solution: </b> {{feedback.solution_explanation}}</p>
+                  <p><b>Observation: </b>{{feedback_piece.observation.observation}} </p>
+                  <p><b>Observation Type:  </b>
+                    {% if feedback_piece.observation.observation_type == True %}
+                    Positive
+                    {% elif feedback_piece.observation.observation_type == False %} 
+                    Negative
+                    {% else %}
+                      Neutral
+                    {% endif %}
+                 
+                  </p>
+                  <p><b>Feedback: </b> {{feedback_piece.feedback.feedback}}</p>
+                  <p><b>Why a good solution: </b> {{feedback_piece.feedback_explanation.feedback_explanation}}</p>
                   <hr>
                 </li>
                 {% endfor %}

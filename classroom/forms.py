@@ -5,6 +5,11 @@ from .models import *
 from datetime import date
 
 
+class EditClassroomForm(forms.Form):
+    course = forms.CharField(required=True)
+    description = forms.CharField(required=False)
+    num_weeks = forms.IntegerField(required=True)
+    current_classroom = forms.BooleanField(required=False)
 
 class AddStudentForm(forms.ModelForm):
 

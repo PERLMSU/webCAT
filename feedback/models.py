@@ -28,7 +28,7 @@ class Category(models.Model):
     description = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    def __str__(self):
+    def __str__(self): 
         return self.name
 
 class SubCategory(models.Model):
@@ -40,25 +40,37 @@ class SubCategory(models.Model):
     def __str__(self):
         return self.name
 
-class CommonFeedback(models.Model):
-    sub_category = models.ForeignKey(SubCategory)
 
-    feedback = models.CharField(max_length=200, null=True)
-    observation = models.CharField(max_length=200, null=True)
-    problem = models.CharField(max_length=2000, null=True)
-    solution = models.CharField(max_length=2000, null=True)
-    solution_explanation = models.CharField(max_length=2000, null=True)
+    # feedback = models.CharField(max_length=200, null=True)
+    # observation = models.CharField(max_length=200, null=True)
+    # problem = models.CharField(max_length=2000, null=True)
+
+    # solution_explanation = models.CharField(max_length=2000, null=True)
     
-    def __str__(self):
-        return "Problem: {} \nSolution: {}".format(self.problem, self.solution)  
+    # def __str__(self):
+    #     return "Problem / Observaton: {} \nSolution: {}".format(self.problem, self.solution)  
 
+class Observation(models.Model):
+    sub_category = models.ForeignKey(SubCategory)
+    observation = models.CharField(max_length=2000, null=True)
+    # 1 for positive, 0 for negative
+    observation_type = models.NullBooleanField()
 
-# class ObservationFeedback(models.Model):
-#     sub_category = models.ForeignKey(SubCategory)
-#     problem = models.CharField(max_length=300)
+class Feedback(models.Model):
+    sub_category = models.ForeignKey(SubCategory)
+    observation = models.ForeignKey(Observation)
+    feedback = models.CharField(max_length=2000, null=True)
 
+class Explanation(models.Model):
+    sub_category = models.ForeignKey(SubCategory)
+    feedback = models.ForeignKey(Feedback)
+    feedback_explanation = models.CharField(max_length=2000, null=True)    
 
-
+class FeedbackPiece(models.Model):
+    sub_category = models.ForeignKey(SubCategory)
+    observation = models.ForeignKey(Observation)
+    feedback = models.ForeignKey(Feedback)
+    feedback_explanation = models.ForeignKey(Explanation)
 
 class Draft(models.Model):
     text = models.CharField(max_length=4096)

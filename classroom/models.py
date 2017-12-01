@@ -12,6 +12,7 @@ class Classroom(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     current_week = models.IntegerField(default=1)
+    num_weeks = models.IntegerField(default=12)
     def __str__(self):
         return self.course
 
