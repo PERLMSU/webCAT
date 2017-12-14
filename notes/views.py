@@ -94,9 +94,12 @@ class NotesView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
 
 		if 'week' in self.kwargs:
-		    week = int(self.kwargs['week'])
+			week = int(self.kwargs['week'])
 		else:
-		    week = 1
+			if request.user.current_classroom.current_week:
+				week = request.user.current_classroom.current_week
+			else:
+				week = 1            
 
 		current_classroom_pk = self.request.user.current_classroom_id
 		if current_classroom_pk:
@@ -106,7 +109,7 @@ class NotesView(LoginRequiredMixin, TemplateView):
 		        classroom = None
 		        self.add_message("Error when trying to load current classroom.")
 		else:
-		    self.add_message("No current classroom is set. Please	 visit the dashboard to set a current classroom.") 
+		    self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
 
 		group_to_student_dict = {}
 		groups_assigned = Group.objects.filter(classroom=classroom,current_instructor = self.request.user)

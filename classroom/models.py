@@ -18,11 +18,14 @@ class Classroom(models.Model):
 
 class Group(models.Model):
     classroom = models.ForeignKey(Classroom,null=True, default=None)
-    group_number = models.IntegerField(unique=True, null=True)
+    group_number = models.IntegerField(null=True)
     current_instructor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
     description = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('classroom', 'group_number',)    
 
     def __str__(self):
         return self.description

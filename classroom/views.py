@@ -61,7 +61,7 @@ def edit_classroom(request, pk):
 
         classroom.course = form.cleaned_data['course']
         classroom.description = form.cleaned_data['description']
-
+        classroom.current_week = form.cleaned_data['current_week']
         current_classroom_flag = form.cleaned_data['current_classroom']
         classroom.num_weeks = form.cleaned_data['num_weeks']
 
@@ -75,7 +75,7 @@ def edit_classroom(request, pk):
         messages.add_message(request, messages.SUCCESS, "Classroom successfully edited! ")  
         return HttpResponseRedirect(reverse('dash-home'))
     else:
-        messages.add_message(request, messages.ERROR, "User not edited, form inputs not valid.")   
+        messages.add_message(request, messages.ERROR, "Classroom not edited, form inputs not valid.")   
         return HttpResponseRedirect(reverse('dash-home'))
 
 

@@ -1,18 +1,23 @@
-<div class="col-lg-9">    
+<div class="col-lg-10">    
     <div class="row" id="main_categories">
-        <div class="container category-container">
+        <div class="category-container">
+            <div class="col-lg-12">
+                <div class="container">
+                    <h5> Main Categories</h5>                   
+                </div>
+            </div>            
             <div class="col-lg-12">
                 {% for category in main_categories %}       
-                    <div class="col-lg-5">
-                        <a href="#" id="{{category.id}}" class="main-category-btn btn-default "><span>{{category.name}}</span></a>
+                    <div class="col-lg-6">
+                        <span><a href="#" id="{{category.id}}" class="main-category-btn btn-default ">{{category.name}}</a></span>
                     </div>  
-                {% if forloop.counter|divisibleby:"2" %}
+                    {% if forloop.counter|divisibleby:"2" %}
                 </div>
             </div>
-            <div class="container category-container">
+            <div class="category-container">
                 <div class="col-lg-12">
-                {% endif %}
-                    {% endfor %}
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>

@@ -107,7 +107,10 @@ class FeedbackView(LoginRequiredMixin, FormView):
 		if 'week' in self.kwargs:
 			week = int(self.kwargs['week'])
 		else:
-			week = 1
+			if request.user.current_classroom.current_week:
+				week = request.user.current_classroom.current_week
+			else:
+				week = 1
 
 		current_classroom_pk = self.request.user.current_classroom_id
 
@@ -203,7 +206,10 @@ class InboxView(LoginRequiredMixin,TemplateView):
 		if 'week' in self.kwargs:
 			week = int(self.kwargs['week'])
 		else:
-		    week = 1
+			if request.user.current_classroom.current_week:
+				week = request.user.current_classroom.current_week
+			else:
+				week = 1
 
 
 		self.context['draft_notifications_need_approval'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 1, draft_to_approve__week_num=week)

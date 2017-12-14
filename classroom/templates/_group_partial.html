@@ -56,11 +56,12 @@
           {% endif %}
           
 
-          <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a> 
+
           <td>
             <a href="#" class="assigngroup" data-toggle="modal" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups"><span class="glyphicon glyphicon-paste"></span></a>
           </td>
           <td><a href="#" data-toggle="modal" data-target="#assignMultipleStudents_{{group.id}}"><span class="fa fa-edit"></span></a></td>  
+          <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a></td>
 
 <div class="modal fade" id="assignMultipleStudents_{{group.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">

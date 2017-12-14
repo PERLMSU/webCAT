@@ -200,6 +200,7 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 		self.context['form'] = AddInstructorForm()
 		users = Profile.objects.filter()
 		self.context['users'] = users
+		self.context['classrooms'] = Classroom.objects.all().order_by('course')
 		self.context['edit_instructor_form'] = EditInstructorForm()
 		#raise Exception("test")
 		return render(self.request, self.template_name, self.context)
@@ -241,6 +242,7 @@ def edit_instructor(request, pk):
 		instructor.first_name = form.cleaned_data['first_name']
 		instructor.last_name = form.cleaned_data['last_name']
 		instructor.email = form.cleaned_data['email']
+		instructor.current_classroom = form.cleaned_data['current_classroom']
 		instructor.permission_level = form.cleaned_data['permission_level']
 		instructor.save()
 		messages.add_message(request, messages.SUCCESS, "User successfully edited!")   
@@ -250,7 +252,19 @@ def edit_instructor(request, pk):
 		return HttpResponseRedirect(reverse('dash-manage-users'))  
 
 
-		
+class DeleteInstructorView(LoginRequiredMixin, View):
+    """ delete instructor view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            instructor = Profile.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this user %s' % e)
+        finally:
+            instructor.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'User successfully deleted!')
+        return HttpResponseRedirect('/dashboard/manage/') 
+
 
 class DashboardView(LoginRequiredMixin, TemplateView):
 	""" dashboard page, manage users

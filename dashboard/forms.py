@@ -56,6 +56,7 @@ class EditInstructorForm(forms.Form):
          (1, 'Admin')]    
     first_name = forms.CharField()
     last_name = forms.CharField()
+    current_classroom = forms.ModelChoiceField(queryset=Classroom.objects.all().order_by('course'))
     permission_level = forms.ChoiceField(choices = CHOICES,
                             widget=forms.RadioSelect(attrs=dict(required=True,
                             render_value=False)),

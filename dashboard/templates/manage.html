@@ -43,6 +43,7 @@
             <th>Verified Email</th>
 
             <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>                    
@@ -61,9 +62,11 @@
             <td> {{user.is_verified}}</td>
            <td>
             <a href="#" data-toggle="modal" data-target="#EditUser_{{user.id}}"><span class="fa fa-edit"> </span></a> 
-            <a style="padding-left:5px;" href="#" data-toggle="modal" data-target="#EditUser_{{user.id}}"><span class="fa fa-remove"></span></a>
-           
-           </td>  
+             </td> 
+<td><a href="#" data-href="{% url "dash-remove-user" user.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{user.first_name}} {{user.last_name}}" value="Delete" class="deletestudent"><span class="fa fa-remove red-icon"></span></a></td>             
+           <!--   <td>
+            <a href="#" data-toggle="modal" data-target="#EditUser_{{user.id}}"><span class="fa fa-remove red-icon"></span></a>
+           </td>   -->
 
 <div class="modal fade" id="EditUser_{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -91,6 +94,23 @@
         <label for="email">Email: </label>
         <input type="text" value="{{user.email}}" name="email">
       </div>
+
+      <div class="form-group">
+        <label for="current_classroom">Classroom: </label>
+       <!--  <span>{{user.current_classroom}}</span> -->
+        <select name="current_classroom">
+          {% for classroom in classrooms %}
+            {% if classroom.id == user.current_classroom.id %}
+              <option value="{{classroom.id}}" selected >{{classroom.course}}</option>
+            {% else %}
+              <option value="{{classroom.id}}">{{classroom.course}}</option>
+
+            {% endif %}
+          {% endfor %}
+        </select>
+        <!-- <input type="text" value="{{user.current_classroom}}" name="current_classroom"> -->
+      </div>
+
       {% if user.permission_level == 0 %}
         <input type="radio" name="permission_level" value="0" checked> Learning Assistant<br>
         <input type="radio" name="permission_level" value="1"> Admin<br>     
@@ -155,6 +175,29 @@
     </div>
 
   </div>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Delete Instructor
+            </div>
+            <div class="modal-body">
+                <span> Are you sure you want to delete: </span>
+                 <b><span type="text" name="del_name" id="del_name"></span></b>
+                 <span> ? </span>
+
+            </div>         
+            <div style="display: none;" class="alert alert-warning warning-delete-group" role="alert">
+                <span style="color: darkyellow;" class="fa fa-warning"></span>Warning! Is instructor assigned to any classrooms or groups? Blah blah blah
+            </div>     
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger btn-ok">Delete</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 

@@ -43,10 +43,8 @@
 
 						    		<div class="row student-checkboxes">
 						    		
-										<div class="col-md-1">						    			
-						    				<input type="checkbox" name="student_name_{{forloop.counter}}" value="{{student.id}}"> </input>
-						    			</div>					    			
-										<div class="col-md-10">						    			
+				    				
+										<div class="col-md-12">						    			
 						    				<span> {{student}}</span> 
 						    				{% with student.id|get_feedback_notes:week as notes %}
 <!-- 						    				<ul>
@@ -55,6 +53,9 @@
 						    					{% endfor %}	
 						    				</ul> -->
 						    				{% endwith %}
+										<div class="col-md-12">						    			
+						    				<input type="checkbox" name="student_name_{{forloop.counter}}" value="{{student.id}}"> </input>
+						    			</div>							    				
 						    			</div>
 							    
 							    	</div>

@@ -35,10 +35,11 @@
           <td> {{student.notes}}</td>
           <td> {{student.student_id}}</td>
           <td> {{student.classroom}}</td>
-          <td><a href="#" data-href="{% url "delete-student" student.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{student.first_name}} {{student.last_name}}" value="Delete" class="deletestudent"><span class="fa fa-remove red-icon"></span></a> 
+
           <td>
             <a href="#" class="editstudentrow" data-toggle="modal" data-id="{{student.id}}" data-target="#EditStudentModal_{{student.id}}"><span class="fa fa-edit"></span></a>        
           </td>
+          <td><a href="#" data-href="{% url "delete-student" student.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{student.first_name}} {{student.last_name}}" value="Delete" class="deletestudent"><span class="fa fa-remove red-icon"></span></a></td>          
         </tr>
 
 

@@ -9,7 +9,13 @@ class EditClassroomForm(forms.Form):
     course = forms.CharField(required=True)
     description = forms.CharField(required=False)
     num_weeks = forms.IntegerField(required=True)
+    current_week = forms.IntegerField(required=True)
     current_classroom = forms.BooleanField(required=False)
+
+    def clean_current_week(self):
+        if (self.cleaned_data['current_week'])< 1 or (self.cleaned_data['current_week']) > (self.cleaned_data['num_weeks']):
+            raise forms.ValidationError("Current week must be in range of the number of weeks of the course.")
+        return self.cleaned_data['current_week']    
 
 class AddStudentForm(forms.ModelForm):
 
