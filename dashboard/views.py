@@ -23,13 +23,17 @@ from userprofile.models import (
 								ConfirmationKey
 							)
 
-from classroom.models import Classroom, Student
-
+from classroom.models import *
+from classroom.forms import AddClassroomForm,EditClassroomForm,AddEditRotationForm
 
 @register.filter
 def get_num_students(classroom_pk):
 	return Student.objects.filter(classroom=classroom_pk).count()
 
+
+@register.filter
+def get_rotations(classroom_pk,semester_pk):
+	return Rotation.objects.filter(classroom=classroom_pk,semester=semester_pk)
 
 @register.filter
 def get_num_instructors(classroom_pk):
@@ -230,6 +234,9 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text) 
 
+
+
+
 def edit_instructor(request, pk):
 	form = EditInstructorForm(request.POST or None)
 	if form.is_valid():
@@ -276,13 +283,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
 		if self.request.user.is_authenticated():
 			self.context['form'] = AddInstructorForm()
-			self.context['register_classroom_form'] = ClassroomRegistrationForm()
+#			self.context['register_classroom_form'] = ClassroomRegistrationForm()
 			users = Profile.objects.all()
 			self.context['users'] = users
 			#if request.user.current_classroom_id:
 			self.context['current_classroom'] = Classroom.objects.get(id=request.user.current_classroom_id or None)
 			#else:
 			#	self.context['c']
+			self.context['rotation_form'] = AddEditRotationForm()
+			self.context['semesters'] = Semester.objects.all().order_by('date_begin')
+			self.context['register_classroom'] = AddClassroomForm()
+			self.context['edit_classroom'] = EditClassroomForm()
 
 			self.context['classrooms'] = Classroom.objects.filter(instructor = self.request.user)
 			return render(self.request, self.template_name, self.context)

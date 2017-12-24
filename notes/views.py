@@ -97,7 +97,7 @@ class NotesView(LoginRequiredMixin, TemplateView):
 			week = int(self.kwargs['week'])
 		else:
 			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week
+				week = request.user.current_classroom.current_week-1
 			else:
 				week = 1            
 
@@ -121,7 +121,8 @@ class NotesView(LoginRequiredMixin, TemplateView):
 		sub_categories = {}
 		for category in main_categories:
 			sub_categories[category.id] = SubCategory.objects.filter(main_category = category)
-		self.context['loop_times'] = range(1, 13)
+		# self.context['loop_times'] = range(1, 13)
+		self.context['loop_times'] = range(1,classroom.get_num_weeks())
 		self.context['week'] = week
 		self.context['student_groups'] = group_to_student_dict
 		self.context['main_categories'] = main_categories

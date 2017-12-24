@@ -19,13 +19,14 @@ from userprofile.models import Profile
 from classroom.models import Classroom
 
 
-class ClassroomRegistrationForm(forms.ModelForm):
-    course = forms.CharField()
-    description = forms.CharField(required=False)
+# class ClassroomRegistrationForm(forms.ModelForm):
+#     course = forms.CharField()
+#     description = forms.CharField(required=False)
+    
 
-    class Meta:
-        model = Classroom
-        fields = ['course','description']
+#     class Meta:
+#         model = Classroom
+#         fields = ['course','description']
 
 
 

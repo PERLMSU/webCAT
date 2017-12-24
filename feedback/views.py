@@ -108,7 +108,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			week = int(self.kwargs['week'])
 		else:
 			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week
+				week = request.user.current_classroom.current_week-1
 			else:
 				week = 1
 
@@ -134,8 +134,9 @@ class FeedbackView(LoginRequiredMixin, FormView):
 	#	raise Exception("test!")
 		main_categories = Category.objects.filter(classroom=classroom)
 
-		self.context['week'] = week
-		self.context['loop_times'] = range(1, 13)
+		self.context['week'] = int(week)
+		# self.context['loop_times'] = range(1, 13)
+		self.context['loop_times'] = range(1,classroom.get_num_weeks())
 		self.context['grade_scale'] = [x*.25 for x in range(17)]
 		self.context['groups_to_students'] = groups_to_students
 		self.context['main_categories'] = main_categories
@@ -207,7 +208,7 @@ class InboxView(LoginRequiredMixin,TemplateView):
 			week = int(self.kwargs['week'])
 		else:
 			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week
+				week = request.user.current_classroom.current_week-1
 			else:
 				week = 1
 
@@ -217,7 +218,7 @@ class InboxView(LoginRequiredMixin,TemplateView):
 		self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
 
 		self.context['week'] = week
-		self.context['loop_times'] = range(1, 13)
+		self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
 		return render(self.request, self.template_name, self.context)
 
 	def add_message(self, text, mtype=25):

@@ -82,6 +82,7 @@
                 <span>{{classroom.course}}</span>
                 <span>{{classroom.description}}</span>
                 (Current) | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
+                
             </strong>
 
                 {% else %}
@@ -89,9 +90,56 @@
                 <span>{{classroom.description}}</span> |
               <!--   <a href="#">Set Current</a> -->
                 | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
+                <form class="form-horizontal" action="{% url "classroom-edit-rotation" %}" method="POST">{% csrf_token %}
+                <h5>Create Rotation</h5>   
+                <p>{{rotation_form.start_week.label_tag}} {{rotation_form.start_week}}</p>
+                <p>{{rotation_form.length.label_tag}} {{rotation_form.length}}</p>
+                <input type="hidden" name="classroom" value="{{classroom.id}}"/>
+                <input type="hidden" name="semester" value="{{classroom.current_semester.id}}"/>
+                <input type="submit" value="Create" class="btn btn-success"/>  
+                </form>        
                 {% endif %}
+
+                {% with classroom.id|get_rotations:classroom.current_semester.id as rotations %}
+                    {% if rotations %}
+                    <h4>Semester Rotations ({{rotations.count}})</h4>
+                    {% for rotation in rotations %}
+                        <p>{{rotation}}</p>
+                        | <a href="#" data-href="{% url "classroom-delete-rotation" rotation.id %}" data-toggle="modal" data-target="#confirm-delete-{{rotation.id}}" value="Delete"><span class="fa fa-remove red-icon"></span></a>
+
+
+
+                <div class="modal fade" id="confirm-delete-{{rotation.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                Delete Rotation
+                            </div>
+                            <div class="modal-body">
+                                <span> Are you sure you want to delete: </span>
+                                 <b><p>{{rotation}}</p></b>
+                                 <span> ? </span>
+
+                            </div>    
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <a class="btn btn-danger btn-ok">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                    {% endfor %}
+                    {% else %}
+                    <h4>No Rotations Created Yet.</h4>
+                    {% endif %}
+                {% endwith %}
             </div>
             <hr>
+
+
+
 
   <div class="modal fade" id="edit_classroom_{{classroom.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -128,16 +176,42 @@
             {% endif %}
           </div>     
         </div>  
-        <div style="padding-left: 20px; padding-right: 20px;">
+
+ <div style="padding-left: 20px; padding-right: 20px;">
+      <div class="form-group">
+        {{ edit_classroom.current_semester.label }} : 
+        {{ classroom.current_semester }}
+
+        <br>
+        Dates: {{classroom.current_semester.date_begin}} - {{classroom.current_semester.date_end}}
+        <br>
+        Number of Weeks: {{ classroom.get_num_weeks }}
+        <br>
+        Set Semester: 
+
+        <select name="current_semester">
+          {% for semester in semesters %}
+            {% if semester.id == classroom.current_semester.id %}
+              <option value="{{semester.id}}" selected >{{semester.title}}</option>
+            {% else %}
+              <option value="{{semester.id}}">{{semester.title}}</option>
+
+            {% endif %}
+          {% endfor %}
+        </select>        
+          </div>
+    </div>
+
+<!--         <div style="padding-left: 20px; padding-right: 20px;">
           <div class="form-group">
              <label for="num_weeks">Number of Weeks</label>
                 <input name="num_weeks" type="number" min="1" value="{{classroom.num_weeks}}">
           </div>     
-        </div> 
+        </div>  -->
         <div style="padding-left: 20px; padding-right: 20px;">
           <div class="form-group">
              <label for="current_week">Current Week</label>
-                <input name="current_week" type="number" min="1" value="{{classroom.current_week}}">
+                <input name="current_week" type="number" min="1" max="{{classroom.get_num_weeks}}" value="{{classroom.current_week}}">
           </div>     
         </div>           
         
@@ -521,7 +595,11 @@
             <label for="description">Course Description</label>
             <textarea name="description" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter course description"></textarea>
           </div>     
-        </div>  
+        </div> 
+
+        {{ register_classroom.current_semester.label }}
+        {{ register_classroom.current_semester }}
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -532,7 +610,6 @@
     </div>
   </div>
 </div>
-
 
 
 

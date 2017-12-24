@@ -78,7 +78,7 @@ class Draft(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     week_num = models.IntegerField()
     student = models.ForeignKey(Student)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,null=True)
     status = models.PositiveSmallIntegerField(choices=DRAFT_STATUS)
 
     def send_to_instructor(self):
