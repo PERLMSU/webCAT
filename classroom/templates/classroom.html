@@ -77,12 +77,42 @@
     </div>
   </div>
 <!-- </div> -->
+<ul class="nav nav-tabs">
+{% with classroom.id|get_rotations:classroom.current_semester.id as rotations %}
+
+    {% for rotation in rotations %}
+    {% if forloop.first %}
+        <li class="active"><a data-toggle="tab" href="#rotation_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.get_end_week}}</a></li>
+    {% else %}
+        <li><a data-toggle="tab" href="#rotation_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.get_end_week}}</a></li>
+    {% endif %}
+ {% endfor %}
+</ul>
+   
+
+
+ 
+
+
+<div class="tab-content">
+   {% for rotation in rotations %}
+    {% include "_group_partial.html" %}
+    {% endfor %}
+
+</div>
+
+{% endwith %}
+
+
+
 
 
 {% include "_student_partial.html" %}
 
 
-{% include "_group_partial.html" %}
+
+
+
 
 {% include "_learningassistant_partial.html" %}
 

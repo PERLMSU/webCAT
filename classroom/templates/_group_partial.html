@@ -1,10 +1,17 @@
 {% load crispy_forms_tags %}
 <!-- <div class="container"> -->
- <div class="panel panel-success">
+{% if forloop.first %}
+ <div id='rotation_{{rotation.id}}' class="tab-pane fade in active panel panel-success">
+  {% else %}
+
+ <div id='rotation_{{rotation.id}}' class="tab-pane fade panel panel-success">
+  {% endif %}
     <div class="panel-heading">
-    <h3> Groups
-<a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup" role="button"><span class="fa fa-group"></span> Add Group  </a>
-{% if not upload_view %} 
+    <h3> Groups {{rotation.start_week}} - {{rotation.get_end_week}}
+
+{% if not upload_view %}       
+<a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup_{{rotation.id}}" role="button"><span class="fa fa-group"></span> Add Group  </a>
+
 <a class="btn btn-success float-right-button" href="{% url "classroom-upload-groups" %}"><span class="fa fa-cloud-upload"></span> Upload</a>
 {% endif %}
      </h3>
@@ -28,18 +35,24 @@
         </tr>
       </thead>
       <tbody>
-    {% for group in groups %}    
+    {% for group in rotation.id|get_rotation_groups %}    
 
         <tr>
           <th scope="row">{{forloop.counter}}</th>
-          <td>{{group.group_number }} </td>
+          <td>{{group.group.group_number }} </td>
           <td> {{ group.description }} </td>
-          <td>{% with group.current_instructor as instructor %}
+          <td>{% with group.instructor as instructor %}
               {{instructor.get_full_name}}
             {% endwith %}
+          
           </td>          
-          {% with students|get_students_by_group:group.id as group_students %}
-          {% if group_students %}
+          
+          {% with group.students.all as group_students %}
+
+          {% if group_students %} 
+           
+
+
             {% for student in group_students %}
               {% if student != None %}
               <td>{{student.first_name}} {{student.last_name}}</td>
@@ -58,10 +71,10 @@
 
 
           <td>
-            <a href="#" class="assigngroup" data-toggle="modal" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups"><span class="glyphicon glyphicon-paste"></span></a>
+            <a href="#" class="assigngroup" data-toggle="modal" data-rotationgroupid="{{group.id}}" data-instructor="{{group.instructor.id}}" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups_{{rotation.id}}"><span class="glyphicon glyphicon-paste"></span></a>
           </td>
           <td><a href="#" data-toggle="modal" data-target="#assignMultipleStudents_{{group.id}}"><span class="fa fa-edit"></span></a></td>  
-          <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a></td>
+          <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a></td>
 
 <div class="modal fade" id="assignMultipleStudents_{{group.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -95,7 +108,7 @@
 </div>
 <!-- </div>   -->
 
-<div class="modal fade" id="assignGroups" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="assignGroups_{{rotation.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -107,17 +120,21 @@
       <div class="modal-body">
         <h4>Group <span id="assign-group-num"></span></h4>
         <h5> Please select the instructor you would like to assign to this group: </h5>
-        <form class="form-horizontal" id="createStudentForm" action="{% url "classroom-assign-groups" %}" method="POST">{% csrf_token %}
+        <form class="form-horizontal" action="{% url "classroom-assign-groups" %}" method="POST">{% csrf_token %}
         <input name="group_num" type="hidden" class="hidden-group-num">
-        <select name="instructor_id">
-          {% for instructor in learning_assistants %}
-            <option value="{{ instructor.id }}">{{ instructor.get_full_name }}</option>
-          {% endfor %}
-        </select>
-        <div>
-          <label for="group_description">Description:</label>
-          <input type="text" name="group_description"/>
-        </div>
+        <input name="rotation_group_id" type="hidden" class="hidden-rotation-group">
+
+        <label for="instructor_id">Instructor: </label>
+
+        {{assign_instructor_form.instructor_id}}
+
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+            <label for="group_description">Description:</label>
+            <textarea name="group_description" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter group description/notes here">{{group.description}}</textarea>
+          </div>     
+        </div>   
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -132,7 +149,7 @@
 
 
 
-<div class="modal fade" id="createGroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="createGroup_{{rotation.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -145,7 +162,15 @@
         <h5> Add Group: </h5>
         <form class="form-horizontal" id="createGroupForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
 
-          {{add_group_form | crispy}}
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+            <label for="group_number">Group Number:</label>
+            <input name="group_number" type="text" class="form-control" placeholder="Enter group number here"></input>
+          </div>     
+        </div>  
+        <input type="hidden" value="{{rotation.id}}" name="rotation"> 
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

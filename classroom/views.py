@@ -15,6 +15,8 @@ from userprofile.models import Profile
 from .forms import *
 MAX_STUDENTS = 4
 
+
+## LEGACY CODE ################################
 @register.filter
 def get_groups_by_instructor(groups, instructor_pk):
     return groups.filter(current_instructor = instructor_pk)
@@ -31,6 +33,15 @@ def get_students_by_group(students, group_pk):
         return g_students
     except Student.DoesNotExist:
         return None
+## ######################################## ##
+@register.filter
+def get_rotation_groups(rotation_pk):
+    return RotationGroup.objects.filter(rotation=rotation_pk)
+
+
+@register.filter
+def get_rotation_groups_by_instructor(rotation_groups,instructor_pk):
+    return rotation_groups.filter(instructor = instructor_pk)
 
 def register_class(request):
     form = AddClassroomForm(request.POST or None)
@@ -51,13 +62,22 @@ def edit_rotation(request):
     form = AddEditRotationForm(request.POST or None)
     if form.is_valid():
         rotation = form.save(commit=False)
-        try:
-            # rotation.classroom = Classroom.objects.get(id=form.cleaned_data['classroom'])
+        # try:
+            # rotation.classroom = Classroom.objects.getc(id=form.cleaned_data['classroom'])
             # rotation.semester = Semester.objects.get(id=form.cleaned_data['semester'])
-            rotation.save()
-            messages.add_message(request, messages.SUCCESS, 'Rotation successfully created!')
-        except Exception as e:
-            messages.add_message(request, messages.ERROR, "An error occurred when attempting to create the rotation: "+str(e))          
+        rotation.save()
+        
+
+        messages.add_message(request, messages.SUCCESS, 'Rotation successfully created!')
+            # try:
+            #     groups = Group.objects.filter(classroom=rotation.classroom)
+            #     for group in groups:
+            #         new_rotation_group = RotationGroup(rotation=rotation,group=group)
+            # except Exception as e:
+            #     messages.add_message(request, messages.ERROR, "An error occurred when attempting to create the rotation GROUPS: "+str(e))  
+
+        # except Exception as e:
+        #     messages.add_message(request, messages.ERROR, "An error occurred when attempting to create the rotation: "+str(e))          
     else:
         messages.error(request, form.errors)
     return HttpResponseRedirect('/dashboard/') 
@@ -101,14 +121,20 @@ def add_group(request):
     if form.is_valid():
         group_num = form.cleaned_data['group_number'] 
         classroom = request.user.current_classroom
-        description = form.cleaned_data['description']
-        group = form.save(commit=False)
+        rotation = form.cleaned_data['rotation']
+        group = Group.objects.create(group_number=group_num)
         try:
             group = Group.objects.get(group_number=group_num,classroom=classroom)
-            messages.add_message(request, messages.ERROR, 'Group already exists. ')
+            try:
+                rotation_group = RotationGroup.objects.get(rotation=rotation,group=group)            
+                messages.add_message(request, messages.ERROR, 'Group already exists. ')
+            except RotationGroup.DoesNotExist:
+                group.create_rotation_group(rotation)
+                messages.add_message(request, messages.SUCCESS, 'Group successfully added!')
         except Group.DoesNotExist:
             group.classroom = classroom
             group.save()
+            group.create_rotation_group(rotation)            
             messages.add_message(request, messages.SUCCESS, 'Group successfully added!')
         return HttpResponseRedirect('/classroom/')
     else: 
@@ -175,32 +201,32 @@ class UploadFileForm(forms.Form):
 
 
 
-class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
-    """ assign students to groups
-    """
-    context = {} 
+# class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
+#     """ assign students to groups
+#     """
+#     context = {} 
 
-    def post(self, *args, **kwargs):
-        form = AssignMultipleStudentsForm(self.request.POST or None)
-        if form.is_valid():
-            checked_groups = form.cleaned_data['group_numbers']
-            try:
-                instructor = Profile.objects.get(id=kwargs['pk'])
-            except Exception as e:
-                messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
-                return HttpResponseRedirect('/classroom/')
+#     def post(self, *args, **kwargs):
+#         form = AssignMultipleStudentsForm(self.request.POST or None)
+#         if form.is_valid():
+#             checked_groups = form.cleaned_data['group_numbers']
+#             try:
+#                 instructor = Profile.objects.get(id=kwargs['pk'])
+#             except Exception as e:
+#                 messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
+#                 return HttpResponseRedirect('/classroom/')
 
-            for group_pk in checked_groups:
-                try:
-                    group = Group.objects.get(id = group_pk)
-                    group.current_instructor = instructor
-                    group.save()
-                except Exception as e:
-                    messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
-            return HttpResponseRedirect('/classroom/')
-        else:
-            messages.error(self.request, form.errors)
-            return HttpResponseRedirect('/classroom/')  
+#             for group_pk in checked_groups:
+#                 try:
+#                     group = Group.objects.get(id = group_pk)
+#                     group.current_instructor = instructor
+#                     group.save()
+#                 except Exception as e:
+#                     messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
+#             return HttpResponseRedirect('/classroom/')
+#         else:
+#             messages.error(self.request, form.errors)
+#             return HttpResponseRedirect('/classroom/')  
 
 
 
@@ -222,7 +248,7 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
             for group_pk in checked_groups:
                 try:
                     group = Group.objects.get(id = group_pk)
-                    group.current_instructor = instructor
+                    group.instructor = instructor
                     group.save()
                     messages.add_message(self.request, messages.SUCCESS, 'Successfully assigned group to %s' % instructor.get_full_name())
                 except Exception as e:
@@ -243,26 +269,30 @@ class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, Tem
         if form.is_valid():
             checked_students = form.cleaned_data['students']
             try:
-                group = Group.objects.get(id=kwargs['pk'])
+                group = RotationGroup.objects.get(id=kwargs['pk'])
             except Exception as e:
                 messages.add_message(self.request, messages.ERROR, 'Unable to assign to this group %s' % e)  
                 return HttpResponseRedirect('/classroom/')
 
-            count = Student.objects.filter(group=group).count()
+            count = group.students.count()
             for student_pk in checked_students:
                 
                     try:
                         student = Student.objects.get(id = student_pk)
                         if count != MAX_STUDENTS:
-                            student.group = group
-                            student.save()
+                            exists =  RotationGroup.objects.filter(rotation=group.rotation,students__contains=student)
+                            if exists:
+                                messages.add_message(self.request, messages.ERROR, ' '+ student.first_name + ' ' + student.last_name + ' exists ') 
+
+
+                            group.students.add(student)
                             messages.add_message(self.request, messages.SUCCESS, 'Successfully added '+ student.first_name + ' ' + student.last_name + ' to group!') 
                         else:
                             messages.add_message(self.request, messages.WARNING, 'Could not add '+ student.first_name + ' ' + student.last_name + ' to group - already 4 members') 
                     except Exception as e:
                         messages.add_message(self.request, messages.ERROR, 'Unable to assign student ' + student.first_name + ' ' + student.last_name + ' %s' % e) 
 
-                    count = Student.objects.filter(group=group).count()
+                    count = group.students.count()
 
             return HttpResponseRedirect('/classroom/')
         else:
@@ -282,22 +312,23 @@ class AssignGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
         form = AssignInstructorForm(self.request.POST or None)
 
         if form.is_valid():
-            instructor_pk = form.cleaned_data['instructor_id']
+            instructor = form.cleaned_data['instructor_id']
+            rotation_group =  form.cleaned_data['rotation_group_id']
             group_num = form.cleaned_data['group_num']
             group_description = form.cleaned_data['group_description']
             classroom = self.request.user.current_classroom
 
-            try:
-                group = Group.objects.get(group_number = group_num,classroom=classroom)
-            except Exception as e:
-                messages.add_message(self.request, messages.ERROR, 'Unable to access this group %s' % e)
-                return HttpResponseRedirect('/classroom/')   
+            # try:
+            #     group = RotationGroup.objects.get(
+            # except Exception as e:
+            #     messages.add_message(self.request, messages.ERROR, 'Unable to access this group %s' % e)
+            #     return HttpResponseRedirect('/classroom/')   
 
             try:
-                instructor = Profile.objects.get(id=instructor_pk)
-                group.current_instructor = instructor
-                group.description = group_description
-                group.save()
+               # instructor = Profile.objects.get(id=instructor_pk)
+                rotation_group.instructor = instructor
+                rotation_group.description = group_description
+                rotation_group.save()
                 messages.add_message(self.request, messages.SUCCESS, 'Successfully edited group!')                
             except Exception as e:
                 messages.add_message(self.request, messages.ERROR, 'Unable to assign this group to this instructor %s' % e)      
@@ -413,11 +444,11 @@ class DeleteGroup(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
     """
     def get(self, *args, **kwargs):
         try:
-            group = Group.objects.get(id=kwargs['pk'])
+            rotation_group = RotationGroup.objects.get(id=kwargs['pk'])
         except Exception as e:
             messages.add_message(self.request, messages.ERROR, 'Unable to delete this group %s' % e)
         finally:
-            group.delete()
+            rotation_group.delete()
             messages.add_message(self.request, messages.SUCCESS, 'Group successfully deleted!')
         return HttpResponseRedirect('/classroom/') 
 
@@ -510,12 +541,17 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 
         students = Student.objects.filter(classroom=classroom).order_by('last_name')
         groups = Group.objects.filter(classroom=classroom).order_by('group_number')
+        rotation_groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,rotation__classroom=classroom)
         semesters = Semester.objects.all().order_by('date_begin')
 
         # try:
         #     classroom = Classroom.objects.get(instructor = self.request.user)
         # except Classroom.DoesNotExist:
         #     classroom = None
+        learning_assistants = Profile.objects.filter(current_classroom = classroom).order_by('last_name')
+        assign_instructor_form = AssignInstructorForm()
+        assign_instructor_form.fields['instructor_id'].choices = [(la[0],la[1]+' '+la[2]) for la in learning_assistants.values_list('id','first_name','last_name').order_by('last_name')]
+      
 
         add_student_form1 = AddStudentForm()
         add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
@@ -535,7 +571,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         assign_students_form.fields['students'].choices = CHOICES_students
 
        # raise Exception("tat")
-        learning_assistants = Profile.objects.filter(current_classroom = classroom).order_by('last_name')
+        
         # learning_assistants = Profile.objects.all().filter(permission_level=0)
      #  instructors = Profile.objects.all()
         return render(self.request, self.template_name,
@@ -544,6 +580,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             'learning_assistants':learning_assistants,
           #  'instructors':instructors,
             'groups': groups,
+            'rotation_groups': rotation_groups,
             'classroom': classroom,
             'semesters' : semesters,
             'add_student_form': add_student_form1,
@@ -551,6 +588,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             'add_classroom_form': AddClassroomForm(),
             'assign_multiple_groups_form': assign_groups_form,
             'assign_multiple_students_form': assign_students_form,
+            'assign_instructor_form': assign_instructor_form,
             'upload_view': False,
         })
 

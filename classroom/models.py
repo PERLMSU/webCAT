@@ -43,8 +43,24 @@ class Rotation(models.Model):
     #start_date= models.DateField(required=False)
     #end_date = models.DateField(required=False)
 
+    def save(self, *args, **kwargs):
+    
+
+        super(Rotation, self).save(*args, **kwargs)
+
+        groups = Group.objects.filter(classroom=self.classroom)
+        for group in groups:
+            new_rotation_group = RotationGroup.objects.create(rotation=self,group=group)
+            new_rotation_group.save() 
+
+    # def __init__(self):
+
+        # groups = Group.objects.filter(classroom=self.classroom)
+        # for group in groups:
+        #     new_rotation_group = RotationGroup(rotation=rotation,group=group)        
+
     def __str__(self):
-        return "{} {} \nStart Week: {} Length: {} \nDate: {} - {}".format(self.classroom, self.semester, self.start_week,self.length,str(self.get_start_date()),str(self.get_end_date()))
+        return "{} Start Week: {} Length: {} \nDate: {} - {}".format(self.semester, self.start_week,self.length,str(self.get_start_date()),str(self.get_end_date()))
     #instructor = models.ForeignKey(settings.AUTH_USER_MODEL)
     def get_start_date(self):
         time_diff = timedelta(weeks=self.start_week)
@@ -54,13 +70,14 @@ class Rotation(models.Model):
         time_diff = timedelta(weeks=self.length)
         return (self.get_start_date() + time_diff)
 
+    def get_end_week(self):
+        return self.start_week + self.length
+
+
+
 class Group(models.Model):
     classroom = models.ForeignKey(Classroom,null=True, default=None)
     group_number = models.IntegerField(null=True)
-    current_instructor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
-    description = models.CharField(max_length=200)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('classroom', 'group_number',)    
@@ -68,12 +85,15 @@ class Group(models.Model):
     def __str__(self):
         return self.group_number
 
-# class Rotation(models.Model):
-#     week_start =  
-
+    def create_rotation_group(self,rotation):
+        try:
+            new_rotation_group = RotationGroup.objects.create(rotation=rotation,group=self)
+            new_rotation_group.save()
+        except Exception as e:
+            messages.add_message(request, messages.ERROR, 'Could not create rotation group: '+ str(e))               
 
 class Student(models.Model):
-    group = models.ForeignKey(Group, null=True, default=None)
+    #group = models.ForeignKey(Group, null=True, default=None)
     classroom = models.ForeignKey(Classroom, null=True, default=None)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -87,3 +107,23 @@ class Student(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
+
+
+class RotationGroup(models.Model):
+    rotation = models.ForeignKey(Rotation)
+    group = models.ForeignKey(Group)
+    instructor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+    description = models.CharField(max_length=200)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    students = models.ManyToManyField(Student)
+
+    def group_number(self):
+        return self.group.group_number
+
+    def __str__(self):
+        return "# {} Tutor: {} Rotation: {}".format(self.group, self.current_instructor, self.rotation)  
+
+
+
+

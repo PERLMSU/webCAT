@@ -245,7 +245,11 @@ $(document).on("click", ".deletegroup", function () {
 $(document).on("click", ".assigngroup", function () {
      var groupNum = $(this).data('id');
      var description = $(this).data('info'); 
+     var instructor_id = $(this).data('instructor');
+      var rotationGroupId = $(this).data('rotationgroupid');
      $(".modal-body .hidden-group-num").val( groupNum );
+     $(".modal-body #id_instructor_id").val( instructor_id );
+     $(".modal-body .hidden-rotation-group").val( rotationGroupId );
      $(".modal-body input[name='group_description']").val( description );
      $(".modal-body #assign-group-num").html( groupNum );
 });

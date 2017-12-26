@@ -3,6 +3,7 @@ from django.forms import ModelForm
 from django.contrib.auth.models import User
 from .models import *
 from datetime import date
+from userprofile.models import Profile
 
 
 class AddEditRotationForm(forms.ModelForm):
@@ -71,19 +72,15 @@ class AddStudentForm(forms.ModelForm):
             raise forms.ValidationError("Last name must not be longer than %d characters." % 30)          
         return self.cleaned_data['last_name']
 
-class AddGroupForm(forms.ModelForm):
+class AddGroupForm(forms.Form):
 
-    description = forms.CharField(required=False)
     group_number = forms.IntegerField()
+    rotation = forms.ModelChoiceField(queryset=Rotation.objects.all())
 
-    class Meta:
-        model = Group
-        fields = ['description','group_number']
-
-    def clean_description(self):
-        if len(self.cleaned_data['description']) > 200:
-            raise forms.ValidationError("Description name must not be longer than %d characters." % 200)          
-        return self.cleaned_data['description']       
+    # def clean_description(self):
+    #     if len(self.cleaned_data['description']) > 200:
+    #         raise forms.ValidationError("Description name must not be longer than %d characters." % 200)          
+    #     return self.cleaned_data['description']       
 
 class AddClassroomForm(forms.ModelForm):
 
@@ -107,9 +104,10 @@ class AddClassroomForm(forms.ModelForm):
         return self.cleaned_data['course'] 
 
 class AssignInstructorForm(forms.Form):
-    instructor_id = forms.IntegerField()
-    group_description = forms.CharField()
+    instructor_id = forms.ModelChoiceField(queryset=Profile.objects.all(),required=False)
+    group_description = forms.CharField(required=False)
     group_num = forms.IntegerField()
+    rotation_group_id = forms.ModelChoiceField(queryset=RotationGroup.objects.all())
 
 
 class AssignMultipleGroupsForm(forms.Form):
