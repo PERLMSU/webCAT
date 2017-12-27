@@ -251,7 +251,7 @@ $(document).on("click", ".assigngroup", function () {
      $(".modal-body #id_instructor_id").val( instructor_id );
      $(".modal-body .hidden-rotation-group").val( rotationGroupId );
      $(".modal-body input[name='group_description']").val( description );
-     $(".modal-body #assign-group-num").html( groupNum );
+     $(".modal-body .assign-group-num").html( groupNum );
 });
 
 $(document).on("click", ".all-notes-view", function () {

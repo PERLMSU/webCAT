@@ -1,8 +1,16 @@
 {% load crispy_forms_tags %}
 <!-- <div class="container"> -->
- <div class="panel panel-info">
+{% if forloop.first %}
+ <div id='rotation_instructor_{{rotation.id}}' class="tab-pane fade in active panel panel-info">
+  {% else %}
+
+ <div id='rotation_instructor_{{rotation.id}}' class="tab-pane fade panel panel-info">
+  {% endif %}
+
+{% with rotation_groups|get_rotation_groups_by_rotation:rotation.id as rot_groups %}
+ <!-- <div class="panel panel-info"> -->
     <div class="panel-heading">
-    <h3> Instructors
+    <h3> Instructor Assignments
 <a class="btn btn-info float-right-button" href="{% url "dash-manage-users" %}"><span class="fa fa-child"></span> Manage Users</a>
      </h3>
   </div>      
@@ -24,13 +32,15 @@
           <td>{{la.get_full_name}}
           <td>{{la.email }} </td>
           <td>
-sdsds
+{% for rotation_group in rot_groups|get_rotation_groups_by_instructor:la.id %}
+  <li>{{rotation_group.group_number}}</li>
+{% endfor %}
           </td>
           <td>
-            <a href="#" data-toggle="modal" data-target="#assignMultipleGroups_{{la.id}}"><span class="fa fa-rocket"></span></a>
+            <a href="#" data-toggle="modal" data-target="#assignMultipleGroups_{{la.id}}_{{rotation.id}}"><span class="fa fa-rocket"></span></a>
            </td>
         </tr>
-<div class="modal fade" id="assignMultipleGroups_{{la.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="assignMultipleGroups_{{la.id}}_{{rotation.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -40,10 +50,21 @@ sdsds
         <h4 class="modal-title" id="myModalLabel">Assign Multiple Groups</h4>
       </div>
       <div class="modal-body">
-        <h4>Group <span id="assign-group-num"></span></h4>
+        <h4>Group <span class="assign-group-num"></span></h4>
         <h5> Please select the groups you would like to assign to {{la.get_full_name}} </h5>
         <form class="form-horizontal" action="{% url "classroom-assign-multiple-groups" la.id %}" method="POST">{% csrf_token %}
-        {{ assign_multiple_groups_form.as_p }}
+  <!--       <select name="group_numbers"> -->
+
+         
+          {% for rotation_group in rot_groups %}
+            {% if rotation_group in rotation_groups|get_rotation_groups_by_instructor:la.id %}
+              <input type="checkbox" checked name="group_numbers" value='{{rotation_group.id}}'>{{rotation_group.group_number}}</input>
+            {% else %}
+              <input type="checkbox" name="group_numbers" value='{{rotation_group.id}}'>{{rotation_group.group_number}}</input>
+            {% endif %}
+          {% endfor %}
+
+        </select> 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -51,9 +72,12 @@ sdsds
         </form>
       </div>
     </div>
+
   </div>
+
 </div>          
-    {% endfor %}    
+    {% endfor %} 
+    {% endwith %}   
       </tbody>
     </table>    
   </div>  

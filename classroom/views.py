@@ -21,6 +21,10 @@ MAX_STUDENTS = 4
 def get_groups_by_instructor(groups, instructor_pk):
     return groups.filter(current_instructor = instructor_pk)
 
+@register.filter
+def get_rotation_groups_by_rotation(rotation_groups,rotation_pk):
+    return rotation_groups.filter(rotation = rotation_pk)
+
 
 @register.filter
 def get_students_by_group(students, group_pk):
@@ -247,7 +251,7 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
 
             for group_pk in checked_groups:
                 try:
-                    group = Group.objects.get(id = group_pk)
+                    group = RotationGroup.objects.get(id = group_pk)
                     group.instructor = instructor
                     group.save()
                     messages.add_message(self.request, messages.SUCCESS, 'Successfully assigned group to %s' % instructor.get_full_name())
@@ -280,10 +284,11 @@ class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, Tem
                     try:
                         student = Student.objects.get(id = student_pk)
                         if count != MAX_STUDENTS:
-                            exists =  RotationGroup.objects.filter(rotation=group.rotation,students__contains=student)
-                            if exists:
-                                messages.add_message(self.request, messages.ERROR, ' '+ student.first_name + ' ' + student.last_name + ' exists ') 
-
+                            exists =  RotationGroup.objects.filter(rotation=group.rotation,students__id=student.id)
+                            #remove existing students from other groups
+                                #messages.add_message(self.request, messages.ERROR, ' '+ student.first_name + ' ' + student.last_name + ' exists ') 
+                            for exist in exists:
+                                exist.students.remove(student)
 
                             group.students.add(student)
                             messages.add_message(self.request, messages.SUCCESS, 'Successfully added '+ student.first_name + ' ' + student.last_name + ' to group!') 
@@ -557,11 +562,13 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
 
         assign_groups_form = AssignMultipleGroupsForm()
-        assign_groups_form.fields['group_numbers'].choices = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
+        assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom).values_list('id','group__group_number').order_by('group__group_number'))
         #choices = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
         #ssign_groups_form.set_group_numbers(choices)
 
-        CHOICES_groups = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
+        #CHOICES_groups = tuple(RotationGroup.objects.filter(classroom=classroom).values_list('id','group__group_number').order_by('group__group_number'))
+        
+
         assign_students_form = AssignMultipleStudentsForm()
         all_students = Student.objects.filter(classroom=classroom).values_list('id','first_name','last_name').order_by('last_name')
 

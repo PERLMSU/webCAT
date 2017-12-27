@@ -111,7 +111,7 @@ class AssignInstructorForm(forms.Form):
 
 
 class AssignMultipleGroupsForm(forms.Form):
-	CHOICES = tuple(Group.objects.all().values_list('id','group_number').order_by('group_number'))
+	CHOICES = tuple(RotationGroup.objects.all().values_list('id','group__group_number').order_by('group__group_number'))
 
 	group_numbers = forms.MultipleChoiceField(
 	    required=True,
