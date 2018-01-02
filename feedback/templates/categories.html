@@ -108,7 +108,10 @@
           <div class="modal-body">
             <h5> Category: </h5>
             <form class="form-horizontal" id="createCategoryForm" action="{% url "category-create-main" %}" method="POST">{% csrf_token %}        
+              <div class="form-group padding-lr">
             {{create_main_category_form | crispy}}
+
+          </div>
 
           </div>
       <div class="modal-footer">

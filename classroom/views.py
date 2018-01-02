@@ -23,29 +23,50 @@ def get_groups_by_instructor(groups, instructor_pk):
 
 @register.filter
 def get_rotation_groups_by_rotation(rotation_groups,rotation_pk):
-    return rotation_groups.filter(rotation = rotation_pk)
+    return rotation_groups.filter(rotation = rotation_pk).order_by('group_number')
 
 
 @register.filter
-def get_students_by_group(students, group_pk):
-    group = Group.objects.get(id=group_pk)
-    try:
-        g_students = list(students.filter(group=group))
-        group_size = 4
-        for i in (range(group_size-len(g_students))): #Fill with nuns!
-            g_students.append(None)
-        return g_students
-    except Student.DoesNotExist:
-        return None
+def get_number_groups(rotation):
+    return RotationGroup.objects.filter(rotation=rotation.id).count()
+
+@register.filter
+def make_list(number):
+    return range(number)
+    # list_nums = list(range(1,int(number)))
+    # raise Exception("wtf")
+    # return list_nums
+   # return range(range(1,int(number)))
+
+@register.filter
+def get_students_list(students):
+    g_students = list(students)
+    group_size = 4
+    for i in (range(group_size-len(g_students))): #Fill with nuns!
+        g_students.append(None)
+    return g_students
+
+
+# @register.filter
+# def get_students_by_group(students, group_pk):
+#     group = Group.objects.get(id=group_pk)
+#     try:
+#         g_students = list(students.filter(group=group))
+#         group_size = 4
+#         for i in (range(group_size-len(g_students))): #Fill with nuns!
+#             g_students.append(None)
+#         return g_students
+#     except Student.DoesNotExist:
+#         return None
 ## ######################################## ##
 @register.filter
 def get_rotation_groups(rotation_pk):
-    return RotationGroup.objects.filter(rotation=rotation_pk)
+    return RotationGroup.objects.filter(rotation=rotation_pk).order_by('group_number')
 
 
 @register.filter
 def get_rotation_groups_by_instructor(rotation_groups,instructor_pk):
-    return rotation_groups.filter(instructor = instructor_pk)
+    return rotation_groups.filter(instructor = instructor_pk).order_by('group_number')
 
 def register_class(request):
     form = AddClassroomForm(request.POST or None)
@@ -119,31 +140,35 @@ def edit_classroom(request, pk):
 
 
 def add_group(request):
-    form = AddGroupForm(request.POST or None)
-    userid = request.user.id
-    user = request.user
-    if form.is_valid():
-        group_num = form.cleaned_data['group_number'] 
-        classroom = request.user.current_classroom
-        rotation = form.cleaned_data['rotation']
-        group = Group.objects.create(group_number=group_num)
-        try:
-            group = Group.objects.get(group_number=group_num,classroom=classroom)
-            try:
-                rotation_group = RotationGroup.objects.get(rotation=rotation,group=group)            
-                messages.add_message(request, messages.ERROR, 'Group already exists. ')
-            except RotationGroup.DoesNotExist:
-                group.create_rotation_group(rotation)
-                messages.add_message(request, messages.SUCCESS, 'Group successfully added!')
-        except Group.DoesNotExist:
-            group.classroom = classroom
-            group.save()
-            group.create_rotation_group(rotation)            
-            messages.add_message(request, messages.SUCCESS, 'Group successfully added!')
-        return HttpResponseRedirect('/classroom/')
-    else: 
-        messages.error(request, form.errors)
-        return HttpResponseRedirect('/classroom/') 
+	form = AddGroupForm(request.POST or None)
+	userid = request.user.id
+	user = request.user
+	if form.is_valid():
+		group_number = form.cleaned_data['group_number'] 
+		number_of_groups = form.cleaned_data['number_of_groups']
+		#classroom = request.user.current_classroom
+		rotation = form.cleaned_data['rotation']
+		list_group_num = []
+ 
+		if number_of_groups:
+			list_group_num = [x for x in range(1,number_of_groups+1)]  
+		else:
+			list_group_num = [group_number]
+		added_count = 0			
+		for group_num in list_group_num:
+			
+			try:
+				group = RotationGroup.objects.get(group_number=group_num,rotation=rotation)				   			
+			except RotationGroup.DoesNotExist:
+				group = RotationGroup.objects.create(group_number=group_num,rotation=rotation)
+				added_count += 1
+				group.save()				
+		messages.add_message(request, messages.SUCCESS, 'Groups (%s) successfully added!' % str(added_count))     
+			# finally:				
+			# 	group.create_rotation_group(rotation)            				
+	else: 
+		messages.error(request, form.errors)
+	return HttpResponseRedirect('/classroom/') 
 
 def add_student(request):
     form = AddStudentForm(request.POST or None)
@@ -155,13 +180,13 @@ def add_student(request):
         class_pk = form.cleaned_data['classroom_pk']  
 
         student = form.save(commit=False)     
-        if group_num:
-            try:
-                group = Group.objects.get(group_number=group_num)
-                student.group = group
-            except Group.DoesNotExist:
-                messages.add_message(request, messages.WARNING, 'Group number ' + str(group_num) + ' was not found. Please create group before assigning to students.')                
-                student.group = None
+        # if group_num:
+        #     try:
+        #         group = Group.objects.get(group_number=group_num)
+        #         student.group = group
+        #     except Group.DoesNotExist:
+        #         messages.add_message(request, messages.WARNING, 'Group number ' + str(group_num) + ' was not found. Please create group before assigning to students.')                
+        #         student.group = None
 
         if class_pk:
             try:
@@ -254,7 +279,7 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
                     group = RotationGroup.objects.get(id = group_pk)
                     group.instructor = instructor
                     group.save()
-                    messages.add_message(self.request, messages.SUCCESS, 'Successfully assigned group to %s' % instructor.get_full_name())
+                    messages.add_message(self.request, messages.SUCCESS, 'Successfully assigned group '+str(group.group_number)+' to %s' % instructor.get_full_name())
                 except Exception as e:
                     messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
             return HttpResponseRedirect('/classroom/')
@@ -544,9 +569,9 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         else:
             self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")
 
-        students = Student.objects.filter(classroom=classroom).order_by('last_name')
-        groups = Group.objects.filter(classroom=classroom).order_by('group_number')
-        rotation_groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,rotation__classroom=classroom)
+        students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).order_by('last_name')
+       #gr groups = Group.objects.filter(classroom=classroom).order_by('group_number')
+        rotation_groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,rotation__classroom=classroom).order_by('group_number')
         semesters = Semester.objects.all().order_by('date_begin')
 
         # try:
@@ -562,7 +587,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
 
         assign_groups_form = AssignMultipleGroupsForm()
-        assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom).values_list('id','group__group_number').order_by('group__group_number'))
+        assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom).values_list('id','group_number').order_by('group_number'))
         #choices = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
         #ssign_groups_form.set_group_numbers(choices)
 
@@ -586,7 +611,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             'students': students,
             'learning_assistants':learning_assistants,
           #  'instructors':instructors,
-            'groups': groups,
+          #  'groups': groups,
             'rotation_groups': rotation_groups,
             'classroom': classroom,
             'semesters' : semesters,

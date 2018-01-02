@@ -16,10 +16,9 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>First Name</th>
-          <th>Last Name</th>  
+          <th>Full Name</th> 
           <th>Notes</th>
-          <th>Student Id</th>
+         <!--  <th>Student Id</th> -->
           <th>Course</th>
           <th></th>
           <th></th>
@@ -29,10 +28,8 @@
     {% for student in students %}        
         <tr>
           <th scope="row">{{forloop.counter}}</th>
-          <td>{{student.first_name }} </td>
-          <td>{{student.last_name }}</td>
-          <td> {{student.notes}}</td>
-          <td> {{student.student_id}}</td>
+          <td>{{student.first_name }} {{student.last_name }} </td>
+          <td style="width:40%;"> {{student.notes}}</td>
           <td> {{student.classroom}}</td>
 
           <td>
@@ -53,22 +50,39 @@
       </div>
       <div class="modal-body">
         <form class="form-horizontal" id="editStudentForm" action="{% url "classroom-edit-student" student.id %}" method="POST">{% csrf_token %}
-         <div class="form-group">  
-          <label for="first_name">First Name: </label>
-          <input type="text" value="{{student.first_name}}" name="first_name">
-         </div>
-          <div class="form-group">
-        <label for="last_name">Last Name: </label>
-        <input type="text" value="{{student.last_name}}" name="last_name">
-      </div>
-      <div class="form-group">
+          
+            <div class="form-group padding-lr">
+
+              <label for="first_name">First Name: </label>
+              <textarea name="first_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter First Name">{{student.first_name}}</textarea>          
+            </div>
+      
+
+       
+      
+         
+
+
+            <div class="form-group padding-lr">
+
+              <label for="last_name">Last Name: </label>
+              <textarea name="last_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Last Name">{{student.last_name}}</textarea>          
+            </div>
+
+        <div class="form-group padding-lr">
+          <label for="notes">Notes: </label>
+          <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter group description/notes here">{{student.notes}}</textarea>
+        </div>      
+      <div class="form-group padding-lr">
+        <label for="email">Email: </label>
+       <textarea name="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Email">{{student.get_email}}</textarea> 
+      </div>        
+
+<!--       <div class="form-group padding-lr">
         <label for="student_id">Student ID: </label>
         <input type="text" value="{{student.student_id}}" name="student_id">
-      </div>
-      <div class="form-group">
-        <label for="notes">Notes: </label>
-        <input type="text" value="{{student.notes}}" name="notes">
-      </div>      
+      </div> -->
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -101,7 +115,22 @@
       <div class="modal-body">
         <h5> Add Student: </h5>
         <form class="form-horizontal" id="createStudentForm" action="{% url "classroom-create-student" %}" method="POST">{% csrf_token %}
-          {{add_student_form | crispy}}
+            <div class="form-group padding-lr">
+
+              <label for="first_name">First Name: </label>
+              <textarea name="first_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter First Name"></textarea>          
+            </div>
+
+            <div class="form-group padding-lr">
+
+              <label for="last_name">Last Name: </label>
+              <textarea name="last_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Last Name"></textarea>          
+            </div>
+
+        <div class="form-group padding-lr">
+          <label for="notes">Notes: </label>
+          <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter group description/notes here"></textarea>
+        </div>   
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

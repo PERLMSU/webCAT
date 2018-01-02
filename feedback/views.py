@@ -16,7 +16,7 @@ from .forms import *
 from django.db import IntegrityError
 from classroom.models import Classroom
 from feedback.models import *
-from classroom.models import Student, Group
+from classroom.models import Student
 from notes.models import Note
 from django.views.decorators.csrf import csrf_exempt
 import datetime

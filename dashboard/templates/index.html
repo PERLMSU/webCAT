@@ -53,6 +53,7 @@
                 <strong>
                 <span>{{current_classroom.course}}</span>
                 <span>{{current_classroom.description}}</span>
+                | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{current_classroom.id}}">Edit</a>
                 </strong>
                 <hr>
                 <strong>Statistics Overview </strong>
@@ -130,12 +131,12 @@
             {% for classroom in classrooms %}
             <div class="padding-lr">
                 {% if classroom.id == current_classroom.id %}
-                <strong>
+  <!--               <strong>
                 <span>{{classroom.course}}</span>
                 <span>{{classroom.description}}</span>
                 (Current) | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
                 
-            </strong>
+            </strong> -->
 
                 {% else %}
                 <span>{{classroom.course}}</span>
@@ -153,7 +154,7 @@
                 <input type="hidden" name="semester" value="{{classroom.current_semester.id}}"/>
                 <input type="submit" value="Create" class="btn btn-success"/>  
                 </form>        
-                {% endif %}
+               
 
                 {% with classroom.id|get_rotations:classroom.current_semester.id as rotations %}
                     {% if rotations %}
@@ -195,6 +196,7 @@
                     <h4>No Rotations Created Yet.</h4>
                     {% endif %}
                 {% endwith %}
+                 {% endif %}    
             </div>
             <hr>
 
@@ -230,7 +232,7 @@
 
              <label for="current_classroom">Current Classroom</label>
              {% if classroom.id == current_classroom.id %}
-            <input name="current_classroom" type="checkbox" checked>
+            <input name="current_classroom" type="checkbox" checked disabled>
             {% else %}
             <input name="current_classroom" type="checkbox">
             {% endif %}

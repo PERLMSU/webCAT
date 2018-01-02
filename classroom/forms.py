@@ -74,7 +74,8 @@ class AddStudentForm(forms.ModelForm):
 
 class AddGroupForm(forms.Form):
 
-    group_number = forms.IntegerField()
+    group_number = forms.IntegerField(required=False)
+    number_of_groups = forms.IntegerField(required=False)
     rotation = forms.ModelChoiceField(queryset=Rotation.objects.all())
 
     # def clean_description(self):
@@ -111,7 +112,7 @@ class AssignInstructorForm(forms.Form):
 
 
 class AssignMultipleGroupsForm(forms.Form):
-	CHOICES = tuple(RotationGroup.objects.all().values_list('id','group__group_number').order_by('group__group_number'))
+	CHOICES = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))
 
 	group_numbers = forms.MultipleChoiceField(
 	    required=True,

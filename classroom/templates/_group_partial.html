@@ -1,21 +1,23 @@
 {% load crispy_forms_tags %}
+{% load mathfilters %}
 <!-- <div class="container"> -->
 {% if forloop.first %}
- <div id='rotation_{{rotation.id}}' class="tab-pane fade in active panel panel-success">
-  {% else %}
-
- <div id='rotation_{{rotation.id}}' class="tab-pane fade panel panel-success">
-  {% endif %}
-    <div class="panel-heading">
-    <h3> Groups {{rotation.start_week}} - {{rotation.get_end_week}}
-
-{% if not upload_view %}       
-<a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup_{{rotation.id}}" role="button"><span class="fa fa-group"></span> Add Group  </a>
-
-<a class="btn btn-success float-right-button" href="{% url "classroom-upload-groups" %}"><span class="fa fa-cloud-upload"></span> Upload</a>
+  <div id='rotation_{{rotation.id}}' class="tab-pane fade in active panel panel-success">
+{% else %}
+  <div id='rotation_{{rotation.id}}' class="tab-pane fade panel panel-success">
 {% endif %}
-     </h3>
-   </div>
+
+<div class="panel-heading">
+  <h3> Groups {{rotation.start_week}} - {{rotation.get_end_week}}
+
+  {% if not upload_view %}       
+    <a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup_{{rotation.id}}" role="button"><span class="fa fa-group"></span> Set Number of Groups  </a>
+
+    <a class="btn btn-success float-right-button" href="{% url "classroom-upload-groups" %}"><span class="fa fa-cloud-upload"></span> Upload</a>
+  {% endif %}
+  </h3>
+ </div>
+
    <div class="panel-body">
     <table class="table table-striped table-hover">
       <thead>
@@ -24,10 +26,10 @@
           <th>Group Number</th>
           <th>Description</th>
           <th>LA</th>
-          <th>Student 1</th>
-          <th>Student 2</th>
-          <th>Student 3</th>
-          <th>Student 4</th>
+          <th>Student</th>
+          <th>Student</th>
+          <th>Student</th>
+          <th>Student</th>
           <th></th>
           <th></th>
           <th></th>
@@ -35,45 +37,30 @@
         </tr>
       </thead>
       <tbody>
-    {% for group in rotation.id|get_rotation_groups %}    
+
+      {% for group in rotation.id|get_rotation_groups %}    
 
         <tr>
           <th scope="row">{{forloop.counter}}</th>
-          <td>{{group.group.group_number }} </td>
+          <td>{{group.group_number }} </td>
           <td> {{ group.description }} </td>
-          <td>{% with group.instructor as instructor %}
-              {{instructor.get_full_name}}
-            {% endwith %}
+          <td>
+              {{group.instructor.get_full_name}}
           
           </td>          
           
-          {% with group.students.all as group_students %}
+        
 
-          {% if group_students %} 
-           
-
-
-            {% for student in group_students %}
-              {% if student != None %}
+            {% for student in group.students.all|get_students_list %}
               <td>{{student.first_name}} {{student.last_name}}</td>
-              {% else %}
-                <td></td>
-              {% endif %}
-            {% endfor %}
-
-          {% else %}
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          {% endif %}
+            {% endfor %}      
           
 
 
           <td>
-            <a href="#" class="assigngroup" data-toggle="modal" data-rotationgroupid="{{group.id}}" data-instructor="{{group.instructor.id}}" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups_{{rotation.id}}"><span class="glyphicon glyphicon-paste"></span></a>
+            <a href="#" class="assigngroup" data-toggle="modal" data-rotationgroupid="{{group.id}}" data-instructor="{{group.instructor.id}}" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups_{{rotation.id}}"><span class="fa fa-edit"></span></a>
           </td>
-          <td><a href="#" data-toggle="modal" data-target="#assignMultipleStudents_{{group.id}}"><span class="fa fa-edit"></span></a></td>  
+          <td><a href="#" data-toggle="modal" data-target="#assignMultipleStudents_{{group.id}}"><span class="glyphicon glyphicon-paste"></span></a></td>  
           <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a></td>
 
 <div class="modal fade" id="assignMultipleStudents_{{group.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -89,7 +76,24 @@
       <!--   <h4>Add Students to Group <span id="assign-group-num"></span></h4> -->
         <h5> Please select the students you would like to add to group {{group.group_number}} </h5>
         <form class="form-horizontal" action="{% url "classroom-assign-multiple-students" group.id %}" method="POST">{% csrf_token %}
-        {{ assign_multiple_students_form.as_p }}
+
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+          {% for student in students %}
+            {% if student in group.students.all %}
+            <p>
+              <input type="checkbox" checked name="students" value='{{student.id}}'> {{student.get_full_name}}</input>
+            </p>
+            {% else %}
+            <p>
+              <input type="checkbox" name="students" value='{{student.id}}'> {{student.get_full_name}}</input>
+            </p>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        </div>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -99,7 +103,7 @@
     </div>
   </div>
 </div>               
-          {% endwith %}        
+
         </tr>
     {% endfor %}    
       </tbody>
@@ -156,10 +160,10 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title" id="myModalLabel">Add New Group</h4>
+        <h4 class="modal-title" id="myModalLabel">Add New Group(s)</h4>
       </div>
       <div class="modal-body">
-        <h5> Add Group: </h5>
+<!--         <h5> Add Group: </h5>
         <form class="form-horizontal" id="createGroupForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
 
         <div style="padding-left: 20px; padding-right: 20px;">
@@ -170,12 +174,28 @@
           </div>     
         </div>  
         <input type="hidden" value="{{rotation.id}}" name="rotation"> 
+          <input type="submit" value="Save" class="btn btn-primary"/>      
+        </form>    -->  
+        <hr>
+        <form class="form-horizontal" id="createGroupsForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
+
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+            <label for="number_of_groups">Number of Groups in Rotation:</label>
+            <input name="number_of_groups" type="text" class="form-control" placeholder="{{rotation|get_number_groups}}">
+            </input>
+          </div>     
+        </div>  
+        <input type="hidden" value="{{rotation.id}}" name="rotation"> 
+            
+                 
 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <input type="submit" value="Save" class="btn btn-primary"/>      
-        </form>
+        <input type="submit" value="Save" class="btn btn-primary"/>   
+          </form>   
       </div>
     </div>
   </div>

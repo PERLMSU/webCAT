@@ -12,7 +12,7 @@ from django.template.defaulttags import register
 # Create your views here.
 from ast import literal_eval
 from feedback.models import Category, SubCategory
-from classroom.models import Classroom, Group, Student
+from classroom.models import Classroom, Student
 from notes.forms import AddFeedbackForm
 from notes.models import Note
 

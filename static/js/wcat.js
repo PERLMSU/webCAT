@@ -3,7 +3,7 @@
   //   $("#link").off("click");
   // });
 
-$(':checkbox').checkboxpicker();
+//$(':checkbox').checkboxpicker();
 
 
 $(document).on('change',".observation-dropdown", function(){

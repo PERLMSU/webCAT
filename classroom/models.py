@@ -3,6 +3,7 @@ import calendar
 
 from django.conf import settings
 from django.db import models
+from django.db import IntegrityError
 
 from datetime import datetime, date, time, timedelta
 
@@ -48,10 +49,10 @@ class Rotation(models.Model):
 
         super(Rotation, self).save(*args, **kwargs)
 
-        groups = Group.objects.filter(classroom=self.classroom)
-        for group in groups:
-            new_rotation_group = RotationGroup.objects.create(rotation=self,group=group)
-            new_rotation_group.save() 
+        # groups = Group.objects.filter(classroom=self.classroom)
+        # for group in groups:
+        #     new_rotation_group = RotationGroup.objects.create(rotation=self,group=group)
+        #     new_rotation_group.save() 
 
     # def __init__(self):
 
@@ -75,32 +76,42 @@ class Rotation(models.Model):
 
 
 
-class Group(models.Model):
-    classroom = models.ForeignKey(Classroom,null=True, default=None)
-    group_number = models.IntegerField(null=True)
+# class Group(models.Model):
+#     classroom = models.ForeignKey(Classroom,null=True, default=None)
+#     group_number = models.IntegerField(null=True)
 
-    class Meta:
-        unique_together = ('classroom', 'group_number',)    
+#     class Meta:
+#         unique_together = ('classroom', 'group_number',)    
 
-    def __str__(self):
-        return self.group_number
+#     def __str__(self):
+#         return self.group_number
 
-    def create_rotation_group(self,rotation):
-        try:
-            new_rotation_group = RotationGroup.objects.create(rotation=rotation,group=self)
-            new_rotation_group.save()
-        except Exception as e:
-            messages.add_message(request, messages.ERROR, 'Could not create rotation group: '+ str(e))               
+#     def create_rotation_group(self,rotation):
+#         try:
+#             new_rotation_group = RotationGroup.objects.create(rotation=rotation,group=self)
+#             new_rotation_group.save()
+#         except IntegrityError:
+#             pass
+            #messages.add_message(request, messages.ERROR, 'Could not create rotation group: '+ str(e))               
 
 class Student(models.Model):
     #group = models.ForeignKey(Group, null=True, default=None)
     classroom = models.ForeignKey(Classroom, null=True, default=None)
+    semester = models.ForeignKey(Semester)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    notes = models.CharField(max_length=200)
-    student_id = models.IntegerField(unique=True, null=True)
+    notes = models.CharField(max_length=2000)
+    email = models.EmailField(null=True,blank=True)
+    #student_id = models.IntegerField(unique=True, null=True)
+
+    def get_email(self):
+        if self.email:
+            return email
+        else:
+            return ''
+
 
     def get_full_name(self):
         return "{} {}".format(self.first_name, self.last_name).strip()
@@ -111,15 +122,15 @@ class Student(models.Model):
 
 class RotationGroup(models.Model):
     rotation = models.ForeignKey(Rotation)
-    group = models.ForeignKey(Group)
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
     description = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     students = models.ManyToManyField(Student)
+    group_number = models.IntegerField()
 
-    def group_number(self):
-        return self.group.group_number
+    class Meta:
+        unique_together = ('rotation', 'group_number',)   
 
     def __str__(self):
         return "# {} Tutor: {} Rotation: {}".format(self.group, self.current_instructor, self.rotation)  

@@ -1,4 +1,6 @@
 {% load crispy_forms_tags %}
+{% load mathfilters %}
+
 <!-- <div class="container"> -->
 {% if forloop.first %}
  <div id='rotation_instructor_{{rotation.id}}' class="tab-pane fade in active panel panel-info">
@@ -57,11 +59,14 @@
 
          
           {% for rotation_group in rot_groups %}
+
+          <p style="padding-left: 10px;">
             {% if rotation_group in rotation_groups|get_rotation_groups_by_instructor:la.id %}
-              <input type="checkbox" checked name="group_numbers" value='{{rotation_group.id}}'>{{rotation_group.group_number}}</input>
+              <input type="checkbox" checked name="group_numbers" value='{{rotation_group.id}}'> {{rotation_group.group_number}}</input>
             {% else %}
-              <input type="checkbox" name="group_numbers" value='{{rotation_group.id}}'>{{rotation_group.group_number}}</input>
+              <input type="checkbox" name="group_numbers" value='{{rotation_group.id}}'> {{rotation_group.group_number}}</input>
             {% endif %}
+          </p>
           {% endfor %}
 
         </select> 
