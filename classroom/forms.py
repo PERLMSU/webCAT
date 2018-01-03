@@ -54,13 +54,15 @@ class AddStudentForm(forms.ModelForm):
     first_name = forms.CharField()
     notes = forms.CharField(required=False)
     last_name = forms.CharField()
-    student_id = forms.CharField()
-    group_number = forms.IntegerField(required=False)
-    classroom_pk = forms.IntegerField(required=False,widget=forms.HiddenInput())
+    email = forms.EmailField(required=False)
+   # student_id = forms.CharField()
+    #group_number = forms.IntegerField(required=False)
+    classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(),required=True)
+    semester = forms.ModelChoiceField(queryset=Semester.objects.all(),required=True)
 
     class Meta:
         model = Student
-        fields = ['first_name','last_name','student_id','notes']
+        fields = ['first_name','last_name','email','notes','semester','classroom']
 
     def clean_first_name(self):
         if len(self.cleaned_data['first_name']) > 30:

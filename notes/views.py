@@ -97,7 +97,7 @@ class NotesView(LoginRequiredMixin, TemplateView):
 			week = int(self.kwargs['week'])
 		else:
 			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week-1
+				week = request.user.current_classroom.current_week
 			else:
 				week = 1            
 

@@ -17,8 +17,9 @@
         <tr>
           <th>#</th>
           <th>Full Name</th> 
+          <th>Email</th>
           <th>Notes</th>
-         <!--  <th>Student Id</th> -->
+          
           <th>Course</th>
           <th></th>
           <th></th>
@@ -29,7 +30,9 @@
         <tr>
           <th scope="row">{{forloop.counter}}</th>
           <td>{{student.first_name }} {{student.last_name }} </td>
+           <td>{{student.get_email}}</td>
           <td style="width:40%;"> {{student.notes}}</td>
+
           <td> {{student.classroom}}</td>
 
           <td>
@@ -71,7 +74,7 @@
 
         <div class="form-group padding-lr">
           <label for="notes">Notes: </label>
-          <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter group description/notes here">{{student.notes}}</textarea>
+          <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter student description/notes here">{{student.notes}}</textarea>
         </div>      
       <div class="form-group padding-lr">
         <label for="email">Email: </label>
@@ -129,8 +132,14 @@
 
         <div class="form-group padding-lr">
           <label for="notes">Notes: </label>
-          <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter group description/notes here"></textarea>
-        </div>   
+          <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter student description/notes here"></textarea>
+        </div>  
+        <div class="form-group padding-lr">
+          <label for="email">Email: </label>
+         <textarea name="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Email">{{student.get_email}}</textarea> 
+        </div>    
+        <input type="hidden" name="semester" value='{{classroom.current_semester.id}}'/>      
+        <input type="hidden" name="classroom" value='{{classroom.id}}'/>     
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

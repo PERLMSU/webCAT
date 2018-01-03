@@ -40,6 +40,7 @@ class Rotation(models.Model):
     semester = models.ForeignKey(Semester)
     classroom = models.ForeignKey(Classroom)
     start_week = models.IntegerField()
+    end_week = models.IntegerField()
     length = models.IntegerField()
     #start_date= models.DateField(required=False)
     #end_date = models.DateField(required=False)
@@ -103,12 +104,12 @@ class Student(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     notes = models.CharField(max_length=2000)
-    email = models.EmailField(null=True,blank=True)
+    email = models.EmailField(null=True,blank=True,unique=True)
     #student_id = models.IntegerField(unique=True, null=True)
 
     def get_email(self):
         if self.email:
-            return email
+            return self.email
         else:
             return ''
 

@@ -87,6 +87,7 @@ def edit_rotation(request):
     form = AddEditRotationForm(request.POST or None)
     if form.is_valid():
         rotation = form.save(commit=False)
+        rotation.end_week = rotation.start_week + rotation.length
         # try:
             # rotation.classroom = Classroom.objects.getc(id=form.cleaned_data['classroom'])
             # rotation.semester = Semester.objects.get(id=form.cleaned_data['semester'])
@@ -176,8 +177,8 @@ def add_student(request):
     userid = request.user.id
     user = request.user
     if form.is_valid():
-        group_num = form.cleaned_data['group_number'] 
-        class_pk = form.cleaned_data['classroom_pk']  
+        #group_num = form.cleaned_data['group_number'] 
+       # class_pk = form.cleaned_data['classroom_pk']  
 
         student = form.save(commit=False)     
         # if group_num:
@@ -188,13 +189,13 @@ def add_student(request):
         #         messages.add_message(request, messages.WARNING, 'Group number ' + str(group_num) + ' was not found. Please create group before assigning to students.')                
         #         student.group = None
 
-        if class_pk:
-            try:
-                classroom = Classroom.objects.get(id=class_pk)
-                student.classroom = classroom
-            except Classroom.DoesNotExist:
-                messages.add_message(request, messages.WARNING, 'Classroom id: ' + str(class_pk) + ' was not found.')                
-                student.classroom = None                 
+        # if class_pk:
+        #     try:
+        #         classroom = Classroom.objects.get(id=class_pk)
+        #         student.classroom = classroom
+        #     except Classroom.DoesNotExist:
+        #         messages.add_message(request, messages.WARNING, 'Classroom id: ' + str(class_pk) + ' was not found.')                
+        #         student.classroom = None                 
         student.save()
         messages.add_message(request, messages.SUCCESS, 'Student successfully added!')
         return HttpResponseRedirect('/classroom/')
@@ -584,7 +585,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
       
 
         add_student_form1 = AddStudentForm()
-        add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
+#        add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
 
         assign_groups_form = AssignMultipleGroupsForm()
         assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom).values_list('id','group_number').order_by('group_number'))

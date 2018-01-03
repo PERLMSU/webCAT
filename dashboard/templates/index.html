@@ -64,14 +64,7 @@
                 <br>
                 <span>Current Week: {{ current_classroom.current_week}} </span>    
 
-                <form class="form-horizontal" action="{% url "classroom-edit-rotation" %}" method="POST">{% csrf_token %}
-                <h5>Create Rotation</h5>   
-                <p>{{rotation_form.start_week.label_tag}} {{rotation_form.start_week}}</p>
-                <p>{{rotation_form.length.label_tag}} {{rotation_form.length}}</p>
-                <input type="hidden" name="classroom" value="{{current_classroom.id}}"/>
-                <input type="hidden" name="semester" value="{{current_classroom.current_semester.id}}"/>
-                <input type="submit" value="Create" class="btn btn-success"/>  
-                </form>  
+
 
 
               {% with current_classroom.id|get_rotations:current_classroom.current_semester.id as rotations %}
@@ -114,6 +107,27 @@
                     <h4>No Rotations Created Yet.</h4>
                     {% endif %}
                 {% endwith %}
+
+                <div class="col-lg-12 padding-top-bottom">
+                    <h4>Create Rotation</h4> 
+                    <form class="form-horizontal" action="{% url "classroom-edit-rotation" %}" method="POST">{% csrf_token %}
+                    
+                    <div class="col-lg-3">
+                        {{rotation_form.start_week.label_tag}}
+                    </div>
+                     <div class="col-lg-9">
+                        {{rotation_form.start_week}}
+                     </div>
+                    <div class="col-lg-3">{{rotation_form.length.label_tag}}
+                    </div>
+                    <div class="col-lg-9">{{rotation_form.length}}</div>
+                    <input type="hidden" name="classroom" value="{{current_classroom.id}}"/>
+                    <input type="hidden" name="semester" value="{{current_classroom.current_semester.id}}"/>
+                    <div class="col-lg-12 padding-top-bottom">
+                    <input type="submit" style="width: 100%" value="Create" class="btn btn-success"/>  
+                    </div>
+                    </form>   
+                </div>               
 
             </div>
         {% else %}

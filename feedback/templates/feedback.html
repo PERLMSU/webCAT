@@ -37,22 +37,29 @@
               </form>      
             </div>
           </div>
-
+{% for group in rotation_groups %}
+      {% if group.students.all %}
             <div class="panel panel-info">
-            {% for group, students in groups_to_students.items %}
-              {% if students %}
-               <div class="panel-heading"> <h5> Group {{group.group_number}}</h5> </div>
-               <div class="panel-body">
+            
+               <div class="panel-heading"> 
+                <h5> Group {{group.group_number}}</h5> 
+               </div>
                
-                   {% for student in students %}
+                <div class="panel-body">
+               
+                   {% for student in group.students.all %}
                         <a class="student-feedback" data-id="feedback_{{student.id}}" href="#"><p>{{student.first_name}} {{student.last_name}}</p></a>
                    {% endfor %}
               
-               </div>
-               {% endif %}
-            {% endfor %}
-            </div>
-        </div>
+                </div>
+            
+              </div>
+   {% endif %}
+{% endfor %}            
+          </div>
+
+
+
           {% include '_edit_feedback_partial.html' %}
     </div>   
 </div> 

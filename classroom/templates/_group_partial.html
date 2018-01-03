@@ -8,7 +8,7 @@
 {% endif %}
 
 <div class="panel-heading">
-  <h3> Groups {{rotation.start_week}} - {{rotation.get_end_week}}
+  <h3> Groups {{rotation.start_week}} - {{rotation.end_week}}
 
   {% if not upload_view %}       
     <a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup_{{rotation.id}}" role="button"><span class="fa fa-group"></span> Set Number of Groups  </a>

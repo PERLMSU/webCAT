@@ -16,7 +16,7 @@ from .forms import *
 from django.db import IntegrityError
 from classroom.models import Classroom
 from feedback.models import *
-from classroom.models import Student
+from classroom.models import *
 from notes.models import Note
 from django.views.decorators.csrf import csrf_exempt
 import datetime
@@ -108,37 +108,40 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			week = int(self.kwargs['week'])
 		else:
 			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week-1
+				week = request.user.current_classroom.current_week
 			else:
 				week = 1
 
-		current_classroom_pk = self.request.user.current_classroom_id
+		# current_classroom_pk = self.request.user.current_classroom_id
 
-		if current_classroom_pk:
-			try:
+		# if current_classroom_pk:
+		# 	try:
 
-				classroom = Classroom.objects.get(id=current_classroom_pk)
+		# 		classroom = Classroom.objects.get(id=current_classroom_pk)
 
-			except Classroom.DoesNotExist:
-				classroom = None
-				self.add_message("Error when trying to load current classroom.")
-		else:
-			self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
+		# 	except Classroom.DoesNotExist:
+		# 		classroom = None
+		# 		self.add_message("Error when trying to load current classroom.")
+		# else:
+		# 	self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
+		classroom = request.user.current_classroom
 
-		groups = Group.objects.filter(classroom=classroom,current_instructor = self.request.user)
-		groups_to_students = {}
+		groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester.id,instructor= self.request.user,
+			rotation__start_week__lte=week,rotation__end_week__gte=week)
+		#groups_to_students = {}
 		student_to_feedback_draft = {}
-		for group in groups:
-			groups_to_students[group] = Student.objects.filter(group=group)
+		# for group in groups:
+		# 	groups_to_students[group] = Student.objects.filter(group__students=group)
 
 	#	raise Exception("test!")
 		main_categories = Category.objects.filter(classroom=classroom)
 
 		self.context['week'] = int(week)
+		self.context['rotation_groups'] = groups
 		# self.context['loop_times'] = range(1, 13)
 		self.context['loop_times'] = range(1,classroom.get_num_weeks())
 		self.context['grade_scale'] = [x*.25 for x in range(17)]
-		self.context['groups_to_students'] = groups_to_students
+		#self.context['groups_to_students'] = groups_to_students
 		self.context['main_categories'] = main_categories
 		self.context['notifications'] = Notification.objects.filter(user=self.request.user)
 
@@ -208,7 +211,7 @@ class InboxView(LoginRequiredMixin,TemplateView):
 			week = int(self.kwargs['week'])
 		else:
 			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week-1
+				week = request.user.current_classroom.current_week
 			else:
 				week = 1
 

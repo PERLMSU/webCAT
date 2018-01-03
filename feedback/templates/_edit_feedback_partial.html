@@ -1,6 +1,6 @@
-{% for group, students in groups_to_students.items %}
-   {% if students %}
-       {% for student in students %}
+{% for group in rotation_groups %}
+   {% if group.students.all %}
+       {% for student in group.students.all %}
        <div class="col-lg-10">
 		<div class="feedback-student-writer" style="display: none;" id="feedback_{{student.id}}">       
 			<div class="panel panel-default">
@@ -113,7 +113,10 @@
 	{% endif %}
 {% endfor %}
 
+{% if not rotation_groups %}
 
+<h3>No groups assigned for this rotation yet. </h3>
+{% endif %}
 <!-- Modal -->
 
 {% for main in main_categories %}

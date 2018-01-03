@@ -82,10 +82,10 @@
 
 
             {% for rotation in rotations %}
-            {% if forloop.first %}
-                <li class="active"><a data-toggle="tab" href="#rotation_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.get_end_week}}</a></li>
+            {% if rotation.start_week <= classroom.current_week and rotation.end_week >= classroom.current_week %}
+                <li class="active"><a data-toggle="tab" href="#rotation_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.end_week}}</a></li>
             {% else %}
-                <li><a data-toggle="tab" href="#rotation_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.get_end_week}}</a></li>
+                <li><a data-toggle="tab" href="#rotation_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.end_week}}</a></li>
             {% endif %}
          {% endfor %}
         </ul>
@@ -118,10 +118,10 @@
 
         <ul class="nav nav-tabs">
             {% for rotation in rotations %}
-                {% if forloop.first %}
-                    <li class="active"><a data-toggle="tab" href="#rotation_instructor_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.get_end_week}}</a></li>
+                {% if rotation.start_week <= classroom.current_week and rotation.end_week >= classroom.current_week %}
+                    <li class="active"><a data-toggle="tab" href="#rotation_instructor_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.end_week}}</a></li>
                 {% else %}
-                    <li><a data-toggle="tab" href="#rotation_instructor_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.get_end_week}}</a></li>
+                    <li><a data-toggle="tab" href="#rotation_instructor_{{rotation.id}}">Week {{rotation.start_week}} - {{rotation.end_week}}</a></li>
                 {% endif %}
             {% endfor %}
         </ul>
