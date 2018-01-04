@@ -104,16 +104,17 @@ class FeedbackView(LoginRequiredMixin, FormView):
 
 	def get(self, request, *args, **kwargs):
 
-		if 'week' in self.kwargs:
-			week = int(self.kwargs['week'])
-		else:
-			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week
-			else:
-				week = 1
-
 		classroom = request.user.current_classroom
 		if classroom != None:
+
+			if 'week' in self.kwargs:
+				week = int(self.kwargs['week'])
+			else:
+				if request.user.current_classroom.current_week:
+					week = request.user.current_classroom.current_week
+				else:
+					week = 1
+
 			groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester.id,instructor= self.request.user,
 				rotation__start_week__lte=week,rotation__end_week__gte=week)
 			#groups_to_students = {}
@@ -196,16 +197,17 @@ class InboxView(LoginRequiredMixin,TemplateView):
 
 	def get(self, request, *args, **kwargs):
 
-		if 'week' in self.kwargs:
-			week = int(self.kwargs['week'])
-		else:
-			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week
-			else:
-				week = 1
+
 
 		classroom = request.user.current_classroom
 		if classroom != None:
+			if 'week' in self.kwargs:
+				week = int(self.kwargs['week'])
+			else:
+				if request.user.current_classroom.current_week:
+					week = request.user.current_classroom.current_week
+				else:
+					week = 1			
 			self.context['draft_notifications_need_approval'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 1, draft_to_approve__week_num=week)
 			self.context['draft_notifications_need_revision'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 2,draft_to_approve__week_num=week)
 			self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
@@ -368,17 +370,7 @@ def create_common_feedback(request, pk):
 	return HttpResponseRedirect('/feedback/categories/')			
 			#new_feedback_piece = FeedbackPiece.create()
 
-	# 	common_feedback = form.save(commit=False)
-	# 	try:
-	# 		common_feedback.sub_category = SubCategory.objects.get(id = pk)
-	# 		common_feedback.save()
-	# 		messages.add_message(request, messages.SUCCESS, 'Feedback sucessfully created.')
-	# 	except Exception as e:
-	# 		messages.add_message(request, messages.ERROR, 'Error when adding feedback: '+e)
-	# 	return HttpResponseRedirect('/feedback/categories/')
-	# else: 
-	# 	messages.error(request, form.errors)
-	# 	return HttpResponseRedirect('/feedback/categories/') 
+
 
 
 def approve_draft(request, pk):
@@ -470,17 +462,7 @@ class DeleteSubCategoryView(LoginRequiredMixin, View):
         return HttpResponseRedirect('/feedback/categories/') 
 
 
-#class EditDraftView(LoginRequiredMixin, FormView):
 
-	#@csrf_exempt
-	#def post(self, request, *args, **kwargs):
-		#raise Exception("got here?")
-		#form = EditDraftForm(request.POST)
-		#raise Exception("got here! ")
-		#if form.is_valid():
-	#		text = form.cleaned_data['text']
-#		context = {}
-	#	return self.render_to_response(context)
 
 def edit_subcategory(request, pk):
 	form = EditCategoryForm(request.POST or None)

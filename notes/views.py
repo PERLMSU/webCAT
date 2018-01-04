@@ -93,17 +93,17 @@ class NotesView(LoginRequiredMixin, TemplateView):
 
 	def get(self, request, *args, **kwargs):
 
-		if 'week' in self.kwargs:
-			week = int(self.kwargs['week'])
-		else:
-			if request.user.current_classroom.current_week:
-				week = request.user.current_classroom.current_week
-			else:
-				week = 1            
+          
 
 		classroom = self.request.user.current_classroom
 		if classroom != None:
-
+			if 'week' in self.kwargs:
+				week = int(self.kwargs['week'])
+			else:
+				if request.user.current_classroom.current_week:
+					week = request.user.current_classroom.current_week
+				else:
+					week = 1  
 			groups_assigned = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,instructor = self.request.user)
 
 
