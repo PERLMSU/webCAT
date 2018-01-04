@@ -10,6 +10,7 @@ django-crispy-forms==1.6.1
 django-debug-toolbar==1.6
 django-excel==0.0.6
 django-localflavor==1.4.1
+django-mathfilters==0.4.0
 django-model-utils==3.0.0
 django-star-ratings==0.5.5
 django-widget-tweaks==1.4.1
