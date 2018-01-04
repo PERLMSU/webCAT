@@ -29,8 +29,8 @@
 	    		<div class="row">
 	    			
 			    	<div class="panel panel-info">
-    	{% for group, students in student_groups.items %}
-    		{% if students %}
+    	{% for group in rotation_groups %}
+    		{% if group.students %}
 <!-- 	    		<div class="row">
 	    			
 			    	<div class="panel panel-info"> -->
@@ -39,7 +39,7 @@
 			      		</div> 			
 			      		<div class="panel-body">
 			      				<!-- <div class="col-md-12"> -->
-					    		{% for student in students %}
+					    		{% for student in group.students.all %}
 
 						    		<div class="row student-checkboxes">
 						    		

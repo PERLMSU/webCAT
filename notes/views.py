@@ -12,7 +12,7 @@ from django.template.defaulttags import register
 # Create your views here.
 from ast import literal_eval
 from feedback.models import Category, SubCategory
-from classroom.models import Classroom, Student
+from classroom.models import *
 from notes.forms import AddFeedbackForm
 from notes.models import Note
 
@@ -88,10 +88,10 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect('/notes/')  
 
 class NotesView(LoginRequiredMixin, TemplateView):
-    template_name = "notes.html"
-    context = {}
+	template_name = "notes.html"
+	context = {}
 
-    def get(self, request, *args, **kwargs):
+	def get(self, request, *args, **kwargs):
 
 		if 'week' in self.kwargs:
 			week = int(self.kwargs['week'])
@@ -101,21 +101,20 @@ class NotesView(LoginRequiredMixin, TemplateView):
 			else:
 				week = 1            
 
-		current_classroom_pk = self.request.user.current_classroom_id
-		if current_classroom_pk:
-		    try:
-		        classroom = Classroom.objects.get(id=current_classroom_pk)
-		    except Classroom.DoesNotExist:
-		        classroom = None
-		        self.add_message("Error when trying to load current classroom.")
-		else:
-		    self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
+		classroom = self.request.user.current_classroom
+		# current_classroom_pk = self.request.user.current_classroom_id
+		# if current_classroom_pk:
+		#     try:
+		#         classroom = Classroom.objects.get(id=current_classroom_pk)
+		#     except Classroom.DoesNotExist:
+		#         classroom = None
+		#         self.add_message("Error when trying to load current classroom.")
+		# else:
+		#     self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
 
-		group_to_student_dict = {}
-		groups_assigned = Group.objects.filter(classroom=classroom,current_instructor = self.request.user)
-		for group in groups_assigned:
-		    students = Student.objects.filter(group=group)
-		    group_to_student_dict[group] = students
+
+		groups_assigned = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,current_instructor = self.request.user)
+
 
 		main_categories = Category.objects.filter(classroom=classroom)
 		sub_categories = {}
@@ -124,13 +123,13 @@ class NotesView(LoginRequiredMixin, TemplateView):
 		# self.context['loop_times'] = range(1, 13)
 		self.context['loop_times'] = range(1,classroom.get_num_weeks())
 		self.context['week'] = week
-		self.context['student_groups'] = group_to_student_dict
+		self.context['rotation_groups'] = groups_assigned
 		self.context['main_categories'] = main_categories
 		self.context['sub_categories'] = sub_categories
 		return render(self.request, self.template_name, self.context)
 
-    def add_message(self, text, mtype=25):
-        messages.add_message(self.request, mtype, text)
+	def add_message(self, text, mtype=25):
+		messages.add_message(self.request, mtype, text)
 
 
 def change_week_notes(request):
