@@ -31,15 +31,13 @@ class AddEditRotationForm(forms.ModelForm):
         return self.cleaned_data['start_week']
 
 class EditClassroomForm(forms.Form):
-    course = forms.CharField(required=True)
+    course_code = forms.CharField(required=True)
+    course_number = forms.CharField(required=True)
     description = forms.CharField(required=False)
    # num_weeks = forms.IntegerField(required=True)
     current_week = forms.IntegerField(required=True)
     current_classroom = forms.BooleanField(required=False)
     current_semester = forms.ModelChoiceField(queryset=Semester.objects.all(),required=True)
-
-    # def clean_current_semester():
-    #     try self.cleaned_data['current_semester']
 
     def clean_current_week(self):
 
@@ -88,13 +86,14 @@ class AddGroupForm(forms.Form):
 class AddClassroomForm(forms.ModelForm):
 
     description = forms.CharField(required=False)
-    course = forms.CharField()
+    course_code = forms.CharField()
+    course_number = forms.CharField()
     current_semester = forms.ModelChoiceField(queryset=Semester.objects.all())
     #num_weeks = forms.IntegerField()
 
     class Meta:
         model = Classroom
-        fields = ['course','description','current_semester']
+        fields = ['course_code','course_number','description','current_semester']
 
     def clean_description(self):
         if len(self.cleaned_data['description']) > 200:

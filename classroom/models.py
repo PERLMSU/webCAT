@@ -13,6 +13,7 @@ class Semester(models.Model):
     date_end = models.DateField()
     title = models.CharField(max_length=200)
 
+
     def get_number_weeks(self):
         monday1 = (self.date_begin - timedelta(days=self.date_end.weekday()))
         monday2 = (self.date_end - timedelta(days=self.date_end.weekday()))        
@@ -24,17 +25,20 @@ class Semester(models.Model):
 class Classroom(models.Model):
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL)
     current_semester = models.ForeignKey(Semester)
-    course = models.CharField(max_length=20)
+    #course = models.CharField(max_length=20)
+    course_code = models.CharField(max_length=5, null=True)
+    course_number = models.CharField(max_length=5,null=True)
     description = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     current_week = models.IntegerField(default=1)
    # num_weeks = models.IntegerField(default=12)
     def __str__(self):
-        return self.course
+        return '{} {}'.format(self.course_code, self.course_number)
 
     def get_num_weeks(self):
         return self.current_semester.get_number_weeks()
+
 
 class Rotation(models.Model):
     semester = models.ForeignKey(Semester)
@@ -62,7 +66,7 @@ class Rotation(models.Model):
         #     new_rotation_group = RotationGroup(rotation=rotation,group=group)        
 
     def __str__(self):
-        return "{} Start Week: {} Length: {} \nDate: {} - {}".format(self.semester, self.start_week,self.length,str(self.get_start_date()),str(self.get_end_date()))
+        return "Duration: {}-{} Dates: {} - {}".format(self.start_week,self.end_week,str(self.get_start_date()),str(self.get_end_date()))
     #instructor = models.ForeignKey(settings.AUTH_USER_MODEL)
     def get_start_date(self):
         time_diff = timedelta(weeks=self.start_week)

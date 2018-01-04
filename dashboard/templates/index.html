@@ -51,7 +51,7 @@
             <h3> Your Current Classroom</h3>
              <div class="padding-lr">
                 <strong>
-                <span>{{current_classroom.course}}</span>
+                <span>{{current_classroom}}</span>
                 <span>{{current_classroom.description}}</span>
                 | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{current_classroom.id}}">Edit</a>
                 </strong>
@@ -153,7 +153,7 @@
             </strong> -->
 
                 {% else %}
-                <span>{{classroom.course}}</span>
+                <span>{{classroom}}</span>
                 <span>{{classroom.description}}</span> |
               <!--   <a href="#">Set Current</a> -->
                 | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
@@ -234,10 +234,17 @@
         <div style="padding-left: 20px; padding-right: 20px;">
           <div class="form-group">
 
-            <label for="course">Course Name</label>
-            <textarea name="course" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter course title here">{{classroom.course}}</textarea>
+            <label for="course_code">Course Code</label>
+            <input value='{{classroom.course_code}}'  name="course_code" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter course code here"></input>
           </div>     
         </div>   
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+            <label for="course_number">Course Number</label>
+            <input value='{{classroom.course_number}}' name="course_number" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter course number here"></input>
+          </div>     
+        </div>           
         <div style="padding-left: 20px; padding-right: 20px;">
           <div class="form-group">
 
@@ -661,10 +668,17 @@
         <div style="padding-left: 20px; padding-right: 20px;">
           <div class="form-group">
 
-            <label for="course">Course Name</label>
-            <textarea name="course" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter course title here"></textarea>
+            <label for="course_code">Course Code</label>
+            <input name="course_code" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter course code here"></input>
           </div>     
         </div>   
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+            <label for="course_number">Course Number</label>
+            <input  name="course_number" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter course number here"></input>
+          </div>     
+        </div>  
         <div style="padding-left: 20px; padding-right: 20px;">
           <div class="form-group">
 

@@ -204,7 +204,7 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 		self.context['form'] = AddInstructorForm()
 		users = Profile.objects.filter()
 		self.context['users'] = users
-		self.context['classrooms'] = Classroom.objects.all().order_by('course')
+		self.context['classrooms'] = Classroom.objects.all().order_by('course_code')
 		self.context['edit_instructor_form'] = EditInstructorForm()
 		#raise Exception("test")
 		return render(self.request, self.template_name, self.context)

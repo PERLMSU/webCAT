@@ -51,7 +51,7 @@
             <th scope="row">{{forloop.counter}}</th>
             <td>{{user.first_name }} {{user.last_name }}</td>
             <td><a href="{% url 'user-details' user.id %}"> {{user.email }}</a></td>
-            <td>{{user.current_classroom.course}}</td>
+            <td>{{user.current_classroom}}</td>
             <td>
               {% if user.permission_level %}
                   Professor
@@ -103,9 +103,9 @@
         <select name="current_classroom">
           {% for classroom in classrooms %}
             {% if classroom.id == user.current_classroom.id %}
-              <option value="{{classroom.id}}" selected >{{classroom.course}}</option>
+              <option value="{{classroom.id}}" selected >{{classroom}}</option>
             {% else %}
-              <option value="{{classroom.id}}">{{classroom.course}}</option>
+              <option value="{{classroom.id}}">{{classroom}}</option>
 
             {% endif %}
           {% endfor %}

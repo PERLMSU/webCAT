@@ -57,29 +57,25 @@
             <div class="form-group padding-lr">
 
               <label for="first_name">First Name: </label>
-              <textarea name="first_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter First Name">{{student.first_name}}</textarea>          
+              <input value='{{student.first_name}}' name="first_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter First Name"></input>          
             </div>
-      
-
-       
-      
-         
-
 
             <div class="form-group padding-lr">
 
               <label for="last_name">Last Name: </label>
-              <textarea name="last_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Last Name">{{student.last_name}}</textarea>          
+              <input value='{{student.last_name}}' name="last_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Last Name"></input>          
             </div>
+
+      <div class="form-group padding-lr">
+        <label for="email">Email: </label>
+       <input value='{{student.get_email}}' name="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Email"></input> 
+      </div>              
 
         <div class="form-group padding-lr">
           <label for="notes">Notes: </label>
           <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter student description/notes here">{{student.notes}}</textarea>
         </div>      
-      <div class="form-group padding-lr">
-        <label for="email">Email: </label>
-       <textarea name="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Email">{{student.get_email}}</textarea> 
-      </div>        
+     
 
 <!--       <div class="form-group padding-lr">
         <label for="student_id">Student ID: </label>
@@ -121,23 +117,25 @@
             <div class="form-group padding-lr">
 
               <label for="first_name">First Name: </label>
-              <textarea name="first_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter First Name"></textarea>          
+              <input name="first_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter First Name"></input>          
             </div>
 
             <div class="form-group padding-lr">
 
               <label for="last_name">Last Name: </label>
-              <textarea name="last_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Last Name"></textarea>          
+              <input name="last_name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Last Name"></input>          
             </div>
+
+      <div class="form-group padding-lr">
+        <label for="email">Email: </label>
+       <input name="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Email"></input> 
+      </div>      
 
         <div class="form-group padding-lr">
           <label for="notes">Notes: </label>
           <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter student description/notes here"></textarea>
         </div>  
-        <div class="form-group padding-lr">
-          <label for="email">Email: </label>
-         <textarea name="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Email">{{student.get_email}}</textarea> 
-        </div>    
+
         <input type="hidden" name="semester" value='{{classroom.current_semester.id}}'/>      
         <input type="hidden" name="classroom" value='{{classroom.id}}'/>     
       </div>

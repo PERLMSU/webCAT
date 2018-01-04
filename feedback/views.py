@@ -410,16 +410,7 @@ def create_category(request):
 		description = form.cleaned_data['description']
 		category = form.save(commit=False)
 
-		current_classroom_pk = request.user.current_classroom_id
-		classroom = None
-		if current_classroom_pk:
-			try:
-				classroom = Classroom.objects.get(id=current_classroom_pk)
-			except Classroom.DoesNotExist:
-				classroom = None
-				messages.add_message(request, messages.ERROR, "Error when trying to load current classroom.")
-		else:
-			messages.add_message(request, messages.ERROR, "No current classroom is set. Please visit the dashboard to set a current classroom.")
+		classroom = request.user.current_classroom
 
 		try:
 			category.classroom = classroom

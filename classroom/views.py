@@ -119,7 +119,8 @@ def edit_classroom(request, pk):
             messages.add_message(request, messages.ERROR, "Could not edit classroom: "+e)  
             return HttpResponseRedirect(reverse('dash-manage-users'))
 
-        classroom.course = form.cleaned_data['course']
+        classroom.course_number = form.cleaned_data['course_number']
+        classroom.course_code = form.cleaned_data['course_code']
         classroom.description = form.cleaned_data['description']
         classroom.current_week = form.cleaned_data['current_week']
         current_classroom_flag = form.cleaned_data['current_classroom']
@@ -128,7 +129,7 @@ def edit_classroom(request, pk):
 
 
         if current_classroom_flag:
-            request.user.current_classroom_id = pk
+            request.user.current_classroom = classroom
             request.user.save()
             messages.add_message(request, messages.SUCCESS, "Set classroom as current. ")          
 
