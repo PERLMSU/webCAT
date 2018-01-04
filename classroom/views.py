@@ -558,72 +558,67 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 
     def get(self, *args, **kwargs):
 
-        current_classroom_pk = self.request.user.current_classroom_id
-        if current_classroom_pk:
-            try:
-                classroom = Classroom.objects.get(id=current_classroom_pk)
-            except Classroom.DoesNotExist:
-                classroom = None
-                self.add_message("Error when trying to load current classroom.")
+        classroom = self.request.user.current_classroom
+        if classroom != None:
 
+            students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).order_by('last_name')
+           #gr groups = Group.objects.filter(classroom=classroom).order_by('group_number')
+            rotation_groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,rotation__classroom=classroom).order_by('group_number')
+            semesters = Semester.objects.all().order_by('date_begin')
 
+            # try:
+            #     classroom = Classroom.objects.get(instructor = self.request.user)
+            # except Classroom.DoesNotExist:
+            #     classroom = None
+            learning_assistants = Profile.objects.filter(current_classroom = classroom).order_by('last_name')
+            assign_instructor_form = AssignInstructorForm()
+            assign_instructor_form.fields['instructor_id'].choices = [(la[0],la[1]+' '+la[2]) for la in learning_assistants.values_list('id','first_name','last_name').order_by('last_name')]
+          
+
+            add_student_form1 = AddStudentForm()
+    #        add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
+
+            assign_groups_form = AssignMultipleGroupsForm()
+            assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom).values_list('id','group_number').order_by('group_number'))
+            #choices = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
+            #ssign_groups_form.set_group_numbers(choices)
+
+            #CHOICES_groups = tuple(RotationGroup.objects.filter(classroom=classroom).values_list('id','group__group_number').order_by('group__group_number'))
+            
+
+            assign_students_form = AssignMultipleStudentsForm()
+            all_students = Student.objects.filter(classroom=classroom).values_list('id','first_name','last_name').order_by('last_name')
+
+            students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
+
+            CHOICES_students = tuple(students_full_name)        
+            assign_students_form.fields['students'].choices = CHOICES_students
+
+           # raise Exception("tat")
+            
+            # learning_assistants = Profile.objects.all().filter(permission_level=0)
+         #  instructors = Profile.objects.all()
+            return render(self.request, self.template_name,
+            {
+                'students': students,
+                'learning_assistants':learning_assistants,
+              #  'instructors':instructors,
+              #  'groups': groups,
+                'rotation_groups': rotation_groups,
+                'classroom': classroom,
+                'semesters' : semesters,
+                'add_student_form': add_student_form1,
+                'add_group_form': AddGroupForm(),
+                'add_classroom_form': AddClassroomForm(),
+                'assign_multiple_groups_form': assign_groups_form,
+                'assign_multiple_students_form': assign_students_form,
+                'assign_instructor_form': assign_instructor_form,
+                'upload_view': False,
+            })
         else:
-            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")
+            messages.add_message(request, messages.WARNING, 'Please register a classroom.')            
+            return HttpResponseRedirect(reverse('dash-manage-users'))             
 
-        students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).order_by('last_name')
-       #gr groups = Group.objects.filter(classroom=classroom).order_by('group_number')
-        rotation_groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,rotation__classroom=classroom).order_by('group_number')
-        semesters = Semester.objects.all().order_by('date_begin')
-
-        # try:
-        #     classroom = Classroom.objects.get(instructor = self.request.user)
-        # except Classroom.DoesNotExist:
-        #     classroom = None
-        learning_assistants = Profile.objects.filter(current_classroom = classroom).order_by('last_name')
-        assign_instructor_form = AssignInstructorForm()
-        assign_instructor_form.fields['instructor_id'].choices = [(la[0],la[1]+' '+la[2]) for la in learning_assistants.values_list('id','first_name','last_name').order_by('last_name')]
-      
-
-        add_student_form1 = AddStudentForm()
-#        add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
-
-        assign_groups_form = AssignMultipleGroupsForm()
-        assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom).values_list('id','group_number').order_by('group_number'))
-        #choices = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
-        #ssign_groups_form.set_group_numbers(choices)
-
-        #CHOICES_groups = tuple(RotationGroup.objects.filter(classroom=classroom).values_list('id','group__group_number').order_by('group__group_number'))
-        
-
-        assign_students_form = AssignMultipleStudentsForm()
-        all_students = Student.objects.filter(classroom=classroom).values_list('id','first_name','last_name').order_by('last_name')
-
-        students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
-
-        CHOICES_students = tuple(students_full_name)        
-        assign_students_form.fields['students'].choices = CHOICES_students
-
-       # raise Exception("tat")
-        
-        # learning_assistants = Profile.objects.all().filter(permission_level=0)
-     #  instructors = Profile.objects.all()
-        return render(self.request, self.template_name,
-        {
-            'students': students,
-            'learning_assistants':learning_assistants,
-          #  'instructors':instructors,
-          #  'groups': groups,
-            'rotation_groups': rotation_groups,
-            'classroom': classroom,
-            'semesters' : semesters,
-            'add_student_form': add_student_form1,
-            'add_group_form': AddGroupForm(),
-            'add_classroom_form': AddClassroomForm(),
-            'assign_multiple_groups_form': assign_groups_form,
-            'assign_multiple_students_form': assign_students_form,
-            'assign_instructor_form': assign_instructor_form,
-            'upload_view': False,
-        })
 
     def add_message(self, text, mtype=25):
         messages.add_message(self.request, mtype, text) 
