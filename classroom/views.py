@@ -616,7 +616,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
                 'upload_view': False,
             })
         else:
-            messages.add_message(request, messages.WARNING, 'Please register a classroom.')            
+            messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
             return HttpResponseRedirect(reverse('dash-manage-users'))             
 
 
