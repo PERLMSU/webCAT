@@ -287,7 +287,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 			users = Profile.objects.all()
 			self.context['users'] = users
 			#if request.user.current_classroom_id:
-			self.context['current_classroom'] = Classroom.objects.get(id=request.user.current_classroom_id or None)
+			self.context['current_classroom'] = request.user.current_classroom or None
 			#else:
 			#	self.context['c']
 			self.context['rotation_form'] = AddEditRotationForm()
