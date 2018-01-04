@@ -102,31 +102,25 @@ class NotesView(LoginRequiredMixin, TemplateView):
 				week = 1            
 
 		classroom = self.request.user.current_classroom
-		# current_classroom_pk = self.request.user.current_classroom_id
-		# if current_classroom_pk:
-		#     try:
-		#         classroom = Classroom.objects.get(id=current_classroom_pk)
-		#     except Classroom.DoesNotExist:
-		#         classroom = None
-		#         self.add_message("Error when trying to load current classroom.")
-		# else:
-		#     self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
+		if classroom != None:
+
+			groups_assigned = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,instructor = self.request.user)
 
 
-		groups_assigned = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,current_instructor = self.request.user)
-
-
-		main_categories = Category.objects.filter(classroom=classroom)
-		sub_categories = {}
-		for category in main_categories:
-			sub_categories[category.id] = SubCategory.objects.filter(main_category = category)
-		# self.context['loop_times'] = range(1, 13)
-		self.context['loop_times'] = range(1,classroom.get_num_weeks())
-		self.context['week'] = week
-		self.context['rotation_groups'] = groups_assigned
-		self.context['main_categories'] = main_categories
-		self.context['sub_categories'] = sub_categories
-		return render(self.request, self.template_name, self.context)
+			main_categories = Category.objects.filter(classroom=classroom)
+			sub_categories = {}
+			for category in main_categories:
+				sub_categories[category.id] = SubCategory.objects.filter(main_category = category)
+			# self.context['loop_times'] = range(1, 13)
+			self.context['loop_times'] = range(1,classroom.get_num_weeks())
+			self.context['week'] = week
+			self.context['rotation_groups'] = groups_assigned
+			self.context['main_categories'] = main_categories
+			self.context['sub_categories'] = sub_categories
+			return render(self.request, self.template_name, self.context)
+		else:
+			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			return HttpResponseRedirect(reverse('dash-home')) 			
 
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text)

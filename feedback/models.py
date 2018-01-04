@@ -126,6 +126,8 @@ class Grade(models.Model):
     category = models.ForeignKey(Category)
 
 class Notification(models.Model):
+    #classroom = models.ForeignKey(Classroom)
+    #semester = models.ForeignKey(Semester)
     notification = models.CharField(max_length=500)
     draft_to_approve = models.ForeignKey(Draft, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)

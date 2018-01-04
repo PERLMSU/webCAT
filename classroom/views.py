@@ -378,32 +378,27 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
     def get(self, request, *args, **kwargs):
         form = UploadFileForm()
 
+        classroom = self.request.user.current_classroom
+        if classroom != None:
 
-        current_classroom_pk = self.request.user.current_classroom_id
-        if current_classroom_pk:
-            try:
-                classroom = Classroom.objects.get(id=current_classroom_pk)
-            except Classroom.DoesNotExist:
-                classroom = None
-                self.add_message("Error when trying to load current classroom.")
+            students = Student.objects.filter(classroom=classroom).order_by('last_name')
+            groups = Group.objects.filter(classroom=classroom).order_by('group_number')                   
+           # classroom = Classroom.objects.get(instructor = self.request.user)
+            add_student_form = AddStudentForm()
+            return render(self.request, self.template_name,
+            {
+                'form': form,
+                'title': 'Excel file upload and download example',
+                'header': ('Please choose any excel file ' +
+                           'from your cloned repository:'),
+                'students': students,
+                'classroom': classroom,
+                'add_student_form': add_student_form,
+                'upload_view': True,
+            }) 
         else:
-            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
-
-        students = Student.objects.filter(classroom=classroom).order_by('last_name')
-        groups = Group.objects.filter(classroom=classroom).order_by('group_number')                   
-       # classroom = Classroom.objects.get(instructor = self.request.user)
-        add_student_form = AddStudentForm()
-        return render(self.request, self.template_name,
-        {
-            'form': form,
-            'title': 'Excel file upload and download example',
-            'header': ('Please choose any excel file ' +
-                       'from your cloned repository:'),
-            'students': students,
-            'classroom': classroom,
-            'add_student_form': add_student_form,
-            'upload_view': True,
-        }) 
+            messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+            return HttpResponseRedirect(reverse('dash-home'))                 
 
     def post(self, *args, **kwargs):
         form = UploadFileForm(self.request.POST, self.request.FILES)
@@ -494,32 +489,27 @@ class UploadGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
     def get(self, request, *args, **kwargs):
         form = UploadFileForm()
 
+        classroom = self.request.user.current_classroom
+        if classroom != None:
 
-        current_classroom_pk = self.request.user.current_classroom_id
-        if current_classroom_pk:
-            try:
-                classroom = Classroom.objects.get(id=current_classroom_pk)
-            except Classroom.DoesNotExist:
-                classroom = None
-                self.add_message("Error when trying to load current classroom.")
+            students = Student.objects.filter(classroom=classroom).order_by('last_name')
+            groups = Group.objects.filter(classroom=classroom).order_by('group_number')
+           # classroom = Classroom.objects.get(instructor = self.request.user)
+            return render(self.request, self.template_name,
+            {
+                'form': form,
+                'add_group_form': AddGroupForm(),
+                'title': 'Excel file upload and download example',
+                'header': ('Please choose any excel file ' +
+                           'from your cloned repository:'),
+                'groups': groups,
+                'classroom': classroom,
+                'students': students,
+                'upload_view': True,
+            }) 
         else:
-            self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")  
-
-        students = Student.objects.filter(classroom=classroom).order_by('last_name')
-        groups = Group.objects.filter(classroom=classroom).order_by('group_number')
-       # classroom = Classroom.objects.get(instructor = self.request.user)
-        return render(self.request, self.template_name,
-        {
-            'form': form,
-            'add_group_form': AddGroupForm(),
-            'title': 'Excel file upload and download example',
-            'header': ('Please choose any excel file ' +
-                       'from your cloned repository:'),
-            'groups': groups,
-            'classroom': classroom,
-            'students': students,
-            'upload_view': True,
-        }) 
+            messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+            return HttpResponseRedirect(reverse('dash-home'))       
 
     def post(self, *args, **kwargs):
         form = UploadFileForm(self.request.POST, self.request.FILES)
@@ -617,7 +607,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             })
         else:
             messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
-            return HttpResponseRedirect(reverse('dash-manage-users'))             
+            return HttpResponseRedirect(reverse('dash-home'))             
 
 
     def add_message(self, text, mtype=25):

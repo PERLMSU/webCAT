@@ -112,40 +112,31 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			else:
 				week = 1
 
-		# current_classroom_pk = self.request.user.current_classroom_id
-
-		# if current_classroom_pk:
-		# 	try:
-
-		# 		classroom = Classroom.objects.get(id=current_classroom_pk)
-
-		# 	except Classroom.DoesNotExist:
-		# 		classroom = None
-		# 		self.add_message("Error when trying to load current classroom.")
-		# else:
-		# 	self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.") 
 		classroom = request.user.current_classroom
+		if classroom != None:
+			groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester.id,instructor= self.request.user,
+				rotation__start_week__lte=week,rotation__end_week__gte=week)
+			#groups_to_students = {}
+			student_to_feedback_draft = {}
+			# for group in groups:
+			# 	groups_to_students[group] = Student.objects.filter(group__students=group)
 
-		groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester.id,instructor= self.request.user,
-			rotation__start_week__lte=week,rotation__end_week__gte=week)
-		#groups_to_students = {}
-		student_to_feedback_draft = {}
-		# for group in groups:
-		# 	groups_to_students[group] = Student.objects.filter(group__students=group)
+		#	raise Exception("test!")
+			main_categories = Category.objects.filter(classroom=classroom)
 
-	#	raise Exception("test!")
-		main_categories = Category.objects.filter(classroom=classroom)
+			self.context['week'] = int(week)
+			self.context['rotation_groups'] = groups
+			# self.context['loop_times'] = range(1, 13)
+			self.context['loop_times'] = range(1,classroom.get_num_weeks())
+			self.context['grade_scale'] = [x*.25 for x in range(17)]
+			#self.context['groups_to_students'] = groups_to_students
+			self.context['main_categories'] = main_categories
+			self.context['notifications'] = Notification.objects.filter(user=self.request.user)
 
-		self.context['week'] = int(week)
-		self.context['rotation_groups'] = groups
-		# self.context['loop_times'] = range(1, 13)
-		self.context['loop_times'] = range(1,classroom.get_num_weeks())
-		self.context['grade_scale'] = [x*.25 for x in range(17)]
-		#self.context['groups_to_students'] = groups_to_students
-		self.context['main_categories'] = main_categories
-		self.context['notifications'] = Notification.objects.filter(user=self.request.user)
-
-		return render(self.request, self.template_name, self.context)
+			return render(self.request, self.template_name, self.context)
+		else:
+			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			return HttpResponseRedirect(reverse('dash-home'))  		
 
 	def post(self,*args, **kwargs):
 		form = EditDraftForm(self.request.POST or None)
@@ -154,8 +145,6 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			draft_text = form.cleaned_data['draft_text']
 			student_pk = form.cleaned_data['student_pk']
 			week_num = form.cleaned_data['week_num']
-
-
 
 			try:
 				student = Student.objects.get(id=student_pk)
@@ -215,43 +204,22 @@ class InboxView(LoginRequiredMixin,TemplateView):
 			else:
 				week = 1
 
+		classroom = request.user.current_classroom
+		if classroom != None:
+			self.context['draft_notifications_need_approval'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 1, draft_to_approve__week_num=week)
+			self.context['draft_notifications_need_revision'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 2,draft_to_approve__week_num=week)
+			self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
 
-		self.context['draft_notifications_need_approval'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 1, draft_to_approve__week_num=week)
-		self.context['draft_notifications_need_revision'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 2,draft_to_approve__week_num=week)
-		self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
-
-		self.context['week'] = week
-		self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
-		return render(self.request, self.template_name, self.context)
+			self.context['week'] = week
+			self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
+			return render(self.request, self.template_name, self.context)
+		else:
+			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			return HttpResponseRedirect(reverse('dash-home')) 			
 
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text)	
 
-
-# class CommonView(LoginRequiredMixin,TemplateView):
-# 	template_name = "common.html"
-# 	context = {}	
-
-# 	def get(self, request, *args, **kwargs):
-# 		try:
-# 			classroom = Classroom.objects.get(instructor = self.request.user)
-# 		except Classroom.DoesNotExist:
-# 			classroom = None
-
-# 		main_categories = Category.objects.filter(classroom=classroom)
-		
-
-# 		sub_categories = {}
-# 		for category in main_categories:
-# 			sub_categories[category.id] = SubCategory.objects.filter(main_category = category)		
-
-# 		self.context['main_categories'] = main_categories
-# 		self.context['sub_categories'] = sub_categories
-
-# 		return render(self.request, self.template_name, self.context)
-
-# 	def add_message(self, text, mtype=25):
-# 		messages.add_message(self.request, mtype, text)	
 
 
 
@@ -272,21 +240,18 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 	context = {}
 
 	def get(self, *args, **kwargs):
-		current_classroom_pk = self.request.user.current_classroom_id
-		if current_classroom_pk:
-			try:
-				classroom = Classroom.objects.get(id=current_classroom_pk)
-			except Classroom.DoesNotExist:
-				classroom = None
-				self.add_message("Error when trying to load current classroom.")
-		else:
-			self.add_message("No current classroom is set. Please visit the dashboard to set a current classroom.")
-		self.context['create_main_category_form'] = AddCategoryForm()
-		self.context['create_sub_category_form'] = AddSubCategoryForm()
-		self.context['create_feedback_form'] = AddFeedbackPieceForm()
-		self.context['main_categories'] = Category.objects.filter(classroom=classroom)
+		classroom = self.request.user.current_classroom
+		if classroom != None:
+			self.context['create_main_category_form'] = AddCategoryForm()
+			self.context['create_sub_category_form'] = AddSubCategoryForm()
+			self.context['create_feedback_form'] = AddFeedbackPieceForm()
+			self.context['main_categories'] = Category.objects.filter(classroom=classroom)
 
-		return render(self.request, self.template_name, self.context)
+
+			return render(self.request, self.template_name, self.context)
+		else:
+			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			return HttpResponseRedirect(reverse('dash-home'))
 
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text)	
