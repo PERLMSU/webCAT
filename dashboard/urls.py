@@ -13,6 +13,7 @@ from .views import (
     UpdateEmailView,
     ChangePasswordView,
     edit_instructor,
+    add_semester,
     DeleteInstructorView,
 )
 
@@ -20,6 +21,7 @@ from .views import (
 urlpatterns = [
 	url(r'^$', DashboardView.as_view(), name='dash-home'),
   url(r'^manage/$', ManageUsersView.as_view(), name="dash-manage-users"),
+  url(r'^semester/add/$', add_semester, name="dash-add-semester"),
   url(r'^manage/edit/(?P<pk>\d+)/$', edit_instructor, name="dash-edit-user"),
   url(r'^manage/delete/(?P<pk>\d+)/$', DeleteInstructorView.as_view(), name="dash-remove-user"),
     url(r'^settings/$', EmailConfirmationView.as_view(), name="dash-settings"),

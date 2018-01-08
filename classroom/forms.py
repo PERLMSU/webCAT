@@ -6,6 +6,15 @@ from datetime import date
 from userprofile.models import Profile
 
 
+class AddSemesterForm(forms.ModelForm):
+    date_begin = forms.DateField()
+    date_end = forms.DateField()
+    title = models.CharField(max_length=200)
+
+    class Meta:
+        model = Semester  
+        fields = ['date_begin','date_end','title']
+
 class AddEditRotationForm(forms.ModelForm):
     start_week = forms.IntegerField(min_value=1,required=True)
     length = forms.IntegerField(min_value=1,required=True)

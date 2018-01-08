@@ -24,7 +24,7 @@ from userprofile.models import (
 							)
 
 from classroom.models import *
-from classroom.forms import AddClassroomForm,EditClassroomForm,AddEditRotationForm
+from classroom.forms import *
 
 @register.filter
 def get_num_students(classroom_pk):
@@ -234,7 +234,17 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text) 
 
-
+def add_semester(request):
+	form = AddSemesterForm(request.POST or None)
+	if form.is_valid():
+		semester = form.save(commit=False)
+		semester.save()
+		messages.add_message(request, messages.SUCCESS, "Semester successfully added!")  
+		return HttpResponseRedirect(reverse('dash-home'))        
+	else:
+		messages.error(request, form.errors)
+		return HttpResponseRedirect(reverse('dash-home'))    	
+	#return HttpResponseRedirect('/dashboard/') 
 
 
 def edit_instructor(request, pk):
@@ -283,6 +293,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
 		if self.request.user.is_authenticated():
 			self.context['form'] = AddInstructorForm()
+			self.context['add_semester_form'] = AddSemesterForm()
 #			self.context['register_classroom_form'] = ClassroomRegistrationForm()
 			users = Profile.objects.all()
 			self.context['users'] = users

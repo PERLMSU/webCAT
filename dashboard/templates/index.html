@@ -38,6 +38,8 @@
   <div class="panel-heading"><h3 class="padding-top-bottom">Classrooms
 
             <button class="btn btn-lg btn-warning float-right" data-toggle="modal" data-target="#register-new-classroom"><i class="fa fa-fw fa-university"></i>   Register Classroom</button>
+                        <button class="btn btn-lg btn-primary float-right margin-right" data-toggle="modal" data-target="#registerSemester"><i class="fa fa-fw fa-plus-square-o"></i> Add Semester</button>
+            
   </div>
   <div class="panel-body">
 
@@ -273,11 +275,12 @@
         Set Semester: 
 
         <select name="current_semester">
+            <!-- <option>-------</option> -->
           {% for semester in semesters %}
             {% if semester.id == classroom.current_semester.id %}
-              <option value="{{semester.id}}" selected >{{semester.title}}</option>
+              <option value="{{semester.id}}" selected >{{semester}}</option>
             {% else %}
-              <option value="{{semester.id}}">{{semester.title}}</option>
+              <option value="{{semester.id}}">{{semester}}</option>
 
             {% endif %}
           {% endfor %}
@@ -650,6 +653,52 @@
     </div> -->
 <!-- </div> -->
 <!-- /.row -->
+
+    <div class="modal fade" id="registerSemester" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Register Semester</h4>
+          </div>
+          <div class="modal-body">
+            <h5> Semester: </h5>
+            <form class="form-horizontal" id="createStudentForm" action="{% url "dash-add-semester" %}" method="POST">{% csrf_token %}
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+            <label for="title">Semester Title</label>
+            <input name="title" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter semester title here"></input>
+          </div>     
+        </div>   
+
+            <label for="date_begin">Beginning of Semester</label>
+            <input name="date_begin" type="date" class="form-control" aria-describedby="emailHelp" placeholder="Enter semester beginning date"></input>
+          </div>     
+        </div>  
+        <div style="padding-left: 20px; padding-right: 20px;">
+          <div class="form-group">
+
+            <label for="date_end">End of Semester</label>
+            <input name="date_end" type="date" class="form-control" aria-describedby="emailHelp" placeholder="Enter semester ending date"></input>
+          </div>     
+        </div> 
+                
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <input type="submit" value="Save" class="btn btn-primary"/>      
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>   
 
 
 <div class="modal fade" id="register-new-classroom" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

@@ -19,8 +19,11 @@ class Semester(models.Model):
         monday2 = (self.date_end - timedelta(days=self.date_end.weekday()))        
         return (monday2 - monday1).days / 7
 
+    def get_year(self):
+        pass
+
     def __str__(self):
-        return self.title
+        return "{} {} to {}".format(self.title, self.date_begin, self.date_end)
 
 class Classroom(models.Model):
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL)
