@@ -268,6 +268,7 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
 
     def post(self, *args, **kwargs):
         form = AssignMultipleGroupsForm(self.request.POST or None)
+        #raise Exception("what")
         if form.is_valid():
             checked_groups = form.cleaned_data['group_numbers']
             try:
@@ -276,7 +277,10 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
                 messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
                 return HttpResponseRedirect('/classroom/')
 
+            #
+
             for group_pk in checked_groups:
+                #
                 try:
                     group = RotationGroup.objects.get(id = group_pk)
                     group.instructor = instructor
@@ -552,6 +556,13 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         classroom = self.request.user.current_classroom
         if classroom != None:
 
+            # all_students = Student.objects.all().values_list('id','first_name','last_name').order_by('last_name')
+
+            # students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
+
+            # CHOICES_students = tuple(students_full_name)  
+            
+
             students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).order_by('last_name')
            #gr groups = Group.objects.filter(classroom=classroom).order_by('group_number')
             rotation_groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,rotation__classroom=classroom).order_by('group_number')
@@ -569,8 +580,9 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             add_student_form1 = AddStudentForm()
     #        add_student_form1.fields["classroom_pk"].initial = current_classroom_pk
 
+           # CHOICES_groups = tuple(RotationGroup.objects.filter(rotation__classroom=classroom,rotation__semester=classroom.current_semester).values_list('id','group_number').order_by('group_number'))
             assign_groups_form = AssignMultipleGroupsForm()
-            assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom).values_list('id','group_number').order_by('group_number'))
+            assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom,rotation__semester=classroom.current_semester).values_list('id','group_number').order_by('group_number'))
             #choices = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
             #ssign_groups_form.set_group_numbers(choices)
 
@@ -578,14 +590,14 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             
 
             assign_students_form = AssignMultipleStudentsForm()
-            all_students = Student.objects.filter(classroom=classroom).values_list('id','first_name','last_name').order_by('last_name')
+            all_students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).values_list('id','first_name','last_name').order_by('last_name')
 
             students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
 
             CHOICES_students = tuple(students_full_name)        
             assign_students_form.fields['students'].choices = CHOICES_students
-
            # raise Exception("tat")
+            
             
             # learning_assistants = Profile.objects.all().filter(permission_level=0)
          #  instructors = Profile.objects.all()

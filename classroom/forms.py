@@ -64,8 +64,8 @@ class AddStudentForm(forms.ModelForm):
     email = forms.EmailField(required=False)
    # student_id = forms.CharField()
     #group_number = forms.IntegerField(required=False)
-    classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(),required=True)
-    semester = forms.ModelChoiceField(queryset=Semester.objects.all(),required=True)
+    classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(),required=False)
+    semester = forms.ModelChoiceField(queryset=Semester.objects.all(),required=False)
 
     class Meta:
         model = Student
@@ -122,14 +122,22 @@ class AssignInstructorForm(forms.Form):
 
 
 class AssignMultipleGroupsForm(forms.Form):
-	CHOICES = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))
+	#CHOICES = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))
 
-	group_numbers = forms.MultipleChoiceField(
-	    required=True,
-	    widget=forms.CheckboxSelectMultiple,
-	    choices = CHOICES,
-	)  
-
+	# group_numbers = forms.MultipleChoiceField(
+	#     required=True,
+	#     widget=forms.CheckboxSelectMultiple,
+	#     choices = CHOICES,
+	# )  
+    group_numbers = forms.MultipleChoiceField(
+            required=True,
+            widget=forms.CheckboxSelectMultiple,
+            choices = [],
+        ) 
+    def __init__(self, *args, **kwargs):
+		super(AssignMultipleGroupsForm, self).__init__(*args, **kwargs)   
+		#self.fields['group_numbers'].choices = choices
+		self.fields['group_numbers'].choices = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))    
 	# def __init__(self, *args, **kwargs):
 	# 	global CHOICES_GLOBAL
 	# 	self.user = kwargs.pop('user', None)
@@ -142,17 +150,25 @@ class AssignMultipleGroupsForm(forms.Form):
 
 
 class AssignMultipleStudentsForm(forms.Form):
-	all_students = Student.objects.all().values_list('id','first_name','last_name').order_by('last_name')
+	# all_students = Student.objects.all().values_list('id','first_name','last_name').order_by('last_name')
 
-	students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
+	# students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
 
-	CHOICES_students = tuple(students_full_name)    
+	# CHOICES_students = tuple(students_full_name)    
 	#raise Exception("wutt")
 	students = forms.MultipleChoiceField(
 	    required=True,
 	    widget=forms.CheckboxSelectMultiple,
-	    choices=CHOICES_students,
+	    choices=[],
 	)
+	def __init__(self, *args, **kwargs):
+	    super(AssignMultipleStudentsForm, self).__init__(*args, **kwargs)
+	    all_students = Student.objects.all().values_list('id','first_name','last_name').order_by('last_name')
+
+	    students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
+
+	    CHOICES_students = tuple(students_full_name)       
+	    self.fields['students'].choices = CHOICES_students     
 
 	def clean_students(self):
 	    value = self.cleaned_data['students']
