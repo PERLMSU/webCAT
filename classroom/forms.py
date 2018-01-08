@@ -129,12 +129,12 @@ class AssignMultipleGroupsForm(forms.Form):
 	#     widget=forms.CheckboxSelectMultiple,
 	#     choices = CHOICES,
 	# )  
-    group_numbers = forms.MultipleChoiceField(
-            required=True,
-            widget=forms.CheckboxSelectMultiple,
-            choices = [],
-        ) 
-    def __init__(self, *args, **kwargs):
+	group_numbers = forms.MultipleChoiceField(
+		required=True,
+		widget=forms.CheckboxSelectMultiple,
+		choices = [],
+	) 
+	def __init__(self, *args, **kwargs):
 		super(AssignMultipleGroupsForm, self).__init__(*args, **kwargs)   
 		#self.fields['group_numbers'].choices = choices
 		self.fields['group_numbers'].choices = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))    
