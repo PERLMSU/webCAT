@@ -36,6 +36,12 @@ def get_draft_grades(draft):
 	return Grade.objects.filter(draft=draft)
 
 
+@register.filter
+def get_note_feedback_pieces(note):
+	if note.observation != None:
+		return FeedbackPiece.objects.filter(observation=note.observation)
+	else:
+		return FeedbackPiece.objects.filter(sub_category=note.sub_category)  
 
 
 @register.filter

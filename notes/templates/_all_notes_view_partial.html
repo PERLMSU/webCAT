@@ -1,18 +1,23 @@
 
-
+<!-- <h1>,hello</h1> -->
 <div id="all_notes_view" style="display: none;">
+
 	<div class="col-lg-9"> 
-		{% for group, students in student_groups.items %}
-			{% if students %}
+		<h3> All Notes View </h3>
+    	{% for group in rotation_groups %}
+    		{% if group.students.all %}
 
 				<h5>Group {{group.group_number}}</h5>	
 
-				{% for student in students %}
+				{% for student in group.students.all %}
 					<span> {{student}}</span> 
 					{% with student.id|get_feedback_notes:week as notes %}
 						<ul>
 							{% for note in notes %}
-								<li><strong>{{note.sub_category.name}} - </strong>{{note.note}}</li>
+								<li><strong>{{note.sub_category.name}}</strong>
+									<br>Observation: {{note.observation}}
+									<br>Custom Note: {{note.note}}
+								</li>
 							{% endfor %}	
 						</ul>
 					{% endwith %}	

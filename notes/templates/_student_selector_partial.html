@@ -1,4 +1,4 @@
-<div class="col-lg-2">
+
  <!--    <div class="container"> -->
 
 <div class="row">
@@ -30,7 +30,7 @@
 	    			
 			    	<div class="panel panel-info">
     	{% for group in rotation_groups %}
-    		{% if group.students %}
+    		{% if group.students.all %}
 <!-- 	    		<div class="row">
 	    			
 			    	<div class="panel panel-info"> -->
@@ -70,4 +70,3 @@
 <!-- 	</div> -->
 			    		</div>
 			    	</div>
-</div>

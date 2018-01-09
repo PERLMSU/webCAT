@@ -11,7 +11,7 @@ from django.conf import settings
 from django.template.defaulttags import register
 # Create your views here.
 from ast import literal_eval
-from feedback.models import Category, SubCategory
+from feedback.models import *
 from classroom.models import *
 from notes.forms import AddFeedbackForm
 from notes.models import Note
@@ -30,6 +30,9 @@ def get_feedback_notes(student_pk,week):
     feedback_notes = Note.objects.filter(student=student_pk,week_num=week)
     return feedback_notes
 
+@register.filter
+def get_observations(subcategory):
+    return Observation.objects.filter(sub_category=subcategory.id).order_by('observation_type')
 
 class AddFeedback(LoginRequiredMixin, TemplateView):
     """ create a feedback note for student(s)
@@ -46,7 +49,8 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
 
            # selected_students_pk = [item for value in selected_students for item in literal_eval(value)]
 
-            category_to_add_feedback = SubCategory.objects.get(id=kwargs['pk'])
+            subcategory = form.cleaned_data['subcategory']
+            observation = form.cleaned_data['observation']
             feedback_note = form.cleaned_data['note']
             week = form.cleaned_data['week_num']
 
@@ -61,7 +65,7 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
                # raise Exception("test")
                 try:
                     student = Student.objects.get(id=student_pk)
-                    new_feedback = Note.objects.create(note=feedback_note,student=student,sub_category=category_to_add_feedback,week_num=week)
+                    new_feedback = Note.objects.create(note=feedback_note,student=student,sub_category=subcategory,observation=observation,week_num=week)
                     new_feedback.save()
                     messages.add_message(self.request, messages.SUCCESS, 'Note(s) successfully added.')
                 except Exception as e:

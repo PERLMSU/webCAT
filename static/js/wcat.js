@@ -279,7 +279,15 @@ $(document).on("click", ".back-to-main-categories", function () {
 
 $(document).on("click", ".sub-category-btn", function () {
      var category_pk = this.id;
-     $("#note_taker_"+category_pk).show();
+     if ($("#note_taker_"+category_pk).is(":visible"))
+     {
+        $("#note_taker_"+category_pk).hide();
+     }
+     else
+     {
+        $("#note_taker_"+category_pk).show("slow");
+     }     
+     //$("#note_taker_"+category_pk).show();
      $('#main_categories').hide();
      $('#all_notes_view').hide();
      // $(".modal-body #categoryName").html( categoryName );

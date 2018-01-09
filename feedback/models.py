@@ -64,6 +64,9 @@ class Observation(models.Model):
         elif self.observation_type == False:
             return "Negative"
 
+    def __str__(self):
+        return "{} {}".format(self.get_observation_type(), self.observation)
+
 class Feedback(models.Model):
     sub_category = models.ForeignKey(SubCategory)
     observation = models.ForeignKey(Observation)

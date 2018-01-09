@@ -6,5 +6,5 @@ urlpatterns = [
 	url(r'^$', NotesView.as_view(), name="notes-home"),
 	  url(r'^week/(?P<week>\d+)/$', NotesView.as_view(), name="notes-home"),
 	  url(r'^week/change/$', change_week_notes, name="notes-change-week"),	
-	 url(r'^add/(?P<pk>\d+)/$', AddFeedback.as_view(), name='notes-add-feedback'),
+	 url(r'^add/$', AddFeedback.as_view(), name='notes-add-feedback'),
 ]
