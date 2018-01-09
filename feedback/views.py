@@ -115,7 +115,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 				else:
 					week = 1
 
-			groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester.id,instructor= self.request.user,
+			groups = RotationGroup.objects.filter(rotation__classroom = classroom, rotation__semester=classroom.current_semester.id,instructor= self.request.user,
 				rotation__start_week__lte=week,rotation__end_week__gte=week)
 			#groups_to_students = {}
 			student_to_feedback_draft = {}
@@ -144,20 +144,16 @@ class FeedbackView(LoginRequiredMixin, FormView):
 		#raise Exception("test")
 		if form.is_valid():
 			draft_text = form.cleaned_data['draft_text']
-			student_pk = form.cleaned_data['student_pk']
+			draft = form.cleaned_data['draft']
+			student = form.cleaned_data['student']
 			week_num = form.cleaned_data['week_num']
 
-			try:
-				student = Student.objects.get(id=student_pk)
-			except Student.DoesNotExist:
-				messages.add_message(self.request, messages.ERROR, 'Draft could not be saved for this student.')
-				return HttpResponseRedirect('/feedback/')
-
-			try:
-				draft = Draft.objects.get(owner=self.request.user, student = student, week_num = week_num)
-			except Draft.DoesNotExist:
-				draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)
-
+			# try:
+			# 	draft = Draft.objects.get(owner=self.request.user, student = student, week_num = week_num)
+			# except Draft.DoesNotExist:
+			# 	draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)
+			if not draft:
+				draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)				
 
 			grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.iteritems()
 				if name.startswith('grade_')])
@@ -282,7 +278,7 @@ def create_common_feedback(request, pk):
 	if form.is_valid():
 		feedback = form.cleaned_data['feedback']
 		observation = form.cleaned_data['observation']
-
+		explanation = form.cleaned_data['feedback_explanation']
 
 		if form.cleaned_data['observation_type']:
 			observation_type = int(form.cleaned_data['observation_type'])
@@ -291,27 +287,27 @@ def create_common_feedback(request, pk):
 
 		if observation_type == -1:
 			observation_type = None
-		explanation = form.cleaned_data['feedback_explanation']
+		
 
 		#If selected from prepopulated / preexisting
-		feedback_pk = form.cleaned_data['feedback_pk']
-		observation_pk = form.cleaned_data['observation_pk']
-		explanation_pk = form.cleaned_data['feedback_explanation_pk']
+		feedback_object = form.cleaned_data['feedback_pk']
+		observation_object = form.cleaned_data['observation_pk']
+		explanation_object = form.cleaned_data['feedback_explanation_pk']
 
-		subcategory_pk = form.cleaned_data['subcategory_pk']
+		subcategory = form.cleaned_data['subcategory_pk']
 
-		observation_object = None
-		feedback_object = None
-		explanation_object = None
+		# observation_object = None
+		# feedback_object = None
+		# explanation_object = None
 
-		#raise Exception("wtf")
-		try:
-			subcategory = SubCategory.objects.get(id=subcategory_pk)
-		except SubCategory.DoesNotExist:
-			subcategory = None
+		# #raise Exception("wtf")
+		# try:
+		# 	subcategory = SubCategory.objects.get(id=subcategory_pk)
+		# except SubCategory.DoesNotExist:
+		# 	subcategory = None
 
 
-		if observation_pk == None:
+		if observation_object == None and observation:
 			#Create observation
 			try:
 				new_observation = Observation(sub_category=subcategory, observation = observation, observation_type = observation_type )
@@ -320,14 +316,14 @@ def create_common_feedback(request, pk):
 				messages.add_message(request, messages.SUCCESS, 'Successfully added new observation')
 			except Exception as e:
 				messages.add_message(request, messages.ERROR, 'Unable to create this observation %s' % e)				
-		else:
-			try:
-				observation_object = Observation.objects.get(id=observation_pk)
-			except Observation.DoesNotExist:
-				observation_object = None			
+		# else:
+		# 	try:
+		# 		observation_object = Observation.objects.get(id=observation_pk)
+		# 	except Observation.DoesNotExist:
+		# 		observation_object = None			
 
-
-		if feedback_pk == None:
+		#raise Exception("wat")
+		if feedback_object == None and (feedback and observation_object != None):
 			#Create observation
 			try:
 				new_feedback = Feedback(observation=observation_object, feedback = feedback,sub_category=subcategory)
@@ -336,13 +332,13 @@ def create_common_feedback(request, pk):
 				messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback')
 			except Exception as e:
 				messages.add_message(request, messages.ERROR, 'Unable to create this feedback %s' % e)		
-		else:
-			try:
-				feedback_object = Feedback.objects.get(id=feedback_pk)
-			except Feedback.DoesNotExist:
-				feedback_object = None					
+		# else:
+		# 	try:
+		# 		feedback_object = Feedback.objects.get(id=feedback_pk)
+		# 	except Feedback.DoesNotExist:
+		# 		feedback_object = None					
 
-		if explanation_pk == None:
+		if explanation_object == None and (explanation and feedback_object != None):
 			#Create observation
 			try:
 				new_explanation = Explanation(feedback=feedback_object, feedback_explanation = explanation,sub_category=subcategory)
@@ -351,11 +347,11 @@ def create_common_feedback(request, pk):
 				messages.add_message(request, messages.SUCCESS, 'Successfully added new explanation')
 			except Exception as e:
 				messages.add_message(request, messages.ERROR, 'Unable to create this explanation %s' % e)		
-		else:
-			try:
-				explanation_object = Explanation.objects.get(id=explanation_pk)
-			except Explanation.DoesNotExist:
-				explanation_object = None	
+		# else:
+		# 	try:
+		# 		explanation_object = Explanation.objects.get(id=explanation_pk)
+		# 	except Explanation.DoesNotExist:
+		# 		explanation_object = None	
 
 
 		try:
@@ -366,7 +362,7 @@ def create_common_feedback(request, pk):
 			messages.add_message(request, messages.ERROR, 'Unable to create this feedback piece %s' % e)				
 		return HttpResponseRedirect('/feedback/categories/')
 
-	messages.add_message(request, messages.ERROR, 'Form not valid')
+	messages.add_message(request, messages.ERROR, form.errors)
 	return HttpResponseRedirect('/feedback/categories/')			
 			#new_feedback_piece = FeedbackPiece.create()
 
@@ -388,15 +384,15 @@ def send_draft_revision(request):
 	form = AddRevisionNotesForm(request.POST or None)
 	#raise Exception("wuht")
 	if form.is_valid():	
-		draft_pk = form.cleaned_data['draft_pk']
+		draft = form.cleaned_data['draft_pk']
 		revision_notes = form.cleaned_data['revision_notes']		
 		try:
-			draft = Draft.objects.get(id=draft_pk)
+			#draft = Draft.objects.get(id=draft_pk)
 			draft.status = 2
 			draft.save()
 			draft.add_revision_notes(revision_notes)
 			messages.add_message(request, messages.INFO, 'Draft revision notes sent.')		
-		except Draft.DoesNotExist:
+		except Exception as e:
 			messages.add_message(request, messages.ERROR, 'Error when sending feedback draft revision notes.')
 		return HttpResponseRedirect('/feedback/inbox/') 
 	else:
@@ -422,6 +418,20 @@ def create_category(request):
 	else: 
 		messages.error(request, form.errors)
 		return HttpResponseRedirect('/feedback/categories/') 
+
+
+class DeleteFeedbackPieceView(LoginRequiredMixin, View):
+    """ delete category view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            feedbackpiece = FeedbackPiece.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this feedback piece %s' % e)
+        finally:
+            feedbackpiece.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Feedback Piece successfully deleted!')
+        return HttpResponseRedirect('/feedback/categories/') 
 
 
 class DeleteCategoryView(LoginRequiredMixin, View):

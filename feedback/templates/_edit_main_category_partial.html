@@ -11,10 +11,15 @@
         <div class="modal-body">
           <h3> {{category.name }} </h3>
             <form class="form-horizontal" action="{% url "edit-category" category.id %}" method="POST">{% csrf_token %}
-            <label for="name">Name: </label>
-            <input type="text" name="name" value="{{category.name}}"/>
-            <label for="description">Description: </label>
-            <input type="text" name="description" value="{{category.description}}"/>
+            <div class="form-group padding-lr">
+
+              <label for="name">Name: </label>
+              <input value='{{category.name}}' name="name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter Category Name"></input>          
+            </div>  
+        <div class="form-group padding-lr">
+          <label for="description">Description: </label>
+          <textarea name="notes" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter category description/notes here">{{category.description}}</textarea>
+        </div>                          
 
         </div>
         <div class="modal-footer">

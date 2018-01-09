@@ -104,7 +104,8 @@ class NotesView(LoginRequiredMixin, TemplateView):
 					week = request.user.current_classroom.current_week
 				else:
 					week = 1  
-			groups_assigned = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,instructor = self.request.user)
+			groups_assigned = RotationGroup.objects.filter(rotation__classroom = classroom,rotation__semester=classroom.current_semester,instructor= self.request.user,
+                rotation__start_week__lte=week,rotation__end_week__gte=week)
 
 
 			main_categories = Category.objects.filter(classroom=classroom)

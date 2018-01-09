@@ -46,7 +46,8 @@
               <ul>
                 <hr>
                 {% for feedback_piece in feedback_collection %}
-                <h4> Feedback Piece </h4>
+                <h4><a data-toggle="modal" data-target="#edit_feedbackpiece_{{feedback_piece.id}}" role="button">Feedback Piece </a> </h4>
+                <a href="#" data-href="{% url "delete-feedback-piece" feedback_piece.id %}" data-toggle="modal" data-target="#confirm-delete-feedbackpiece" data-id="{{feedback_piece.id}}" value="Delete" class="float-right-button deletecategory"><span class="fa fa-minus red-icon"></span></a>
                 <li>
                   <p><b>Observation: </b>{{feedback_piece.observation.observation}} </p>
                   <p><b>Observation Type:  </b>
@@ -63,6 +64,9 @@
                   <p><b>Why a good solution: </b> {{feedback_piece.feedback_explanation.feedback_explanation}}</p>
                   <hr>
                 </li>
+
+                 {% include '_edit_feedback_piece_partial.html' %}
+
                 {% endfor %}
               </ul>
               {% endwith %}
@@ -108,9 +112,14 @@
           <div class="modal-body">
             <h5> Category: </h5>
             <form class="form-horizontal" id="createCategoryForm" action="{% url "category-create-main" %}" method="POST">{% csrf_token %}        
-              <div class="form-group padding-lr">
-            {{create_main_category_form | crispy}}
+               <div class="form-group padding-lr">
+            <label for="name">Name: </label>
+<input name="name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter main category name here"></input>              
 
+          </div>
+           <div class="form-group padding-lr">
+            <label for="description">Description: </label>
+          <textarea name="description" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter main category description/notes here"></textarea>            
           </div>
 
           </div>
@@ -138,6 +147,28 @@
             </div>
                  <div class="alert alert-warning" role="alert">
                   <span style="color: darkyellow;" class="fa fa-warning"></span>Warning! If this is a main category, all of its subcategories will also be deleted.
+                  </div>            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger btn-ok">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="confirm-delete-feedbackpiece" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Delete Feedback Piece
+            </div>
+            <div class="modal-body">
+                <span> Are you sure you want to delete the feedback piece: </span>
+                 <b><span type="text" name="categoryName" id="categoryName"></span></b>
+                 <span> ? </span>
+
+            </div>
+                 <div class="alert alert-warning" role="alert">
+                  <span style="color: darkyellow;" class="fa fa-warning"></span>Warning! You will not be able to recover this feedback piece.
                   </div>            
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

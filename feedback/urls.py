@@ -19,6 +19,8 @@ urlpatterns = [
   url(r'^categories/editsubcategory/(?P<pk>\d+)/$', edit_subcategory, name="edit-subcategory"),
   url(r'^categories/delete_sub/(?P<pk>\d+)/$', DeleteSubCategoryView.as_view(), name="delete-subcategory"),
   url(r'^categories/delete_main/(?P<pk>\d+)/$', DeleteCategoryView.as_view(), name="delete-category"),
+  url(r'^categories/delete_feedback/(?P<pk>\d+)/$', DeleteFeedbackPieceView.as_view(), name="delete-feedback-piece"),
+  
   # url(r'^common/$', CommonView.as_view(), name="feedback-common"),
 
  # url(r'^edit-draft/$', EditDraftView.as_view(), name="edit-draft"),

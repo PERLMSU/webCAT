@@ -42,6 +42,8 @@ class Classroom(models.Model):
     def get_num_weeks(self):
         return self.current_semester.get_number_weeks()
 
+    def get_current_rotation(self):
+        return Rotation.objects.get(classroom=self,semester=self.current_semester, start_week__lte=self.current_week,end_week__gte=self.current_week)      
 
 class Rotation(models.Model):
     semester = models.ForeignKey(Semester)

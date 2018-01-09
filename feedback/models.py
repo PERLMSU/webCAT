@@ -52,19 +52,30 @@ class SubCategory(models.Model):
 
 class Observation(models.Model):
     sub_category = models.ForeignKey(SubCategory)
-    observation = models.CharField(max_length=2000, null=True)
+    observation = models.CharField(max_length=2000)
     # 1 for positive, 0 for negative
     observation_type = models.NullBooleanField()
+
+    def get_observation_type(self):
+        if self.observation_type:
+            return "Positive"
+        elif self.observation_type == None:
+            return "Neutral"
+        elif self.observation_type == False:
+            return "Negative"
 
 class Feedback(models.Model):
     sub_category = models.ForeignKey(SubCategory)
     observation = models.ForeignKey(Observation)
-    feedback = models.CharField(max_length=2000, null=True)
+    feedback = models.CharField(max_length=2000)
 
 class Explanation(models.Model):
     sub_category = models.ForeignKey(SubCategory)
     feedback = models.ForeignKey(Feedback)
-    feedback_explanation = models.CharField(max_length=2000, null=True)    
+    feedback_explanation = models.CharField(max_length=2000)
+
+    def __str__(self):
+        return "{}".format(self.feedback_explanation)
 
 class FeedbackPiece(models.Model):
     sub_category = models.ForeignKey(SubCategory)

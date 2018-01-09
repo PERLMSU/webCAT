@@ -55,7 +55,7 @@
           <p> Status: {{noti.draft_to_approve.status}} </p>
 
           {% if noti.draft_to_approve.status == 1 %}
-          <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
+          <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve-with-edits">Approve With Edits</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
           {% endif %}
           <hr>
         </div>

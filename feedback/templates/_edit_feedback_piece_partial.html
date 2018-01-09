@@ -1,5 +1,4 @@
-{% load crispy_forms_tags %}
-  <div class="modal fade" id="createCommonFeedback_{{subcategory.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal fade" id="edit_feedbackpiece_{{feedback_piece.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
 
@@ -7,48 +6,35 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title">Subcategory: {{subcategory.name}} </h4>
+          <h4 class="modal-title">Edit Feedback Piece</h4>
         </div>
-
+        
         <div class="modal-body">
-          <h4> Add Common Feedback</h4>
-          <form class="form-horizontal" id="createFeedbackForm" action="{% url "category-create-feedback" subcategory.id %}" method="POST">{% csrf_token %}        
-
-<!-- <div style="padding-left: 20px; padding-right: 20px;">
-  <div class="form-group">
-
-    <label for="feedback">Feedback</label>
-    <textarea name="feedback" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter common feedback"></textarea>
-  </div>     
-</div>        
-
-<div style="padding-left: 20px; padding-right: 20px;">
-  <div class="form-group">
-
-    <label for="observation">Observation </label>
-    <textarea name="observation" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter observation"></textarea>
-  </div>     
-</div>     -->
-{% with subcategory|get_feedback_pieces as feedback_pieces %}
 
 
+
+          <h3> {{feedback_piece.name }} </h3>
 <div style="padding-left: 20px; padding-right: 20px;">
 
 
 
   <div class="form-group">
 
-  <label for="observation_pk">Existing Observation: </label>
+  <label for="observation_pk">Current Observation: </label>
     <select class="observation-dropdown" name="observation_pk" style="width:80%;">
       <option value="">-</option>
       {% for observation in subcategory|get_subcategory_observations %}
-        <option value="{{ observation.id }}">{{ observation.observation }}</option>
+        {% if observation == feedback_piece.observation %}
+          <option value="{{ observation.id }}" selected >{{ observation.observation }} Type: {{observation.get_observation_type}}</option>
+        {% else %}           
+        <option value="{{ observation.id }}">{{ observation.observation }} Type: {{observation.get_observation_type}}</option>
+        {% endif %}
       {% endfor %}
     </select>
     <br>
 
     <label for="observation">Observation</label>
-    <textarea name="observation" type="text" class="form-control observation-new" aria-describedby="emailHelp" placeholder="Enter the observation"></textarea>
+    <textarea disabled name="observation" type="text" class="form-control observation-new" aria-describedby="emailHelp" placeholder="Enter the observation"></textarea>
     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
   </div>     
 </div>
@@ -57,9 +43,9 @@
   <div class="form-group">
 
     <label for="observation_type">Observation Type</label>
-    <label class="radio-inline"><input type="radio" value="1" name="observation_type">Positive</label>
-    <label class="radio-inline"><input type="radio" value="0" name="observation_type">Negative</label>
-    <label class="radio-inline"><input type="radio" value="-1" name="observation_type">Neutral</label>    
+    <label class="radio-inline"><input disabled type="radio" value="1" name="observation_type">Positive</label>
+    <label class="radio-inline"><input disabled type="radio" value="0" name="observation_type">Negative</label>
+    <label class="radio-inline"><input disabled type="radio" value="-1" name="observation_type">Neutral</label>    
   </div>     
 </div>    
 
@@ -68,17 +54,21 @@
 
 
   <div class="form-group">
-  <label for="feedback_pk">Existing Feedback: </label>
+  <label for="feedback_pk">Current Feedback: </label>
     <select class="feedback-dropdown" name="feedback_pk" style="width:80%;">
       <option value="">-</option>
       {% for feedback in subcategory|get_subcategory_feedbacks %}
+        {% if feedback == feedback_piece.feedback %}
+          <option value="{{ feedback.id }}" selected >{{ feedback.feedback }}</option>
+        {% else %}      
         <option value="{{ feedback.id }}">{{ feedback.feedback }}</option>
+        {% endif %}
       {% endfor %}
     </select>
     <br>    
 
     <label for="feedback">Feedback</label>
-    <textarea name="feedback" type="text" class="form-control feedback-new" aria-describedby="emailHelp" placeholder="Enter the solution to the problem"></textarea>
+    <textarea disabled name="feedback" type="text" class="form-control feedback-new" aria-describedby="emailHelp" placeholder="Enter the solution to the problem"></textarea>
     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
   </div>     
 </div>              
@@ -86,17 +76,22 @@
 <div style="padding-left: 20px; padding-right: 20px;">
   <div class="form-group">
 
-  <label for="feedback_explanation_pk">Existing Feedback Explanation:  </label>
+  <label for="feedback_explanation_pk">Current Feedback Explanation:  </label>
     <select class="explanation-dropdown" name="feedback_explanation_pk" style="width:80%;">
       <option value="">-</option>
       {% for feedback_explanation in subcategory|get_subcategory_feedback_explanations %}
+        {% if feedback_explanation == feedback_piece.feedback_explanation %}
+          <option value="{{ feedback_explanation.id }}" selected >{{ feedback_explanation.feedback_explanation }}</option>
+        {% else %}
         <option value="{{ feedback_explanation.id }}">{{ feedback_explanation.feedback_explanation }}</option>
+
+        {% endif %}
       {% endfor %}
     </select>
     <br>        
 
     <label for="feedback_explanation">Feedback Explanation</label>
-    <textarea name="feedback_explanation" type="text" class="form-control explanation-new" aria-describedby="emailHelp" placeholder="Why is this a good solution?"></textarea>
+    <textarea  disabled name="feedback_explanation" type="text" class="form-control explanation-new" aria-describedby="emailHelp" placeholder="Why is this a good solution?"></textarea>
     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
   </div>     
 </div>   
@@ -106,14 +101,13 @@
                 <textarea name="feedback" class="form-control" rows="3"></textarea>
             </div> -->
         </div>
-        {% endwith %}
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <input type="submit" value="Create" class="btn btn-primary"/>      
+            <input type="submit" value="Save" class="btn btn-success"/>      
           </form>
         </div>
 
       </div>
     </div>
-  </div>
+  </div> 

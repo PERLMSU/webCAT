@@ -566,7 +566,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).order_by('last_name')
            #gr groups = Group.objects.filter(classroom=classroom).order_by('group_number')
             rotation_groups = RotationGroup.objects.filter(rotation__semester=classroom.current_semester,rotation__classroom=classroom).order_by('group_number')
-            semesters = Semester.objects.all().order_by('date_begin')
+           # semesters = Semester.objects.all().order_by('date_begin')
 
             # try:
             #     classroom = Classroom.objects.get(instructor = self.request.user)
@@ -582,7 +582,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 
            # CHOICES_groups = tuple(RotationGroup.objects.filter(rotation__classroom=classroom,rotation__semester=classroom.current_semester).values_list('id','group_number').order_by('group_number'))
             assign_groups_form = AssignMultipleGroupsForm()
-            assign_groups_form.fields['group_numbers'].choices = tuple(RotationGroup.objects.filter(rotation__classroom=classroom,rotation__semester=classroom.current_semester).values_list('id','group_number').order_by('group_number'))
+            assign_groups_form.fields['group_numbers'].choices = rotation_groups.values_list('id','group_number').order_by('group_number')
             #choices = tuple(Group.objects.filter(classroom=classroom).values_list('id','group_number').order_by('group_number'))
             #ssign_groups_form.set_group_numbers(choices)
 
@@ -590,7 +590,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             
 
             assign_students_form = AssignMultipleStudentsForm()
-            all_students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).values_list('id','first_name','last_name').order_by('last_name')
+            all_students = students.values_list('id','first_name','last_name').order_by('last_name')
 
             students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
 
@@ -609,7 +609,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
               #  'groups': groups,
                 'rotation_groups': rotation_groups,
                 'classroom': classroom,
-                'semesters' : semesters,
+                #'semesters' : semesters,
                 'add_student_form': add_student_form1,
                 'add_group_form': AddGroupForm(),
                 'add_classroom_form': AddClassroomForm(),
