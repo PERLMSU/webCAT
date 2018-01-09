@@ -44,7 +44,7 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
         
         if form.is_valid():
 
-            selected_students = [value for name, value in self.request.POST.iteritems()
+            selected_students = [value for name, value in self.request.POST.items()
                 if name.startswith('student_name')]
 
            # selected_students_pk = [item for value in selected_students for item in literal_eval(value)]

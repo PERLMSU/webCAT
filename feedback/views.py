@@ -161,7 +161,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			if not draft:
 				draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)				
 
-			grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.iteritems()
+			grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.items()
 				if name.startswith('grade_')])
 
 		#	print(grades_values)
