@@ -165,7 +165,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 				if name.startswith('grade_')])
 
 		#	print(grades_values)
-			for category_pk,grade_val in grades_values.iteritems():
+			for category_pk,grade_val in grades_values.items():
 				category = Category.objects.get(id=category_pk)
 				try:
 					grade = Grade.objects.get(draft=draft, category=category)
