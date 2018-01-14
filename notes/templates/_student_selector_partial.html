@@ -26,9 +26,9 @@
       </div>
   </div>
 
-	    		<div class="row">
-	    			
-			    	<div class="panel panel-info">
+<div class="row">
+	
+	<div class="panel panel-info">
     	{% for group in rotation_groups %}
     		{% if group.students.all %}
 <!-- 	    		<div class="row">
@@ -38,35 +38,26 @@
 			      			<h5>Group {{group.group_number}}</h5>
 			      		</div> 			
 			      		<div class="panel-body">
-			      				<!-- <div class="col-md-12"> -->
-					    		{% for student in group.students.all %}
+			      				
+			    		{% for student in group.students.all %}
 
-						    		<div class="row student-checkboxes">
-						    		
-				    				
-										<div class="col-md-12">						    			
-						    				<span> {{student}}</span> 
-						    				{% with student.id|get_feedback_notes:week as notes %}
-<!-- 						    				<ul>
-						    					{% for note in notes %}
-						    						<li><strong>{{note.sub_category.name}} - </strong>{{note.note}}</li>
-						    					{% endfor %}	
-						    				</ul> -->
-						    				{% endwith %}
-										<div class="col-md-12">						    			
-						    				<input type="checkbox" name="student_name_{{forloop.counter}}" value="{{student.id}}"> </input>
-						    			</div>							    				
-						    			</div>
-							    
-							    	</div>
-					    		{% endfor %}
+				    		<div class="row student-checkboxes">
+					    		<div class="col-md-12 padding-bottom-sm">
+									<input class="student-checkbox float-left" type="checkbox" name="student_name_{{forloop.counter}}" value="{{student.id}}"> </input>						    			
+		    						<span class="small-print"> {{student}}</span> 
+						   		</div> 			
+	    		
+				    		
+					    
+					    	</div>
+			    		{% endfor %}
 					    			<!-- 	</div> -->
-			    			</div>
+		    			</div>
 
 
 			    {% endif %}
     	<!-- 	</div> -->
 		{% endfor %}	    	
 <!-- 	</div> -->
-			    		</div>
-			    	</div>
+	</div>
+</div>

@@ -25,6 +25,14 @@ $(document).on('change',".observation-dropdown", function(){
  
 });  
 
+$(".student-checkbox").change(function() {
+    if(this.checked) {
+        $(this).closest('.student-checkboxes').addClass("highlight");
+    } else {
+    $(this).closest('.student-checkboxes').removeClass("highlight");
+    }
+});
+
 
 $(document).on('change',".feedback-dropdown", function(){
  //alert($(this).val());  // will display selected option's value
@@ -281,7 +289,7 @@ $(document).on("click", ".sub-category-btn", function () {
      var category_pk = this.id;
      if ($("#note_taker_"+category_pk).is(":visible"))
      {
-        $("#note_taker_"+category_pk).hide();
+        $("#note_taker_"+category_pk).hide("slow");
      }
      else
      {

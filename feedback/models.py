@@ -65,7 +65,7 @@ class Observation(models.Model):
             return "Negative"
 
     def __str__(self):
-        return "{} {}".format(self.get_observation_type(), self.observation)
+        return "{}".format(self.observation)
 
 class Feedback(models.Model):
     sub_category = models.ForeignKey(SubCategory)

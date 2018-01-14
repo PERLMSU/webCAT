@@ -23,18 +23,13 @@
                 
 
                     <div class="no-display note-container" id="note_taker_{{category.id}}">
-                        <div class="col-lg-12">
+                        <div class="col-lg-12" style="background-color:#efefef;">
                             <form class="noteForm" method="post" action="{% url "notes-add-feedback" %}">
                                 {% csrf_token %}
 
                                 <input type="hidden" value="{{category.id}}" name="subcategory">
-                                <label for="note">{{category.name}} Note / Observation: </label>
+                               <!--  <label for="note">Add Note / Observation: </label> -->
 
-                                <div class="form-group padding-lr">
-                                    <label for="note">Custom Note: </label>
-                                    <input name="note" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter customized note here"></input>              
-
-                              </div>
 
                                 <input name="week_num" type="hidden" value='{{week}}'>
                                 
@@ -43,18 +38,44 @@
                                 {% with category|get_observations as observations %}
 
                                     {% if not observations %}
-                                        <p> No observations to choose from. </p>  
+                                        <!-- <p> No observations to choose from. </p>   -->
                                     {% else %}
-                                        <p> Existing Observations for this subcategory: </p>               
+                                     <!--    <p> Existing Observations for this subcategory: </p>   -->             
                                     {% endif %}
                                     {% for observation in observations %}
+
+                                    {% if observation.get_observation_type == "Negative" %}
+                                       <div style="background-color: #f0808052;">
+                                            <label class="radio"><input type="radio" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                       </div>
+                                    {% elif  observation.get_observation_type == "Positive" %}
+                                     <div style="background-color: #90ee905e;">
                                        <label class="radio"><input type="radio" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                   </div>
+                                   {% else %}
+                                   <!-- <div style="background-color: lightgrey"> -->
+                                       <label class="radio"><input type="radio" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                 <!--   </div> -->
+                                   {% endif %}
                                     {% endfor %}
 
                                 {% endwith %}
                             </div>
 
-                               <input type="submit" value="Save" class="btn btn-success"/>
+                                <div class="form-group padding-lr">
+                                    <!--  <div class="col-lg-12"> -->
+                                    <div class="row">
+                                        <!-- <label for="note">Custom Note: </label> -->
+                                        <input name="note" style="width:70%; float:left;" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter customized note here"></input>  
+                                        <input style="margin-left:15px;" type="submit" value="Save" class="btn btn-success"/>    
+                                    </div>      
+                                   <!--   <div class="col-lg-3">  --> 
+                                    
+                              <!--   </div> -->
+                              <!--   </div> -->
+                              </div>                            
+
+                               
                                     
                             </form>
                         </div>

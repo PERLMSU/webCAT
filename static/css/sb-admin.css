@@ -5,7 +5,19 @@
  */
 
 /* Global Styles */
+.padding-bottom-sm
+{
+  padding-bottom:6px;
+}
+.small-print
+{
+  font-size:15px;
+  padding-bottom:5px;
+}
 
+.highlight {
+  background-color: antiquewhite;
+}
 .padding-lr
 {
   padding-left: 20px;
@@ -17,6 +29,7 @@
     padding-top: 20px;
   padding-bottom: 20px;
 }
+
 
 
 .navbar-webcat {
@@ -59,7 +72,7 @@
 }
 
 .note-container{
-    height:200px;
+  /*  height:200px;*/
 }
 
 .sub-category-btn {
