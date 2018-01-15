@@ -161,8 +161,12 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			if not draft:
 				draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)				
 
-			grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.items()
+			# grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.items()
+			# 	if name.startswith('grade_')])
+			grades_values = dict([(name.decode("utf-8")[6:],value.decode("utf-8")) for name, value in self.request.POST.items()
 				if name.startswith('grade_')])
+
+			#raise Exception("wht")
 
 		#	print(grades_values)
 			for category_pk,grade_val in grades_values.items():
@@ -363,7 +367,7 @@ def create_common_feedback(request, pk):
 		try:
 			new_fb_piece = FeedbackPiece(sub_category=subcategory, observation = observation_object, feedback = feedback_object, feedback_explanation = explanation_object)
 			new_fb_piece.save()
-			messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback piece playa!')
+			messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback piece!')
 		except Exception as e:
 			messages.add_message(request, messages.ERROR, 'Unable to create this feedback piece %s' % e)				
 		return HttpResponseRedirect('/feedback/categories/')
