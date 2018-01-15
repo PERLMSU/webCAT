@@ -163,8 +163,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 
 			# grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.items()
 			# 	if name.startswith('grade_')])
-			grades_values = dict([(name.decode("utf-8")[6:],value.decode("utf-8")) for name, value in self.request.POST.items()
-				if name.startswith('grade_')])
+			grades_values = dict([(name[6:],value) for name, value in self.request.POST.items() if name.startswith('grade_')])
 
 			#raise Exception("wht")
 
