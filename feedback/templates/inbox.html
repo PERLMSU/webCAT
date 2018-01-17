@@ -44,7 +44,8 @@
           <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
           <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
           <p> Feedback: {{noti.draft_to_approve.text}} </p>
-          <p> Grades: 
+          <p> Grades: </p>
+          <p>
             {% with noti.draft_to_approve|get_draft_grades as grades %}
               {% for gr in grades %}
                 <span>{{gr.category.name}}: {{gr.grade}}</span><br>
@@ -76,7 +77,8 @@
           <span><p> Learning Assistant: {{noti.draft_to_approve.owner.get_full_name}}</p></span>
           <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
           <p> Feedback: {{noti.draft_to_approve.text}} </p>
-          <p> Grades: 
+          <p> Grades: </p>
+          <p>
             {% with noti.draft_to_approve|get_draft_grades as grades %}
               {% for gr in grades %}
                <span>{{gr.category.name}}: {{gr.grade}}</span><br>
@@ -110,7 +112,8 @@
           <span> <p>Student: {{noti.draft_to_approve.student}} </p></span>
           <p> Feedback: {{noti.draft_to_approve.text}} </p>
        <!--    <p> Status: {{noti.draft_to_approve.status}} </p> -->
-          <p> Grades: 
+          <p> Grades: </p>
+          <p>
             {% with noti.draft_to_approve|get_draft_grades as grades %}
               {% for gr in grades %}
                <span>{{gr.category.name}}: {{gr.grade}}</span><br>

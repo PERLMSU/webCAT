@@ -5,6 +5,12 @@
  */
 
 /* Global Styles */
+
+.classroom-dashboard 
+{
+  border-bottom: 10px dotted #222e5178;
+}
+
 .padding-bottom-sm
 {
   padding-bottom:6px;

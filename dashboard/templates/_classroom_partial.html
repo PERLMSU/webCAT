@@ -1,0 +1,117 @@
+  <div class="col-lg-12 classroom-dashboard">
+
+
+        
+        <div class="col-lg-5">
+
+
+            {% if classroom == user.current_classroom %}
+            <h3> Current Classroom</h3>
+            {% else %}
+            <h3> Inactive Classroom</h3>
+            {% endif %}
+             <div class="padding-lr">
+                <strong>
+                <span class="fa fa-institution"></span><span> {{classroom}}</span>
+                <span>{{classroom.description}}</span>
+                | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
+                </strong>
+            </div>
+        </div>
+            <div class="col-lg-4">
+                
+                <h3>Statistics Overview </h3>
+                <p><span><span class="fa fa-users"></span> Number of Students: {{ classroom|get_num_students }} </span></p>
+                
+                <p><span><span class="fa fa-user"></span> Number of Instructors: {{ classroom|get_num_instructors}} </span></p>
+                
+                <p><span class="fa fa-calendar"></span><span> Current Week: {{ classroom.current_week}} </span> </p>
+            </div>
+
+
+ <div class="col-lg-8">
+              {% with classroom.id|get_rotations:classroom.current_semester.id as rotations %}
+                    {% if rotations %}
+                    <h4>Semester Rotations ({{rotations.count}})</h4>
+            <table class="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Timeline</th>
+                  <th scope="col">Remove</th>
+                <!--   <th scope="col">Custom Notes</th> -->
+                </tr>
+              </thead>
+              <tbody>                       
+                    {% for rotation in rotations %}
+                    
+                   <!--  <div class="col-lg-12">
+                        <div class="col-lg-10"> -->
+                            <tr>
+                                <td>
+                                    {{rotation}}
+                                </td>
+                    <!--     </div> -->
+                        <!-- <div class="col-lg-2"> -->
+                                <td>
+                                    <a href="#" data-href="{% url "classroom-delete-rotation" rotation.id %}" data-toggle="modal" data-target="#confirm-delete-{{rotation.id}}" value="Delete"><span class="fa fa-remove red-icon"></span></a>
+                                </td>
+                            </tr>
+                    <!--     </div> -->
+                  <!--    </div> -->
+
+
+                <div class="modal fade" id="confirm-delete-{{rotation.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                Delete Rotation
+                            </div>
+                            <div class="modal-body">
+                                <span> Are you sure you want to delete: </span>
+                                 <b><p>{{rotation}}</p></b>
+                                 <span> ? </span>
+
+                            </div>    
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <a class="btn btn-danger btn-ok">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                    {% endfor %}
+            </tbody>
+            </table>                    
+                    {% else %}
+                    <h4>No Rotations Created Yet.</h4>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+    <div class="col-lg-4 padding-top-bottom">
+        <h4>Create New Rotation <span class="fa fa-rotate-right"></span></h4>
+        <form class="form-horizontal" action="{% url "classroom-edit-rotation" %}" method="POST">{% csrf_token %}
+                    
+          <div class="form-group padding-lr">
+
+            <label for="start_week">Start Week</label>
+            <input name="start_week" type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter start week"></input>
+          </div>  
+          <div class="form-group padding-lr">
+
+            <label for="length">Rotation Length</label>
+            <input name="length" type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter number of weeks of rotation"></input>
+          </div>  
+            <input type="hidden" name="classroom" value="{{classroom.id}}"/>
+            <input type="hidden" name="semester" value="{{classroom.current_semester.id}}"/>
+            
+            <div class="form-group padding-lr">
+                <input type="submit" style="width: 100%" value="Create" class="btn btn-success"/>
+            </div>  
+        
+            </form>   
+        </div>               
+
+</div>

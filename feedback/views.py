@@ -135,7 +135,7 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			self.context['rotation_groups'] = groups
 			# self.context['loop_times'] = range(1, 13)
 			self.context['loop_times'] = range(1,classroom.get_num_weeks())
-			self.context['grade_scale'] = [x*.25 for x in range(17)]
+			self.context['grade_scale'] = [x*.25 for x in range(17)][::-1]
 			#self.context['groups_to_students'] = groups_to_students
 			self.context['main_categories'] = main_categories
 			self.context['notifications'] = Notification.objects.filter(user=self.request.user)

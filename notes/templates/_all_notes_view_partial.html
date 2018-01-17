@@ -9,21 +9,48 @@
 
 				<h5>Group {{group.group_number}}</h5>	
 
+
+			<table class="table table-striped table-bordered table-hover">
+			  <thead>
+			    <tr>
+			      <th scope="col">Student</th>
+			      <th scope="col">Observations / Notes</th>
+			    <!--   <th scope="col">Custom Notes</th> -->
+			    </tr>
+			  </thead>
+			  <tbody>				
+
 				{% for student in group.students.all %}
-					<span> {{student}}</span> 
+				<tr>
+					<td> {{student}}</td> 
+					<td>
 					{% with student.id|get_feedback_notes:week as notes %}
 						<ul>
 							{% for note in notes %}
-								<li><strong>{{note.sub_category.name}}</strong>
-									<br>Observation: {{note.observation}}
-									<br>Custom Note: {{note.note}}
+								<li>
+									<p><strong>Category: </strong> {{note.sub_category.main_category.name}} -> {{note.sub_category.name}}</p>
+
+									<p><strong>Observation:</strong> {{note.observation}}</p>
+								
+									{% if note.note %} 
+										<p><strong>Custom Note: </strong>{{note.note}}</p> 
+									{% endif %}
+									
+
 								</li>
+								<br>
 							{% endfor %}	
+						
 						</ul>
-					{% endwith %}	
 					
+					{% endwith %}	
+					</td>
+				</tr>
 				{% endfor %}	
 		    {% endif %}
+
+		</tbody>
+</table>
 		    	<!-- 	</div> -->
 		{% endfor %}	
 	</div>

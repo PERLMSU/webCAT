@@ -75,12 +75,11 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title" id="myModalLabel">Edit User</h4>
+        <h4 class="modal-title" id="myModalLabel">Edit Instructor</h4>
       </div>
       <div class="modal-body">
         <h4> {{user.first_name}} {{user.last_name}} </h4>
 
-        <h5> Edit Instructor </h5>
         <form class="form-horizontal" id="createStudentForm" action="{% url "dash-edit-user" user.id %}" method="POST">{% csrf_token %}
             <div class="form-group padding-lr">
 
