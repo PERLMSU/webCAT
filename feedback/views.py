@@ -252,7 +252,8 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 			self.context['create_main_category_form'] = AddCategoryForm()
 			self.context['create_sub_category_form'] = AddSubCategoryForm()
 			self.context['create_feedback_form'] = AddFeedbackPieceForm()
-			self.context['main_categories'] = Category.objects.filter(classroom=classroom)
+			# self.context['main_categories'] = Category.objects.filter(classroom=classroom)
+			self.context['main_categories'] = Category.objects.all()
 
 
 			return render(self.request, self.template_name, self.context)

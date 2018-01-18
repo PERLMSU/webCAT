@@ -80,7 +80,7 @@
       <div class="modal-body">
         <h4> {{user.first_name}} {{user.last_name}} </h4>
 
-        <form class="form-horizontal" id="createStudentForm" action="{% url "dash-edit-user" user.id %}" method="POST">{% csrf_token %}
+        <form class="form-horizontal" action="{% url "dash-edit-user" user.id %}" method="POST">{% csrf_token %}
             <div class="form-group padding-lr">
 
               <label for="first_name">First Name: </label>
@@ -163,11 +163,24 @@
       </div>
       <div class="modal-body">
               <div class="form">
-                <form class="register-form" method="post" action=".">
+                <form class="register-form" id="add-instructor-form" method="post" action=".">
+
+    <div class="alert alert-warning fade in alert-dismissible" id="add-instructor-error-pw" style="display:none;" role="alert">
+    <!--   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+        Password is not valid. Minimum of 6 characters, and be sure to also include a number.
+    </div>
+    <div class="alert alert-warning fade in alert-dismissible" id="add-instructor-error-email" style="display:none;" role="alert">
+    <!--   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+        Please enter a valid email address.
+    </div>   
+         <div class="alert alert-warning fade in alert-dismissible" id="add-instructor-error-pw-confirm" style="display:none;" role="alert">
+    <!--   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+        Passwords do not match.
+    </div>  
 
                   {% csrf_token %} 
                     {{form|crispy}}
-                  <button>Add</button>
+                  <button id="add-instructor-button">Add</button>
                   
                 </form>
 

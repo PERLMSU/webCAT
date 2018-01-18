@@ -112,7 +112,8 @@ class NotesView(LoginRequiredMixin, TemplateView):
                 rotation__start_week__lte=week,rotation__end_week__gte=week)
 
 
-			main_categories = Category.objects.filter(classroom=classroom)
+			# main_categories = Category.objects.filter(classroom=classroom)
+			main_categories = Category.objects.all()
 			sub_categories = {}
 			for category in main_categories:
 				sub_categories[category.id] = SubCategory.objects.filter(main_category = category)

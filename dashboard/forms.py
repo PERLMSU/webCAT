@@ -121,8 +121,8 @@ class AddInstructorForm(forms.Form):
             if len(self.cleaned_data['password']) < 6:
                 raise forms.ValidationError("Password must be at least %d characters long." % 6)
             
-            if all(c.isupper() == self.cleaned_data['password'].isupper() for c in self.cleaned_data['password']):
-                raise forms.ValidationError("Password must contain at least one uppercase letter")
+            # if all(c.isupper() == self.cleaned_data['password'].isupper() for c in self.cleaned_data['password']):
+            #     raise forms.ValidationError("Password must contain at least one uppercase letter")
 
             if all(c.isdigit() == self.cleaned_data['password'].isdigit() for c in self.cleaned_data['password']):
                 raise forms.ValidationError("Password must contain at least one digit")

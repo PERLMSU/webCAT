@@ -220,15 +220,18 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 						   email=form.cleaned_data['email'],
 						   permission = form.cleaned_data['permission_level']
 						   )
-				user.send_confirmation_email(self.request)   
 				self.add_message("User successfully created!")   
-				return HttpResponseRedirect(reverse('dash-manage-users'))
+				return HttpResponseRedirect(reverse('dash-manage-users'))				
 			except Exception as e:
-				messages.add_message(self.request, messages.ERROR, "Could not create user: "+e)
+				messages.add_message(self.request, messages.ERROR, "Could not create user: "+str(e))
+			try:
+				user.send_confirmation_email(self.request)   
+			except Exception as e:
+				messages.add_message(self.request, messages.ERROR, "Could not send confirmation email: "+str(e))				
 		self.context['form'] = form
 		users = Profile.objects.all()
 		self.context['users'] = users
-		messages.add_message(self.request, messages.ERROR, "Form not valid, failed to create user.")          
+		messages.add_message(self.request, messages.ERROR, form.errors)          
 		return render(self.request, self.template_name, self.context)
 
 	def add_message(self, text, mtype=25):

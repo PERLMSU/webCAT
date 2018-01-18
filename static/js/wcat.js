@@ -5,6 +5,31 @@
 
 //$(':checkbox').checkboxpicker();
 
+// checkPwd = function() {
+//     var str = document.getElementById('pass').value;
+//     if (str.length < 6) {
+//         alert("too_short");
+//         return("too_short");
+//     } else if (str.length > 50) {
+//         alert("too_long");
+//         return("too_long");
+//     } else if (str.search(/\d/) == -1) {
+//         alert("no_num");
+//         return("no_num");
+//     } else if (str.search(/[a-zA-Z]/) == -1) {
+//         alert("no_letter");
+//         return("no_letter");
+//     } else if (str.search(/[^a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\.\,\;\:]/) != -1) {
+//         alert("bad_char");
+//         return("bad_char");
+//     }
+//     alert("oukey!!");
+//     return("ok");
+// }
+
+
+
+
 
 $(document).on('change',".observation-dropdown", function(){
  //alert($(this).val());  // will display selected option's value
@@ -33,6 +58,51 @@ $(".student-checkbox").change(function() {
     }
 });
 
+$( "#add-instructor-form" ).submit(function() {
+   // event.preventDefault();
+    var pw = document.getElementById('id_password').value;
+    var confirm_pw = document.getElementById('id_confirm_password').value;
+    var pw_valid = true;
+    var email_valid = true;
+    if (pw.length < 6) {
+        pw_valid = false;      
+    } else if (pw.length > 50) {
+        pw_valid = false; 
+    } else if (pw.search(/\d/) == -1) {
+        pw_valid = false; 
+    } else if (pw.search(/[a-zA-Z]/) == -1) {
+        pw_valid = false; 
+    } else if (pw.search(/[^a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\.\,\;\:]/) != -1) {
+        pw_valid = false;
+    }
+
+    if (!(confirm_pw === pw)){
+        pw_valid = false;
+        $('#add-instructor-error-pw-confirm').show();
+    }
+
+    if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(document.getElementById('id_email').value)))
+    {
+        email_valid = false;
+    }
+
+    if (!pw_valid)
+    {
+        $('#add-instructor-error-pw').show();      
+        //return false;   
+    }
+
+    if (!email_valid)
+    {
+        $('#add-instructor-error-email').show();      
+        //return false;           
+    }
+   
+    //alert("oukey!!");
+    return (pw_valid && email_valid)
+
+  //$( "#add-instructor-form" ).submit();
+});
 
 $(document).on('change',".feedback-dropdown", function(){
  //alert($(this).val());  // will display selected option's value
