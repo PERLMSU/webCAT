@@ -226,38 +226,7 @@ def edit_student(request, pk):
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
-    classroom = forms.CharField(widget=forms.HiddenInput())
-
-
-
-
-
-# class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
-#     """ assign students to groups
-#     """
-#     context = {} 
-
-#     def post(self, *args, **kwargs):
-#         form = AssignMultipleStudentsForm(self.request.POST or None)
-#         if form.is_valid():
-#             checked_groups = form.cleaned_data['group_numbers']
-#             try:
-#                 instructor = Profile.objects.get(id=kwargs['pk'])
-#             except Exception as e:
-#                 messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
-#                 return HttpResponseRedirect('/classroom/')
-
-#             for group_pk in checked_groups:
-#                 try:
-#                     group = Group.objects.get(id = group_pk)
-#                     group.current_instructor = instructor
-#                     group.save()
-#                 except Exception as e:
-#                     messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
-#             return HttpResponseRedirect('/classroom/')
-#         else:
-#             messages.error(self.request, form.errors)
-#             return HttpResponseRedirect('/classroom/')  
+    classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(),widget=forms.HiddenInput())
 
 
 
@@ -378,7 +347,9 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
     """ upload students
     """
     template_name = 'upload_students.html'
-    context = {}    
+    context = {}
+    count = 0
+    email_already_exist = 0    
 
     def get(self, request, *args, **kwargs):
         form = UploadFileForm()
@@ -386,19 +357,16 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
         classroom = self.request.user.current_classroom
         if classroom != None:
 
-            students = Student.objects.filter(classroom=classroom).order_by('last_name')
-            groups = Group.objects.filter(classroom=classroom).order_by('group_number')                   
+            students = Student.objects.filter(classroom=classroom).order_by('last_name')                 
            # classroom = Classroom.objects.get(instructor = self.request.user)
-            add_student_form = AddStudentForm()
+            # add_student_form = AddStudentForm()
             return render(self.request, self.template_name,
             {
-                'form': form,
-                'title': 'Excel file upload and download example',
-                'header': ('Please choose any excel file ' +
-                           'from your cloned repository:'),
+                # 'form': form,
+                'title': 'Excel file upload and download',
+                'header': ('Please choose an excel file to upload'),
                 'students': students,
                 'classroom': classroom,
-                'add_student_form': add_student_form,
                 'upload_view': True,
             }) 
         else:
@@ -407,33 +375,46 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
 
     def post(self, *args, **kwargs):
         form = UploadFileForm(self.request.POST, self.request.FILES)
-        def group_class_func(row):
-            try:
-                classroom = Classroom.objects.get(id=classroom_pk)
+        self.count = 0
+        self.email_already_exist = 0
+        def class_semester_func(row):
+            # try:
+            #     classroom = Classroom.objects.get(id=classroom_pk)
 
-            except Classroom.DoesNotExist:
-                classroom = None     
-            try:
-                group = Group.objects.get(group_number=row[2])
-            except Group.DoesNotExist:
-                group = None 
-            row[2] = group   
-            row.pop()
-            row.append(classroom)  
-           # print(row)               
+            # except Classroom.DoesNotExist:
+            #     classroom = None     
+            # try:
+            #     group = Group.objects.get(group_number=row[2])
+            # except Group.DoesNotExist:
+            #     group = None 
+            # row[2] = group   
+
+
+            row[4] = classroom
+            row[5] = classroom.current_semester
+
+            if not Student.objects.filter(email=row[2]).count():
+                self.count += 1  
+            else:
+                self.email_already_exist += 1            
             return row
         if form.is_valid():
-            classroom_pk = form.cleaned_data['classroom']   
+            classroom  = form.cleaned_data['classroom']
 
             self.request.FILES['file'].save_to_database(
                 model = Student,
                 mapdict= {"First_Name": "first_name",
                           "Last_Name": "last_name",
-                          "Group_Number": "group",
-                          "Student_ID": "student_id",
-                          "Classroom_ID": "classroom"}, 
-                initializer = group_class_func)
-            self.add_message("Students successfully added!") 
+                          "Email": "email",
+                          'Notes':'notes',
+                          "Classroom":"classroom",
+                          "Semester":"semester"
+                          },
+                initializer = class_semester_func)
+
+            self.add_message( str(self.count) + " Students successfully added!")
+            self.add_message(str(self.email_already_exist) + " Students were not added because their email address already exists.")
+
             return HttpResponseRedirect(reverse('classroom-upload-students'))
         else:
             self.add_message("Form not valid, failed to add students.")          

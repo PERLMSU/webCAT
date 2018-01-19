@@ -25,6 +25,9 @@ class Semester(models.Model):
     def __str__(self):
         return "{} {} to {}".format(self.title, self.date_begin, self.date_end)
 
+    class Meta:
+        ordering = ["date_begin"]
+
 class Classroom(models.Model):
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL)
     current_semester = models.ForeignKey(Semester)
@@ -45,6 +48,9 @@ class Classroom(models.Model):
     def get_current_rotation(self):
         return Rotation.objects.get(classroom=self,semester=self.current_semester, start_week__lte=self.current_week,end_week__gte=self.current_week)      
 
+    class Meta:
+        ordering = ["course_code","course_number"]
+
 class Rotation(models.Model):
     semester = models.ForeignKey(Semester)
     classroom = models.ForeignKey(Classroom)
@@ -53,6 +59,9 @@ class Rotation(models.Model):
     length = models.IntegerField()
     #start_date= models.DateField(required=False)
     #end_date = models.DateField(required=False)
+
+    class Meta:
+        ordering = ["start_week"]
 
     def save(self, *args, **kwargs):
     
