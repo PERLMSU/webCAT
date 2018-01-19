@@ -6,6 +6,10 @@ import calendar
 from django.conf import settings
 from django.db import models
 
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+
 from classroom.models import Classroom, Student
 
 NOT_SUBMITTED = 0
@@ -133,6 +137,29 @@ class Draft(models.Model):
                 user = self.owner,
                 notification="This draft has been approved"
             )            
+
+    def send_email_to_student(self):
+        if self.student.email:
+            host_email = settings.EMAIL_HOST_USER
+            subject =   "PCubed Feedback - Week "+str(self.week_num)
+            email_to = self.student.email
+            html_content = render_to_string('email/grades.html',{
+                                                            'subject': subject,
+                                                            'feedback': self.text,
+                                                            'student': self.student,
+                                                            'grades': self.get_grades()
+                                                        })
+            subject, from_email, title=subject, host_email, email_to
+            msg = EmailMultiAlternatives(subject, html_content, from_email, [title])
+            msg.content_subtype = "html"
+            msg.send()   
+            return True         
+        else:
+            return False
+
+    def get_grades(self):
+        grades = Grade.objects.filter(draft=self)
+        return grades
 
 class Grade(models.Model):
     grade = models.DecimalField(max_digits=3, decimal_places=2)

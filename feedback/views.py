@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
 from django.template.defaulttags import register
+
 from .forms import *
 # Create your views here.
 from django.db import IntegrityError
@@ -473,6 +474,31 @@ class DeleteSubCategoryView(LoginRequiredMixin, View):
         return HttpResponseRedirect('/feedback/categories/') 
 
 
+class SendDrafts(SuperuserRequiredMixin, View):
+
+	def get(self, *args, **kwargs):
+		week = int(self.kwargs['week'])
+		sent_count = 0
+		drafts = Draft.objects.filter(student__classroom=self.request.user.current_classroom,student__semester=self.request.user.current_classroom.current_semester,
+			week_num=week,status=3)
+		successfully_sent = []
+		no_email_found = []
+		no_email_count = 0
+		for draft in drafts:
+		# for i in range(10):
+			try:
+				if draft.send_email_to_student():
+					sent_count += 1
+					successfully_sent.append(draft.student.get_full_name())
+				else:
+					no_email_count += 1
+					no_email_found.append(draft.student.get_full_name())
+			except Exception as e:
+				messages.add_message(self.request, messages.ERROR, 'Unable to send this feedback to student: %s' % e) 
+
+		messages.add_message(self.request, messages.SUCCESS, str(len(successfully_sent)) + ' Feedback Emails have been sent to: ' +', '.join(successfully_sent))             
+		messages.add_message(self.request, messages.ERROR, str(len(no_email_found)) + ' Emails could not be sent, no email addresses found for: ' +', '.join(no_email_found))             
+		return HttpResponseRedirect('/feedback/inbox/') 	
 
 
 def edit_subcategory(request, pk):

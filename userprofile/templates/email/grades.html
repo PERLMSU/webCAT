@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p><strong>{{ subject }}</strong></p>
+
+Hello {{student}}
+
+<p>Feedback for this week: </p>
+<p>{{ feedback }}</p>
+
+<p>Grades: </p>
+ {% for grade in grades %} 
+<p>{{grade.category}} {{grade.grade}}</p>
+{% endfor %}
+
+</body>
+</html>

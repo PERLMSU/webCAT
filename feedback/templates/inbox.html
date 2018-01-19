@@ -34,7 +34,13 @@
           </div>
 
 <div class="row">
+
+
   <div class="col-md-12">
+
+  <a class="btn btn-warning" data-href="{% url "inbox-send-all-drafts" week %}" data-toggle="modal" data-target="#confirm-send" href='#'><span class="fa fa-send"></span> Email All Approved Drafts</a>
+  <hr>
+
     <div class="panel panel-warning">
       <div class="panel-heading"><h3>Drafts to Review ({{draft_notifications_need_approval.count}})</h3></div>
       <div class="panel-body">
@@ -172,6 +178,24 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <a class="btn btn-success btn-ok">Approve</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="confirm-send" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Send All Approved Drafts
+            </div>
+            <div class="modal-body">
+                Are you sure you want to email all the approved drafts to students for this week?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-success btn-ok">Send</a>
             </div>
         </div>
     </div>

@@ -299,6 +299,9 @@ $('[id^=confirm-delete]').on('show.bs.modal', function(e) {
 $('#confirm-approve').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
+$('#confirm-send').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
 
 $('#confirm-modal').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
