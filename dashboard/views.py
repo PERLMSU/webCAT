@@ -221,7 +221,7 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 						   permission = form.cleaned_data['permission_level']
 						   )
 				self.add_message("User successfully created!")   
-				return HttpResponseRedirect(reverse('dash-manage-users'))				
+				# return HttpResponseRedirect(reverse('dash-manage-users'))				
 			except Exception as e:
 				messages.add_message(self.request, messages.ERROR, "Could not create user: "+str(e))
 			try:
