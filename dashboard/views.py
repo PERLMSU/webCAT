@@ -225,7 +225,9 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 			except Exception as e:
 				messages.add_message(self.request, messages.ERROR, "Could not create user: "+str(e))
 			try:
-				user.send_confirmation_email(self.request)   
+
+				user.send_confirmation_email(self.request)  
+				self.add_message("Confirmation email sent.")   
 			except Exception as e:
 				messages.add_message(self.request, messages.ERROR, "Could not send confirmation email: "+str(e))				
 		self.context['form'] = form
