@@ -1,0 +1,46 @@
+
+
+
+  <div class="modal fade" id="create_observation_{{subcategory.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Add Observation to {{subcategory.name}}</h4>
+        </div>
+
+        <div class="modal-body">
+          <h5> Subcategory: </h5>
+          <form class="form-horizontal" action="{% url "create-observation" %}" method="POST">{% csrf_token %}        
+
+           <div class="form-group padding-lr">
+              <label for="observation">Observation</label>
+              <textarea name="observation" type="text" class="form-control observation-new" aria-describedby="emailHelp" placeholder="Enter the observation"></textarea>
+              <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+            </div>     
+
+
+            <div class="form-group padding-lr">
+
+              <label for="observation_type">Observation Type</label>
+              <label class="radio-inline"><input type="radio" value="1" name="observation_type">Positive</label>
+              <label class="radio-inline"><input type="radio" value="0" name="observation_type">Negative</label>
+              <label class="radio-inline"><input type="radio" value="-1" name="observation_type">Neutral</label>    
+            </div>  
+
+            <input type="hidden" name="subcategory_pk" value="{{subcategory.id}}"> 
+             
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <input type="submit" value="Create" class="btn btn-primary"/>      
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>

@@ -102,6 +102,129 @@ def get_student_draft(student_pk, week):
 	draft = Draft.objects.filter(student = student_pk, week_num = week).first()
 	return draft
 
+# class EditObservation(SuperuserRequiredMixin,TemplateView):
+
+#     def post(self, *args, **kwargs):
+#         form = EditObservationForm(self.request.POST or None)
+#         #raise Exception("what")
+#         if form.is_valid():
+#             observation_text = form.cleaned_data['observation']
+#             observation = form.cleaned_data['observation_pk']
+#             observation_type = int(form.cleaned_data['observation_type'])
+#             if observation_type == -1:
+#             	observation_type = None
+#             try:
+#                 observation.observation = observation_text
+#                 observation.observation_type = observation_type
+#                 observation.save()
+#                 messages.add_message(self.request, messages.SUCCESS, 'Successfully edited observation.')
+#             except Exception as e:
+#                 messages.add_message(self.request, messages.ERROR, 'Unable to edit observation.%s' % e)
+#             return HttpResponseRedirect('/feedback/manager/')
+#         else:
+#             messages.error(self.request, form.errors)
+#             return HttpResponseRedirect('/feedback/manager/')     
+
+class AddEditObservation(SuperuserRequiredMixin,TemplateView):
+
+	def post(self, *args, **kwargs):
+		form = EditObservationForm(self.request.POST or None)
+		#raise Exception("what")
+		if form.is_valid():
+			observation = form.cleaned_data['observation_pk'] 
+			try:
+				if observation:
+					f = EditObservationForm(self.request.POST, instance=observation)
+					f.save()
+					messages.add_message(self.request, messages.SUCCESS, 'Successfully edited observation.')
+				else:
+					new_observation = form.save()
+					messages.add_message(self.request, messages.SUCCESS, 'Successfully added observation.')
+			except Exception as e:
+				messages.add_message(self.request, messages.ERROR, 'Unable to edit/add observation.%s' % e)
+            # observation_text = form.cleaned_data['observation']
+            # observation = form.cleaned_data['observation_pk']            
+
+            # observation_type = int(form.cleaned_data['observation_type'])
+            # if observation_type == -1:
+            # 	observation_type = None         	
+            # try:
+            #     observation.observation = observation_text
+            #     observation.observation_type = observation_type
+            #     observation.save()
+            #     messages.add_message(self.request, messages.SUCCESS, 'Successfully edited observation.')
+            # except Exception as e:
+            #     messages.add_message(self.request, messages.ERROR, 'Unable to edit observation.')
+			return HttpResponseRedirect('/feedback/manager/')
+		else:
+			messages.error(self.request, form.errors)
+			return HttpResponseRedirect('/feedback/manager/') 
+
+class AddEditCommonFeedback(SuperuserRequiredMixin,TemplateView):
+
+	def post(self, *args, **kwargs):
+		form = EditCommonFeedbackForm(self.request.POST or None)
+		#raise Exception("what")
+		if form.is_valid():
+
+			feedback = form.cleaned_data['feedback_pk'] 
+			try:
+				if feedback:
+					f = EditCommonFeedbackForm(self.request.POST, instance=feedback)
+					f.save()
+					messages.add_message(self.request, messages.SUCCESS, 'Successfully edited feedback.')
+				else:
+					new_common_feedback = form.save()
+					messages.add_message(self.request, messages.SUCCESS, 'Successfully created feedback.')
+			except Exception as e:
+				messages.add_message(self.request, messages.ERROR, 'Unable to edit/add feedback.%s' % e)        	
+
+			return HttpResponseRedirect('/feedback/manager/')
+		else:
+			messages.error(self.request, form.errors)
+			return HttpResponseRedirect('/feedback/manager/') 
+
+
+class AddEditFeedbackExplanation(SuperuserRequiredMixin,TemplateView):
+
+	def post(self, *args, **kwargs):
+		form = EditExplanationForm(self.request.POST or None)
+		#raise Exception("what")
+		if form.is_valid():
+
+			feedback_explanation = form.cleaned_data['explanation_pk'] 
+			try:
+				if feedback_explanation:
+					f = EditExplanationForm(self.request.POST, instance=feedback_explanation)
+					f.save()
+					messages.add_message(self.request, messages.SUCCESS, 'Successfully edited feedback explanation.')
+				else:
+					feedback_explanation = form.save()
+					messages.add_message(self.request, messages.SUCCESS, 'Successfully created explanation for feedback.')
+			except Exception as e:
+				messages.add_message(self.request, messages.ERROR, 'Unable to edit/add explanation.%s' % e)        	
+				
+			return HttpResponseRedirect('/feedback/manager/')
+		else:
+			messages.error(self.request, form.errors)
+			return HttpResponseRedirect('/feedback/manager/') 
+
+
+class FeedbackManager(SuperuserRequiredMixin, TemplateView):
+	template_name = "feedbackmanager.html"
+	context = {}
+
+	def get(self, *args, **kwargs):
+
+		classroom = self.request.user.current_classroom
+		if classroom != None:
+			self.context['main_categories'] = Category.objects.all()
+			return render(self.request, self.template_name, self.context)
+		else:
+			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			return HttpResponseRedirect(reverse('dash-home'))  				
+
+
 class FeedbackView(LoginRequiredMixin, FormView):
 	template_name = "feedback.html"
 	form_class = EditDraftForm
@@ -474,6 +597,50 @@ class DeleteSubCategoryView(LoginRequiredMixin, View):
         return HttpResponseRedirect('/feedback/categories/') 
 
 
+
+class DeleteObservationView(LoginRequiredMixin, View):
+    """ delete observation view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            observation = Observation.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this observation %s' % e)
+        finally:
+            observation.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Observation successfully deleted!')
+        return HttpResponseRedirect('/feedback/manager/') 
+
+
+
+class DeleteCommonFeedbackView(LoginRequiredMixin, View):
+    """ delete feedback view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            common_feedback = Feedback.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this common feedback %s' % e)
+        finally:
+            common_feedback.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Common Feedback successfully deleted!')
+        return HttpResponseRedirect('/feedback/manager/') 
+
+class DeleteFeedbackExplanationView(LoginRequiredMixin, View):
+    """ delete feedback view
+    """
+    def get(self, *args, **kwargs):
+        try:
+            feedback_explanation = Explanation.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this explanation %s' % e)
+        finally:
+            feedback_explanation.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Explanation successfully deleted!')
+        return HttpResponseRedirect('/feedback/manager/') 
+
+
+
 class SendDrafts(SuperuserRequiredMixin, View):
 
 	def get(self, *args, **kwargs):
@@ -497,7 +664,8 @@ class SendDrafts(SuperuserRequiredMixin, View):
 				messages.add_message(self.request, messages.ERROR, 'Unable to send this feedback to student: %s' % e) 
 
 		messages.add_message(self.request, messages.SUCCESS, str(len(successfully_sent)) + ' Feedback Emails have been sent to: ' +', '.join(successfully_sent))             
-		messages.add_message(self.request, messages.ERROR, str(len(no_email_found)) + ' Emails could not be sent, no email addresses found for: ' +', '.join(no_email_found))             
+		if no_email_count:
+			messages.add_message(self.request, messages.ERROR, str(len(no_email_found)) + ' Emails could not be sent, no email addresses found for: ' +', '.join(no_email_found))             
 		return HttpResponseRedirect('/feedback/inbox/') 	
 
 

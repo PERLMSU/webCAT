@@ -152,9 +152,7 @@
                     <li class="active">
                         <a href="{% url "dash-home" %}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
-                    <li>
-                        <a href="{% url "feedback-inbox" %}"><i class="fa fa-fw fa-envelope"></i> Inbox <span class="badge">{{notifications.count}}</span></a>
-                    </li>                     
+                   
                     {% if user.is_superuser %}
                     <li>
                         <a href="{% url "dash-manage-users" %}"><i class="fa fa-fw fa-user"></i> Manage Users</a>
@@ -162,28 +160,41 @@
                     <li>
                         <a href="{% url "classroom-home" %}"><i class="fa fa-fw fa-university"></i> Classroom</a>
                     </li>
+
                     {% endif %}
-                   
+                    <li>
+                        <a href="{% url "feedback-inbox" %}"><i class="fa fa-fw fa-envelope"></i> Inbox <span class="badge">{{notifications.count}}</span></a>
+                    </li>  
+                    <li>
+                        <a href="{% url "feedback-home" %}"><i class="fa fa-fw fa-edit"></i> Feedback Writer</a> 
+                    </li>                            
+                    
+         <!--           
                     <li>
                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-edit"></i> Feedback <i class="fa fa-fw fa-caret-down"></i></a>
                         <ul id="demo" class="show">
                             <li>
-                                <a href="{% url "feedback-home" %}">Editor</a>
+                                <a href="{% url "feedback-home" %}">Writer</a>
                             </li>                            
                             <li>
                                 <a href="{% url "feedback-categories" %}">Categories</a>
-                            </li>
-  <!--                           <li>
-                                <a href="#">Common Feedback</a>
-                            </li>     -->                        
+                            </li>                      
                         </ul>
-                    </li>                    
+                    </li>      -->               
 <!--                     <li>
                         <a href="{% url "dash-feedback"}"><i class="fa fa-fw fa-edit"></i> Feedback <i class="fa fa-fw fa-caret-down"></i></a>
                     </li> -->
                     <li>
                         <a href="{% url "notes-home" %}"><i class="fa fa-fw fa-file"></i> Notes</a>
-                    </li>                       
+                    </li>     
+
+                    <li>
+                        <a href="{% url "feedback-categories" %}"><i class="fa fa-fw fa-th-large"></i> Category Manager</a>
+                    </li>  
+
+                    <li>
+                        <a href="{% url "feedback-manager" %}"><i class="fa fa-fw fa-list-ul"></i> Feedback Manager</a>
+                    </li>                                                            
                     <li>
                         <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
                     </li>

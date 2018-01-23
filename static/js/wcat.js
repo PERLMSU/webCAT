@@ -288,6 +288,30 @@ $(document).on("click", ".deletecategory", function () {
      $(".modal-body #categoryName").html( categoryName );
 });
 
+
+$(document).on("click", ".deleteexplanation", function () {
+     var deleteName = $(this).data('id');
+     $(".modal-body #deleteName").html( deleteName );
+});
+
+$(document).on("click", ".newobservation", function () {
+     var subcategory = $(this).data('id');
+     $(".modal-body #new-obs-subcategory").val( subcategory );
+});
+
+
+$(document).on("click", ".newfeedback", function () {
+     var subcategory = $(this).data('id');
+     var observation = $(this).data('observation');
+     $(".modal-body #new-fb-subcategory").val( subcategory );
+     $(".modal-body #new-fb-observation").val( observation );
+});
+
+$(document).on("click", ".deleteobservation", function () {
+     var observationName = $(this).data('id');
+     $(".modal-body #observationName").html( observationName );
+});
+
 $('#confirm-delete').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });

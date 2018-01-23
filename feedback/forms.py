@@ -36,6 +36,37 @@ class AddCategoryForm(forms.ModelForm):
 #         model = CommonFeedback
 #         fields = ['problem','solution','solution_explanation']
 
+class EditObservationForm(forms.ModelForm):
+    observation = forms.CharField()
+    observation_pk = forms.ModelChoiceField(queryset=Observation.objects.all(),required=False)
+    observation_type = forms.IntegerField(required=False)
+    sub_category = forms.ModelChoiceField(queryset=SubCategory.objects.all(),required=True)
+
+    class Meta:
+        model = Observation
+        fields = ['sub_category', 'observation', 'observation_type']
+
+
+class EditCommonFeedbackForm(forms.ModelForm):
+    feedback_pk = forms.ModelChoiceField(queryset=Feedback.objects.all(),required=False)
+    feedback = forms.CharField() 
+    sub_category = forms.ModelChoiceField(queryset=SubCategory.objects.all(),required=False)
+    observation = forms.ModelChoiceField(queryset=Observation.objects.all(),required=False)
+
+    class Meta:
+        model = Feedback
+        fields = ['sub_category', 'observation', 'feedback']
+
+class EditExplanationForm(forms.ModelForm):
+    explanation_pk = forms.ModelChoiceField(queryset=Explanation.objects.all(),required=False)
+    sub_category = forms.ModelChoiceField(queryset=SubCategory.objects.all(),required=False)
+    feedback = forms.ModelChoiceField(queryset=Feedback.objects.all(),required=False)
+    feedback_explanation = forms.CharField() 
+    
+    class Meta:
+        model = Explanation
+        fields = ['feedback_explanation','sub_category','feedback']
+
 class AddFeedbackPieceForm(forms.Form):
     #pull common observations that already exist
 

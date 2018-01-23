@@ -1,0 +1,35 @@
+  <div class="modal fade" id="edit_feedback_{{feedback.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Add/Edit Common Feedback</h4>
+        </div>
+        
+        <div class="modal-body">
+            <form class="form-horizontal" action="{% url "edit-common-feedback" %}" method="POST">{% csrf_token %}
+
+           <div class="form-group padding-lr">
+            <label for="feedback">Feedback: </label>
+          <textarea name="feedback" type="text" class="form-control" rows="8" aria-describedby="emailHelp" placeholder="Enter feedback here">{{feedback}}</textarea> 
+
+          <input name="feedback_pk" type="hidden" value="{{feedback.id}}">
+          <input name="observation" id="new-fb-observation" type="hidden" value="{{observation.id}}">         
+          <input name="sub_category" id="new-fb-subcategory" type="hidden" value="{{subcategory.id}}">          
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <input type="submit" value="Save" class="btn btn-success"/>    
+            <!-- <input type="submit" value="Delete" class="btn btn-danger"/> -->   
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div> 

@@ -76,6 +76,9 @@ class Feedback(models.Model):
     observation = models.ForeignKey(Observation)
     feedback = models.CharField(max_length=2000)
 
+    def __str__(self):
+        return "{}".format(self.feedback)
+
 class Explanation(models.Model):
     sub_category = models.ForeignKey(SubCategory)
     feedback = models.ForeignKey(Feedback)
@@ -98,6 +101,7 @@ class Draft(models.Model):
     student = models.ForeignKey(Student)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,null=True)
     status = models.PositiveSmallIntegerField(choices=DRAFT_STATUS)
+    email_sent = models.BooleanField(default=False)
 
     def send_to_instructor(self):
         instructor = self.owner.get_current_classroom_instructor()
@@ -152,7 +156,9 @@ class Draft(models.Model):
             subject, from_email, title=subject, host_email, email_to
             msg = EmailMultiAlternatives(subject, html_content, from_email, [title])
             msg.content_subtype = "html"
-            msg.send()   
+            msg.send()
+            self.email_sent = True
+            self.save()   
             return True         
         else:
             return False
