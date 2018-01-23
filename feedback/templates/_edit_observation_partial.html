@@ -10,6 +10,7 @@
         </div>
         
         <div class="modal-body">
+          <h3>Subcategory: <span id="subcategory-name"></span></h3>
             <form class="form-horizontal" action="{% url "edit-observation" %}" method="POST">{% csrf_token %}
 
            <div class="form-group padding-lr">
