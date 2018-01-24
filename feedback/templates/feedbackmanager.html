@@ -69,6 +69,7 @@
 				        <!--   <th></th> -->
 				          <th><h4>Feedback &amp; Explanations <i class="fa fa-fw fa-comment"></i> </h4></th>				    
 				          	<th></th>
+				          	<th></th>
 				        </tr>
 				      </thead>
 				      <tbody>        				 
@@ -128,12 +129,16 @@
 			        				
 				        				{% endfor %}
 				        				<hr>
-			        					<a class="newfeedback btn btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a> 
+			        				<!-- 	<a class="newfeedback btn btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a>  -->
 
 				        			</ul>
 			        				</td>
 			        				<td>
-<a href="#" data-href="{% url "delete-observation" observation.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{observation.observation}}" value="Delete" class="float-right-button deleteobservation"><span class="fa fa-minus red-icon"></span></a>   
+			        					<a href="#" data-href="{% url "delete-observation" observation.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{observation.observation}}" value="Delete" class="btn btn-sm btn-danger float-right-button deleteobservation"><span class="fa fa-remove"></span></a> 
+			        				</td>
+			        				<td>
+
+		<a class="newfeedback btn btn-sm btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a>   
 			        				</td>
 			    					<!-- </div> -->
 			    				<!-- </div> -->

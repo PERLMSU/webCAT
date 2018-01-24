@@ -71,6 +71,10 @@ class Observation(models.Model):
     def __str__(self):
         return "{}".format(self.observation)
 
+
+    class Meta:
+        ordering = ["observation_type"]
+
 class Feedback(models.Model):
     sub_category = models.ForeignKey(SubCategory)
     observation = models.ForeignKey(Observation)
