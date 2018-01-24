@@ -172,12 +172,19 @@
     margin-left: 10px;
 }
 
+.grey-icon {
+  color:dimgray;
+}
 .green-icon {
     color: green;
 }
 
 .red-icon {
     color: red;
+}
+.thumb-red-icon
+{
+  color: indianred;
 }
 .category-main {
     /*padding: 30px;*/

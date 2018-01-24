@@ -75,11 +75,21 @@
         				{% for observation in subcategory|get_subcategory_observations %}
         				<tr>
 			        				<td>
-			        					{{observation.get_observation_type }}
+
+
+			        				
+							            {% if observation.get_observation_type == "Positive" %}
+							              <i class="fa fa-2x fa-thumbs-up green-icon"></i>
+							            {% elif observation.get_observation_type == "Negative" %}
+							             <i class="fa fa-2x fa-thumbs-down thumb-red-icon"></i>
+							             {% elif observation.get_observation_type == "Neutral" %}
+							             <i class="fa fa-2x fa-minus grey-icon"></i>   
+							            {% endif %}  
 			        				</td>				        				
 				        			<td> 
 			        					<p>           
-			        						<a data-toggle="modal" data-target="#edit_observation_{{observation.id}}" role="button">{{observation }}</a> </p>
+			        						<h4><a data-toggle="modal" data-target="#edit_observation_{{observation.id}}" role="button">{{observation }}</a> </h4>
+			        					</p>
 
 
 			        						{% include '_edit_observation_partial.html' %}   
@@ -89,9 +99,8 @@
 			        			
 				        			<td>
 				        				<ul>
-				        					<a class="newfeedback" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">Add New Feedback<i class="fa fa-fw fa-plus green-icon"></i></a> 
-				        					  
-				        					<hr>
+	
+				        					<!-- <hr> -->
 				        				{% for feedback in observation|get_observation_feedbacks %}
 				        				
 				        					<li> 
@@ -118,6 +127,9 @@
 				        					</ul>
 			        				
 				        				{% endfor %}
+				        				<hr>
+			        					<a class="newfeedback btn btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a> 
+
 				        			</ul>
 			        				</td>
 			        				<td>

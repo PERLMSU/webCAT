@@ -305,8 +305,10 @@ $(document).on("click", ".newobservation", function () {
 $(document).on("click", ".newfeedback", function () {
      var subcategory = $(this).data('id');
      var observation = $(this).data('observation');
-     $(".modal-body #new-fb-subcategory").val( subcategory );
-     $(".modal-body #new-fb-observation").val( observation );
+     var observation_text = $(this).data('observationtext');
+     $("#edit_feedback_ .fb-observation").html( observation_text );
+     $("#edit_feedback_ .new-fb-subcategory").val( subcategory );
+     $("#edit_feedback_ .new-fb-observation").val( observation );
 });
 
 $(document).on("click", ".deleteobservation", function () {

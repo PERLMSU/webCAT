@@ -10,6 +10,7 @@
         </div>
         
         <div class="modal-body">
+          <h4>Observation: <span class="fb-observation">{{observation}}</span></h4>
             <form class="form-horizontal" action="{% url "edit-common-feedback" %}" method="POST">{% csrf_token %}
 
            <div class="form-group padding-lr">
@@ -17,8 +18,8 @@
           <textarea name="feedback" type="text" class="form-control" rows="8" aria-describedby="emailHelp" placeholder="Enter feedback here">{{feedback}}</textarea> 
 
           <input name="feedback_pk" type="hidden" value="{{feedback.id}}">
-          <input name="observation" id="new-fb-observation" type="hidden" value="{{observation.id}}">         
-          <input name="sub_category" id="new-fb-subcategory" type="hidden" value="{{subcategory.id}}">          
+          <input name="observation" class="new-fb-observation" type="hidden" value="{{observation.id}}">         
+          <input name="sub_category" class="new-fb-subcategory" type="hidden" value="{{subcategory.id}}">          
           </div>
 
         </div>
