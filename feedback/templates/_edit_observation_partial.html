@@ -10,7 +10,7 @@
         </div>
         
         <div class="modal-body">
-          <h3>Subcategory: <span id="subcategory-name"></span></h3>
+          <h3>Subcategory: <span class="subcategory-name">{{subcategory.name}}</span></h3>
             <form class="form-horizontal" action="{% url "edit-observation" %}" method="POST">{% csrf_token %}
 
            <div class="form-group padding-lr">
@@ -20,7 +20,7 @@
 
 
           <input name="observation_pk" type="hidden" value="{{observation.id}}">    
-           <input name="sub_category" id="new-obs-subcategory" type="hidden" value="{{subcategory.id}}">          
+           <input name="sub_category" class="new-obs-subcategory" type="hidden" value="{{subcategory.id}}">          
           </div>
           <div class="form-group padding-lr">
 

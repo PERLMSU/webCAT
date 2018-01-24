@@ -297,8 +297,8 @@ $(document).on("click", ".deleteexplanation", function () {
 $(document).on("click", ".newobservation", function () {
      var subcategory = $(this).data('id');
      var subcategoryName = $(this).data('subcategory');
-     $(".modal-body #new-obs-subcategory").val( subcategory );
-      $(".modal-body #subcategory-name").html( subcategoryName );
+     $("#edit_observation_ .new-obs-subcategory").val( subcategory );
+     $("#edit_observation_ .subcategory-name").html( subcategoryName );
 });
 
 
