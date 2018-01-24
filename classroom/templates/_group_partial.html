@@ -8,10 +8,10 @@
 {% endif %}
 
 <div class="panel-heading">
-  <h3> Groups {{rotation.start_week}} - {{rotation.end_week}}
+  <h3><i class="fa fa-rocket"></i> Groups {{rotation.start_week}} - {{rotation.end_week}}
 
   {% if not upload_view %}       
-    <a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup_{{rotation.id}}" role="button"><span class="fa fa-group"></span> Set Number of Groups  </a>
+    <a class="btn btn-primary float-right-button" data-toggle="modal" data-target="#createGroup_{{rotation.id}}" role="button"><span class="fa fa-rocket"></span> Set Number of Groups  </a>
 
     <!-- <a class="btn btn-success float-right-button" href="{% url "classroom-upload-groups" %}"><span class="fa fa-cloud-upload"></span> Upload</a> -->
   {% endif %}

@@ -77,11 +77,13 @@
         <ul>
           {% for subcategory in subcategories %}
             <li>
-              <a data-toggle="modal" data-target="#edit_subcategory_{{subcategory.id}}"
-                role="button"> {{subcategory.name }} </a>
+               {{subcategory.name }}
 
-              <a href="#" data-href="{% url "delete-subcategory" subcategory.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{subcategory.name}}" value="Delete" class="deletecategory float-right"><span class="fa fa-remove red-icon"></span></a>  
-
+               <span class="float-right">
+               <a data-toggle="modal" data-target="#edit_subcategory_{{subcategory.id}}"
+                role="button"><i class="fa fa-edit"></i></a>
+              <a href="#" data-href="{% url "delete-subcategory" subcategory.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{subcategory.name}}" value="Delete" class="deletecategory"><span class="fa fa-remove red-icon"></span></a>  
+            </span>
 
 
          <!--    </li> -->
