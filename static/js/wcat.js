@@ -294,6 +294,17 @@ $(document).on("click", ".deleteexplanation", function () {
      $(".modal-body #deleteName").html( deleteName );
 });
 
+
+$(document).on("click", ".newexplanation", function () {
+     var subcategory = $(this).data('id');
+     var feedback = $(this).data('feedback');
+     var feedback_id = $(this).data('feedbackid');
+     $("#edit_explanation_ .new-exp-subcategory").val( subcategory );
+     $("#edit_explanation_ .new-explanation").html( feedback );
+     $("#edit_explanation_ .new-explanation-fb").val( feedback_id );
+});
+
+
 $(document).on("click", ".newobservation", function () {
      var subcategory = $(this).data('id');
      var subcategoryName = $(this).data('subcategory');

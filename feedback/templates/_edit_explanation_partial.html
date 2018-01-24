@@ -11,7 +11,7 @@
         
         <div class="modal-body">
 
-          <p>Feedback: {{feedback}}</p>
+          <p>Feedback: <span class="new-explanation"></span>{{feedback}}</p>
             <form class="form-horizontal" action="{% url "edit-feedback-explanation" %}" method="POST">{% csrf_token %}
 
            <div class="form-group padding-lr">
@@ -19,8 +19,8 @@
           <textarea name="feedback_explanation" type="text" class="form-control" rows="8" aria-describedby="emailHelp" placeholder="Enter explanation here">{{explanation}}</textarea> 
 
           <input name="explanation_pk" type="hidden" value="{{explanation.id}}"> 
-          <input name="feedback" type="hidden" value="{{feedback.id}}">      
-          <input name="sub_category" type="hidden" value="{{subcategory.id}}">           
+          <input name="feedback" class="new-explanation-fb" type="hidden" value="{{feedback.id}}">      
+          <input name="sub_category" class="new-exp-subcategory" type="hidden" value="{{subcategory.id}}">           
           </div>            
 
         </div>

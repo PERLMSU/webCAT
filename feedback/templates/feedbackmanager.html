@@ -122,7 +122,7 @@
 				        					</div>
 				        					<div class="col-md-2">
 			        							<span class="float-right">
-													<a data-toggle="modal" data-target="#edit_explanation_" role="button"><i class="fa fa-fw fa-plus green-icon" title="Add Explanation"></i></a> 			        								
+													<a class="newexplanation" data-id="{{subcategory.id}}" data-feedback="{{feedback}}" data-feedbackid="{{feedback.id}}" data-toggle="modal" data-target="#edit_explanation_" role="button"><i class="fa fa-fw fa-plus green-icon" title="Add Explanation"></i></a> 			        								
 			        								<a data-toggle="modal" data-target="#edit_feedback_{{feedback.id}}" role="button"><i class="fa fa-edit"></i></a>
 				        							
 				        						  <a data-href="{% url "delete-common-feedback" feedback.id %}" data-toggle="modal" data-target="#confirm-delete-explanation" data-id="{{feedback}}" value="Delete" class="deleteexplanation"><i class="fa fa-fw fa-remove red-icon"></i></a> 
@@ -132,7 +132,7 @@
 				        					{% include '_edit_common_feedback_partial.html' %}   
 				        					<ul>
 				        						
-				        							{% include '_edit_explanation_partial.html' %}  
+				        							
 
 				        						{% for explanation in feedback|get_feedback_explanations %}
 			        								<div class="row">
@@ -163,7 +163,7 @@
 
 			        				<td class="col-md-1">
 
-		<a class="newfeedback btn btn-sm btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a>   
+										<a class="newfeedback btn btn-sm btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a>   
 			        				</td>
 			        				<td>
 			        					
@@ -245,5 +245,6 @@
 
 {% include '_edit_common_feedback_partial.html' %}
 
+{% include '_edit_explanation_partial.html' %}  
 
 {% endblock %}
