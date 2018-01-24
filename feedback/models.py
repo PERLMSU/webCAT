@@ -43,7 +43,8 @@ class SubCategory(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name
-
+    class Meta:
+        ordering = ["name"]
 
     # feedback = models.CharField(max_length=200, null=True)
     # observation = models.CharField(max_length=200, null=True)
@@ -73,7 +74,7 @@ class Observation(models.Model):
 
 
     class Meta:
-        ordering = ["observation_type"]
+        ordering = ["observation_type",'observation']
 
 class Feedback(models.Model):
     sub_category = models.ForeignKey(SubCategory)
