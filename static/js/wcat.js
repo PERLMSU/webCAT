@@ -264,6 +264,23 @@ $(document).on("click", ".student-feedback", function () {
      $("#"+studentId).show();
 });
 
+$(document).on("click", ".add-to-feedback-btn", function () {
+     var studentID = $(this).data('id');
+    var selected = [];
+     $('.add-to-feedback-checkboxes input:checked').each(function() {
+
+          // $(that).append('<input type="hidden" name="student_name'+index.toString()+'" value="'+($(this).attr('value'))+'" /> ');
+         selected.push($(this).attr('value'))+' ';         
+     });     
+     //alert(selected);
+     // $(".feedback-student-writer").hide();
+     // $("#"+studentId).show();
+     $("#draft-student-"+studentID).append(selected); 
+     
+     $('input:checkbox').removeAttr('checked');
+     $('.modal').modal('hide');
+});
+
 
 
 $(document).on("click", ".editstudentrow", function () {

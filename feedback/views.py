@@ -44,6 +44,7 @@ def get_note_feedback_pieces(note):
 	else:
 		return FeedbackPiece.objects.filter(sub_category=note.sub_category)  
 
+#def get_observations_by_notes(notes):
 
 @register.filter
 def get_subcategory_observations(subcategory):
@@ -219,6 +220,7 @@ class FeedbackManager(SuperuserRequiredMixin, TemplateView):
 		classroom = self.request.user.current_classroom
 		if classroom != None:
 			self.context['main_categories'] = Category.objects.all()
+			self.context['manager_view'] = True
 			return render(self.request, self.template_name, self.context)
 		else:
 			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
@@ -259,10 +261,11 @@ class FeedbackView(LoginRequiredMixin, FormView):
 			self.context['rotation_groups'] = groups
 			# self.context['loop_times'] = range(1, 13)
 			self.context['loop_times'] = range(1,classroom.get_num_weeks())
-			self.context['grade_scale'] = [x*.25 for x in range(17)][::-1]
+			self.context['grade_scale'] = [x*.25 for x in range(17)]
 			#self.context['groups_to_students'] = groups_to_students
 			self.context['main_categories'] = main_categories
 			self.context['notifications'] = Notification.objects.filter(user=self.request.user)
+			self.context['manager_view'] = False
 
 			return render(self.request, self.template_name, self.context)
 		else:

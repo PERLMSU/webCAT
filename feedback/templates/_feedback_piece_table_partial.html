@@ -1,0 +1,173 @@
+	<table class="table table-bordered table-striped table-hover">
+				      <thead>
+				        <tr>
+
+				        	
+				        	<th><h4> Type </h4> </th>
+				          <th><h4> Observation <i class="fa fa-fw fa-eye"></i></h4></th>
+				    
+				          
+				      
+				          <th><h4>Feedback &amp; Explanations <i class="fa fa-fw fa-comment"></i> </h4></th>
+
+
+				          	{% if manager_view %}					          			    
+				          	<th></th>
+				          	<th></th>
+
+			          		{% endif %}
+				          	
+				        </tr>
+				      </thead>
+				      <tbody>    	 
+        					{% for observation in subcategory|get_subcategory_observations %}
+        						{% if manager_view or observation == note.observation or not note.observation %}
+        				<tr>
+
+
+			        				<td class="col-md-1">
+
+
+			        				
+							            {% if observation.get_observation_type == "Positive" %}
+							              <i class="fa fa-2x fa-thumbs-up green-icon"></i>
+							            {% elif observation.get_observation_type == "Negative" %}
+							             <i class="fa fa-2x fa-thumbs-down thumb-red-icon"></i>
+							             {% elif observation.get_observation_type == "Neutral" %}
+							             <i class="fa fa-2x fa-minus grey-icon"></i>   
+							            {% endif %}  
+			        				</td>				        				
+				        			<td class="col-md-2"> 
+				        				<div class="row">
+				        					<div class="col-md-10">
+				        					<p>           
+				        						
+				        							{{observation }}
+				        								</p>
+				        						</div>
+				        						{% if manager_view %}
+					        						<div class="col-md-1">
+					        							<a class="float-right" data-toggle="modal" data-target="#edit_observation_{{observation.id}}" role="button"><i class="fa fa-edit"></i></a>
+					        						</div>
+				        							{% include '_edit_observation_partial.html' %}   
+				        						{% endif %}
+
+			        					</div>
+			        						
+
+			        				</td>
+
+
+			        			
+				        			<td class="col-md-7">
+				        				<ul>
+										
+				        					<!-- <hr> -->
+				        				{% for feedback in observation|get_observation_feedbacks %}
+				        				<div class="row">
+					        				<div class="col-md-10">
+					        					<li> 
+					        							{{feedback}}
+
+					        						</p>
+				        						</li>
+				        					</div>
+
+				        					{% if manager_view %}
+				        					<div class="col-md-2">
+			        							<span class="float-right">
+													<a class="newexplanation" data-id="{{subcategory.id}}" data-feedback="{{feedback}}" data-feedbackid="{{feedback.id}}" data-toggle="modal" data-target="#edit_explanation_" role="button"><i class="fa fa-fw fa-plus green-icon" title="Add Explanation"></i></a> 			        								
+			        								<a data-toggle="modal" data-target="#edit_feedback_{{feedback.id}}" role="button"><i class="fa fa-edit"></i></a>
+				        							
+				        						  <a data-href="{% url "delete-common-feedback" feedback.id %}" data-toggle="modal" data-target="#confirm-delete-explanation" data-id="{{feedback}}" value="Delete" class="deleteexplanation"><i class="fa fa-fw fa-remove red-icon"></i></a> 
+			        							</span>
+				        					</div>
+
+				        					{% include '_edit_common_feedback_partial.html' %}  
+
+				        					
+				        					{% elif draft.status != 1 and draft.status != 3 %}
+		        							<div class="col-md-2">
+		        								<span class="float-right">
+		        									<div class="add-to-feedback-checkboxes">
+		        										<input value='{{feedback}}' type="checkbox" name="add_to_feedback"></input>
+	        										</div>
+												</span> 
+		        							</div>	
+				        					{% endif %}
+			        					</div>	
+				        					 
+				        					<ul>
+				        						
+				        							
+
+				        						{% for explanation in feedback|get_feedback_explanations %}
+			        								<div class="row">
+					        							<div class="col-md-10">
+						        							<li> 
+						        								<p> <!-- <i class="fa fa-fw fa-info-circle"></i> -->
+						        									{{explanation }} 						        										
+						        									   
+						        								</p>
+					        								</li>
+					        							</div>
+					        							{% if manager_view %}
+
+						        							<div class="col-md-2">
+						        								<span class="float-right">
+						        									<a data-toggle="modal" data-target="#edit_explanation_{{explanation.id}}" role="button"><i class="fa fa-edit"></i></a> 
+																	<a data-href="{% url "delete-explanation" explanation.id %}" data-toggle="modal" data-target="#confirm-delete-explanation" data-id="{{explanation}}" value="Delete" class="deleteexplanation"><i class="fa fa-fw fa-remove red-icon"></i></a>
+																</span> 
+						        							</div>
+
+						        							{% include '_edit_explanation_partial.html' %}
+
+					        							{% elif draft.status != 1 and draft.status != 3 %}
+
+						        							<div class="col-md-2">
+						        								<span class="float-right">
+						        									<div class="add-to-feedback-checkboxes">
+						        										<input value='{{explanation}}' type="checkbox" name="add_to_feedback"></input>
+						        									</div>
+																</span> 
+						        							</div>					        							
+					        							{% endif %}
+
+					        						</div>
+				        						{% endfor %}
+				        					</ul>
+			        				
+				        				{% endfor %}
+				        				<hr>
+			        				<!-- 	<a class="newfeedback btn btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a>  -->
+
+				        			</ul>
+			        				</td>
+
+
+			        				{% if manager_view %}
+			        				<td class="col-md-1">
+
+										<a class="newfeedback btn btn-sm btn-success" data-observationtext="{{observation}}" data-observation="{{observation.id}}" data-toggle="modal" data-id="{{subcategory.id}}" data-target="#edit_feedback_" role="button">New Feedback <i class="fa fa-fw fa-comment"></i></a>   
+			        				</td>
+			        				<td>
+			        					
+			        					<a href="#" data-href="{% url "delete-observation" observation.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{observation.observation}}" value="Delete" class="btn btn-sm btn-danger deleteobservation float-right"><span class="fa fa-remove"></span></a> 
+			        				</td>		
+			        				{% endif %}	  
+
+			        				{% if help_view %}
+			        				<td>
+			        					Button go here?
+			        				</td>
+
+			        				{% endif %}      				
+			    					<!-- </div> -->
+			    				<!-- </div> -->
+ 
+						<!-- </div>	 -->	
+						</tr>		
+						{% endif %}							    				       					
+        				{% endfor %}
+        			</tbody>
+    				</table>
