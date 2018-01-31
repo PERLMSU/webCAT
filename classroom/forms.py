@@ -84,13 +84,13 @@ class AddStudentForm(forms.ModelForm):
 class AddGroupForm(forms.Form):
 
     group_number = forms.IntegerField(required=False)
-    number_of_groups = forms.IntegerField(required=False)
+    number_of_groups = forms.IntegerField(required=True)
     rotation = forms.ModelChoiceField(queryset=Rotation.objects.all())
 
-    # def clean_description(self):
-    #     if len(self.cleaned_data['description']) > 200:
-    #         raise forms.ValidationError("Description name must not be longer than %d characters." % 200)          
-    #     return self.cleaned_data['description']       
+    def clean_number_of_groups(self):
+        if self.cleaned_data['number_of_groups'] < 0:
+            raise forms.ValidationError("Number of groups must be greater than or equal to zero.")          
+        return self.cleaned_data['number_of_groups']       
 
 class AddClassroomForm(forms.ModelForm):
 

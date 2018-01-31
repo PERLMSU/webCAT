@@ -29,6 +29,18 @@
 
 
 
+$( "#createGroupsForm" ).submit(function( event ) {
+  //alert( "Handler for .submit() called." );
+ 
+    var num_groups = $(this).children().find('input[name="number_of_groups"]').val()
+    if (parseInt(num_groups) < 0)
+    {
+        $(this).children().closest('div.alert').show()
+        event.preventDefault();
+    }
+
+});
+
 
 
 $(document).on('change',".observation-dropdown", function(){

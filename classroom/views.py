@@ -152,20 +152,50 @@ def add_group(request):
 		rotation = form.cleaned_data['rotation']
 		list_group_num = []
  
-		if number_of_groups:
+ 		original_rotation_groups = rotation.get_rotation_groups()
+ 		original_rotation_groups_count = original_rotation_groups.count()
+
+ 		difference = original_rotation_groups_count - number_of_groups
+
+ 		#print(original_rotation_groups)
+		if number_of_groups != 0:
 			list_group_num = [x for x in range(1,number_of_groups+1)]  
 		else:
-			list_group_num = [group_number]
-		added_count = 0			
-		for group_num in list_group_num:
+			list_group_num = []
+		# elif group_:
+		# 	list_group_num = [group_number]
+		added_count = 0
+		removed_count = 0
+
+		to_remove = []
+		if difference > 0:
+			for group_index in range(len(list_group_num),(len(list_group_num)+difference)):
+				group = original_rotation_groups[group_index]
+				to_remove.append(group)
+				#group.delete()
+				removed_count += 1
+			 	print(group)
+
+		else:
+			for group_num in list_group_num:
 			
-			try:
-				group = RotationGroup.objects.get(group_number=group_num,rotation=rotation)				   			
-			except RotationGroup.DoesNotExist:
-				group = RotationGroup.objects.create(group_number=group_num,rotation=rotation)
-				added_count += 1
-				group.save()				
-		messages.add_message(request, messages.SUCCESS, 'Groups (%s) successfully added!' % str(added_count))     
+				try:
+					group = original_rotation_groups.get(group_number=group_num)			   			
+				except RotationGroup.DoesNotExist:
+					group = RotationGroup.objects.create(group_number=group_num,rotation=rotation)
+					added_count += 1
+					group.save()
+
+			
+
+		if added_count: 				
+			messages.add_message(request, messages.SUCCESS, 'Groups (%s) successfully added!' % str(added_count))
+		elif removed_count:
+			for group in to_remove:
+				group.delete()
+			messages.add_message(request, messages.SUCCESS, 'Groups (%s) successfully removed.' % str(removed_count))
+		else:
+			messages.add_message(request, messages.WARNING, 'No groups were added.')  
 			# finally:				
 			# 	group.create_rotation_group(rotation)            				
 	else: 

@@ -32,7 +32,7 @@
           <th>Student</th>
           <th></th>
           <th></th>
-          <th></th>
+       <!--    <th></th> -->
           
         </tr>
       </thead>
@@ -61,7 +61,7 @@
             <a href="#" class="assigngroup" data-toggle="modal" data-rotationgroupid="{{group.id}}" data-instructor="{{group.instructor.id}}" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups_{{rotation.id}}"><span class="fa fa-edit"></span></a>
           </td>
           <td><a href="#" data-toggle="modal" data-target="#assignMultipleStudents_{{group.id}}"><span class="glyphicon glyphicon-paste"></span></a></td>  
-          <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a></td>
+<!--           <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a></td> -->
 
 <div class="modal fade" id="assignMultipleStudents_{{group.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -161,6 +161,8 @@
         <h4 class="modal-title" id="myModalLabel"><i class="fa fa-rocket"></i> Set Number of Groups</h4>
       </div>
       <div class="modal-body">
+
+
 <!--         <h5> Add Group: </h5>
         <form class="form-horizontal" id="createGroupForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
 
@@ -177,11 +179,16 @@
         <hr>
         <form class="form-horizontal" id="createGroupsForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
 
+    <div class="alert alert-warning fade in alert-dismissible" style="display:none;" role="alert">
+    <!--   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+        Please enter a number greater than or equal to zero.
+    </div>        
+
         <div style="padding-left: 20px; padding-right: 20px;">
           <div class="form-group">
 
             <label for="number_of_groups">Number of Groups in Rotation:</label>
-            <input name="number_of_groups" type="text" class="form-control" placeholder="{{rotation|get_number_groups}}">
+            <input name="number_of_groups" type="number" required class="form-control" placeholder="{{rotation|get_number_groups}}">
             </input>
           </div>     
         </div>  

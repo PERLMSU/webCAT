@@ -93,7 +93,8 @@ class Rotation(models.Model):
     def get_end_week(self):
         return self.start_week + self.length
 
-
+    def get_rotation_groups(self):
+        return RotationGroup.objects.filter(rotation=self).order_by('group_number')
 
 # class Group(models.Model):
 #     classroom = models.ForeignKey(Classroom,null=True, default=None)
@@ -149,10 +150,11 @@ class RotationGroup(models.Model):
     group_number = models.IntegerField()
 
     class Meta:
+        ordering = ["group_number"]        
         unique_together = ('rotation', 'group_number',)   
 
     def __str__(self):
-        return "# {} Tutor: {} Rotation: {}".format(self.group, self.current_instructor, self.rotation)  
+        return "# {} Tutor: {} Rotation: {}".format(self.group_number, self.instructor, self.rotation)  
 
 
 
