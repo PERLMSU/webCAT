@@ -27,6 +27,44 @@
 //     return("ok");
 // }
 
+$(document).ready(function() {
+
+    $('.draft-form').ajaxForm({ 
+        //window.location.reload()
+        complete: function(data) {
+            if (data.responseJSON["success"] == true)
+            {
+                var student_id = data.responseJSON["student_id"];     
+                var last_updated = data.responseJSON["last_updated"];
+                
+                if (last_updated.indexOf("PM") >= 0)
+                {
+                    // var pm = last_updated.indexOf("PM");
+                    last_updated = last_updated.replace("PM","p.m.");
+                }
+                else if (last_updated.indexOf("AM") >= 0)
+                {
+                    last_updated = last_updated.replace("PM","a.m.");
+
+                }
+                //var date = new Date(last_updated.replace(' ', 'T')+'Z');     
+                $('#feedback_'+String(student_id)).show();           
+                $('#feedback_updated_'+String(student_id)).html(last_updated);
+               // $("#saved_"+String(student_id)).show();
+                $("#saved_"+String(student_id)).fadeTo(2000, 500).slideUp(500, function(){
+                    $("#saved_"+String(student_id)).slideUp(500);
+                });                
+            }
+            else
+            {
+                $('[id^=error_]').fadeTo(2000, 500).slideUp(500, function(){
+                    $('[id^=error_]').slideUp(500);
+                });  
+            }             
+
+        }
+    }); 
+}); 
 
 
 $( "#createGroupsForm" ).submit(function( event ) {

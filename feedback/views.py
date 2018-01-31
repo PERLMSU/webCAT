@@ -1,7 +1,7 @@
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.views.generic import TemplateView, View, FormView
@@ -12,6 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
 from django.template.defaulttags import register
 
+import json
 from .forms import *
 # Create your views here.
 from django.db import IntegrityError
@@ -227,7 +228,7 @@ class FeedbackManager(SuperuserRequiredMixin, TemplateView):
 			return HttpResponseRedirect(reverse('dash-home'))  				
 
 
-class FeedbackView(LoginRequiredMixin, FormView):
+class FeedbackView(LoginRequiredMixin, View):
 	template_name = "feedback.html"
 	form_class = EditDraftForm
 
@@ -315,9 +316,12 @@ class FeedbackView(LoginRequiredMixin, FormView):
 				draft.send_to_instructor()
 				messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')   
 			draft.save()
-			return HttpResponseRedirect('/feedback/week/'+str(week_num))
-		messages.add_message(self.request, messages.ERROR, 'Draft could not be saved.')
-		return HttpResponseRedirect('/feedback/')
+			return JsonResponse({'success':True,'student_id':student.id,'last_updated':datetime.datetime.now().strftime("%b. %d, %Y, %I:%M %p")})
+			#return HttpResponseRedirect('/feedback/week/'+str(week_num))
+		messages.error(self.request, form.errors)
+		#form.errors['student_id']=student.id
+		return JsonResponse({'success':False})
+		#return HttpResponseRedirect('/feedback/')
 
 	def add_message(self, text, mtype=25):
 		messages.add_message(self.request, mtype, text)

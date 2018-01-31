@@ -37,7 +37,7 @@
 						    		</div>
 					    		<input type="hidden" name="student" value="{{student.id}}">
 					    		<input type="hidden" name="draft" value="{{draft.id}}">
-					    		<input type="hidden" name="week_num" class="week_number_input">
+					    		<input type="hidden" name="week_num" class="week_number_input" value='{{week}}'>
 					    		
 
 					    		<div class="col-lg-7">
@@ -68,18 +68,34 @@
 									<br>
 								{% endfor %}
 							</div>
-								Last Updated: {{draft.date_updated}} <br>
+							<div class="col-md-4">
+								Last Updated: <span id="feedback_updated_{{student.id}}">{{draft.date_updated}}</span><br>
 								{% if draft.status != 1 and draft.status != 3 %}
+
 									<div style="padding-top:10px;">
 								    	<button data-toggle="tooltip" title="Save draft" type="submit" name="save" value="save" class="btn btn-success"> <span class="glyphicon glyphicon-floppy-disk"></span></button>
 								    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
 								    	<button data-toggle="tooltip" title="Send to instructor" type="submit" name="send" value="send" class="btn btn-info"><span class="glyphicon glyphicon-send"></span></button>
-								    </div>
+
+
+										     
+									 										    								    								    	
+										   	 <div id="saved_{{student.id}}" class="alert alert-success alert-dismissible" style="display:none; float:right;" role="alert">
+										   	 	  Changes Saved!
+										    </div>
+	 											<div id="error_{{student.id}}" class="alert alert-danger alert-dismissible" style="display:none; float:right;" role="alert">
+										   	 	  Error. Not Saved.
+										    </div>										    
+									
+									        </div>
+								 
+
+
 						    	{% endif %}
 								</form>
 							
 
-
+								</div>
 						</div>
 						<div class="col-lg-12">
 							
