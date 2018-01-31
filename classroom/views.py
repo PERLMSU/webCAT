@@ -175,7 +175,6 @@ def add_group(request):
 				#group.delete()
 				removed_count += 1
 			 	print(group)
-
 		else:
 			for group_num in list_group_num:
 			
