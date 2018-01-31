@@ -172,9 +172,7 @@ def add_group(request):
 			for group_index in range(len(list_group_num),(len(list_group_num)+difference)):
 				group = original_rotation_groups[group_index]
 				to_remove.append(group)
-				#group.delete()
 				removed_count += 1
-			 	print(group)
 		else:
 			for group_num in list_group_num:
 			
