@@ -42,6 +42,20 @@ $( "#createGroupsForm" ).submit(function( event ) {
 });
 
 
+$( "#nukeStudentsForm" ).submit(function( event ) {
+  //alert( "Handler for .submit() called." );
+ 
+    var confirmation_nuke = $("#nuke_em").val()
+    if (confirmation_nuke != "Nuke Them All")
+    {
+        $(this).children().closest('div.alert').show()
+        event.preventDefault();
+    }
+
+});
+
+
+
 
 $(document).on('change',".observation-dropdown", function(){
  //alert($(this).val());  // will display selected option's value

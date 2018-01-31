@@ -152,10 +152,10 @@ def add_group(request):
 		rotation = form.cleaned_data['rotation']
 		list_group_num = []
  
- 		original_rotation_groups = rotation.get_rotation_groups()
- 		original_rotation_groups_count = original_rotation_groups.count()
+		original_rotation_groups = rotation.get_rotation_groups()
+		original_rotation_groups_count = original_rotation_groups.count()
 
- 		difference = original_rotation_groups_count - number_of_groups
+		difference = original_rotation_groups_count - number_of_groups
 
  		#print(original_rotation_groups)
 		if number_of_groups != 0:
@@ -234,6 +234,22 @@ def add_student(request):
         messages.error(request, form.errors)
         return HttpResponseRedirect('/classroom/') 
 
+
+class DeleteAllStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, View):
+	""" delete goal view
+	"""
+	def post(self, *args, **kwargs):
+		try: 
+			classroom = Classroom.objects.get(id=kwargs['pk'])
+		except Exception as e:
+			messages.add_message(self.request, messages.ERROR, 'Unable to delete students from this classroom %s' % classroom)
+		finally:
+			students_to_delete = Student.objects.filter(classroom=classroom,semester=classroom.current_semester)
+			students_to_delete.delete()
+		#goal.delete()
+
+			messages.add_message(self.request, messages.SUCCESS, 'Students successfully deleted!')
+		return HttpResponseRedirect(reverse('classroom-home'))
 
 def edit_student(request, pk):
     

@@ -179,7 +179,12 @@
         <hr>
         <form class="form-horizontal" id="createGroupsForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
 
-    <div class="alert alert-warning fade in alert-dismissible" style="display:none;" role="alert">
+    <div class="alert alert-warning fade in alert-dismissible" role="alert">
+    <!--   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+        Warning! If you set the groups lower than the current amount, those groups along with their assignments / information will be deleted. 
+    </div>  
+
+    <div class="alert alert-info fade in alert-dismissible" style="display:none;" role="alert">
     <!--   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
         Please enter a number greater than or equal to zero.
     </div>        

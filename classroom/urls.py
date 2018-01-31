@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^delete_rotation/(?P<pk>\d+)/$', views.DeleteRotation.as_view(), name='classroom-delete-rotation'),
     url(r'^add_student', views.add_student, name='classroom-create-student'),
     url(r'^edit_student/(?P<pk>\d+)/$', views.edit_student, name='classroom-edit-student'),
+    url(r'^remove_students/(?P<pk>\d+)/$', views.DeleteAllStudentsView.as_view(), name='classroom-nuke-students'),
     url(r'^add_group', views.add_group, name='classroom-create-group'),
     url(r'^upload/student/$', views.UploadStudentsView.as_view(), name='classroom-upload-students'),
     url(r'^upload/group/$', views.UploadGroupsView.as_view(), name='classroom-upload-groups'),
