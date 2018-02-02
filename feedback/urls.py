@@ -4,6 +4,8 @@ from .views import *
 
 urlpatterns = [
   url(r'^$', FeedbackView.as_view(), name="feedback-home"),
+  url(r'^(?P<pk>\d+)/$', FeedbackView.as_view(), name="feedback-home-save"),
+  url(r'^student/(?P<pk>\d+)/$', FeedbackView.as_view(), name="feedback-home"),
   url(r'^week/(?P<week>\d+)/$', FeedbackView.as_view(), name="feedback-home"),
   url(r'^week/change/$', change_week_feedback, name="feedback-change-week"),
   url(r'^inbox/$', InboxView.as_view(), name="feedback-inbox"),

@@ -275,6 +275,7 @@ class FeedbackView(LoginRequiredMixin, View):
 
 	def post(self,*args, **kwargs):
 		form = EditDraftForm(self.request.POST or None)
+		student_ = Student.objects.get(id=kwargs['pk'])		
 		#raise Exception("test")
 		if form.is_valid():
 			draft_text = form.cleaned_data['draft_text']
@@ -309,18 +310,21 @@ class FeedbackView(LoginRequiredMixin, View):
 			draft.text = draft_text
 			draft.updated_ts = datetime.datetime.now()
 			
+			saved_draft = True
 			if self.request.POST.get("save"):
-				messages.add_message(self.request, messages.SUCCESS, 'Draft saved.')
+				saved_draft = True
+				#messages.add_message(self.request, messages.SUCCESS, 'Draft saved.')
 			elif self.request.POST.get("send"):
+				saved_draft=False
 				draft.status = 1
 				draft.send_to_instructor()
-				messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')   
+				# messages.add_message(self.request, messages.WARNING, 'Draft has been saved and sent to instructor for approval.')   
 			draft.save()
-			return JsonResponse({'success':True,'student_id':student.id,'last_updated':datetime.datetime.now().strftime("%b. %d, %Y, %I:%M %p")})
+			return JsonResponse({'success':True,'saved_draft':saved_draft,'student_id':student.id,'last_updated':datetime.datetime.now().strftime("%b. %d, %Y, %I:%M %p")})
 			#return HttpResponseRedirect('/feedback/week/'+str(week_num))
 		#messages.error(self.request, form.errors)
 		#form.errors['student_id']=student.id
-		return JsonResponse({'success':False})
+		return JsonResponse({'success':False,'form_errors':form.errors,'student_id':student_.id})
 		#return HttpResponseRedirect('/feedback/')
 
 	def add_message(self, text, mtype=25):

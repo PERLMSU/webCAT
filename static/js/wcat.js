@@ -27,6 +27,15 @@
 //     return("ok");
 // }
 
+
+$(document).on("click", "#save-all-button", function () {
+     // var studentId = $(this).data('id');
+     // $(".feedback-student-writer").hide();
+     // $("#"+studentId).show();
+     $( ".draft-form" ).submit();
+
+});
+
 $(document).ready(function() {
 
     $('.draft-form').ajaxForm({ 
@@ -48,18 +57,42 @@ $(document).ready(function() {
 
                 }
                 //var date = new Date(last_updated.replace(' ', 'T')+'Z');     
+                $('[id^=feedback_]').hide();
+
                 $('#feedback_'+String(student_id)).show();           
                 $('#feedback_updated_'+String(student_id)).html(last_updated);
                // $("#saved_"+String(student_id)).show();
+               if (data.responseJSON["saved_draft"] == true)
+               {
                 $("#saved_"+String(student_id)).fadeTo(2000, 500).slideUp(500, function(){
                     $("#saved_"+String(student_id)).slideUp(500);
-                });                
+                }); 
+                $("#saved_"+String(student_id)).fadeTo(2000, 500).slideUp(500, function(){
+                    $("#saved_"+String(student_id)).slideUp(500);
+                });                   
+               }
+               else
+               {
+
+                 $("#status_1_"+String(student_id)).show();
+               //  $("#draft-student-"+String(student_id)).prop('disabled',true);
+                 $("#save_send_btns_"+String(student_id)).hide();
+                 $("#feedback_"+String(student_id)+' :input').attr("disabled", true);
+                 
+                 //$("#category_grades_"+String(student_id))+' '
+                 
+
+               }
+                                  
+               
             }
             else
             {
-                $('[id^=error_]').fadeTo(2000, 500).slideUp(500, function(){
-                    $('[id^=error_]').slideUp(500);
-                });  
+                var student_id = data.responseJSON["student_id"];
+                $('#error_'+String(student_id)).fadeTo(2000, 500).slideUp(500, function(){
+                    $('#error_'+String(student_id)).slideUp(500);
+                });
+              //  alert(data.responseJSON["form_errors"]['draft_text']);  
             }             
 
         }

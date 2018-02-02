@@ -13,9 +13,15 @@
 							
 						    
 						    
-						    	<form class="draft-form" action="{% url 'feedback-home' %}" method="POST">{% csrf_token %}
+						    	<form class="draft-form" action="{% url 'feedback-home-save' student.id %}" method="POST">{% csrf_token %}
+
+						    		<div id="status_1_{{student.id}}" class="alert alert-warning" style="display:none;" role="alert">
+						    			<span class="glyphicon glyphicon-exclamation-sign"></span> This feedback draft is currently awaiting approval from the instructor.
+					    			</div>
+
+
 						    		{% if draft.status == 1 %}
-						    		<div class="alert alert-warning" role="alert">
+						    		<div  class="alert alert-warning" role="alert">
 						    			<span class="glyphicon glyphicon-exclamation-sign"></span> This feedback draft is currently awaiting approval from the instructor.
 					    			</div>
 					    			{% elif draft.status == 2 %}
@@ -40,7 +46,7 @@
 					    		<input type="hidden" name="week_num" class="week_number_input" value='{{week}}'>
 					    		
 
-					    		<div class="col-lg-7">
+					    		<div class="col-lg-7" id="category_grades_{{student.id}}">
 					    		{% for category in main_categories %}
 					    			{% with draft|get_grade_for_category:category as category_grade %}
 					    			
@@ -73,10 +79,11 @@
 								{% if draft.status != 1 and draft.status != 3 %}
 
 									<div style="padding-top:10px;">
-								    	<button data-toggle="tooltip" title="Save draft" type="submit" name="save" value="save" class="btn btn-success"> <span class="glyphicon glyphicon-floppy-disk"></span></button>
-								    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
-								    	<button data-toggle="tooltip" title="Send to instructor" type="submit" name="send" value="send" class="btn btn-info"><span class="glyphicon glyphicon-send"></span></button>
-
+										<div id="save_send_btns_{{student.id}}">
+									    	<button data-toggle="tooltip" title="Save draft" type="submit" name="save" value="save" class="btn btn-success"> <span class="glyphicon glyphicon-floppy-disk"></span></button>
+									    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
+									    	<button data-toggle="tooltip" title="Send to instructor" type="submit" name="send" value="send" class="btn btn-info"><span class="glyphicon glyphicon-send"></span></button>
+								    	</div>
 
 										     
 									 										    								    								    	
