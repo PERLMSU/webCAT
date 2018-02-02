@@ -6,7 +6,7 @@ from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, View
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.base import ContentFile
@@ -20,7 +20,8 @@ from .forms import *
 
 from userprofile.models import (
 								Profile, 
-								ConfirmationKey
+								ConfirmationKey,
+								ResetPasswordKey
 							)
 
 from classroom.models import *
@@ -38,6 +39,88 @@ def get_rotations(classroom_pk,semester_pk):
 @register.filter
 def get_num_instructors(classroom_pk):
 	return Profile.objects.filter(current_classroom=classroom_pk).count()	
+
+
+
+class ForgotPasswordView(TemplateView):
+    """ forgot password
+    """
+    template_name = 'registration/forgot_password.html'
+    context = {}
+
+    def get(self, *agrs, **kwargs):
+        self.context['form'] = ForgotPasswordForm()
+        return render(self.request, self.template_name, self.context)
+
+    def post(self, *agrs, **kwargs):
+        form = ForgotPasswordForm(self.request.POST)
+        self.context['form'] = form
+
+        if form.is_valid():
+            user = Profile.objects.get(email=form.cleaned_data['email'])
+            email = user.email
+            key = ResetPasswordKey.objects.create(user=user)
+            url_path = self.request.build_absolute_uri(reverse('reset-password', args=(key.key,)))
+            html_content = render_to_string('email/forgot_password.html',{
+                                                            'subject': 'Resetting Your Password',
+                                                            'email': email,
+                                                            'url': url_path
+                                                        })
+            subject, from_email, to = 'Password Reset', settings.EMAIL_HOST_USER, email
+            msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
+            msg.content_subtype = "html"
+            msg.send()
+            self.add_message("Email has been sent")
+            return render(self.request, self.template_name, self.context)
+        return render(self.request, self.template_name, self.context)
+
+    def add_message(self, text, mtype=25):
+        messages.add_message(self.request, mtype, text)
+
+
+class ResetPasswordView(TemplateView):
+    """ reset password
+    """
+    template_name = 'registration/reset_password.html'
+    context = {}
+
+    def get(self, *args, **kwargs):
+        self.context['form'] = ResetPasswordForm()
+
+        try:
+            key = ResetPasswordKey.objects.get(key=kwargs['key'])
+        except ResetPasswordKey.DoesNotExist:
+            key=None
+        self.context['email'] = key.user.email     
+        return render(self.request,  self.template_name, self.context)
+
+    def post(self, *args, **kwargs):
+        form = ResetPasswordForm(self.request.POST)
+
+        try:
+            key = ResetPasswordKey.objects.get(key=kwargs['key'])
+        except ResetPasswordKey.DoesNotExist:
+            key=None
+        
+        if key is not None:
+            if form.is_valid():
+                password = form.cleaned_data['password']
+                user = Profile.objects.get(email=key.user.email)
+                user.set_password(password)
+                user.save()
+                key.is_used = True
+                key.save()
+                ResetPasswordKey.objects.filter(user=user, is_used=False).delete()
+                self.add_message("Password has been updated.")
+                return HttpResponseRedirect(reverse('login'))
+            self.context['form'] = form
+          #  self.context['email'] = key.user.email
+            return render(self.request, self.template_name, self.context)
+        self.add_message("Reset password link is no longer valid.")
+        return render(self.request, self.template_name, self.context)
+
+    def add_message(self, text, mtype=25):
+        messages.add_message(self.request, mtype, text)
 
 
 

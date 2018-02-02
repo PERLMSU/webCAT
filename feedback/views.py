@@ -318,7 +318,7 @@ class FeedbackView(LoginRequiredMixin, View):
 			draft.save()
 			return JsonResponse({'success':True,'student_id':student.id,'last_updated':datetime.datetime.now().strftime("%b. %d, %Y, %I:%M %p")})
 			#return HttpResponseRedirect('/feedback/week/'+str(week_num))
-		messages.error(self.request, form.errors)
+		#messages.error(self.request, form.errors)
 		#form.errors['student_id']=student.id
 		return JsonResponse({'success':False})
 		#return HttpResponseRedirect('/feedback/')

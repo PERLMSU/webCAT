@@ -1,21 +1,6 @@
 from django.conf.urls import url
 from django.template.response import TemplateResponse
-from .views import (
-	DashboardView,
-  SettingsView,
-    ManageUsersView,
-     LoginView,
-     LogoutView,
-    # SignupView,
-    ActivationView,
-    ResendActivationView,
-    EmailConfirmationView,
-    UpdateEmailView,
-    ChangePasswordView,
-    edit_instructor,
-    add_semester,
-    DeleteInstructorView,
-)
+from .views import *
 
 
 urlpatterns = [
@@ -31,5 +16,7 @@ urlpatterns = [
 	  url(r'^activate/(?P<key>[0-9A-Za-z]+)/$', ActivationView.as_view(), name="activation"),
     url(r'^resend/activation/key/$', ResendActivationView.as_view(), name="resend-activation-key"), 
     url(r'^accounts/login/$', LoginView.as_view(), name="login"),
-    url(r'^accounts/logout/$', LogoutView.as_view(), name="logout"),     
+    url(r'^accounts/logout/$', LogoutView.as_view(), name="logout"),    
+    url(r'^forgot-password/$', ForgotPasswordView.as_view(), name="forgot-password"),
+    url(r'^reset-password/(?P<key>[0-9A-Za-z]+)/$', ResetPasswordView.as_view(), name="reset-password"), 
 ]

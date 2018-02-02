@@ -19,16 +19,45 @@ from userprofile.models import Profile
 from classroom.models import Classroom
 
 
-# class ClassroomRegistrationForm(forms.ModelForm):
-#     course = forms.CharField()
-#     description = forms.CharField(required=False)
-    
 
-#     class Meta:
-#         model = Classroom
-#         fields = ['course','description']
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField()
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not email:
+            raise forms.ValidationError('Email is required')
+
+        qs = Profile.objects.filter(email=email).exists()
+        if not qs:
+            raise forms.ValidationError("Email doesn't exist")
+        return email
 
 
+class ResetPasswordForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput({
+        'class':'input form-control',
+        'placeholder': 'Password'
+        }))
+    confirm_password = forms.CharField(widget=forms.PasswordInput({
+        'class':'input form-control',
+        'placeholder': 'Confirm password'
+        }))
+
+    def clean(self):
+        if 'password' in self.cleaned_data and 'confirm_password' in self.cleaned_data:
+            if len(self.cleaned_data['password']) < 6:
+                raise forms.ValidationError("Password must be at least %d characters long." % 6)
+            
+            if all(c.isupper() == self.cleaned_data['password'].isupper() for c in self.cleaned_data['password']):
+                raise forms.ValidationError("Password must contain at least one uppercase letter")
+
+            if all(c.isdigit() == self.cleaned_data['password'].isdigit() for c in self.cleaned_data['password']):
+                raise forms.ValidationError("Password must contain at least one digit")
+
+            if self.cleaned_data['password'] != self.cleaned_data['confirm_password']:
+                raise forms.ValidationError(_("The two password fields did not match."))
+            return self.cleaned_data
 
 class LoginForm(forms.Form):
     """ login form

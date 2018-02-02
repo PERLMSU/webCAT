@@ -1,5 +1,24 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
+.main-container {
+    height: 70%;
+}
+
+.main-container .form-forgot-password {
+    position: relative;
+    z-index: 1;
+    background: #FFFFFF;
+    max-width: 700px;
+    margin: 50px auto 50px;
+    padding-left: 45px;
+    padding-right: 45px;
+    padding-bottom: 45px;
+    padding-top: 10px;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+
 h3 {
   margin-top: 20px !important; 
   margin-bottom: 20px !important;
@@ -9,7 +28,7 @@ h3 {
   padding-bottom: 50px;
 }
 .login-page {
-  width: 360px;
+  /*width: 360px;*/
   padding: 5% 0 0;
   margin: auto;
 }
@@ -70,7 +89,7 @@ h3 {
 .container {
   position: relative;
   z-index: 1;
-  max-width: 300px;
+  max-width: 500px;
   margin: 0 auto;
 }
 .container:before, .container:after {

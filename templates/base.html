@@ -30,6 +30,7 @@
 
 <body>
 
+{% if request.user %}
 
     <div id="wrapper">
         
@@ -262,6 +263,9 @@
         </div>
         <!-- /#page-wrapper -->
     </div>
+
+
+    {% endif %}
     <!-- /#wrapper -->
 
 	</body>

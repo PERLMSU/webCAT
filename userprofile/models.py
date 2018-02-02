@@ -138,3 +138,21 @@ class ConfirmationKey(models.Model):
         return uuid4().hex
 
 
+class ResetPasswordKey(models.Model):
+    """reset password key
+    """
+    user = models.ForeignKey(Profile)
+    key = models.CharField(max_length=32, null=True, blank=True)
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "{user}:{key}".format(user=self.user, key=self.key)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.key = self._generate_key()
+        return super(ResetPasswordKey, self).save(*args, **kwargs)
+
+    def _generate_key(self):
+        return uuid4().hex
+

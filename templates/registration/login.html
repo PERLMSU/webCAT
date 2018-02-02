@@ -28,7 +28,7 @@
       <button>login</button>
 						<!-- <input type="submit" value="Log In" class="btn btn-default btn-block">  -->
 	  <input type="hidden" name="next" value="{{ next }}" />
-	  <p class="message">Forgot password? <a href="#">Click here to reset</a></p>
+	  <p class="message">Forgot password? <a href="{% url 'forgot-password' %}">Click here to reset</a></p>
 
     </form>
 
