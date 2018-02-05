@@ -14,7 +14,9 @@
 			  <thead>
 			    <tr>
 			      <th scope="col">Student</th>
-			      <th scope="col">Observations / Notes</th>
+			      <th scope="col">Observations &amp; Notes</th>
+
+
 			    <!--   <th scope="col">Custom Notes</th> -->
 			    </tr>
 			  </thead>
@@ -25,24 +27,39 @@
 					<td> {{student}}</td> 
 					<td>
 					{% with student.id|get_feedback_notes:week as notes %}
-						<ul>
-							{% for note in notes %}
-								<li>
-									<p><strong>Category: </strong> {{note.sub_category.main_category.name}} -> {{note.sub_category.name}}</p>
 
-									<p><strong>Observation:</strong> {{note.observation}}</p>
+				
+							{% for note in notes %}
+					<div class="col-lg-12">
+						<div class="col-md-11">							
+					
+									
+								<p><i class="fa fa-th-large"></i> {{note.sub_category.main_category.name}} <i class="fa fa-pie-chart"></i> {{note.sub_category.name}}</p>
+								<ul>
+									<li><p><i class="fa fa-eye"></i> {{note.observation}}</p></li>
 								
 									{% if note.note %} 
-										<p><strong>Custom Note: </strong>{{note.note}}</p> 
+										<li><p>Note: {{note.note}}</p> </li>
 									{% endif %}
+								</ul>
 									
+							</div>
+							<div class="col-md-1">
 
-								</li>
-								<br>
+								<a href="#" data-href="{% url "notes-delete-feedback" note.id %}" data-toggle="modal" data-target="#confirm-delete" value="Delete"><span class="fa fa-remove red-icon"></span></a>
+							</div>			
+</div>
+		</td>
+				</tr>
+
+				<tr>
+					<td></td>
+					<td>
+
 							{% endfor %}	
 						
-						</ul>
-					
+				
+
 					{% endwith %}	
 					</td>
 				</tr>
@@ -55,3 +72,24 @@
 		{% endfor %}	
 	</div>
 </div>
+
+
+
+
+    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Delete Note
+                </div>
+                <div class="modal-body">
+                    <span> Are you sure you want to delete this note?</span>
+
+                </div>  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-danger btn-ok">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>

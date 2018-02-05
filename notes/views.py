@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, View
@@ -33,6 +33,23 @@ def get_feedback_notes(student_pk,week):
 @register.filter
 def get_observations(subcategory):
     return Observation.objects.filter(sub_category=subcategory.id).order_by('observation_type')
+
+class DeleteNote(LoginRequiredMixin, View):
+    """ delete feedback view
+    """
+    def get(self, *args, **kwargs):
+        note_id = kwargs['pk']
+        try:
+            note = Note.objects.get(id=kwargs['pk'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, 'Unable to delete this note %s' % e)
+        finally:
+            note.delete()
+            messages.add_message(self.request, messages.SUCCESS, 'Note successfully removed!')
+      #  return JsonResponse({'note_pk':note_id})
+        return HttpResponseRedirect('/notes/')
+
+
 
 class AddFeedback(LoginRequiredMixin, TemplateView):
     """ create a feedback note for student(s)
