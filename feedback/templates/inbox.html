@@ -62,7 +62,14 @@
           <p> Status: {{noti.draft_to_approve.status}} </p>
 
           {% if noti.draft_to_approve.status == 1 %}
-          <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve-with-edits">Approve With Edits</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
+          <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a href="#" data-toggle="modal" data-target="#confirm-approve-with-edits-{{noti.draft_to_approve.id}}">Approve With Edits</a>   | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
+
+
+
+          {% include "_approve_with_edits_partial.html" %}
+
+
+
           {% endif %}
           <hr>
         </div>
@@ -93,6 +100,13 @@
 
           </p>
           <p> Status: {{noti.draft_to_approve.status}} </p>
+
+
+
+      <a href="#" data-toggle="modal" data-target="#confirm-approve-with-edits-{{noti.draft_to_approve.id}}">Approve With Edits</a>
+      {% include "_approve_with_edits_partial.html" %}
+
+
 
           {% if noti.draft_to_approve.status == 1 %}
           <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
@@ -130,6 +144,14 @@
           {% if noti.draft_to_approve.status == 1 %}
           <p><a href="#" data-href="{% url "inbox-approve-draft" noti.draft_to_approve.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a class="create-revision-notes" data-id="{{noti.draft_to_approve.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
           {% endif %}
+
+<a href="#" data-toggle="modal" data-target="#confirm-approve-with-edits-{{noti.draft_to_approve.id}}">Make Edits</a>   
+
+{% include "_approve_with_edits_partial.html" %}
+ 
+
+
+
           <hr>
         </div>
         {% endfor %}
@@ -165,6 +187,10 @@
       </div>
     </div>
   </div>
+
+
+
+
 
 <div class="modal fade" id="confirm-approve" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -513,6 +513,25 @@ def create_common_feedback(request, pk):
 
 
 
+class ApproveDraft(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
+
+	def post(self, *args, **kwargs):
+		form = ApproveEditDraftForm(self.request.POST or None)
+		if form.is_valid():
+			draft = form.cleaned_data['draft_pk']
+			draft_text = form.cleaned_data['draft_text']
+			if draft.status != 3:
+				draft.status = 3
+				draft.send_approval_notification()
+			draft.text = draft_text				
+			draft.save()
+			messages.add_message(self.request, messages.SUCCESS, 'Successfully approved with edits.')
+			return HttpResponseRedirect('/feedback/inbox/')
+			#return JsonResponse({'draft_id':draft.id,'draft_text':draft_text})
+		else:
+			messages.add_message(self.request, messages.ERROR, form.errors)
+			return JsonResponse(form.errors)
+
 
 def approve_draft(request, pk):
 	try:

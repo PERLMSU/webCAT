@@ -12,6 +12,7 @@ urlpatterns = [
   url(r'^inbox/change/$', change_week, name="inbox-change-week"),
   url(r'^inbox/week/(?P<week>\d+)/$', InboxView.as_view(), name="feedback-inbox"),
   url(r'^inbox/approve/(?P<pk>\d+)/$', approve_draft, name="inbox-approve-draft"),
+  url(r'^inbox/approve-edits/$', ApproveDraft.as_view(), name="inbox-approve-draft-edits"),
   url(r'^inbox/send/(?P<week>\d+)/$', SendDrafts.as_view(), name="inbox-send-all-drafts"),
   url(r'^inbox/revision/$', send_draft_revision, name="send-revision-notes"),
   url(r'^manager/$', FeedbackManager.as_view(), name="feedback-manager"),

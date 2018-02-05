@@ -38,6 +38,24 @@ $(document).on("click", "#save-all-button", function () {
 
 $(document).ready(function() {
 
+
+    // $('.approve-edits-form').ajaxForm({ 
+    //     //window.location.reload()
+    //     complete: function(data) {
+    //         // if (data.responseJSON["success"] == true)
+    //         // {
+
+    //         // }
+    //         alert(data);
+
+    //     }
+    // }); 
+
+
+
+
+
+
     $('.draft-form').ajaxForm({ 
         //window.location.reload()
         complete: function(data) {
