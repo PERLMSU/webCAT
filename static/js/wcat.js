@@ -57,10 +57,10 @@ $(document).ready(function() {
 
                 }
                 //var date = new Date(last_updated.replace(' ', 'T')+'Z');     
-                $('[id^=feedback_]').hide();
+               // $('[id^=feedback_]').hide();
 
-                $('#feedback_'+String(student_id)).show();           
-                $('#feedback_updated_'+String(student_id)).html(last_updated);
+             //   $('#feedback_'+String(student_id)).show();           
+                $('#feedbackupdated_'+String(student_id)).html(last_updated);
                // $("#saved_"+String(student_id)).show();
                if (data.responseJSON["saved_draft"] == true)
                {
