@@ -24,37 +24,48 @@
           <a class="back-to-main-categories" href='#'><span title="Activate Categories View" class="glyphicon glyphicon-th-large"></span></a>
         </div>
       </div>
-  </div>
+  <!-- </div> -->
 
-<div class="row">
+<!-- <div class="row"> -->
 	
 	<div class="panel panel-info">
+    <div class="panel-heading">
+        <h4>Groups</h4>
+      </div>
+        <div class="panel-body">
     	{% for group in rotation_groups %}
     		{% if group.students.all %}
-<!-- 	    		<div class="row">
+	    		<div class="row">
 	    			
-			    	<div class="panel panel-info"> -->
-			      		<div class="panel-heading">
-			      			<h5>Group {{group.group_number}}</h5>
-			      		</div> 			
-			      		<div class="panel-body">
+			<!--     	<div class="panel panel-info"> -->
+
+			      			<span style="float: left;">Group {{group.group_number}}</span>
+			  <!--     		</div> 		 -->	
+			      	
 			      				
 			    		{% for student in group.students.all %}
 
-				    		<div class="row student-checkboxes">
-					    		<div class="col-md-12 padding-bottom-sm">
+
+				    		<div class="student-checkboxes col-md-2">
+                <!--   <div class="col-md-3"> -->
+                  <label style="width:100%">
+					    		<div class="padding-bottom-sm">
 									<input class="student-checkbox float-left" type="checkbox" name="student_name_{{forloop.counter}}" value="{{student.id}}"> </input>						    			
 		    						<span class="small-print"> {{student}}</span> 
 						   		</div> 
+                    </label>
+            <!--       </div> -->
 						   	</div>
+              
 			    		{% endfor %}
-					    			<!-- 	</div> -->
-		    			</div>
+					    				</div>
+		    		
 
 
 			    {% endif %}
     	<!-- 	</div> -->
-		{% endfor %}	    	
+		{% endfor %}	 
+      </div>   	
 <!-- 	</div> -->
 	</div>
 </div>

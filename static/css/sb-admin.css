@@ -6,6 +6,18 @@
 
 /* Global Styles */
 
+input[type='checkbox'] {
+    -webkit-appearance:none;
+    width:30px;
+    height:30px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #555;
+}
+input[type='checkbox']:checked {
+    background: #abd;
+}
+
 :focus{
   outline:none;
 }
@@ -118,6 +130,11 @@
   /*  height:200px;*/
 }
 
+.sub-category-btn:hover
+{
+  text-decoration: none;
+}
+
 .sub-category-btn {
 
     width: 100%;
@@ -127,7 +144,7 @@
   padding: 25px 12px;
   margin-bottom: 0;
   margin-top: 10px;
-  font-size: 15px;
+  font-size: 25px;
   font-weight: normal;
   line-height: 1.42857143;
   text-align: center;
@@ -148,10 +165,10 @@
 .main-category-btn {
 
     width: 100%;
-    height: 200px;
+    height: 150px;
     vertical-align: center;
   display: inline-block;
-  padding: 60px 12px;
+  padding: 40px 12px;
   margin-bottom: 0;
   font-size: 35px;
   font-weight: normal;
