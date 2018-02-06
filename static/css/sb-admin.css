@@ -56,6 +56,8 @@
 }
 
 .navbar-webcat .navbar-nav {
+/*  width: 100%;*/
+  padding-bottom: 20px;
   background-color: #222e51;
 
 }
@@ -224,7 +226,7 @@ body {
 
 @media(min-width:768px) {
     #wrapper {
-        padding-left: 225px;
+        padding-left: 130px;
     }
 
     #page-wrapper {
@@ -306,9 +308,9 @@ ul.alert-dropdown {
     .side-nav {
         position: fixed;
         top: 51px;
-        left: 225px;
-        width: 225px;
-        margin-left: -225px;
+        left: 130px;
+        width: 130px;
+        margin-left: -130px;
         border: none;
         border-radius: 0;
         overflow-y: auto;
@@ -319,7 +321,8 @@ ul.alert-dropdown {
     }
 
     .side-nav>li>a {
-        width: 225px;
+      font-size:12px;
+        width: 130px;
     }
 
     .side-nav li a:hover,
