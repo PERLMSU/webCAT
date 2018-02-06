@@ -42,11 +42,11 @@
 			      			<span style="float: left;">Group {{group.group_number}}</span>
 			  <!--     		</div> 		 -->	
 			      	
-			      				
+			      				<div class="col-md-12">
 			    		{% for student in group.students.all %}
 
 
-				    		<div class="student-checkboxes col-md-2">
+				    		<div class="student-checkboxes col-md-3">
                 <!--   <div class="col-md-3"> -->
                   <label style="width:100%">
 					    		<div class="padding-bottom-sm">
@@ -56,10 +56,12 @@
                     </label>
             <!--       </div> -->
 						   	</div>
-              
+           
 			    		{% endfor %}
+                
 					    				</div>
-		    		
+                        </div>
+		    		 <hr>
 
 
 			    {% endif %}
