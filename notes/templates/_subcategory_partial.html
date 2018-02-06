@@ -12,7 +12,7 @@
             <div class="col-lg-12">
                 <div class="container">
                     <h5> Subcategories</h5>
-                    <a href="#" style="padding-bottom:10px;" class="back-to-main-categories"> <span class="fa fa-arrow-left"></span> Go Back</a> 
+                    <a href="#/" style="padding-bottom:10px;" class="back-to-main-categories"> <span class="fa fa-arrow-left"></span> Go Back</a> 
                 </div>
             </div>
             
@@ -20,7 +20,7 @@
               {% if categories %}   
                 {% for category in categories %}   
                 <div class="col-lg-6">
-                    <a href="#" id="{{category.id}}" class="sub-category-btn btn-default">{{category.name}}</a>
+                    <a href="#/" id="{{category.id}}" class="sub-category-btn btn-default">{{category.name}}</a>
                 
 
                     <div class="no-display note-container" id="note_taker_{{category.id}}">
@@ -46,17 +46,18 @@
                                     {% for observation in observations %}
 
                                     {% if observation.get_observation_type == "Negative" %}
-                                       <div style="background-color: #f0808052;">
-                                            <label class="radio"><input type="radio" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                       <div class="note-radio" style="background-color: #f0808052;">
+                                            <label><input type="radio" class="radio-custom" value="{{observation.id}}" name="observation">{{observation}}</label>
                                        </div>
                                     {% elif  observation.get_observation_type == "Positive" %}
-                                     <div style="background-color: #90ee905e;">
-                                       <label class="radio"><input type="radio" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                     <div class="note-radio"  style="background-color: #90ee905e;">
+                                      <label><input type="radio" class="radio-custom"  value="{{observation.id}}" name="observation"/>{{observation}}</label>  
                                    </div>
                                    {% else %}
+                                   <div class="note-radio">
                                    <!-- <div style="background-color: lightgrey"> -->
-                                       <label class="radio"><input type="radio" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
-                                 <!--   </div> -->
+                                       <label><input type="radio" class="radio-custom" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                   </div>
                                    {% endif %}
                                     {% endfor %}
 
@@ -67,8 +68,8 @@
                                     <!--  <div class="col-lg-12"> -->
                                     <div class="row">
                                         <!-- <label for="note">Custom Note: </label> -->
-                                        <input name="note" style="width:70%; float:left;" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter customized note here"></input>  
-                                        <input style="margin-left:15px;" type="submit" value="Save" class="btn btn-success"/>    
+                                        <input name="note" style="width:100%;" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter customized note here"></input>  
+                                        <input style="width: 100%; line-height: 2.5;" type="submit" value="Save" class="btn btn-lg btn-success"/>    
                                     </div>      
                                    <!--   <div class="col-lg-3">  --> 
                                     

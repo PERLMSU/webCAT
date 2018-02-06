@@ -27,6 +27,11 @@
 //     return("ok");
 // }
 
+$('.note-radio').on('click', function() {
+    $(this).find(':radio').prop('checked', true);
+
+});
+
 
 $(document).on("click", "#save-all-button", function () {
      // var studentId = $(this).data('id');

@@ -64,7 +64,11 @@
                                   {% for noti in notifications %}
                        
                         <li class="message-preview">
+                            {% if user.is_superuser %}
                              <a href="/feedback/inbox/week/{{noti.draft_to_approve.week_num}}">   
+                            {% else %}
+                            <a href="/feedback/week/{{noti.draft_to_approve.week_num}}">   
+                            {% endif %}
                                 <div class="media">   
                                                             
                                     <span class="pull-left">
@@ -78,7 +82,9 @@
                                             <br>
                                             Updated: {{noti.updated_ts}}
                                         </p>
-                                        <p>WEEK {{noti.draft_to_approve.week_num}}
+                                        <p>Week {{noti.draft_to_approve.week_num}}
+                                            <p> Student: {{noti.draft_to_approve.student}}</p>
+
                                         <p>{{noti.notification }}
                                             </p>
                                     </div> 

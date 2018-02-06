@@ -80,7 +80,7 @@ class Rotation(models.Model):
         #     new_rotation_group = RotationGroup(rotation=rotation,group=group)        
 
     def __str__(self):
-        return "Duration: {}-{} Dates: {} - {}".format(self.start_week,self.end_week,str(self.get_start_date()),str(self.get_end_date()))
+        return "Weeks: {}-{} Dates: {} - {}".format(self.start_week,self.end_week,str(self.get_start_date()),str(self.get_end_date()))
     #instructor = models.ForeignKey(settings.AUTH_USER_MODEL)
     def get_start_date(self):
         time_diff = timedelta(weeks=self.start_week)

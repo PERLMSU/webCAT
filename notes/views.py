@@ -142,7 +142,7 @@ class NotesView(LoginRequiredMixin, TemplateView):
 			self.context['sub_categories'] = sub_categories
 			return render(self.request, self.template_name, self.context)
 		else:
-			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
 			return HttpResponseRedirect(reverse('dash-home')) 			
 
 	def add_message(self, text, mtype=25):

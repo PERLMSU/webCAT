@@ -224,7 +224,7 @@ class FeedbackManager(SuperuserRequiredMixin, TemplateView):
 			self.context['manager_view'] = True
 			return render(self.request, self.template_name, self.context)
 		else:
-			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
 			return HttpResponseRedirect(reverse('dash-home'))  				
 
 
@@ -270,7 +270,7 @@ class FeedbackView(LoginRequiredMixin, View):
 
 			return render(self.request, self.template_name, self.context)
 		else:
-			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
 			return HttpResponseRedirect(reverse('dash-home'))  		
 
 	def post(self,*args, **kwargs):
@@ -356,7 +356,7 @@ class InboxView(SuperuserRequiredMixin,TemplateView):
 			self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
 			return render(self.request, self.template_name, self.context)
 		else:
-			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
 			return HttpResponseRedirect(reverse('dash-home')) 			
 
 	def add_message(self, text, mtype=25):
@@ -393,7 +393,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
 			return render(self.request, self.template_name, self.context)
 		else:
-			messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+			messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
 			return HttpResponseRedirect(reverse('dash-home'))
 
 	def add_message(self, text, mtype=25):

@@ -113,6 +113,8 @@ class Draft(models.Model):
         try:
             notification = Notification.objects.get(draft_to_approve = self)
             notification.updated_ts = datetime.datetime.now()
+            notification.user = instructor
+            notification.notification = "This draft has been submitted for approval. Please review."
             notification.save()
         except (Notification.DoesNotExist):
             notification = Notification.objects.create(
@@ -124,6 +126,7 @@ class Draft(models.Model):
     def add_revision_notes(self, notes):
         try:
             notification = Notification.objects.get(draft_to_approve = self)
+            notification.user = self.owner
             notification.notification = "This draft has revision notes: " + notes 
             notification.updated_ts = datetime.datetime.now()
             notification.save()
@@ -138,6 +141,7 @@ class Draft(models.Model):
         try: 
             notification = Notification.objects.get(draft_to_approve = self)
             notification.notification = "This draft has been approved"
+            notification.user = self.owner
             notification.updated_ts = datetime.datetime.now()
             notification.save()            
         except (Notification.DoesNotExist):
@@ -171,6 +175,11 @@ class Draft(models.Model):
     def get_grades(self):
         grades = Grade.objects.filter(draft=self)
         return grades
+
+    class Meta:    
+        unique_together = ('owner', 'student','week_num')   
+
+
 
 class Grade(models.Model):
     grade = models.DecimalField(max_digits=3, decimal_places=2)

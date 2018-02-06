@@ -68,6 +68,11 @@ def get_rotation_groups(rotation_pk):
 def get_rotation_groups_by_instructor(rotation_groups,instructor_pk):
     return rotation_groups.filter(instructor = instructor_pk).order_by('group_number')
 
+@register.filter
+def get_rotation_groups_by_instructor_home(instructor, classroom):
+    week = classroom.current_week
+    return RotationGroup.objects.filter(rotation__start_week__lte=week,rotation__end_week__gte=week, instructor = instructor,rotation__semester=classroom.current_semester,rotation__classroom=classroom).order_by('group_number')
+
 def register_class(request):
     form = AddClassroomForm(request.POST or None)
     if form.is_valid():
@@ -413,7 +418,7 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
                 'upload_view': True,
             }) 
         else:
-            messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+            messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
             return HttpResponseRedirect(reverse('dash-home'))                 
 
     def post(self, *args, **kwargs):
@@ -537,7 +542,7 @@ class UploadGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView)
                 'upload_view': True,
             }) 
         else:
-            messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+            messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
             return HttpResponseRedirect(reverse('dash-home'))       
 
     def post(self, *args, **kwargs):
@@ -643,7 +648,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
                 'upload_view': False,
             })
         else:
-            messages.add_message(self.request, messages.WARNING, 'Please register a classroom.')            
+            messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
             return HttpResponseRedirect(reverse('dash-home'))             
 
 

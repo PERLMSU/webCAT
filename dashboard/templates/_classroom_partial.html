@@ -5,17 +5,16 @@
         <div class="col-lg-5">
 
 
-            {% if classroom == user.current_classroom %}
-            <h3> Current Classroom</h3>
-            {% else %}
-            <h3> Inactive Classroom</h3>
-            {% endif %}
+
+
              <div class="padding-lr">
                 <strong>
-                <span class="fa fa-institution"></span><span> {{classroom}}</span>
+                <h3><span class="fa fa-institution"></span><span> {{classroom}}</span></h3>
                 <span>{{classroom.description}}</span>
+                {% if user.is_superuser %}
                 | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
                 </strong>
+                {% endif %}
             </div>
         </div>
             <div class="col-lg-4">
@@ -29,6 +28,7 @@
             </div>
 
 
+{% if user.is_superuser %}
  <div class="col-lg-8">
               {% with classroom.id|get_rotations:classroom.current_semester.id as rotations %}
                     {% if rotations %}
@@ -113,5 +113,23 @@
         
             </form>   
         </div>               
+{% endif %}
+ <div class="col-lg-8">
+    <h3><i class="fa fa-rocket"></i> {{request.user.get_short_name}}'s Groups </h3>
+<p>({{classroom.get_current_rotation}})</p>
+{% for group in request.user|get_rotation_groups_by_instructor_home:classroom %}
+      {% if group.students.all %}
+      <div class="col-md-4">
+                <h5> Group {{group.group_number}}</h5> 
+               
+                   {% for student in group.students.all %}
+                        <p>{{student.first_name}} {{student.last_name}}</p>
+                   {% endfor %}
+        </div>
+            
+   {% endif %}
+{% endfor %}  
+
+ </div>
 
 </div>

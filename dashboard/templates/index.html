@@ -8,7 +8,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">
-            Dashboard <small>Statistics Overview</small>
+            Dashboard <small>Overview</small>
         </h1>
         <ol class="breadcrumb">
             <li class="active">
@@ -39,8 +39,11 @@
             <button class="btn btn-md btn-warning" data-toggle="modal" data-target="#register-new-classroom"><i class="fa fa-fw fa-university"></i>   Register Classroom</button>
                         <button class="btn btn-md btn-primary margin-right" data-toggle="modal" data-target="#registerSemester"><i class="fa fa-graduation-cap"></i> Register Semester</button>
 <hr>
+
+{% endif %}
+
 <div class="panel panel-default">
-  <div class="panel-heading"><h3>Classrooms</h3>
+  <div class="panel-heading"><h3>{% if user.is_superuser %} Classrooms {% else %} Classroom - {{current_classroom}} {% endif %}</h3>
             
   </div>
 
@@ -56,10 +59,13 @@
 
         {% endwith %}
 
+        {% else %}
+        <h3> You are not assigned to any classroom yet.</h3>
+
         {% endif %}
 
 
-        {% if classrooms %}
+        {% if classrooms and user.is_superuser %}
 
         <!--     <h3> All Classrooms</h3> -->
 
@@ -81,8 +87,6 @@
 
 
             {% endfor %}
-        {% else %}
-        <h3> No classrooms registered. </h3>
 
         {% endif %}
         <!--    </div>  -->                  
@@ -122,7 +126,6 @@
     </div>
 </div>        --> 
 
-{% endif %}
 
 
 <div class="row">
