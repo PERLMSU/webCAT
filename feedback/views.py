@@ -331,7 +331,7 @@ class FeedbackView(LoginRequiredMixin, View):
 		messages.add_message(self.request, mtype, text)
 
 
-class InboxView(LoginRequiredMixin,TemplateView):
+class InboxView(SuperuserRequiredMixin,TemplateView):
 	template_name = "inbox.html"
 	context = {}	
 

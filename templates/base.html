@@ -95,10 +95,11 @@
                                   
 
 
-
+                        {% if user.is_superuser %}
                         <li class="message-footer">
                             <a href="{% url "feedback-inbox" %}">Read All Messages</a>
                         </li>
+                        {% endif %}
                     </ul>
                 
                 </li>
@@ -136,9 +137,13 @@
                         <li>
                             <a href="{% url "user-details" request.user.id %}"><i class="fa fa-fw fa-user"></i> Profile</a>
                         </li>
+
+                        {% if user.is_superuser %}
                         <li>
                             <a href="{% url "feedback-inbox" %}"><i class="fa fa-fw fa-envelope"></i> Inbox </a>
                         </li>
+
+                        {% endif %}
                         <li>
                             <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
                         </li>
@@ -151,26 +156,26 @@
             </ul>
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <ul class="nav navbar-nav side-nav">
-                    <li class="active">
+                <ul class="nav top-nav">
+          <!--           <li class="active">
                         <a href="{% url "dash-home" %}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
-                   
+                    -->
                     {% if user.is_superuser %}
                     <li>
-                        <a href="{% url "dash-manage-users" %}"><i class="fa fa-fw fa-user"></i> Manage Users</a>
+                        <a href="{% url "dash-manage-users" %}"><i class="fa fa-fw fa-user"></i> Users</a>
                     </li>
                     <li>
                         <a href="{% url "classroom-home" %}"><i class="fa fa-fw fa-university"></i> Classroom</a>
                     </li>
 
-                    {% endif %}
+                 
                     <li>
                         <a href="{% url "feedback-inbox" %}"><i class="fa fa-fw fa-envelope"></i> Inbox <span class="badge">{{notifications.count}}</span></a>
                     </li>  
-                    <li>
-                        <a href="{% url "feedback-home" %}"><i class="fa fa-fw fa-edit"></i> Feedback Writer</a> 
-                    </li>                            
+
+                       {% endif %}
+                           
                     
          <!--           
                     <li>
@@ -187,20 +192,28 @@
 <!--                     <li>
                         <a href="{% url "dash-feedback"}"><i class="fa fa-fw fa-edit"></i> Feedback <i class="fa fa-fw fa-caret-down"></i></a>
                     </li> -->
-                    <li>
-                        <a href="{% url "notes-home" %}"><i class="fa fa-fw fa-file"></i> Note Taker</a>
-                    </li>     
+  
 
+                      {% if user.is_superuser %}
                     <li>
-                        <a href="{% url "feedback-categories" %}"><i class="fa fa-fw fa-th-large"></i> Category Manager</a>
+                        <a href="{% url "feedback-categories" %}"><i class="fa fa-fw fa-th-large"></i> Category</a>
                     </li>  
 
                     <li>
-                        <a href="{% url "feedback-manager" %}"><i class="fa fa-fw fa-list-ul"></i> Feedback Manager</a>
-                    </li>                                                            
+                        <a href="{% url "feedback-manager" %}"><i class="fa fa-fw fa-list-ul"></i> Feedback</a>
+                    </li>  
+                    {% endif %}   
+
                     <li>
+                        <a href="{% url "notes-home" %}"><i class="fa fa-fw fa-file"></i> Note Taker</a>
+                    </li>   
+
+                    <li>
+                        <a href="{% url "feedback-home" %}"><i class="fa fa-fw fa-edit"></i> Feedback Writer</a> 
+                    </li>                                                        
+                 <!--    <li>
                         <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
-                    </li>
+                    </li> -->
 
 <!--                     <li>
                         <a href="bootstrap-elements.html"><i class="fa fa-fw fa-desktop"></i> Bootstrap Elements</a>

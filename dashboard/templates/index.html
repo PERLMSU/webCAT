@@ -34,6 +34,8 @@
         </div>
     </div>
 </div> -->
+
+{% if user.is_superuser %}
             <button class="btn btn-md btn-warning" data-toggle="modal" data-target="#register-new-classroom"><i class="fa fa-fw fa-university"></i>   Register Classroom</button>
                         <button class="btn btn-md btn-primary margin-right" data-toggle="modal" data-target="#registerSemester"><i class="fa fa-graduation-cap"></i> Register Semester</button>
 <hr>
@@ -120,7 +122,7 @@
     </div>
 </div>        --> 
 
-
+{% endif %}
 
 
 <div class="row">
