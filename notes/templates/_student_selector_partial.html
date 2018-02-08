@@ -28,7 +28,7 @@
 
 <!-- <div class="row"> -->
 	
-	<div class="panel panel-info">
+	<div id="groups-view" class="panel panel-info">
     <div class="panel-heading">
         <h4>Groups</h4>
       </div>
@@ -39,14 +39,14 @@
 	    			
 			<!--     	<div class="panel panel-info"> -->
 
-			      			<span style="float: left;">Group {{group.group_number}}</span>
+			      			<span style="float: left;">{{group.group_number}}</span>
 			  <!--     		</div> 		 -->	
 			      	
-			      				<div class="col-md-12">
+			      				<div class="col-xs-12">
 			    		{% for student in group.students.all %}
 
 
-				    		<div class="student-checkboxes col-md-3">
+				    		<div class="student-checkboxes col-xs-3">
                 <!--   <div class="col-md-3"> -->
                   <label style="width:100%">
 					    		<div class="padding-bottom-sm">

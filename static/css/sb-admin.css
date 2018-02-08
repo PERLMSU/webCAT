@@ -6,10 +6,16 @@
 
 /* Global Styles */
 
+.margin-bottom-sm
+{
+  margin-bottom: 10px;
+  margin-top:5px;
+}
+
 input[type='checkbox'] {
     -webkit-appearance:none;
-    width:30px;
-    height:30px;
+    width:25px;
+    height:25px;
     background:white;
     border-radius:5px;
     border:2px solid #555;
@@ -31,6 +37,7 @@ input[type='checkbox']:checked {
   background:#fff;
   width:50px;
   height:50px;
+  float:left;
   border-radius:50%;
 }
 .radio-custom:checked{
@@ -45,8 +52,11 @@ input[type='checkbox']:checked {
 
 .note-radio {
   font-size: 20px;
-  line-height: 2.5;
+  line-height: 1.5;
   width:100%;
+  margin-bottom:5px;
+  border-radius:15px;
+  display: inline-block;
 }
 
 .note-radio:hover
@@ -64,8 +74,8 @@ input[type='checkbox']:checked {
 }
 .small-print
 {
-  font-size:15px;
-  padding-bottom:5px;
+  font-size:12px;
+ /* padding-bottom:5px;*/
 }
 
 .highlight {
@@ -169,7 +179,7 @@ input[type='checkbox']:checked {
     vertical-align: center;
   display: inline-block;
   padding: 40px 12px;
-  margin-bottom: 0;
+  margin-bottom: 20px;
   font-size: 35px;
   font-weight: normal;
   line-height: 1.42857143;

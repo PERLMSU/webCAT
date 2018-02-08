@@ -2,7 +2,7 @@
 
 
 {% for main_category_pk, categories in sub_categories.items %}
- <div class="col-lg-10">
+ <div class="col-lg-9">
     <div class="no-display" id="sub_categories_{{main_category_pk}}">
        <!--  <a href="#" class="back-to-main-categories"> Back </a> -->
 
@@ -26,7 +26,7 @@
                 
 
                     <div class="no-display note-container" id="note_taker_{{category.id}}">
-                        <div class="col-lg-12" style="background-color:#efefef;">
+                        <div style="background-color:#efefef;">
                             <form class="noteForm" method="post" action="{% url "notes-add-feedback" %}">
                                 {% csrf_token %}
 
@@ -37,40 +37,41 @@
                                 <input name="week_num" type="hidden" value='{{week}}'>
                                 
 
-                                <div class="form-group padding-lr">
+                                
                                 {% with category|get_observations as observations %}
-
-                                    {% if not observations %}
-                                        <!-- <p> No observations to choose from. </p>   -->
-                                    {% else %}
-                                     <!--    <p> Existing Observations for this subcategory: </p>   -->             
-                                    {% endif %}
+                               
+          
+                                    {% if observations  %}
+                                       <div class="form-group">
                                     {% for observation in observations %}
 
                                     {% if observation.get_observation_type == "Negative" %}
                                        <div class="note-radio" style="background-color: #f0808052;">
-                                            <label><input type="radio" class="radio-custom" value="{{observation.id}}" name="observation">{{observation}}</label>
+                                            <input type="radio" class="radio-custom" value="{{observation.id}}" name="observation">
+                                            <span>{{observation}}</span>
                                        </div>
                                     {% elif  observation.get_observation_type == "Positive" %}
                                      <div class="note-radio"  style="background-color: #90ee905e;">
-                                      <label><input type="radio" class="radio-custom"  value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                      <input type="radio" class="radio-custom"  value="{{observation.id}}" name="observation"/><span>{{observation}} </span>
                                    </div>
                                    {% else %}
                                    <div class="note-radio">
                                    <!-- <div style="background-color: lightgrey"> -->
-                                       <label><input type="radio" class="radio-custom" value="{{observation.id}}" name="observation"/>{{observation}}</label>  
+                                       <input type="radio" class="radio-custom" value="{{observation.id}}" name="observation"/>{{observation}}
                                    </div>
                                    {% endif %}
                                     {% endfor %}
-
+                                     </div>
+                                     {% endif %}
+                                     
                                 {% endwith %}
-                            </div>
+                           
 
-                                <div class="form-group padding-lr">
+                                <div class="padding-lr">
                                     <!--  <div class="col-lg-12"> -->
                                     <div class="row">
                                         <!-- <label for="note">Custom Note: </label> -->
-                                        <input name="note" style="width:100%;" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter customized note here"></input>  
+                                        <input name="note" type="text" class="form-control margin-bottom-sm" aria-describedby="emailHelp" placeholder="Enter customized note here"></input>  
                                         <input style="width: 100%; line-height: 2.5;" type="submit" value="Save" class="btn btn-lg btn-success"/>    
                                     </div>      
                                    <!--   <div class="col-lg-3">  --> 

@@ -39,6 +39,13 @@ $(document).on("click", "#save-all-button", function () {
      // $("#"+studentId).show();
      $( ".draft-form" ).submit();
 
+    $("#all_saved").fadeTo(2000, 500).slideUp(500, function(){
+        $("#all_saved").slideUp(500);
+    }); 
+    // $("#all_saved").fadeTo(2000, 500).slideUp(500, function(){
+    //     $("#all_saved").slideUp(500);
+    // });      
+
 });
 
 $(document).ready(function() {
@@ -518,6 +525,7 @@ $(document).on("click", ".all-notes-view", function () {
      $('[id^="sub_categories_"]').hide();
      $('#main_categories').hide();
      $('#all_notes_view').show();
+     $('#groups-view').hide();
 });
 
 $(document).on("click", ".main-category-btn", function () {
@@ -533,6 +541,7 @@ $(document).on("click", ".back-to-main-categories", function () {
      $('#main_categories').show();
      $('#all_notes_view').hide();
      $('[id^="sub_categories_"]').hide();
+     $('#groups-view').show();
      // $(".modal-body #categoryName").html( categoryName );
 });
 

@@ -288,7 +288,10 @@ class FeedbackView(LoginRequiredMixin, View):
 			# except Draft.DoesNotExist:
 			# 	draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)
 			if not draft:
-				draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)				
+				try:
+					draft = Draft.objects.get(owner=self.request.user, student = student, week_num = week_num)
+				except Draft.DoesNotExist:
+					draft = Draft.objects.create(owner = self.request.user, student = student, status=0, week_num=week_num)				
 
 			# grades_values = dict([(name.encode('ascii','ignore')[6:],value.encode('ascii','ignore')) for name, value in self.request.POST.items()
 			# 	if name.startswith('grade_')])
@@ -386,7 +389,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 		if classroom != None:
 			self.context['create_main_category_form'] = AddCategoryForm()
 			self.context['create_sub_category_form'] = AddSubCategoryForm()
-			self.context['create_feedback_form'] = AddFeedbackPieceForm()
+			#self.context['create_feedback_form'] = AddFeedbackPieceForm()
 			# self.context['main_categories'] = Category.objects.filter(classroom=classroom)
 			self.context['main_categories'] = Category.objects.all()
 
@@ -416,100 +419,100 @@ def create_subcategory(request, pk):
 		messages.error(request, form.errors)
 		return HttpResponseRedirect('/feedback/categories/') 
 
-def create_common_feedback(request, pk):
+# def create_common_feedback(request, pk):
 
-	form = AddFeedbackPieceForm(request.POST or None)
-	#raise Exception("yay")
-	if form.is_valid():
-		feedback = form.cleaned_data['feedback']
-		observation = form.cleaned_data['observation']
-		explanation = form.cleaned_data['feedback_explanation']
+# 	form = AddFeedbackPieceForm(request.POST or None)
+# 	#raise Exception("yay")
+# 	if form.is_valid():
+# 		feedback = form.cleaned_data['feedback']
+# 		observation = form.cleaned_data['observation']
+# 		explanation = form.cleaned_data['feedback_explanation']
 
-		if form.cleaned_data['observation_type']:
-			observation_type = int(form.cleaned_data['observation_type'])
-		else:
-			observation_type = None
+# 		if form.cleaned_data['observation_type']:
+# 			observation_type = int(form.cleaned_data['observation_type'])
+# 		else:
+# 			observation_type = None
 
-		if observation_type == -1:
-			observation_type = None
+# 		if observation_type == -1:
+# 			observation_type = None
 		
 
-		#If selected from prepopulated / preexisting
-		feedback_object = form.cleaned_data['feedback_pk']
-		observation_object = form.cleaned_data['observation_pk']
-		explanation_object = form.cleaned_data['feedback_explanation_pk']
+# 		#If selected from prepopulated / preexisting
+# 		feedback_object = form.cleaned_data['feedback_pk']
+# 		observation_object = form.cleaned_data['observation_pk']
+# 		explanation_object = form.cleaned_data['feedback_explanation_pk']
 
-		subcategory = form.cleaned_data['subcategory_pk']
+# 		subcategory = form.cleaned_data['subcategory_pk']
 
-		# observation_object = None
-		# feedback_object = None
-		# explanation_object = None
+# 		# observation_object = None
+# 		# feedback_object = None
+# 		# explanation_object = None
 
-		# #raise Exception("wtf")
-		# try:
-		# 	subcategory = SubCategory.objects.get(id=subcategory_pk)
-		# except SubCategory.DoesNotExist:
-		# 	subcategory = None
-
-
-		if observation_object == None and observation:
-			#Create observation
-			try:
-				new_observation = Observation(sub_category=subcategory, observation = observation, observation_type = observation_type )
-				new_observation.save()	
-				observation_object = new_observation					
-				messages.add_message(request, messages.SUCCESS, 'Successfully added new observation')
-			except Exception as e:
-				messages.add_message(request, messages.ERROR, 'Unable to create this observation %s' % e)				
-		# else:
-		# 	try:
-		# 		observation_object = Observation.objects.get(id=observation_pk)
-		# 	except Observation.DoesNotExist:
-		# 		observation_object = None			
-
-		#raise Exception("wat")
-		if feedback_object == None and (feedback and observation_object != None):
-			#Create observation
-			try:
-				new_feedback = Feedback(observation=observation_object, feedback = feedback,sub_category=subcategory)
-				new_feedback.save()	
-				feedback_object = new_feedback					
-				messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback')
-			except Exception as e:
-				messages.add_message(request, messages.ERROR, 'Unable to create this feedback %s' % e)		
-		# else:
-		# 	try:
-		# 		feedback_object = Feedback.objects.get(id=feedback_pk)
-		# 	except Feedback.DoesNotExist:
-		# 		feedback_object = None					
-
-		if explanation_object == None and (explanation and feedback_object != None):
-			#Create observation
-			try:
-				new_explanation = Explanation(feedback=feedback_object, feedback_explanation = explanation,sub_category=subcategory)
-				new_explanation.save()	
-				explanation_object = new_explanation					
-				messages.add_message(request, messages.SUCCESS, 'Successfully added new explanation')
-			except Exception as e:
-				messages.add_message(request, messages.ERROR, 'Unable to create this explanation %s' % e)		
-		# else:
-		# 	try:
-		# 		explanation_object = Explanation.objects.get(id=explanation_pk)
-		# 	except Explanation.DoesNotExist:
-		# 		explanation_object = None	
+# 		# #raise Exception("wtf")
+# 		# try:
+# 		# 	subcategory = SubCategory.objects.get(id=subcategory_pk)
+# 		# except SubCategory.DoesNotExist:
+# 		# 	subcategory = None
 
 
-		try:
-			new_fb_piece = FeedbackPiece(sub_category=subcategory, observation = observation_object, feedback = feedback_object, feedback_explanation = explanation_object)
-			new_fb_piece.save()
-			messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback piece!')
-		except Exception as e:
-			messages.add_message(request, messages.ERROR, 'Unable to create this feedback piece %s' % e)				
-		return HttpResponseRedirect('/feedback/categories/')
+# 		if observation_object == None and observation:
+# 			#Create observation
+# 			try:
+# 				new_observation = Observation(sub_category=subcategory, observation = observation, observation_type = observation_type )
+# 				new_observation.save()	
+# 				observation_object = new_observation					
+# 				messages.add_message(request, messages.SUCCESS, 'Successfully added new observation')
+# 			except Exception as e:
+# 				messages.add_message(request, messages.ERROR, 'Unable to create this observation %s' % e)				
+# 		# else:
+# 		# 	try:
+# 		# 		observation_object = Observation.objects.get(id=observation_pk)
+# 		# 	except Observation.DoesNotExist:
+# 		# 		observation_object = None			
 
-	messages.add_message(request, messages.ERROR, form.errors)
-	return HttpResponseRedirect('/feedback/categories/')			
-			#new_feedback_piece = FeedbackPiece.create()
+# 		#raise Exception("wat")
+# 		if feedback_object == None and (feedback and observation_object != None):
+# 			#Create observation
+# 			try:
+# 				new_feedback = Feedback(observation=observation_object, feedback = feedback,sub_category=subcategory)
+# 				new_feedback.save()	
+# 				feedback_object = new_feedback					
+# 				messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback')
+# 			except Exception as e:
+# 				messages.add_message(request, messages.ERROR, 'Unable to create this feedback %s' % e)		
+# 		# else:
+# 		# 	try:
+# 		# 		feedback_object = Feedback.objects.get(id=feedback_pk)
+# 		# 	except Feedback.DoesNotExist:
+# 		# 		feedback_object = None					
+
+# 		if explanation_object == None and (explanation and feedback_object != None):
+# 			#Create observation
+# 			try:
+# 				new_explanation = Explanation(feedback=feedback_object, feedback_explanation = explanation,sub_category=subcategory)
+# 				new_explanation.save()	
+# 				explanation_object = new_explanation					
+# 				messages.add_message(request, messages.SUCCESS, 'Successfully added new explanation')
+# 			except Exception as e:
+# 				messages.add_message(request, messages.ERROR, 'Unable to create this explanation %s' % e)		
+# 		# else:
+# 		# 	try:
+# 		# 		explanation_object = Explanation.objects.get(id=explanation_pk)
+# 		# 	except Explanation.DoesNotExist:
+# 		# 		explanation_object = None	
+
+
+# 		try:
+# 			new_fb_piece = FeedbackPiece(sub_category=subcategory, observation = observation_object, feedback = feedback_object, feedback_explanation = explanation_object)
+# 			new_fb_piece.save()
+# 			messages.add_message(request, messages.SUCCESS, 'Successfully added new feedback piece!')
+# 		except Exception as e:
+# 			messages.add_message(request, messages.ERROR, 'Unable to create this feedback piece %s' % e)				
+# 		return HttpResponseRedirect('/feedback/categories/')
+
+# 	messages.add_message(request, messages.ERROR, form.errors)
+# 	return HttpResponseRedirect('/feedback/categories/')			
+# 			#new_feedback_piece = FeedbackPiece.create()
 
 
 

@@ -99,7 +99,7 @@ class FeedbackPiece(models.Model):
     feedback_explanation = models.ForeignKey(Explanation)
 
 class Draft(models.Model):
-    text = models.CharField(max_length=4096)
+    text = models.CharField(max_length=4096, null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     week_num = models.IntegerField()
