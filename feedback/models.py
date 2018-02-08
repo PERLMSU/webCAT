@@ -10,7 +10,7 @@ from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 
-from classroom.models import Classroom, Student
+from classroom.models import *
 
 NOT_SUBMITTED = 0
 SUBMITTED_AWAITING_APPROVAL = 1
@@ -108,11 +108,14 @@ class Draft(models.Model):
     status = models.PositiveSmallIntegerField(choices=DRAFT_STATUS)
     email_sent = models.BooleanField(default=False)
 
+    def __str__(self): 
+        return "Instructor: {} Student: {} Feedback: {}".format(self.owner,self.student,self.text)
+
     def send_to_instructor(self):
         instructor = self.owner.get_current_classroom_instructor()
         try:
             notification = Notification.objects.get(draft_to_approve = self)
-            notification.updated_ts = datetime.datetime.now()
+            notification.updated_ts = datetime.now()
             notification.user = instructor
             notification.notification = "This draft has been submitted for approval. Please review."
             notification.save()
@@ -120,7 +123,9 @@ class Draft(models.Model):
             notification = Notification.objects.create(
                 draft_to_approve = self,
                 user = instructor,
-                notification="This draft has been submitted for approval. Please review."
+                notification="This draft has been submitted for approval. Please review.",
+                classroom = self.owner.current_classroom,
+                semester = self.owner.current_classroom.current_semester                
             )
 
     def add_revision_notes(self, notes):
@@ -128,13 +133,15 @@ class Draft(models.Model):
             notification = Notification.objects.get(draft_to_approve = self)
             notification.user = self.owner
             notification.notification = "This draft has revision notes: " + notes 
-            notification.updated_ts = datetime.datetime.now()
+            notification.updated_ts = datetime.now()
             notification.save()
         except (Notification.DoesNotExist):
             notification = Notification.objects.create(
                 draft_to_approve = self,
                 user = self.owner,
-                notification="This draft has revision notes: " + notes 
+                notification="This draft has revision notes: " + notes,
+                classroom = self.owner.current_classroom,
+                semester = self.owner.current_classroom.current_semester
             )
 
     def send_approval_notification(self):
@@ -142,13 +149,15 @@ class Draft(models.Model):
             notification = Notification.objects.get(draft_to_approve = self)
             notification.notification = "This draft has been approved"
             notification.user = self.owner
-            notification.updated_ts = datetime.datetime.now()
+            notification.updated_ts = datetime.now()
             notification.save()            
         except (Notification.DoesNotExist):
             notification = Notification.objects.create(
                 draft_to_approve = self,
                 user = self.owner,
-                notification="This draft has been approved"
+                notification="This draft has been approved",
+                classroom = self.owner.current_classroom,
+                semester = self.owner.current_classroom.current_semester
             )            
 
     def send_email_to_student(self):
@@ -180,6 +189,8 @@ class Draft(models.Model):
         unique_together = ('owner', 'student','week_num')   
 
 
+    def get_notifications(self):
+        return Notification.objects.get(draft_to_approve=self)
 
 class Grade(models.Model):
     grade = models.DecimalField(max_digits=3, decimal_places=2)
@@ -190,7 +201,12 @@ class Notification(models.Model):
     #classroom = models.ForeignKey(Classroom)
     #semester = models.ForeignKey(Semester)
     notification = models.CharField(max_length=500)
+    classroom = models.ForeignKey(Classroom)
+    semester = models.ForeignKey(Semester)
     draft_to_approve = models.ForeignKey(Draft, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_ts = models.DateTimeField(auto_now_add=True)
     updated_ts = models.DateTimeField(auto_now=True)
+
+    def __str__(self): 
+        return "{} {}".format(self.draft_to_approve,self.notification)

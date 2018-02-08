@@ -9,11 +9,12 @@
 
              <div class="padding-lr">
                 <strong>
-                <h3><span class="fa fa-institution"></span><span> {{classroom}}</span></h3>
+                <h3><span class="fa fa-institution"></span><span> {{classroom}}</span> | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
+                </strong></h3>
                 <span>{{classroom.description}}</span>
+                <p>Semester: {{classroom.current_semester}}</p>
                 {% if user.is_superuser %}
-                | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
-                </strong>
+
                 {% endif %}
             </div>
         </div>

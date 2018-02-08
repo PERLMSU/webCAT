@@ -1,0 +1,40 @@
+<div class="row">
+<div class="col-sm-1">
+  <input type="checkbox" name="draft_to_approve" value="{{draft.id}}">
+</div>
+      <div class="col-lg-10">
+          <span> <p> Notification: {{draft.get_notifications.notification}} </p></span>
+          <span><p> Learning Assistant: {{draft.owner.get_full_name}}</p></span>
+          <span> <p>Student: {{draft.student}} | {{draft.student.email}} </p></span>
+          <p> Feedback: {{draft.text}} </p>
+          <p> Grades: </p>
+          <p>
+            {% with draft|get_draft_grades as grades %}
+              {% for gr in grades %}
+                <span>{{gr.category.name}}: {{gr.grade}}</span><br>
+              {% endfor %}
+            {% endwith %}
+
+          </p>          
+          <p> Status: {{draft.status}} </p>
+          <p> Emailed: {{draft.email_sent}}
+
+          {% if draft.status == 1 or draft.status == 2 %}
+          <p><a href="#" data-href="{% url "inbox-approve-draft" draft.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a href="#" data-toggle="modal" data-target="#confirm-approve-with-edits-{{draft.id}}">Approve With Edits</a>
+
+             {% if draft.status == 1 %}
+             | <a class="create-revision-notes" data-id="{{draft.id}}" data-toggle="modal" data-target="#CreateDraftRevisionNotification" role="button">Needs Revision</a> </p>
+             {% endif %}
+
+          
+
+
+
+          {% elif draft.status == 3 %}
+            <p><a href="#" data-toggle="modal" data-target="#confirm-approve-with-edits-{{draft.id}}">Make Edits</a></p>
+          {% endif %}
+
+          {% include "_approve_with_edits_partial.html" %}
+    <hr>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 
-          <div class="modal fade" id="confirm-approve-with-edits-{{noti.draft_to_approve.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal fade" id="confirm-approve-with-edits-{{draft.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
 
@@ -12,9 +12,9 @@
 
                 <div class="modal-body">
                   <form class="approve-edits-form" action="{% url "inbox-approve-draft-edits" %}" method="POST">{% csrf_token %}
-                  <input type="hidden" name="draft_pk" value="{{noti.draft_to_approve.id}}">
+                  <input type="hidden" name="draft_pk" value="{{draft.id}}">
                   Draft:
-                  <textarea name="draft_text" class="form-control" rows="10">{{noti.draft_to_approve.text}}</textarea>
+                  <textarea name="draft_text" class="form-control" rows="10">{{draft.text}}</textarea>
                 </div>
 
                 <div class="modal-footer">

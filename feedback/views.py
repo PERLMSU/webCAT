@@ -357,6 +357,11 @@ class InboxView(SuperuserRequiredMixin,TemplateView):
 			self.context['draft_notifications_need_revision'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 2,draft_to_approve__week_num=week)
 			self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
 
+			self.context['drafts_need_approval'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=1)
+			self.context['drafts_need_revision'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=2)
+			self.context['drafts_approved'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=3,email_sent=False)
+			self.context['drafts_emailed'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=3,email_sent=True)			
+
 			self.context['title'] = "Inbox"
 			self.context['week'] = week
 			self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
@@ -563,7 +568,7 @@ def send_draft_revision(request):
 			draft.add_revision_notes(revision_notes)
 			messages.add_message(request, messages.INFO, 'Draft revision notes sent.')		
 		except Exception as e:
-			messages.add_message(request, messages.ERROR, 'Error when sending feedback draft revision notes.')
+			messages.add_message(request, messages.ERROR, 'Error when sending feedback draft revision notes.'+str(e))
 		return HttpResponseRedirect('/feedback/inbox/') 
 	else:
 		messages.add_message(request, messages.ERROR, 'Form not valid. Please check your inputs.')
@@ -683,7 +688,7 @@ class SendDrafts(SuperuserRequiredMixin, View):
 		week = int(self.kwargs['week'])
 		sent_count = 0
 		drafts = Draft.objects.filter(student__classroom=self.request.user.current_classroom,student__semester=self.request.user.current_classroom.current_semester,
-			week_num=week,status=3)
+			week_num=week,status=3,email_sent=False)
 		successfully_sent = []
 		no_email_found = []
 		no_email_count = 0
