@@ -188,7 +188,7 @@ class UserProfilesView(LoginRequiredMixin, TemplateView):
     def get(self, *args, **kwargs):
         user_id = kwargs.get('pk')
         user = get_object_or_404(Profile, id=user_id)
-        self.context['user'] = user
+        self.context['profile_user'] = user
         return render(self.request, self.template_name, self.context)
 
 

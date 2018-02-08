@@ -13,11 +13,11 @@
                 <!-- <div class="container"> -->
                     <h3> Subcategories</h3>
                     
-                    <a href="#/" style="padding-bottom:10px; width: 100%;
-    text-align: -webkit-left; line-height: 2" class="btn btn-md btn-info back-to-main-categories"> <span class="fa fa-arrow-left"></span> Go Back</a> 
+                    <a href="#/" class="btn btn-md btn-info back-btn back-to-main-categories"> <span class="fa fa-arrow-left"></span> Go Back</a> 
            <!--      </div> -->
             </div>
             
+            <div class="row">
             <div class="col-lg-12">                  
               {% if categories %}   
                 {% for category in categories %}   
@@ -97,6 +97,7 @@
                 <h3>No subcategories found. Click <a href="{% url "feedback-categories" %}">here</a> to add.</h3>
             {% endif %}
             </div>
+          </div>
         </div>
     </div>
   </div>    

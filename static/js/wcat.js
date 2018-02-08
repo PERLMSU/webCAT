@@ -364,6 +364,7 @@ $('.noteForm').submit(function() {
      var that = this;
      var selected = [];
      var index = 0;
+     var valid = true;
      $('.student-checkboxes input:checked').each(function() {
           $(that).append('<input type="hidden" name="student_name'+index.toString()+'" value="'+($(this).attr('value'))+'" /> ');
          selected.push($(this).attr('value'));
@@ -373,13 +374,20 @@ $('.noteForm').submit(function() {
      if (index == 0)
      {
         $('#no-student-selected-error').show();       
-        return false;
+        valid =false;
+     }
+
+
+     if ($(this).find("input:radio:checked").length != 1 && $(this).find("input:text").val().length == 0)
+     {
+        $('#no-observation-selected-error').show();  
+        valid = false;
      }
       // $('<input />').attr('type', 'hidden')
       //     .attr('name', "something")
       //     .attr('value', "something")
       //     .appendTo(that);
-      return true;  
+      return valid;  
     // alert(selected);
      //return false;
 });

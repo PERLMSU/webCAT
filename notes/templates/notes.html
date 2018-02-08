@@ -24,6 +24,12 @@
         Please select student(s) before saving note.
     </div>
 
+    <div class="alert alert-warning fade in alert-dismissible" id="no-observation-selected-error" style="display:none;" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        Please select an observation or write a customized note before saving.
+    </div>
+
+
   <!--   <div class="row"> -->
     <div class="col-lg-3">
         {% include '_student_selector_partial.html' %}

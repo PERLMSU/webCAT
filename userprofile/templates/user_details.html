@@ -2,7 +2,7 @@
 {% load widget_tweaks profile_tags %}
 
 {% block content %}
-<title> Kudo - User Details </title>   
+<title> WCat - User Details </title>   
 
 <div class="row">
     <div class="box">
@@ -22,38 +22,38 @@
                             <div class="row">
                                 <div class="col-md-6 col-xs-12">
                                     <label>First Name:</label>
-                                    <p>{{ user.first_name }}</p>
+                                    <p>{{ profile_user.first_name }}</p>
                                 </div>
                                 <div class="col-md-6 col-xs-12">
                                     <label>Last Name:</label>
-                                    <p>{{ user.last_name }}</p>
+                                    <p>{{ profile_user.last_name }}</p>
                                 </div>
                                 <div class="clearfix"></div>
                                 <div class="col-md-6 col-xs-12">
                                     <label>Email Address:</label>
-                                    <p>{{ user.email }}</p>
+                                    <p>{{ profile_user.email }}</p>
                                 </div>
                                 <div class="col-md-6 col-xs-12">
                                     <label>Nick Name:</label>
-                                    <p>{{ user.nick_name }}</p>
+                                    <p>{{ profile_user.nick_name }}</p>
                                 </div>
                                 <div class="clearfix"></div>
                                 <div class="col-md-6 col-xs-12">
                                     <label>Phone:</label>
-                                    <p>{{ user.phone }}</p>
+                                    <p>{{ profile_user.phone }}</p>
                                 </div>
                                 <div class="col-md-6 col-xs-12">
                                     <label>Birth date:</label>
-                                    <p>{{ user.birth_date|default_if_none:"" }}</p>
+                                    <p>{{ profile_user.birth_date|default_if_none:"" }}</p>
                                 </div>
                                 <div class="clearfix"></div>
                                 <div class="col-md-6 col-xs-12">
                                     <label>Country:</label>
-                                    <p>{{ user.country }}</p>
+                                    <p>{{ profile_user.country }}</p>
                                 </div>
                                 <div class="col-md-6 col-xs-12">
                                     <label>State:</label>
-                                    <p>{{ user.state }}</p>
+                                    <p>{{ profile_user.state }}</p>
                                 </div>
 
                             </div> 
@@ -62,7 +62,7 @@
                             <div class="row">
                                 <div class="col-md-12 col-xs-12">
                                     <label>Bio:</label>
-                                    <p>{{ user.bio }}</p>
+                                    <p>{{ profile_user.bio }}</p>
                                 </div>
                             </div>
                         </div>
