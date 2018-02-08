@@ -91,6 +91,7 @@ class EmailConfirmationView(LoginRequiredMixin, TemplateView):
     def get(self, *args, **kwargs):
         form = AccountSettingsForm(instance=self.request.user)
         self.context['form'] = form
+        self.context['title'] = "Settings"
         return render(self.request, self.template_name, self.context)
 
     def post(self, request, *args, **kwargs):
@@ -113,6 +114,9 @@ class EmailConfirmationView(LoginRequiredMixin, TemplateView):
             msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
             msg.content_subtype = "html"
             msg.send()
+            request.user.is_verified = False
+            request.user.email = email_to
+            request.user.save()
             self.add_message("Confirmation email has been sent.")
 
         self.add_message(form.errors, 40)
@@ -130,12 +134,29 @@ class ConfirmationView(View):
         user = Profile.objects.get(email=activate.user)
         
         if user.is_active == True:
-            user.is_activated = True 
+            user.is_activated = True
+            user.is_verified = True 
             user.save()
             activate.is_used = True
             activate.save()
             ConfirmationKey.objects.filter(user=activate.user, is_used=False).delete()
-            return HttpResponseRedirect(reverse('user-email-settings'))
+            self.add_message("Email address has been confirmed.")
+            return HttpResponseRedirect(reverse('user-account-settings'))
+
+    def add_message(self, text, mtype=25):
+        messages.add_message(self.request, mtype, text)
+
+class ResendActivationView(View):
+    """ Resend activation key
+    """
+    def get(self, *args, **kwargs):
+        user = Profile.objects.get(email=self.request.user)
+        user.send_confirmation_email(self.request)
+        self.add_message("Confirmation email has been resent.")
+        return HttpResponseRedirect(reverse('user-account-settings'))
+
+    def add_message(self, text, mtype=25):
+        messages.add_message(self.request, mtype, text)
 
 
 class UpdateEmailView(LoginRequiredMixin, TemplateView):
@@ -189,6 +210,7 @@ class UserProfilesView(LoginRequiredMixin, TemplateView):
         user_id = kwargs.get('pk')
         user = get_object_or_404(Profile, id=user_id)
         self.context['profile_user'] = user
+        self.context['title'] = user.get_short_name() +"'s Profile "
         return render(self.request, self.template_name, self.context)
 
 

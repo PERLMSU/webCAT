@@ -92,11 +92,11 @@ class Explanation(models.Model):
     def __str__(self):
         return "{}".format(self.feedback_explanation)
 
-class FeedbackPiece(models.Model):
-    sub_category = models.ForeignKey(SubCategory)
-    observation = models.ForeignKey(Observation)
-    feedback = models.ForeignKey(Feedback)
-    feedback_explanation = models.ForeignKey(Explanation)
+# class FeedbackPiece(models.Model):
+#     sub_category = models.ForeignKey(SubCategory)
+#     observation = models.ForeignKey(Observation)
+#     feedback = models.ForeignKey(Feedback)
+#     feedback_explanation = models.ForeignKey(Explanation)
 
 class Draft(models.Model):
     text = models.CharField(max_length=4096, null=True, blank=True)

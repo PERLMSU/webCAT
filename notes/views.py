@@ -137,6 +137,7 @@ class NotesView(LoginRequiredMixin, TemplateView):
 			# self.context['loop_times'] = range(1, 13)
 			self.context['loop_times'] = range(1,classroom.get_num_weeks())
 			self.context['week'] = week
+			self.context['title'] = "Note Taker"
 			self.context['rotation_groups'] = groups_assigned
 			self.context['main_categories'] = main_categories
 			self.context['sub_categories'] = sub_categories

@@ -222,6 +222,7 @@ class FeedbackManager(SuperuserRequiredMixin, TemplateView):
 		if classroom != None:
 			self.context['main_categories'] = Category.objects.all()
 			self.context['manager_view'] = True
+			self.context['title'] = "Manage Feedback"
 			return render(self.request, self.template_name, self.context)
 		else:
 			messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
@@ -258,6 +259,7 @@ class FeedbackView(LoginRequiredMixin, View):
 		#	raise Exception("test!")
 			main_categories = Category.objects.filter(classroom=classroom)
 
+			self.context['title'] = "Feedback Writer"
 			self.context['week'] = int(week)
 			self.context['rotation_groups'] = groups
 			# self.context['loop_times'] = range(1, 13)
@@ -355,6 +357,7 @@ class InboxView(SuperuserRequiredMixin,TemplateView):
 			self.context['draft_notifications_need_revision'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 2,draft_to_approve__week_num=week)
 			self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
 
+			self.context['title'] = "Inbox"
 			self.context['week'] = week
 			self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
 			return render(self.request, self.template_name, self.context)
@@ -392,7 +395,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 			#self.context['create_feedback_form'] = AddFeedbackPieceForm()
 			# self.context['main_categories'] = Category.objects.filter(classroom=classroom)
 			self.context['main_categories'] = Category.objects.all()
-
+			self.context['title'] = "Manage Categories"
 
 			return render(self.request, self.template_name, self.context)
 		else:

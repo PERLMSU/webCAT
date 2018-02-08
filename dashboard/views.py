@@ -124,95 +124,95 @@ class ResetPasswordView(TemplateView):
 
 
 
-class EmailConfirmationView(LoginRequiredMixin, TemplateView):
-	template_name = 'account_email.html'
-	context = {}
+# class EmailConfirmationView(LoginRequiredMixin, TemplateView):
+# 	template_name = 'account_email.html'
+# 	context = {}
 
-	def get(self, *args, **kwargs):
-		form = AccountSettingsForm(instance=self.request.user)
-		self.context['form'] = form
-		return render(self.request, self.template_name, self.context)
+# 	def get(self, *args, **kwargs):
+# 		form = AccountSettingsForm(instance=self.request.user)
+# 		self.context['form'] = form
+# 		return render(self.request, self.template_name, self.context)
 
-	def post(self, request, *args, **kwargs):
-		form = AccountSettingsForm(self.request.POST, instance=self.request.user)
-		self.context['form'] = form
-		if form.is_valid():
-			host_email = settings.EMAIL_HOST_USER
-			confirm_key = ConfirmationKey.objects.create(user=self.request.user)
-			url_path = request.build_absolute_uri('/').strip("/")
-			url =   url_path + "/profile/activate/" + confirm_key.key
-			token = ConfirmationKey.objects.create(user=self.request.user)
-			subject =   "Confirm New Email"
-			email_to = form.data['email']
-			html_content = render_to_string('email/new_email.html',{
-															'subject': subject,
-															'email': email_to,
-															'url': url
-														})
-			subject, from_email, to = 'User Account', host_email, email_to
-			msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
-			msg.content_subtype = "html"
-			msg.send()
-			self.add_message("Confirmation email has been sent.")
+# 	def post(self, request, *args, **kwargs):
+# 		form = AccountSettingsForm(self.request.POST, instance=self.request.user)
+# 		self.context['form'] = form
+# 		if form.is_valid():
+# 			host_email = settings.EMAIL_HOST_USER
+# 			confirm_key = ConfirmationKey.objects.create(user=self.request.user)
+# 			url_path = request.build_absolute_uri('/').strip("/")
+# 			url =   url_path + "/profile/activate/" + confirm_key.key
+# 			token = ConfirmationKey.objects.create(user=self.request.user)
+# 			subject =   "Confirm New Email"
+# 			email_to = form.data['email']
+# 			html_content = render_to_string('email/new_email.html',{
+# 															'subject': subject,
+# 															'email': email_to,
+# 															'url': url
+# 														})
+# 			subject, from_email, to = 'User Account', host_email, email_to
+# 			msg = EmailMultiAlternatives(subject, html_content, from_email, [to])
+# 			msg.content_subtype = "html"
+# 			msg.send()
+# 			self.add_message("Confirmation email has been sent.")
 
-		self.add_message(form.errors, 40)
-		return render(self.request, self.template_name, self.context)
+# 		self.add_message(form.errors, 40)
+# 		return render(self.request, self.template_name, self.context)
 
-	def add_message(self, text, mtype=25):
-		messages.add_message(self.request, mtype, text)
+	# def add_message(self, text, mtype=25):
+	# 	messages.add_message(self.request, mtype, text)
 
-class UpdateEmailView(LoginRequiredMixin, TemplateView):
-	template_name = 'update_email.html'
-	context = {}
+# class UpdateEmailView(LoginRequiredMixin, TemplateView):
+# 	template_name = 'update_email.html'
+# 	context = {}
 
-	def get(self, *args, **kwargs):
-		form = AccountEmailForm(instance=self.request.user)
-		self.context['form'] = form
-		return render(self.request, self.template_name, self.context)
+# 	def get(self, *args, **kwargs):
+# 		form = AccountEmailForm(instance=self.request.user)
+# 		self.context['form'] = form
+# 		return render(self.request, self.template_name, self.context)
 
-	def post(self, request, *args, **kwargs):
-		form = AccountEmailForm(self.request.POST, instance=self.request.user)
-		self.context['form'] = form
-		if form.is_valid():
-			form.save()
-			self.add_message("Your email has been updated.")
+# 	def post(self, request, *args, **kwargs):
+# 		form = AccountEmailForm(self.request.POST, instance=self.request.user)
+# 		self.context['form'] = form
+# 		if form.is_valid():
+# 			form.save()
+# 			self.add_message("Your email has been updated.")
 
-		return render(self.request, self.template_name, self.context)
+# 		return render(self.request, self.template_name, self.context)
 
-	def add_message(self, text, mtype=25):
-		messages.add_message(self.request, mtype, text)
+# 	def add_message(self, text, mtype=25):
+# 		messages.add_message(self.request, mtype, text)
 
 
-class ChangePasswordView(LoginRequiredMixin, View):
+# class ChangePasswordView(LoginRequiredMixin, View):
 
-	def post(self, *args, **kwargs):
-		account = Profile.objects.get(email=self.request.user)
-		form = ChangePasswordForm(self.request.POST, instance=account, user=self.request.user)
-		if form.is_valid():
-			form.save()
-			instance = form.save()
-			instance.backend = settings.AUTHENTICATION_BACKENDS[0]
-			login(self.request,instance)
-			self.add_message("Password has been updated")
+# 	def post(self, *args, **kwargs):
+# 		account = Profile.objects.get(email=self.request.user)
+# 		form = ChangePasswordForm(self.request.POST, instance=account, user=self.request.user)
+# 		if form.is_valid():
+# 			form.save()
+# 			instance = form.save()
+# 			instance.backend = settings.AUTHENTICATION_BACKENDS[0]
+# 			login(self.request,instance)
+# 			self.add_message("Password has been updated")
 	   
-		self.add_message(form.errors, 40)
-		return HttpResponseRedirect(reverse('dash-settings'))
+# 		self.add_message(form.errors, 40)
+# 		return HttpResponseRedirect(reverse('user-account-settings'))
 
-	def add_message(self, text, mtype=25):
-		messages.add_message(self.request, mtype, text)
+# 	def add_message(self, text, mtype=25):
+# 		messages.add_message(self.request, mtype, text)
 
 
-class UserProfilesView(LoginRequiredMixin, TemplateView):
-	""" user profile page
-	"""
-	template_name = 'user_details.html'
-	context = {}
+# class UserProfilesView(LoginRequiredMixin, TemplateView):
+# 	""" user profile page
+# 	"""
+# 	template_name = 'user_details.html'
+# 	context = {}
 
-	def get(self, *args, **kwargs):
-		user_id = kwargs.get('pk')
-		user = get_object_or_404(Profile, id=user_id)
-		self.context['user'] = user
-		return render(self.request, self.template_name, self.context)
+# 	def get(self, *args, **kwargs):
+# 		user_id = kwargs.get('pk')
+# 		user = get_object_or_404(Profile, id=user_id)
+# 		self.context['user'] = user
+# 		return render(self.request, self.template_name, self.context)
 
 class SettingsView(TemplateView):
 	template_name = 'settings.html'
@@ -246,36 +246,26 @@ class LogoutView(View):
 		return HttpResponseRedirect(reverse('login'))
 
 
-class ActivationView(View):
-	""" User Activation
-	"""
-	def get(self, *args, **kwargs):
-		activate = get_object_or_404(ConfirmationKey, key=kwargs['key'])
-		user = Profile.objects.get(email=activate.user)
+# class ActivationView(View):
+# 	""" User Activation
+# 	"""
+# 	def get(self, *args, **kwargs):
+# 		activate = get_object_or_404(ConfirmationKey, key=kwargs['key'])
+# 		user = Profile.objects.get(email=activate.user)
 		
-		if user.is_active == True:
-			user.is_verified = True 
-			user.save()
-			activate.is_used = True
-			activate.save()
-			ConfirmationKey.objects.filter(user=activate.user, is_used=False).delete()
-			self.add_message("Congratulations! Your account is now activated")
-			return HttpResponseRedirect(reverse('dash-home'))
+# 		if user.is_active == True:
+# 			user.is_verified = True 
+# 			user.save()
+# 			activate.is_used = True
+# 			activate.save()
+# 			ConfirmationKey.objects.filter(user=activate.user, is_used=False).delete()
+# 			self.add_message("Your email address has been confirmed.")
+# 			return HttpResponseRedirect(reverse('dash-home'))
 
-	def add_message(self, text, mtype=25):
-		messages.add_message(self.request, mtype, text)
+# 	def add_message(self, text, mtype=25):
+# 		messages.add_message(self.request, mtype, text)
 
-class ResendActivationView(View):
-	""" Resend activation key
-	"""
-	def get(self, *args, **kwargs):
-		user = Profile.objects.get(email=self.request.user)
-		user.send_confirmation_email(self.request)
-		self.add_message("Email has been sent")
-		return HttpResponseRedirect(reverse('dash-home'))
 
-	def add_message(self, text, mtype=25):
-		messages.add_message(self.request, mtype, text)
 
 class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 	""" dashboard page, manage users
@@ -287,6 +277,7 @@ class ManageUsersView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
 		self.context['form'] = AddInstructorForm()
 		users = Profile.objects.filter()
 		self.context['users'] = users
+		self.context['title'] = "Manage Users"
 		self.context['classrooms'] = Classroom.objects.all().order_by('course_code')
 		self.context['edit_instructor_form'] = EditInstructorForm()
 		#raise Exception("test")
@@ -382,6 +373,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		if self.request.user.is_authenticated():
 			self.context['form'] = AddInstructorForm()
 			self.context['add_semester_form'] = AddSemesterForm()
+			self.context['title'] = "Dashboard"
 #			self.context['register_classroom_form'] = ClassroomRegistrationForm()
 			users = Profile.objects.all()
 			self.context['users'] = users

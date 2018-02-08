@@ -105,7 +105,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         """ Send confirmation key to user.
         """
         confirm_key = self.generate_confirm_key()
-        url_path = request.build_absolute_uri(reverse('activation', args=(confirm_key.key,)))
+        url_path = request.build_absolute_uri(reverse('account-activate', args=(confirm_key.key,)))
         host_email = settings.EMAIL_HOST_USER
         subject =   "Confirmation Key"
         email_to = confirm_key.user.email

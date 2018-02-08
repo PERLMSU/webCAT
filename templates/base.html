@@ -28,6 +28,7 @@
 
 </head>
 
+<title>WebCAT - {{title}}</title>
 <body>
 
 {% if request.user %}
@@ -151,7 +152,7 @@
 
                         {% endif %}
                         <li>
-                            <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                            <a href="{% url "user-account-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
                         </li>
                         <li class="divider"></li>
                         <li>
@@ -217,9 +218,7 @@
                     <li>
                         <a href="{% url "feedback-home" %}"><i class="fa fa-fw fa-edit"></i> Writer</a> 
                     </li>                                                        
-                 <!--    <li>
-                        <a href="{% url "dash-settings" %}"><i class="fa fa-fw fa-gear"></i> Settings</a>
-                    </li> -->
+ 
 
 <!--                     <li>
                         <a href="bootstrap-elements.html"><i class="fa fa-fw fa-desktop"></i> Bootstrap Elements</a>
@@ -251,6 +250,18 @@
     {% endfor %}
 {% endif %}
 
+
+        {% if not request.user.is_verified and user.is_authenticated %}
+            <nav class="email-notification container-fluid">
+                <div class="row ">
+                    <div class="col-md-12 alert alert-danger">
+                        <div class="text-center ">
+                            <p><strong>Confirm your email!</strong> Check your email inbox <strong><a href="{% url 'resend-activation-key' %}">Resend email</a></strong></p>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        {% endif %}
 
 <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">

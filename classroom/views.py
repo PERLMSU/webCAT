@@ -411,7 +411,7 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
             return render(self.request, self.template_name,
             {
                 # 'form': form,
-                'title': 'Excel file upload and download',
+                'title': 'Upload Students',
                 'header': ('Please choose an excel file to upload'),
                 'students': students,
                 'classroom': classroom,
@@ -636,6 +636,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
                 'learning_assistants':learning_assistants,
               #  'instructors':instructors,
               #  'groups': groups,
+                'title': "Classroom",
                 'rotation_groups': rotation_groups,
                 'classroom': classroom,
                 #'semesters' : semesters,
