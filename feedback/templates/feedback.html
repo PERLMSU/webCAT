@@ -53,7 +53,22 @@
                 <div class="panel-body">
                
                    {% for student in group.students.all %}
-                        <a class="student-feedback" data-id="feedback_{{student.id}}" href="#"><p>{{student.first_name}} {{student.last_name}}</p></a>
+                    {% with student|get_student_draft:week as draft %}
+                        <a class="student-feedback" data-id="feedback_{{student.id}}" href="#">
+                          <p>{{student.first_name}} {{student.last_name}}
+                            {% if draft.status == 1 %}
+                              <span class="fa fa-circle-o-notch yellow-icon float-right"></span>
+                            {% elif draft.status == 2 %}
+                              <span class="glyphicon glyphicon-exclamation-sign revision-icon float-right"></span>
+                            {% elif draft.status == 3 %}
+                              <span class="glyphicon glyphicon-ok-sign green-icon float-right"></span>
+                            {% endif %}
+
+                          </p>
+                        </a>
+                        
+                       
+                      {% endwith %}
                    {% endfor %}
               
                 </div>

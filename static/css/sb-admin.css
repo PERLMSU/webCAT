@@ -254,6 +254,16 @@ input[type='checkbox']:checked {
     color: green;
 }
 
+.revision-icon
+{
+  color:#a94442;
+}
+
+.yellow-icon
+{
+  color: orange;
+}
+
 .red-icon {
     color: red;
 }
