@@ -6,6 +6,11 @@
 
 /* Global Styles */
 
+.pointer:hover
+{
+  cursor:pointer;
+}
+
 .back-btn {
     padding-bottom:10px;
     width: 100%;

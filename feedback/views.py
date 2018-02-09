@@ -17,6 +17,7 @@ from .forms import *
 # Create your views here.
 from django.db import IntegrityError
 from classroom.models import Classroom
+from userprofile.models import Profile
 from feedback.models import *
 from classroom.models import *
 from notes.models import Note
@@ -37,6 +38,14 @@ def compare_grade(grade,val):
 def get_draft_grades(draft):
 	return Grade.objects.filter(draft=draft)
 
+
+@register.filter
+def filter_drafts_by_instructor(drafts,instructor):
+	return drafts.filter(owner=instructor)
+
+@register.filter
+def filter_draft_count_by_instructor(drafts,instructor):
+	return drafts.filter(owner=instructor).count()
 
 @register.filter
 def get_note_feedback_pieces(note):
@@ -126,6 +135,8 @@ def get_student_draft(student_pk, week):
 #         else:
 #             messages.error(self.request, form.errors)
 #             return HttpResponseRedirect('/feedback/manager/')     
+
+
 
 class AddEditObservation(SuperuserRequiredMixin,TemplateView):
 
@@ -363,6 +374,7 @@ class InboxView(SuperuserRequiredMixin,TemplateView):
 			self.context['drafts_emailed'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=3,email_sent=True)			
 
 			self.context['title'] = "Inbox"
+			self.context['instructors'] = Profile.objects.filter(current_classroom=classroom)
 			self.context['week'] = week
 			self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
 			return render(self.request, self.template_name, self.context)
@@ -522,6 +534,17 @@ def create_subcategory(request, pk):
 # 	return HttpResponseRedirect('/feedback/categories/')			
 # 			#new_feedback_piece = FeedbackPiece.create()
 
+class ApproveAllDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
+
+	def get(self, *args, **kwargs):
+		week = int(self.kwargs['week'])
+		classroom = self.request.user.current_classroom	
+		drafts = Draft.objects.filter(student__classroom=classroom,student__semester=classroom.current_semester,week_num=week,status=1)
+		for draft in drafts:
+			draft.status = 3
+			draft.save()
+		messages.add_message(self.request, messages.SUCCESS, 'Successfully approved all drafts.')
+		return HttpResponseRedirect('/feedback/inbox/')		
 
 
 class ApproveDraft(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
@@ -686,9 +709,13 @@ class SendDrafts(SuperuserRequiredMixin, View):
 
 	def get(self, *args, **kwargs):
 		week = int(self.kwargs['week'])
+		resend = False
+		if 'resend' in self.kwargs:
+			resend = True
+		resend = self.kwargs['resend']
 		sent_count = 0
 		drafts = Draft.objects.filter(student__classroom=self.request.user.current_classroom,student__semester=self.request.user.current_classroom.current_semester,
-			week_num=week,status=3,email_sent=False)
+			week_num=week,status=3,email_sent=resend)
 		successfully_sent = []
 		no_email_found = []
 		no_email_count = 0

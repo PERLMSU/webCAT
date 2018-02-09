@@ -54,7 +54,7 @@
                
                    {% for student in group.students.all %}
                     {% with student|get_student_draft:week as draft %}
-                        <a class="student-feedback" data-id="feedback_{{student.id}}" href="#">
+                        <a class="student-feedback" data-id="feedback_{{student.id}}" href="#/">
                           <p>{{student.first_name}} {{student.last_name}}
                             {% if draft.status == 1 %}
                               <span class="fa fa-circle-o-notch yellow-icon float-right"></span>

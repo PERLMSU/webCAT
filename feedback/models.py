@@ -107,6 +107,7 @@ class Draft(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,null=True)
     status = models.PositiveSmallIntegerField(choices=DRAFT_STATUS)
     email_sent = models.BooleanField(default=False)
+    email_ts = models.DateTimeField(null=True)
 
     def __str__(self): 
         return "Instructor: {} Student: {} Feedback: {}".format(self.owner,self.student,self.text)
@@ -176,6 +177,7 @@ class Draft(models.Model):
             msg.content_subtype = "html"
             msg.send()
             self.email_sent = True
+            self.email_ts = datetime.now()
             self.save()   
             return True         
         else:

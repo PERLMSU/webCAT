@@ -1,5 +1,7 @@
 <div class="row">
+
 <div class="col-sm-1">
+  
   <input type="checkbox" name="draft_to_approve" value="{{draft.id}}">
 </div>
       <div class="col-lg-10">
@@ -17,7 +19,8 @@
 
           </p>          
           <p> Status: {{draft.status}} </p>
-          <p> Emailed: {{draft.email_sent}}
+          <p> Emailed: {{draft.email_sent}}</p>
+          <p> Emailed TS: {{draft.email_ts}}</p>
 
           {% if draft.status == 1 or draft.status == 2 %}
           <p><a href="#" data-href="{% url "inbox-approve-draft" draft.id %}" data-toggle="modal" data-target="#confirm-approve">Approve</a> | <a href="#" data-toggle="modal" data-target="#confirm-approve-with-edits-{{draft.id}}">Approve With Edits</a>

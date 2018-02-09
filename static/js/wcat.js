@@ -490,7 +490,26 @@ $('[id^=confirm-delete]').on('show.bs.modal', function(e) {
 $('#confirm-approve').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
+
+$('#confirm-approve-all').on('show.bs.modal', function(e) {    
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
+
 $('#confirm-send').on('show.bs.modal', function(e) {
+    var all = $(e.relatedTarget).data('id')
+    if (all == "resend")
+    {
+      //  $(this).find('.btn-ok').attr('value', "Resend");
+        $("#email_all_text").html("Are you sure you want resend all emails? This will only resend the drafts that have already been marked as sent.");
+        $("#email_header").html("Resend All Drafts");
+    }
+    else
+    {
+       // $(this).find('.btn-ok').attr('value', "Send");
+       $("#email_header").html("Send All Approved Drafts");
+        $("#email_all_text").html("Are you sure you want to email all the approved drafts to students for this week? <p>*This will only email the drafts that have not been sent yet.</p>");
+    }
+    
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
 

@@ -42,21 +42,25 @@
   <hr> -->
 
     <div class="panel panel-warning">
-      <div class="panel-heading"><h3>Drafts to Review ({{drafts_need_approval.count}})</h3></div>
+      <div class="panel-heading"><h3 class="pointer" data-toggle="collapse" href="#collapse_review">Drafts - Review ({{drafts_need_approval.count}})</h3></div>
+        <div id="collapse_review" class="panel-collapse collapse">
       <div class="panel-body">
 
-        <button type="submit" class="btn btn-success btn-lg">Approve All </button>  <button type="submit" class="btn btn-success btn-lg">Approve Selected </button>
+        {% if drafts_need_approval.count != 0 %}
+        <button data-toggle="modal" data-href="{% url "inbox-approve-all-drafts" week %}"  data-target="#confirm-approve-all" class="btn btn-success btn-lg">Approve All <span class="fa fa-thumbs-up"></span></button>  <button type="submit" class="btn btn-success btn-lg">Approve Selected <span class="fa fa-thumbs-up"></span> </button>
         <hr>
-
-        {% for draft in drafts_need_approval %}
-  
-
-          {% include "_view_draft_partial.html" %}
+        {% endif %}
 
 
-        {% endfor %}
+        {% with drafts_need_approval as drafts %}
+          {% with 1 as status %}
 
+          {% include "_drafts_partial.html" %}
 
+          {% endwith %}
+        {% endwith %}
+
+ </div>
       </div>
     </div>
   </div>
@@ -65,16 +69,20 @@
 <div class="row">
   <div class="col-md-12">
     <div class="panel panel-danger">
-      <div class="panel-heading"><h3>Drafts - Need Revision ({{drafts_need_revision.count}})</h3></div>
+      <div class="panel-heading"><h3 class="pointer" data-toggle="collapse" href="#collapse_revision"> Drafts - Need Revision ({{drafts_need_revision.count}})</h3></div>
+
+        <div id="collapse_revision" class="panel-collapse collapse">
       <div class="panel-body">
-        {% for draft in drafts_need_revision %}
-  
 
-          {% include "_view_draft_partial.html" %}
+        {% with drafts_need_revision as drafts %}
+          {% with 2 as status %}
 
+          {% include "_drafts_partial.html" %}
 
+          {% endwith %}
+        {% endwith %}
 
-        {% endfor %}
+    </div>
       </div>
     </div>
   </div>
@@ -84,20 +92,24 @@
 <div class="row">
   <div class="col-md-12">
     <div class="panel panel-success">
-      <div class="panel-heading"><h3>Drafts Approved ({{drafts_approved.count}})</h3></div>
-      <div class="panel-body">
+      <div class="panel-heading"><h3 class="pointer" data-toggle="collapse" href="#collapse_approved">Drafts - Approved ({{drafts_approved.count}})</h3></div>
 
-        <button type="submit" class="btn btn-warning btn-lg" data-href="{% url "inbox-send-all-drafts" week %}" data-toggle="modal" data-target="#confirm-send" href='#'>Email All <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Email Selected <span class="fa fa-send"> </button>
-        <hr>
+       <div id="collapse_approved" class="panel-collapse collapse">
+        <div class="panel-body">
 
-        {% for draft in drafts_approved %}
-  
+            {% if drafts_approved.count != 0 %}
+          <button type="submit" class="btn btn-warning btn-lg" data-href="{% url "inbox-send-all-drafts" week %}" data-toggle="modal" data-target="#confirm-send"  href='#'>Email All <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Email Selected <span class="fa fa-send"> </button>
+          <hr>
+          {% endif %}
 
-          {% include "_view_draft_partial.html" %}
+          {% with drafts_approved as drafts %}
+            {% with 3 as status %}
 
+            {% include "_drafts_partial.html" %}
 
-
-        {% endfor %}
+            {% endwith %}
+          {% endwith %}
+        </div>
       </div>
     </div>
   </div>
@@ -107,20 +119,24 @@
 <div class="row">
   <div class="col-md-12">
     <div class="panel panel-default">
-      <div class="panel-heading"><h3>Drafts Emailed ({{drafts_emailed.count}})</h3></div>
+      <div class="panel-heading"><h3 class="pointer" data-toggle="collapse" href="#collapse_emailed">Drafts - Emailed ({{drafts_emailed.count}})</h3></div>
+           <div id="collapse_emailed" class="panel-collapse collapse">
       <div class="panel-body">
 
-        <button type="submit" class="btn btn-warning btn-lg">Email All <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Email Selected <span class="fa fa-send"> </button>
+         {% if drafts_emailed.count != 0 %}
+        <button type="submit" data-id="resend" class="btn btn-warning btn-lg" data-href="{% url "inbox-resend-all-drafts" week=week resend=1 %}" data-toggle="modal" data-target="#confirm-send">Resend All Emails <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Resend Selected Emails <span class="fa fa-send"> </button>
         <hr>
+        {% endif %}
 
-        {% for draft in drafts_emailed %}
-  
+   
+        {% with drafts_emailed as drafts %}
+          {% with 4 as status %}
 
-          {% include "_view_draft_partial.html" %}
+          {% include "_drafts_partial.html" %}
 
-
-
-        {% endfor %}
+          {% endwith %}
+        {% endwith %}
+        </div>
       </div>
     </div>
   </div>
@@ -177,18 +193,36 @@
 </div>
 
 
+<div class="modal fade" id="confirm-approve-all" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Approve All Drafts
+            </div>
+            <div class="modal-body">
+                Are you sure you want to approve all drafts?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-success btn-ok">Approve All Drafts</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="modal fade" id="confirm-send" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                Send All Approved Drafts
+                <h3><span id="email_header"></span></h3>
             </div>
             <div class="modal-body">
-                Are you sure you want to email all the approved drafts to students for this week?
+                <span id="email_all_text"></span>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-success btn-ok">Send</a>
+                <a class="btn btn-warning btn-ok">Send</a>
             </div>
         </div>
     </div>
