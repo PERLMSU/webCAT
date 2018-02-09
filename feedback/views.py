@@ -712,7 +712,7 @@ class SendDrafts(SuperuserRequiredMixin, View):
 		resend = False
 		if 'resend' in self.kwargs:
 			resend = True
-		resend = self.kwargs['resend']
+		#resend = self.kwargs['resend']
 		sent_count = 0
 		drafts = Draft.objects.filter(student__classroom=self.request.user.current_classroom,student__semester=self.request.user.current_classroom.current_semester,
 			week_num=week,status=3,email_sent=resend)
