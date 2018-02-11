@@ -180,14 +180,56 @@ $(document).on('change',".observation-dropdown", function(){
 $('#submit-selected-drafts').click(function(){
      /* when the submit button in the modal is clicked, submit the form */
     //alert('submitting');
-    $('#selected-drafts-form').submit();
+    if ($('.draft-checkbox-row input:checked').length == 0)
+    {
+        $("#confirm-approve-selected").modal('toggle');
+        $("#no-draft-selected-error").show();
+     //   alert("No drafts to approve are selected");
+       return false; 
+    }
+   else {
+        $('#selected-drafts-form').submit();
+   }
+    
 });
+$('#confirm-send-selected-drafts').click(function(){
+     /* when the submit button in the modal is clicked, submit the form */
+    //alert('submitting');
+    if ($('.draft-send-checkbox-row input:checked').length == 0)
+    {
+        $("#confirm-send-selected").modal('toggle');
+        $("#no-draft-selected-error").show();
+     //   alert("No drafts to approve are selected");
+       return false; 
+    }
+   else {
+        $('#selected-drafts-send-form').submit();
+   }
+    
+});
+
+$('#confirm-resend-selected-drafts').click(function(){
+     /* when the submit button in the modal is clicked, submit the form */
+    //alert('submitting');
+    if ($('.draft-resend-checkbox-row input:checked').length == 0)
+    {
+        $("#confirm-resend-selected").modal('toggle');
+        $("#no-draft-selected-error").show();
+     //   alert("No drafts to approve are selected");
+       return false; 
+    }
+   else {
+        $('#selected-drafts-resend-form').submit();
+   }    
+});
+
+
 
 $(".draft-checkbox").change(function() {
     if(this.checked) {
-        $(this).closest('.draft-checkbox-row').addClass("highlight");
+        $(this).closest('.draft-highlight').addClass("highlight");
     } else {
-    $(this).closest('.draft-checkbox-row').removeClass("highlight");
+    $(this).closest('.draft-highlight').removeClass("highlight");
     }
 });
 

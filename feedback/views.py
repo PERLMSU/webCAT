@@ -577,9 +577,9 @@ class ApproveSelectedDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateV
 	def post(self, *args, **kwargs):
 		#form = ApproveSelectedDraftsForm(self.request.POST or None)
 		#if form.is_valid():
-		status = kwargs['status']
+		status = int(kwargs['status'])
 		#week = kwargs['week']
-		selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_approve_'+status)]
+		selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_approve_')]
 		#messages.add_message(self.request, messages.SUCCESS, 'Selected drafts')
 		#raise Exception("hello")
 		#messages.add_message(self.request, messages.SUCCESS, "whaddup bish")	
@@ -597,6 +597,47 @@ class ApproveSelectedDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateV
 		#else:
 		messages.add_message(self.request, messages.SUCCESS, "Drafts have been approved ("+str(count)+")")	
 		return HttpResponseRedirect('/feedback/inbox/') 
+
+
+class SendSelectedDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
+
+	def post(self, *args, **kwargs):
+
+		status = int(kwargs['status'])
+		if status == 3:
+			selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_send_')]
+		elif status == 4:
+			selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_resend_')]
+
+		sent_count = 0	
+		successfully_sent = []
+		no_email_found = []
+		no_email_count = 0		
+		for i in range(len(selected_drafts)):
+			draft_pk = int(selected_drafts[i].encode('ascii'))
+			draft = Draft.objects.get(id=draft_pk)
+			try:
+				if draft.send_email_to_student():
+					sent_count += 1
+					successfully_sent.append(draft.student.get_full_name())
+				else:
+					no_email_count += 1
+					no_email_found.append(draft.student.get_full_name())
+			except Exception as e:
+				messages.add_message(self.request, messages.ERROR, 'Unable to send this feedback to student: %s' % e) 
+			#count += 1
+			#except Exception as e:
+			#	messages.add_message(self.request, messages.ERROR, "Something went wrong. A draft could not be found.")	
+
+		if successfully_sent:
+			messages.add_message(self.request, messages.SUCCESS, str(len(successfully_sent)) + ' Feedback Emails have been sent to: ' +', '.join(successfully_sent))             
+		if no_email_count:
+			messages.add_message(self.request, messages.ERROR, str(len(no_email_found)) + ' Emails could not be sent, no email addresses found for: ' +', '.join(no_email_found))  
+
+	#	messages.add_message(self.request, messages.SUCCESS, "Drafts have been emailed ("+str(sent_count)+")")	
+		return HttpResponseRedirect('/feedback/inbox/') 
+
+
 
 def approve_draft(request, pk):
 	try:

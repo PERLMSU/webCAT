@@ -1,7 +1,18 @@
-<div class="row draft-checkbox-row">
+{% if status == 1 %}
+<div class="row draft-highlight draft-checkbox-row">
+  {% elif status == 3 %}
+  <div class="row draft-highlight draft-send-checkbox-row">
+
+ {% elif status == 4 %}
+
+<div class="row draft-highlight draft-resend-checkbox-row"> 
+  {% else %}
+  <div class="row draft-highlight">
+  {% endif %}
+
 
 <div class="col-sm-1">
-  {% if status == 1 %}
+ {% if status == 1 %} 
   <input class="draft-checkbox" type="checkbox" name="draft_to_approve_{{forloop.counter}}" value="{{draft.id}}">
   {% elif status == 3 %}
     <input class="draft-checkbox" type="checkbox" name="draft_to_send_{{forloop.counter}}" value="{{draft.id}}">
