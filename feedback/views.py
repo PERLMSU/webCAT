@@ -554,6 +554,11 @@ class ApproveDraft(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
 		if form.is_valid():
 			draft = form.cleaned_data['draft_pk']
 			draft_text = form.cleaned_data['draft_text']
+
+			#status = form.cleaned_data['status']
+		#	print("HELLO",self.request.POST)
+
+
 			if draft.status != 3:
 				draft.status = 3
 				draft.send_approval_notification()
@@ -566,6 +571,32 @@ class ApproveDraft(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
 			messages.add_message(self.request, messages.ERROR, form.errors)
 			return JsonResponse(form.errors)
 
+
+class ApproveSelectedDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
+
+	def post(self, *args, **kwargs):
+		#form = ApproveSelectedDraftsForm(self.request.POST or None)
+		#if form.is_valid():
+		status = kwargs['status']
+		#week = kwargs['week']
+		selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_approve_'+status)]
+		#messages.add_message(self.request, messages.SUCCESS, 'Selected drafts')
+		#raise Exception("hello")
+		#messages.add_message(self.request, messages.SUCCESS, "whaddup bish")	
+		count = 0			
+		for i in range(len(selected_drafts)):
+			draft_pk = int(selected_drafts[i].encode('ascii'))
+			try:
+				draft = Draft.objects.get(id=draft_pk)
+				draft.status = 3
+				draft.send_approval_notification()
+				draft.save()
+				count += 1
+			except Exception as e:
+				messages.add_message(self.request, messages.ERROR, "Something went wrong. A draft could not be approved.")	
+		#else:
+		messages.add_message(self.request, messages.SUCCESS, "Drafts have been approved ("+str(count)+")")	
+		return HttpResponseRedirect('/feedback/inbox/') 
 
 def approve_draft(request, pk):
 	try:

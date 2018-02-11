@@ -177,6 +177,21 @@ $(document).on('change',".observation-dropdown", function(){
  
 });  
 
+$('#submit-selected-drafts').click(function(){
+     /* when the submit button in the modal is clicked, submit the form */
+    //alert('submitting');
+    $('#selected-drafts-form').submit();
+});
+
+$(".draft-checkbox").change(function() {
+    if(this.checked) {
+        $(this).closest('.draft-checkbox-row').addClass("highlight");
+    } else {
+    $(this).closest('.draft-checkbox-row').removeClass("highlight");
+    }
+});
+
+
 $(".student-checkbox").change(function() {
     if(this.checked) {
         $(this).closest('.student-checkboxes').addClass("highlight");
@@ -492,21 +507,24 @@ $('#confirm-approve').on('show.bs.modal', function(e) {
 });
 
 $('#confirm-approve-all').on('show.bs.modal', function(e) {    
+    var num = $(e.relatedTarget).data('num')
+    $("#approve_all_drafts_header").html(num);
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
 });
 
 $('#confirm-send').on('show.bs.modal', function(e) {
     var all = $(e.relatedTarget).data('id')
+    var num = $(e.relatedTarget).data('num')
     if (all == "resend")
     {
       //  $(this).find('.btn-ok').attr('value', "Resend");
         $("#email_all_text").html("Are you sure you want resend all emails? This will only resend the drafts that have already been marked as sent.");
-        $("#email_header").html("Resend All Drafts");
+        $("#email_header").html("Resend All Drafts ("+num+")");
     }
     else
     {
        // $(this).find('.btn-ok').attr('value', "Send");
-       $("#email_header").html("Send All Approved Drafts");
+       $("#email_header").html("Send All Approved Drafts ("+num+")");
         $("#email_all_text").html("Are you sure you want to email all the approved drafts to students for this week? <p>*This will only email the drafts that have not been sent yet.</p>");
     }
     

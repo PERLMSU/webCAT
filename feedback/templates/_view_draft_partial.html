@@ -1,8 +1,13 @@
-<div class="row">
+<div class="row draft-checkbox-row">
 
 <div class="col-sm-1">
-  
-  <input type="checkbox" name="draft_to_approve" value="{{draft.id}}">
+  {% if status == 1 %}
+  <input class="draft-checkbox" type="checkbox" name="draft_to_approve_{{forloop.counter}}" value="{{draft.id}}">
+  {% elif status == 3 %}
+    <input class="draft-checkbox" type="checkbox" name="draft_to_send_{{forloop.counter}}" value="{{draft.id}}">
+  {% elif status == 4 %}
+  <input class="draft-checkbox" type="checkbox" name="draft_to_resend_{{forloop.counter}}" value="{{draft.id}}">
+  {% endif %}
 </div>
       <div class="col-lg-10">
           <span> <p> Notification: {{draft.get_notifications.notification}} </p></span>

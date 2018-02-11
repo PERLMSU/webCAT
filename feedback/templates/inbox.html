@@ -47,18 +47,25 @@
       <div class="panel-body">
 
         {% if drafts_need_approval.count != 0 %}
-        <button data-toggle="modal" data-href="{% url "inbox-approve-all-drafts" week %}"  data-target="#confirm-approve-all" class="btn btn-success btn-lg">Approve All <span class="fa fa-thumbs-up"></span></button>  <button type="submit" class="btn btn-success btn-lg">Approve Selected <span class="fa fa-thumbs-up"></span> </button>
+        <button data-toggle="modal" data-href="{% url "inbox-approve-all-drafts" week %}" data-num="{{drafts_need_approval.count}}"  data-target="#confirm-approve-all" class="btn btn-success btn-lg">Approve All <span class="fa fa-thumbs-up"></span></button>  
+            
+            <button data-toggle="modal" data-target="#confirm-approve-selected" class="btn btn-success btn-lg">Approve Selected <span class="fa fa-thumbs-up"></span> </button>
+        
+
         <hr>
-        {% endif %}
+       
 
-
-        {% with drafts_need_approval as drafts %}
-          {% with 1 as status %}
-
-          {% include "_drafts_partial.html" %}
-
+         <form id="selected-drafts-form" action="{% url "inbox-approve-selected" status=1 %}" method="post">{% csrf_token %}
+          {% with drafts_need_approval as drafts %}
+            {% with 1 as status %}
+           
+              {% include "_drafts_partial.html" %}
+           
+            {% endwith %}
           {% endwith %}
-        {% endwith %}
+           </form>
+
+         {% endif %}
 
  </div>
       </div>
@@ -98,7 +105,7 @@
         <div class="panel-body">
 
             {% if drafts_approved.count != 0 %}
-          <button type="submit" class="btn btn-warning btn-lg" data-href="{% url "inbox-send-all-drafts" week %}" data-toggle="modal" data-target="#confirm-send"  href='#'>Email All <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Email Selected <span class="fa fa-send"> </button>
+          <button type="submit" data-num="{{drafts_approved.count}}" class="btn btn-warning btn-lg" data-href="{% url "inbox-send-all-drafts" week %}" data-toggle="modal" data-target="#confirm-send"  href='#'>Email All <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Email Selected <span class="fa fa-send"> </button>
           <hr>
           {% endif %}
 
@@ -124,7 +131,7 @@
       <div class="panel-body">
 
          {% if drafts_emailed.count != 0 %}
-        <button type="submit" data-id="resend" class="btn btn-warning btn-lg" data-href="{% url "inbox-resend-all-drafts" week=week resend=1 %}" data-toggle="modal" data-target="#confirm-send">Resend All Emails <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Resend Selected Emails <span class="fa fa-send"> </button>
+        <button type="submit" data-num="{{drafts_emailed.count}}" data-id="resend" class="btn btn-warning btn-lg" data-href="{% url "inbox-resend-all-drafts" week=week resend=1 %}" data-toggle="modal" data-target="#confirm-send">Resend All Emails <span class="fa fa-send"> </button>  <button type="submit" class="btn btn-warning btn-lg">Resend Selected Emails <span class="fa fa-send"> </button>
         <hr>
         {% endif %}
 
@@ -158,7 +165,7 @@
           <form action="{% url "send-revision-notes" %}" method="POST">{% csrf_token %}
           <input type="hidden" name="draft_pk" id="draft_id">
           Revision Notes:
-          <textarea name="revision_notes" class="form-control" rows="10"></textarea>
+          <textarea name="revision_notes" required class="form-control" rows="10"></textarea>
         </div>
 
         <div class="modal-footer">
@@ -172,6 +179,23 @@
   </div>
 
 
+
+<div class="modal fade" id="confirm-approve-selected" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Approve Drafts
+            </div>
+            <div class="modal-body">
+                Are you sure you want to approve these drafts?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-success btn-ok" id="submit-selected-drafts">Approve</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -197,7 +221,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                Approve All Drafts
+                <h3>Approve All Drafts (<span id="approve_all_drafts_header"></span>)</h3>
             </div>
             <div class="modal-body">
                 Are you sure you want to approve all drafts?
