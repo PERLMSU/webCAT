@@ -105,13 +105,14 @@ $(document).ready(function() {
                {
 
                  $("#status_1_"+String(student_id)).show();
+
+                 $("#confirm-send-to-instructor-"+String(student_id)).modal("toggle");
                //  $("#draft-student-"+String(student_id)).prop('disabled',true);
                  $("#save_send_btns_"+String(student_id)).hide();
                  $("#feedback_"+String(student_id)+' :input').attr("disabled", true);
                  
                  //$("#category_grades_"+String(student_id))+' '
                  
-
                }
                                   
                

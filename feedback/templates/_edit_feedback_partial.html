@@ -82,7 +82,30 @@
 										<div id="save_send_btns_{{student.id}}">
 									    	<button data-toggle="tooltip" title="Save draft" type="submit" name="save" value="save" class="btn btn-success"> <span class="glyphicon glyphicon-floppy-disk"></span></button>
 									    	<!-- <a href="#" data-toggle="modal" data-target="#confirm-modal"> test submit</a> -->
-									    	<button data-toggle="tooltip" title="Send to instructor" type="submit" name="send" value="send" class="btn btn-info"><span class="glyphicon glyphicon-send"></span></button>
+									    	<span data-toggle="modal" data-target="#confirm-send-to-instructor-{{student.id}}" >
+									    	<a data-toggle="tooltip" title="Send to instructor" class="btn btn-info"><span class="glyphicon glyphicon-send"></span></a>
+									    </span>
+
+
+
+									<div class="modal fade" id="confirm-send-to-instructor-{{student.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+									    <div class="modal-dialog">
+									        <div class="modal-content">
+									            <div class="modal-header">
+									                <h3>Send Draft to Instructor</h3>
+									            </div>
+									            <div class="modal-body">
+									                <span>Are you sure you would like to send this draft to the instructor for approval?</span>
+									            </div>
+									            <div class="modal-footer">
+									                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+									                <button name="send" value="send" type="submit" class="btn btn-info btn-ok">Send to Instructor</a>
+									            </div>
+									        </div>
+									    </div>
+									</div>
+
+
 								    	</div>
 
 										     
