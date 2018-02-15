@@ -377,6 +377,8 @@ class InboxView(SuperuserRequiredMixin,TemplateView):
 			self.context['title'] = "Inbox"
 			self.context['instructors'] = Profile.objects.filter(current_classroom=classroom)
 			self.context['week'] = week
+			self.context['week_begin'] = classroom.current_semester.get_week_start(week)
+			self.context['week_end'] = classroom.current_semester.get_week_end(week)
 			self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
 			return render(self.request, self.template_name, self.context)
 		else:

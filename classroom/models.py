@@ -22,6 +22,19 @@ class Semester(models.Model):
     def get_year(self):
         pass
 
+    def get_start_date(self):
+        #FIRST MONDAY OF SEMESTER 
+        date = self.date_begin - timedelta(days=self.date_begin.weekday())
+        return date
+
+    def get_week_start(self, week):
+        date = self.get_start_date() + timedelta(weeks=(week-1))
+        return date
+
+    def get_week_end(self,week):
+        date = self.get_week_start(week) + timedelta(days=6)
+        return date
+
     def __str__(self):
         return "{} {} to {}".format(self.title, self.date_begin, self.date_end)
 
@@ -83,11 +96,12 @@ class Rotation(models.Model):
         return "Weeks: {}-{} Dates: {} - {}".format(self.start_week,self.end_week,str(self.get_start_date()),str(self.get_end_date()))
     #instructor = models.ForeignKey(settings.AUTH_USER_MODEL)
     def get_start_date(self):
-        time_diff = timedelta(weeks=self.start_week)
-        return (self.semester.date_begin+time_diff)
+        time_diff = timedelta(weeks=(self.start_week-1))
+        return (self.semester.get_start_date()+time_diff)
 
     def get_end_date(self):
-        time_diff = timedelta(weeks=self.length)
+        time_diff = timedelta(weeks=(self.length-1),days=-1)
+
         return (self.get_start_date() + time_diff)
 
     def get_end_week(self):

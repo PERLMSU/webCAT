@@ -42,6 +42,8 @@
             {{ classroom.current_semester }}
 
             <br>
+            new dates: {{classroom.current_semester.get_start_date}}
+            <br>
             Dates: {{classroom.current_semester.date_begin}} - {{classroom.current_semester.date_end}}
             <br>
             Number of Weeks: {{ classroom.get_num_weeks }}
