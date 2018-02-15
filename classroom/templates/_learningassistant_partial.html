@@ -57,14 +57,16 @@
         <form class="form-horizontal" action="{% url "classroom-assign-multiple-groups" la.id %}" method="POST">{% csrf_token %}
   <!--       <select name="group_numbers"> -->
 
-         
+         <input type="hidden" value="{{rotation.id}}" name="rotation_pk"/>
           {% for rotation_group in rot_groups %}
 
           <p style="padding-left: 10px;">
             {% if rotation_group in rotation_groups|get_rotation_groups_by_instructor:la.id %}
               <input type="checkbox" checked name="group_numbers" value='{{rotation_group.id}}'> {{rotation_group.group_number}}</input>
+              <span>{{rotation_group.instructor.get_full_name}}</span>
             {% else %}
               <input type="checkbox" name="group_numbers" value='{{rotation_group.id}}'> {{rotation_group.group_number}}</input>
+              <span>{{rotation_group.instructor.get_full_name}}</span>
             {% endif %}
           </p>
           {% endfor %}

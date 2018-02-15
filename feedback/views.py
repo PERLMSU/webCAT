@@ -373,6 +373,7 @@ class InboxView(SuperuserRequiredMixin,TemplateView):
 			self.context['drafts_approved'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=3,email_sent=False)
 			self.context['drafts_emailed'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=3,email_sent=True)			
 
+			self.context['grade_scale'] = [x*.25 for x in range(17)]
 			self.context['title'] = "Inbox"
 			self.context['instructors'] = Profile.objects.filter(current_classroom=classroom)
 			self.context['week'] = week
@@ -562,7 +563,23 @@ class ApproveDraft(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
 			if draft.status != 3:
 				draft.status = 3
 				draft.send_approval_notification()
-			draft.text = draft_text				
+			draft.text = draft_text		
+
+
+			grades_values = dict([(name[6:],value) for name, value in self.request.POST.items() if name.startswith('grade_')])
+
+			
+		#	print(grades_values)
+			for category_pk,grade_val in grades_values.items():
+				category = Category.objects.get(id=category_pk)
+				try:
+					grade = Grade.objects.get(draft=draft, category=category)
+					grade.grade = grade_val
+					grade.save()
+				except Grade.DoesNotExist:
+					grade = Grade.objects.create(draft=draft,category=category,grade=grade_val)
+
+			#raise Exception("wht")
 			draft.save()
 			messages.add_message(self.request, messages.SUCCESS, 'Successfully approved with edits.')
 			return HttpResponseRedirect('/feedback/inbox/')

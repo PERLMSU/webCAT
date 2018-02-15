@@ -189,7 +189,7 @@ class Draft(models.Model):
 
     class Meta:    
         unique_together = ('owner', 'student','week_num')   
-
+        ordering = ["student"]
 
     def get_notifications(self):
         return Notification.objects.get(draft_to_approve=self)

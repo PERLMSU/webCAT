@@ -76,12 +76,13 @@
       <!--   <h4>Add Students to Group <span id="assign-group-num"></span></h4> -->
         <h5> Please select the students you would like to add to group {{group.group_number}} </h5>
         <form class="form-horizontal" action="{% url "classroom-assign-multiple-students" group.id %}" method="POST">{% csrf_token %}
-
+          
           <div class="form-group padding-lr">
           {% for student in students %}
             {% if student in group.students.all %}
             <p>
               <input type="checkbox" checked name="students" value='{{student.id}}'> {{student.get_full_name}}</input>
+
             </p>
             {% else %}
             <p>

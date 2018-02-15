@@ -13,7 +13,7 @@ from classroom.models import *
 from userprofile.models import Profile
 
 from .forms import *
-MAX_STUDENTS = 4
+MAX_STUDENTS = 5
 
 
 ## LEGACY CODE ################################
@@ -288,13 +288,23 @@ class AssignMultipleGroupsView(LoginRequiredMixin, SuperuserRequiredMixin, Templ
         #raise Exception("what")
         if form.is_valid():
             checked_groups = form.cleaned_data['group_numbers']
+            rotation = form.cleaned_data['rotation_pk']
             try:
                 instructor = Profile.objects.get(id=kwargs['pk'])
             except Exception as e:
                 messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
                 return HttpResponseRedirect('/classroom/')
 
-            #
+            assigned_groups = RotationGroup.objects.filter(rotation=rotation,instructor=instructor)
+            for group in assigned_groups:
+                group.instructor = None
+                group.save()
+
+            if not checked_groups:
+                messages.add_message(self.request, messages.SUCCESS, 'Successfully unassigned all groups from this instructor.')
+            # print("___________________")
+            # print(assigned_groups)
+            # print("___________________")
 
             for group_pk in checked_groups:
                 #
@@ -320,13 +330,17 @@ class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, Tem
         form = AssignMultipleStudentsForm(self.request.POST or None)
         if form.is_valid():
             checked_students = form.cleaned_data['students']
+
             try:
                 group = RotationGroup.objects.get(id=kwargs['pk'])
             except Exception as e:
                 messages.add_message(self.request, messages.ERROR, 'Unable to assign to this group %s' % e)  
                 return HttpResponseRedirect('/classroom/')
 
+            group.students.clear()
+
             count = group.students.count()
+            successfully_added = []
             for student_pk in checked_students:
                 
                     try:
@@ -339,13 +353,19 @@ class AssignMultipleStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, Tem
                                 exist.students.remove(student)
 
                             group.students.add(student)
-                            messages.add_message(self.request, messages.SUCCESS, 'Successfully added '+ student.first_name + ' ' + student.last_name + ' to group!') 
+                            successfully_added.append(student.first_name + ' ' + student.last_name)
+                           # messages.add_message(self.request, messages.SUCCESS, 'Successfully added '+ student.first_name + ' ' + student.last_name + ' to group!') 
                         else:
                             messages.add_message(self.request, messages.WARNING, 'Could not add '+ student.first_name + ' ' + student.last_name + ' to group - already 4 members') 
                     except Exception as e:
                         messages.add_message(self.request, messages.ERROR, 'Unable to assign student ' + student.first_name + ' ' + student.last_name + ' %s' % e) 
 
                     count = group.students.count()
+
+            if successfully_added:
+                messages.add_message(self.request, messages.SUCCESS, 'Successfully added '+ ", ".join(successfully_added) + ' to group.')
+            if not checked_students:
+                messages.add_message(self.request, messages.SUCCESS, 'Successfully unassigned all students from group.')
 
             return HttpResponseRedirect('/classroom/')
         else:

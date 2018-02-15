@@ -73,6 +73,11 @@
           {% endwith %}
          </form>
 
+
+         {% for draft in drafts_need_approval %}
+          {% include "_approve_with_edits_partial.html" %}
+         {% endfor %}
+         
          {% endif %}
 
  </div>
@@ -96,6 +101,11 @@
 
           {% endwith %}
         {% endwith %}
+
+
+         {% for draft in drafts_need_revision %}
+          {% include "_approve_with_edits_partial.html" %}
+         {% endfor %}
 
     </div>
       </div>
@@ -133,6 +143,10 @@
 
         </form>
 
+         {% for draft in drafts_approved %}
+            {% include "_approve_with_edits_partial.html" %}
+         {% endfor %}
+
         </div>
       </div>
     </div>
@@ -164,6 +178,10 @@
         {% endwith %}
       </form>
 
+
+         {% for draft in drafts_emailed %}
+            {% include "_approve_with_edits_partial.html" %}
+         {% endfor %}
         </div>
       </div>
     </div>

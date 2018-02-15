@@ -123,14 +123,14 @@ class AssignInstructorForm(forms.Form):
 
 class AssignMultipleGroupsForm(forms.Form):
 	#CHOICES = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))
-
+	rotation_pk = forms.ModelChoiceField(queryset=Rotation.objects.all(),widget=forms.HiddenInput())
 	# group_numbers = forms.MultipleChoiceField(
 	#     required=True,
 	#     widget=forms.CheckboxSelectMultiple,
 	#     choices = CHOICES,
 	# )  
 	group_numbers = forms.MultipleChoiceField(
-		required=True,
+		required=False,
 		widget=forms.CheckboxSelectMultiple,
 		choices = [],
 	) 
@@ -157,7 +157,7 @@ class AssignMultipleStudentsForm(forms.Form):
 	# CHOICES_students = tuple(students_full_name)    
 	#raise Exception("wutt")
 	students = forms.MultipleChoiceField(
-	    required=True,
+	    required=False,
 	    widget=forms.CheckboxSelectMultiple,
 	    choices=[],
 	)
@@ -172,6 +172,6 @@ class AssignMultipleStudentsForm(forms.Form):
 
 	def clean_students(self):
 	    value = self.cleaned_data['students']
-	    if len(value) > 4:
-	        raise forms.ValidationError("You can't select more than 4 students.")
+	    if len(value) > 5:
+	        raise forms.ValidationError("You can't select more than 5 students.")
 	    return value    

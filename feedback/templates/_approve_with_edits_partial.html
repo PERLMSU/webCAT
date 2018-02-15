@@ -13,8 +13,38 @@
                 <div class="modal-body">
                   <form class="approve-edits-form" action="{% url "inbox-approve-draft-edits" %}" method="POST">{% csrf_token %}
                   <input type="hidden" name="draft_pk" value="{{draft.id}}">
+                  <input type="hidden" name="week" value="{{week}}">
                   Draft:
-                  <textarea name="draft_text" class="form-control" rows="10">{{draft.text}}</textarea>
+                  <textarea name="draft_text" required class="form-control" rows="10">{{draft.text}}</textarea>
+
+
+
+                    {% with draft.get_grades as grades %}
+                    <div class="row">
+                    {% for grade in grades %}
+                    
+                      <div class="col-sm-8">
+                      <label for="grade_{{grade.category.name}}">{{grade.category.name}}</label>  
+                    </div>  
+                    <div class="col-sm-4">          
+                    <select name="grade_{{grade.category.id}}">
+
+                        {% for val in grade_scale %}
+                          {% if grade.grade|compare_grade:val %}
+                            <option selected value="{{val}}">{{val}}</option>
+                          {% else %}
+                            <option value="{{val}}">{{val}}</option>
+                          {% endif %}
+                        {% endfor %}
+                    </select>
+                    </div>
+
+                         {% endfor %}
+                       </div>
+                  {% endwith %}
+           
+
+
                 </div>
 
                 <div class="modal-footer">

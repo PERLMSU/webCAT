@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 
 from uuid import uuid4
 
-from classroom.models import Classroom
+from classroom.models import *
 
 class ProfileManager(BaseUserManager):
     """ Manager that contains methods used
@@ -87,7 +87,6 @@ class Profile(AbstractBaseUser, PermissionsMixin):
             return None
         else:
             return self.current_classroom.instructor
-
 
     def get_full_name(self):
         return "{} {}".format(self.first_name, self.last_name).strip()
