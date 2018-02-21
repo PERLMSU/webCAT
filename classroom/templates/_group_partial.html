@@ -61,7 +61,6 @@
             <a href="#" class="assigngroup" data-toggle="modal" data-rotationgroupid="{{group.id}}" data-instructor="{{group.instructor.id}}" data-info="{{group.description}}" data-id="{{group.group_number}}" data-target="#assignGroups_{{rotation.id}}"><span class="fa fa-edit"></span></a>
           </td>
           <td><a href="#" data-toggle="modal" data-target="#assignMultipleStudents_{{group.id}}"><span class="glyphicon glyphicon-paste"></span></a></td>  
-<!--           <td><a href="#" data-href="{% url "delete-group" group.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{group.group.group_number}}" value="Delete" class="deletegroup"><span class="fa fa-remove red-icon"></span></a></td> -->
 
 <div class="modal fade" id="assignMultipleStudents_{{group.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -73,7 +72,6 @@
         <h4 class="modal-title" id="myModalLabel">Add Students to Group</h4>
       </div>
       <div class="modal-body">
-      <!--   <h4>Add Students to Group <span id="assign-group-num"></span></h4> -->
         <h5> Please select the students you would like to add to group {{group.group_number}} </h5>
         <form class="form-horizontal" action="{% url "classroom-assign-multiple-students" group.id %}" method="POST">{% csrf_token %}
           
@@ -163,20 +161,6 @@
       </div>
       <div class="modal-body">
 
-
-<!--         <h5> Add Group: </h5>
-        <form class="form-horizontal" id="createGroupForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
-
-        <div style="padding-left: 20px; padding-right: 20px;">
-          <div class="form-group">
-
-            <label for="group_number">Group Number:</label>
-            <input name="group_number" type="text" class="form-control" placeholder="Enter group number here"></input>
-          </div>     
-        </div>  
-        <input type="hidden" value="{{rotation.id}}" name="rotation"> 
-          <input type="submit" value="Save" class="btn btn-primary"/>      
-        </form>    -->  
         <hr>
         <form class="form-horizontal" id="createGroupsForm" action="{% url "classroom-create-group" %}" method="POST">{% csrf_token %}
 

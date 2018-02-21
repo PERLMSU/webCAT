@@ -48,12 +48,12 @@ def filter_drafts_by_instructor(drafts,instructor):
 def filter_draft_count_by_instructor(drafts,instructor):
 	return drafts.filter(owner=instructor).count()
 
-@register.filter
-def get_note_feedback_pieces(note):
-	if note.observation != None:
-		return FeedbackPiece.objects.filter(observation=note.observation)
-	else:
-		return FeedbackPiece.objects.filter(sub_category=note.sub_category)  
+# @register.filter
+# def get_note_feedback_pieces(note):
+# 	if note.observation != None:
+# 		return FeedbackPiece.objects.filter(observation=note.observation)
+# 	else:
+# 		return FeedbackPiece.objects.filter(sub_category=note.sub_category)  
 
 #def get_observations_by_notes(notes):
 
@@ -103,10 +103,10 @@ def get_subcategories(category_pk):
     sub_categories = SubCategory.objects.filter(main_category=category_pk)
     return sub_categories
 
-@register.filter
-def get_feedback_pieces(subcategory_pk):
-	feedback_collection = FeedbackPiece.objects.filter(sub_category=subcategory_pk)
-	return feedback_collection
+# @register.filter
+# def get_feedback_pieces(subcategory_pk):
+# 	feedback_collection = FeedbackPiece.objects.filter(sub_category=subcategory_pk)
+# 	return feedback_collection
 
 
 @register.filter

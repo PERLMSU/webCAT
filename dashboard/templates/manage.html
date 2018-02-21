@@ -64,9 +64,6 @@
             <a href="#" data-toggle="modal" data-target="#EditUser_{{user.id}}"><span class="fa fa-edit"> </span></a> 
              </td> 
 <td><a href="#" data-href="{% url "dash-remove-user" user.id %}" data-toggle="modal" data-target="#confirm-delete" data-id="{{user.first_name}} {{user.last_name}}" value="Delete" class="deletestudent"><span class="fa fa-remove red-icon"></span></a></td>             
-           <!--   <td>
-            <a href="#" data-toggle="modal" data-target="#EditUser_{{user.id}}"><span class="fa fa-remove red-icon"></span></a>
-           </td>   -->
 
 <div class="modal fade" id="EditUser_{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
