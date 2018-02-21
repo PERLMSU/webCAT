@@ -107,7 +107,6 @@ class ApproveDraft(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
 				except Grade.DoesNotExist:
 					grade = Grade.objects.create(draft=draft,category=category,grade=grade_val)
 
-			#raise Exception("wht")
 			draft.save()
 			messages.add_message(self.request, messages.SUCCESS, 'Successfully approved with edits.')
 			return HttpResponseRedirect('/inbox/')
@@ -183,7 +182,7 @@ class SendDrafts(SuperuserRequiredMixin, View):
 		resend = False
 		if 'resend' in self.kwargs:
 			resend = True
-		#resend = self.kwargs['resend']
+
 		sent_count = 0
 		drafts = Draft.objects.filter(student__classroom=self.request.user.current_classroom,student__semester=self.request.user.current_classroom.current_semester,
 			week_num=week,status=3,email_sent=resend)
@@ -191,7 +190,6 @@ class SendDrafts(SuperuserRequiredMixin, View):
 		no_email_found = []
 		no_email_count = 0
 		for draft in drafts:
-		# for i in range(10):
 			try:
 				if draft.send_email_to_student():
 					sent_count += 1
@@ -221,12 +219,10 @@ def approve_draft(request, pk):
 
 def send_draft_revision(request):
 	form = AddRevisionNotesForm(request.POST or None)
-	#raise Exception("wuht")
 	if form.is_valid():	
 		draft = form.cleaned_data['draft_pk']
 		revision_notes = form.cleaned_data['revision_notes']		
 		try:
-			#draft = Draft.objects.get(id=draft_pk)
 			draft.status = 2
 			draft.save()
 			draft.add_revision_notes(revision_notes)

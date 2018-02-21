@@ -19,7 +19,6 @@ from django.db import IntegrityError
 from userprofile.models import Profile
 from feedback.models import *
 from classroom.models import *
-# from inbox.models import Notification
 
 from notes.models import Note
 from django.views.decorators.csrf import csrf_exempt
@@ -47,15 +46,6 @@ def filter_drafts_by_instructor(drafts,instructor):
 @register.filter
 def filter_draft_count_by_instructor(drafts,instructor):
 	return drafts.filter(owner=instructor).count()
-
-# @register.filter
-# def get_note_feedback_pieces(note):
-# 	if note.observation != None:
-# 		return FeedbackPiece.objects.filter(observation=note.observation)
-# 	else:
-# 		return FeedbackPiece.objects.filter(sub_category=note.sub_category)  
-
-#def get_observations_by_notes(notes):
 
 @register.filter
 def get_subcategory_observations(subcategory):
@@ -103,12 +93,6 @@ def get_subcategories(category_pk):
     sub_categories = SubCategory.objects.filter(main_category=category_pk)
     return sub_categories
 
-# @register.filter
-# def get_feedback_pieces(subcategory_pk):
-# 	feedback_collection = FeedbackPiece.objects.filter(sub_category=subcategory_pk)
-# 	return feedback_collection
-
-
 @register.filter
 def get_student_draft(student_pk, week):
 	draft = Draft.objects.filter(student = student_pk, week_num = week).first()
@@ -120,7 +104,6 @@ class AddEditObservation(SuperuserRequiredMixin,TemplateView):
 
 	def post(self, *args, **kwargs):
 		form = EditObservationForm(self.request.POST or None)
-		#raise Exception("what")
 		if form.is_valid():
 			observation = form.cleaned_data['observation_pk'] 
 			try:
@@ -142,7 +125,7 @@ class AddEditCommonFeedback(SuperuserRequiredMixin,TemplateView):
 
 	def post(self, *args, **kwargs):
 		form = EditCommonFeedbackForm(self.request.POST or None)
-		#raise Exception("what")
+		
 		if form.is_valid():
 
 			feedback = form.cleaned_data['feedback_pk'] 
@@ -167,7 +150,6 @@ class AddEditFeedbackExplanation(SuperuserRequiredMixin,TemplateView):
 
 	def post(self, *args, **kwargs):
 		form = EditExplanationForm(self.request.POST or None)
-		#raise Exception("what")
 		if form.is_valid():
 
 			feedback_explanation = form.cleaned_data['explanation_pk'] 
@@ -227,12 +209,9 @@ class FeedbackView(LoginRequiredMixin, View):
 
 			groups = RotationGroup.objects.filter(rotation__classroom = classroom, rotation__semester=classroom.current_semester.id,instructor= self.request.user,
 				rotation__start_week__lte=week,rotation__end_week__gte=week)
-			#groups_to_students = {}
+			
 			student_to_feedback_draft = {}
-			# for group in groups:
-			# 	groups_to_students[group] = Student.objects.filter(group__students=group)
 
-		#	raise Exception("test!")
 			main_categories = Category.objects.filter(classroom=classroom)
 
 			self.context['title'] = "Feedback Writer"
@@ -241,10 +220,8 @@ class FeedbackView(LoginRequiredMixin, View):
 			self.context['week_end'] = classroom.current_semester.get_week_end(week)  			
 
 			self.context['rotation_groups'] = groups
-			# self.context['loop_times'] = range(1, 13)
 			self.context['loop_times'] = range(1,classroom.get_num_weeks())
 			self.context['grade_scale'] = [x*.25 for x in range(17)]
-			#self.context['groups_to_students'] = groups_to_students
 			self.context['main_categories'] = main_categories
 			self.context['notifications'] = Notification.objects.filter(user=self.request.user)
 			self.context['manager_view'] = False
@@ -257,7 +234,6 @@ class FeedbackView(LoginRequiredMixin, View):
 	def post(self,*args, **kwargs):
 		form = EditDraftForm(self.request.POST or None)
 		student_ = Student.objects.get(id=kwargs['pk'])		
-		#raise Exception("test")
 		if form.is_valid():
 			draft_text = form.cleaned_data['draft_text']
 			draft = form.cleaned_data['draft']
@@ -318,8 +294,6 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 		if classroom != None:
 			self.context['create_main_category_form'] = AddCategoryForm()
 			self.context['create_sub_category_form'] = AddSubCategoryForm()
-			#self.context['create_feedback_form'] = AddFeedbackPieceForm()
-			# self.context['main_categories'] = Category.objects.filter(classroom=classroom)
 			self.context['main_categories'] = Category.objects.all()
 			self.context['title'] = "Manage Categories"
 
@@ -401,10 +375,8 @@ class DeleteSubCategoryView(LoginRequiredMixin, View):
     """ delete category view
     """
     def get(self, *args, **kwargs):
-    	#raise Exception("got here?")
         try:
             subcategory = SubCategory.objects.get(id=kwargs['pk'])
-            #raise Exception("whaatt")
         except Exception as e:
             messages.add_message(self.request, messages.ERROR, 'Unable to delete this subcategory %s' % e)
         finally:
@@ -493,212 +465,4 @@ def edit_category(request, pk):
 		messages.error(request, form.errors)
 		return HttpResponseRedirect('/feedback/categories/') 
 
-# class InboxView(SuperuserRequiredMixin,TemplateView):
-# 	template_name = "inbox.html"
-# 	context = {}	
-
-# 	def get(self, request, *args, **kwargs):
-
-# 		classroom = request.user.current_classroom
-# 		if classroom != None:
-# 			if 'week' in self.kwargs:
-# 				week = int(self.kwargs['week'])
-# 			else:
-# 				if request.user.current_classroom.current_week:
-# 					week = request.user.current_classroom.current_week
-# 				else:
-# 					week = 1			
-# 			self.context['draft_notifications_need_approval'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 1, draft_to_approve__week_num=week)
-# 			self.context['draft_notifications_need_revision'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 2,draft_to_approve__week_num=week)
-# 			self.context['draft_notifications_approved'] = Notification.objects.filter(user=self.request.user,draft_to_approve__status = 3,draft_to_approve__week_num=week)
-
-# 			self.context['drafts_need_approval'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=1)
-# 			self.context['drafts_need_revision'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=2)
-# 			self.context['drafts_approved'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=3,email_sent=False)
-# 			self.context['drafts_emailed'] = Draft.objects.filter(week_num=week,student__classroom = classroom,student__semester=classroom.current_semester,status=3,email_sent=True)			
-
-# 			self.context['grade_scale'] = [x*.25 for x in range(17)]
-# 			self.context['title'] = "Inbox"
-# 			self.context['instructors'] = Profile.objects.filter(current_classroom=classroom)
-# 			self.context['week'] = week
-# 			self.context['week_begin'] = classroom.current_semester.get_week_start(week)
-# 			self.context['week_end'] = classroom.current_semester.get_week_end(week)
-# 			self.context['loop_times'] = range(1,request.user.current_classroom.get_num_weeks())
-# 			return render(self.request, self.template_name, self.context)
-# 		else:
-# 			messages.add_message(self.request, messages.WARNING, 'You are not currently assigned to any classroom. Please contact your administrator to be assigned to a classroom.')            
-# 			return HttpResponseRedirect(reverse('dash-home')) 			
-
-# 	def add_message(self, text, mtype=25):
-# 		messages.add_message(self.request, mtype, text)	
-
-
-# class SendDrafts(SuperuserRequiredMixin, View):
-
-# 	def get(self, *args, **kwargs):
-# 		week = int(self.kwargs['week'])
-# 		resend = False
-# 		if 'resend' in self.kwargs:
-# 			resend = True
-# 		#resend = self.kwargs['resend']
-# 		sent_count = 0
-# 		drafts = Draft.objects.filter(student__classroom=self.request.user.current_classroom,student__semester=self.request.user.current_classroom.current_semester,
-# 			week_num=week,status=3,email_sent=resend)
-# 		successfully_sent = []
-# 		no_email_found = []
-# 		no_email_count = 0
-# 		for draft in drafts:
-# 		# for i in range(10):
-# 			try:
-# 				if draft.send_email_to_student():
-# 					sent_count += 1
-# 					successfully_sent.append(draft.student.get_full_name())
-# 				else:
-# 					no_email_count += 1
-# 					no_email_found.append(draft.student.get_full_name())
-# 			except Exception as e:
-# 				messages.add_message(self.request, messages.ERROR, 'Unable to send this feedback to student: %s' % e) 
-
-# 		messages.add_message(self.request, messages.SUCCESS, str(len(successfully_sent)) + ' Feedback Emails have been sent to: ' +', '.join(successfully_sent))             
-# 		if no_email_count:
-# 			messages.add_message(self.request, messages.ERROR, str(len(no_email_found)) + ' Emails could not be sent, no email addresses found for: ' +', '.join(no_email_found))             
-# 		return HttpResponseRedirect('/feedback/inbox/') 
-
-
-# class ApproveAllDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
-
-# 	def get(self, *args, **kwargs):
-# 		week = int(self.kwargs['week'])
-# 		classroom = self.request.user.current_classroom	
-# 		drafts = Draft.objects.filter(student__classroom=classroom,student__semester=classroom.current_semester,week_num=week,status=1)
-# 		for draft in drafts:
-# 			draft.status = 3
-# 			draft.save()
-# 		messages.add_message(self.request, messages.SUCCESS, 'Successfully approved all drafts.')
-# 		return HttpResponseRedirect('/feedback/inbox/')		
-
-
-# class ApproveDraft(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
-
-# 	def post(self, *args, **kwargs):
-# 		form = ApproveEditDraftForm(self.request.POST or None)
-# 		if form.is_valid():
-# 			draft = form.cleaned_data['draft_pk']
-# 			draft_text = form.cleaned_data['draft_text']
-
-
-# 			if draft.status != 3:
-# 				draft.status = 3
-# 				draft.send_approval_notification()
-# 			draft.text = draft_text		
-
-
-# 			grades_values = dict([(name[6:],value) for name, value in self.request.POST.items() if name.startswith('grade_')])
-
-# 			for category_pk,grade_val in grades_values.items():
-# 				category = Category.objects.get(id=category_pk)
-# 				try:
-# 					grade = Grade.objects.get(draft=draft, category=category)
-# 					grade.grade = grade_val
-# 					grade.save()
-# 				except Grade.DoesNotExist:
-# 					grade = Grade.objects.create(draft=draft,category=category,grade=grade_val)
-
-# 			#raise Exception("wht")
-# 			draft.save()
-# 			messages.add_message(self.request, messages.SUCCESS, 'Successfully approved with edits.')
-# 			return HttpResponseRedirect('/feedback/inbox/')
-# 		else:
-# 			messages.add_message(self.request, messages.ERROR, form.errors)
-# 			return JsonResponse(form.errors)
-
-
-# class ApproveSelectedDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
-
-# 	def post(self, *args, **kwargs):
-
-# 		status = int(kwargs['status'])
-
-# 		selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_approve_')]
-
-# 		count = 0			
-# 		for i in range(len(selected_drafts)):
-# 			draft_pk = int(selected_drafts[i].encode('ascii'))
-# 			try:
-# 				draft = Draft.objects.get(id=draft_pk)
-# 				draft.status = 3
-# 				draft.send_approval_notification()
-# 				draft.save()
-# 				count += 1
-# 			except Exception as e:
-# 				messages.add_message(self.request, messages.ERROR, "Something went wrong. A draft could not be approved.")	
-
-# 		messages.add_message(self.request, messages.SUCCESS, "Drafts have been approved ("+str(count)+")")	
-# 		return HttpResponseRedirect('/feedback/inbox/') 
-
-
-# class SendSelectedDrafts(SuperuserRequiredMixin,LoginRequiredMixin, TemplateView):
-
-# 	def post(self, *args, **kwargs):
-
-# 		status = int(kwargs['status'])
-# 		if status == 3:
-# 			selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_send_')]
-# 		elif status == 4:
-# 			selected_drafts = [value for name, value in self.request.POST.items() if name.startswith('draft_to_resend_')]
-
-# 		sent_count = 0	
-# 		successfully_sent = []
-# 		no_email_found = []
-# 		no_email_count = 0		
-# 		for i in range(len(selected_drafts)):
-# 			draft_pk = int(selected_drafts[i].encode('ascii'))
-# 			draft = Draft.objects.get(id=draft_pk)
-# 			try:
-# 				if draft.send_email_to_student():
-# 					sent_count += 1
-# 					successfully_sent.append(draft.student.get_full_name())
-# 				else:
-# 					no_email_count += 1
-# 					no_email_found.append(draft.student.get_full_name())
-# 			except Exception as e:
-# 				messages.add_message(self.request, messages.ERROR, 'Unable to send this feedback to student: %s' % e) 
-
-# 		if successfully_sent:
-# 			messages.add_message(self.request, messages.SUCCESS, str(len(successfully_sent)) + ' Feedback Emails have been sent to: ' +', '.join(successfully_sent))             
-# 		if no_email_count:
-# 			messages.add_message(self.request, messages.ERROR, str(len(no_email_found)) + ' Emails could not be sent, no email addresses found for: ' +', '.join(no_email_found))  
-
-# 		return HttpResponseRedirect('/feedback/inbox/') 
-
-
-
-# def approve_draft(request, pk):
-# 	try:
-# 		draft = Draft.objects.get(id=pk)
-# 		draft.status = 3
-# 		draft.send_approval_notification()
-# 		draft.save()
-# 		messages.add_message(request, messages.SUCCESS, 'Draft sucessfully approved.')		
-# 	except Draft.DoesNotExist:
-# 		messages.add_message(request, messages.ERROR, 'Error when approving feedback draft.')
-# 	return HttpResponseRedirect('/feedback/inbox/') 	
-
-# def send_draft_revision(request):
-# 	form = AddRevisionNotesForm(request.POST or None)
-# 	#raise Exception("wuht")
-# 	if form.is_valid():	
-# 		draft = form.cleaned_data['draft_pk']
-# 		revision_notes = form.cleaned_data['revision_notes']		
-# 		try:
-# 			#draft = Draft.objects.get(id=draft_pk)
-# 			draft.status = 2
-# 			draft.save()
-# 			draft.add_revision_notes(revision_notes)
-# 			messages.add_message(request, messages.INFO, 'Draft revision notes sent.')		
-# 		except Exception as e:
-# 			messages.add_message(request, messages.ERROR, 'Error when sending feedback draft revision notes.'+str(e))
-# 		return HttpResponseRedirect('/feedback/inbox/') 
-# 	else:
-# 		messages.add_message(request, messages.ERROR, 'Form not valid. Please check your inputs.')
-# 		return HttpResponseRedirect('/feedback/inbox/') 			
+			

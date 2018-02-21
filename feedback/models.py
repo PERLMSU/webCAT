@@ -11,7 +11,6 @@ from django.template.loader import render_to_string
 
 
 from classroom.models import *
-#from inbox.models import Notification
 
 NOT_SUBMITTED = 0
 SUBMITTED_AWAITING_APPROVAL = 1
@@ -186,8 +185,6 @@ class Grade(models.Model):
     category = models.ForeignKey(Category)
 
 class Notification(models.Model):
-    #classroom = models.ForeignKey(Classroom)
-    #semester = models.ForeignKey(Semester)
     notification = models.CharField(max_length=500)
     classroom = models.ForeignKey(Classroom)
     semester = models.ForeignKey(Semester)

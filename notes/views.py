@@ -64,8 +64,6 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
             selected_students = [value for name, value in self.request.POST.items()
                 if name.startswith('student_name')]
 
-           # selected_students_pk = [item for value in selected_students for item in literal_eval(value)]
-
             subcategory = form.cleaned_data['subcategory']
             observation = form.cleaned_data['observation']
             feedback_note = form.cleaned_data['note']
@@ -75,11 +73,7 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
                 messages.add_message(self.request, messages.WARNING, 'No notes were added because no students were selected.')
 
             for i in range(len(selected_students)):
-                #
-                #student_pk = student_pk.encode('ascii')
                 student_pk = int(selected_students[i].encode('ascii'))
-                #student = Student.objects.get(student_pk)
-               # raise Exception("test")
                 try:
                     student = Student.objects.get(id=student_pk)
                     new_feedback = Note.objects.create(note=feedback_note,student=student,sub_category=subcategory,observation=observation,week_num=week)
@@ -88,21 +82,6 @@ class AddFeedback(LoginRequiredMixin, TemplateView):
                 except Exception as e:
                     messages.add_message(self.request, messages.ERROR, 'Unable to create this feedback note. %s' % e) 
 
-     #       raise Exception("testy")
-            # checked_groups = form.cleaned_data['group_numbers']
-            # try:
-            #     instructor = Profile.objects.get(id=kwargs['pk'])
-            # except Exception as e:
-            #     messages.add_message(self.request, messages.ERROR, 'Unable to assign to this instructor %s' % e)  
-            #     return HttpResponseRedirect('/classroom/')
-
-            # for group_pk in checked_groups:
-            #     try:
-            #         group = Group.objects.get(id = group_pk)
-            #         group.current_instructor = instructor
-            #         group.save()
-            #     except Exception as e:
-            #         messages.add_message(self.request, messages.ERROR, 'Unable to assign group numbers to this instructor %s' % e) 
             return HttpResponseRedirect('/notes/')
         else:
             messages.error(self.request, form.errors)
@@ -128,13 +107,11 @@ class NotesView(LoginRequiredMixin, TemplateView):
 			groups_assigned = RotationGroup.objects.filter(rotation__classroom = classroom,rotation__semester=classroom.current_semester,instructor= self.request.user,
                 rotation__start_week__lte=week,rotation__end_week__gte=week)
 
-
-			# main_categories = Category.objects.filter(classroom=classroom)
 			main_categories = Category.objects.all()
 			sub_categories = {}
 			for category in main_categories:
 				sub_categories[category.id] = SubCategory.objects.filter(main_category = category)
-			# self.context['loop_times'] = range(1, 13)
+                
 			self.context['loop_times'] = range(1,classroom.get_num_weeks())
 			self.context['week'] = week
 			self.context['week_begin'] = classroom.current_semester.get_week_start(week)

@@ -128,7 +128,6 @@ class EditClassroomForm(forms.Form):
     course_code = forms.CharField(required=True)
     course_number = forms.CharField(required=True)
     description = forms.CharField(required=False)
-   # num_weeks = forms.IntegerField(required=True)
     current_week = forms.IntegerField(required=True)
     current_classroom = forms.BooleanField(required=False)
     current_semester = forms.ModelChoiceField(queryset=Semester.objects.all(),required=True)
@@ -147,8 +146,6 @@ class AddStudentForm(forms.ModelForm):
     notes = forms.CharField(required=False)
     last_name = forms.CharField()
     email = forms.EmailField(required=False)
-   # student_id = forms.CharField()
-    #group_number = forms.IntegerField(required=False)
     classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(),required=False)
     semester = forms.ModelChoiceField(queryset=Semester.objects.all(),required=False)
 
@@ -183,7 +180,6 @@ class AddClassroomForm(forms.ModelForm):
     course_code = forms.CharField()
     course_number = forms.CharField()
     current_semester = forms.ModelChoiceField(queryset=Semester.objects.all())
-    #num_weeks = forms.IntegerField()
 
     class Meta:
         model = Classroom
@@ -207,40 +203,20 @@ class AssignInstructorForm(forms.Form):
 
 
 class AssignMultipleGroupsForm(forms.Form):
-	#CHOICES = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))
 	rotation_pk = forms.ModelChoiceField(queryset=Rotation.objects.all(),widget=forms.HiddenInput())
-	# group_numbers = forms.MultipleChoiceField(
-	#     required=True,
-	#     widget=forms.CheckboxSelectMultiple,
-	#     choices = CHOICES,
-	# )  
+
 	group_numbers = forms.MultipleChoiceField(
 		required=False,
 		widget=forms.CheckboxSelectMultiple,
 		choices = [],
 	) 
 	def __init__(self, *args, **kwargs):
-		super(AssignMultipleGroupsForm, self).__init__(*args, **kwargs)   
-		#self.fields['group_numbers'].choices = choices
+		super(AssignMultipleGroupsForm, self).__init__(*args, **kwargs)  
 		self.fields['group_numbers'].choices = tuple(RotationGroup.objects.all().values_list('id','group_number').order_by('group_number'))    
-	# def __init__(self, *args, **kwargs):
-	# 	global CHOICES_GLOBAL
-	# 	self.user = kwargs.pop('user', None)
-	# 	# if self.user == None:
-	# 	# 	CHOICES_GLOBAL = tuple()
-	# 	# else:
-	# 	CHOICES_GLOBAL = tuple(Group.objects.filter(classroom=self.user.current_classroom).values_list('id','group_number').order_by('group_number'))
 
-	# 	super(AssignMultipleGroupsForm, self).__init__(*args, **kwargs)
 
 
 class AssignMultipleStudentsForm(forms.Form):
-	# all_students = Student.objects.all().values_list('id','first_name','last_name').order_by('last_name')
-
-	# students_full_name = [(student[0],student[1]+' '+student[2]) for student in all_students]
-
-	# CHOICES_students = tuple(students_full_name)    
-	#raise Exception("wutt")
 	students = forms.MultipleChoiceField(
 	    required=False,
 	    widget=forms.CheckboxSelectMultiple,
