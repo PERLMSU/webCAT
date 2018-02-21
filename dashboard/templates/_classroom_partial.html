@@ -9,9 +9,10 @@
 
              <div class="padding-lr">
                 <strong>
-                <h3><span class="fa fa-institution"></span><span> {{classroom}}</span> | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a> {% if classroom == current_classroom %}  |
+                <h3><span class="fa fa-institution"></span><span> {{classroom}}</span>{% if user.is_superuser %} | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>    {% if classroom == current_classroom %}  |
                 Current
 
+                    {% endif %}
                 {% endif %}
                 </strong></h3>
 
@@ -109,6 +110,12 @@
                                 Delete Rotation
                             </div>
                             <div class="modal-body">
+
+
+    <div class="alert alert-warning fade in alert-dismissible" role="alert">
+    <!--   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+        Warning! Deleting this rotation will also delete all of the group information, student assignments, and instructor assignments within it. 
+    </div>                                  
                                 <span> Are you sure you want to delete: </span>
                                  <b><p>{{rotation}}</p></b>
                                  <span> ? </span>

@@ -462,7 +462,7 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
         classroom = self.request.user.current_classroom
         if classroom != None:
 
-            students = Student.objects.filter(classroom=classroom).order_by('last_name')                 
+            students = Student.objects.filter(classroom=classroom,semester=classroom.current_semester).order_by('last_name')                 
            # classroom = Classroom.objects.get(instructor = self.request.user)
             # add_student_form = AddStudentForm()
             return render(self.request, self.template_name,
