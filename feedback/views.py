@@ -272,6 +272,9 @@ class FeedbackView(LoginRequiredMixin, View):
 
 			self.context['title'] = "Feedback Writer"
 			self.context['week'] = int(week)
+			self.context['week_begin'] = classroom.current_semester.get_week_start(week)
+			self.context['week_end'] = classroom.current_semester.get_week_end(week)  			
+
 			self.context['rotation_groups'] = groups
 			# self.context['loop_times'] = range(1, 13)
 			self.context['loop_times'] = range(1,classroom.get_num_weeks())

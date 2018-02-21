@@ -17,27 +17,112 @@ class AddSemesterForm(forms.ModelForm):
 
 class AddEditRotationForm(forms.ModelForm):
     start_week = forms.IntegerField(min_value=1,required=True)
-    length = forms.IntegerField(min_value=1,required=True)
-    classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(),widget=forms.HiddenInput())
-    semester = forms.ModelChoiceField(queryset=Semester.objects.all(),widget=forms.HiddenInput())    
+    end_week = forms.IntegerField(min_value=1,required=True)
+    rotation_pk = forms.ModelChoiceField(queryset=Rotation.objects.all(),widget=forms.HiddenInput(),required=False)
+  #  length = forms.IntegerField(min_value=1,required=False)
+    classroom = forms.ModelChoiceField(queryset=Classroom.objects.all(),widget=forms.HiddenInput(),required=False)
+    semester = forms.ModelChoiceField(queryset=Semester.objects.all(),widget=forms.HiddenInput(),required=False)    
 
     class Meta:
         model = Rotation
-        fields = ['start_week','length','semester','classroom']
+        fields = ['start_week','end_week']
 
-    def clean_start_week(self):        
-        semester = Semester.objects.get(id=self.data.get('semester') or None)
-        classroom = Classroom.objects.get(id=self.data.get('classroom') or None)  
+
+    # def clean_classroom(self):
+    #     # try:
+    #     #     classroom = Classroom.objects.get(id=self.data.get('classroom'))
+    #     # except Classroom.DoesNotExist:
+    #     try:
+    #         rotation = Rotation.objects.get(id=self.data.get('rotation_pk'))
+    #         return rotation.classroom
+    #     except Rotation.DoesNotExist:
+    #         return self.cleaned_data['classroom']                
+
+    # def clean_semester(self):
+    #     # try:
+    #     #     semester = Classroom.objects.get(id=self.data.get('semester'))
+    #     # except Semester.DoesNotExist:
+    #     try:
+    #         rotation = Rotation.objects.get(id=self.data.get('rotation_pk'))
+    #         #semester = rotation.semester
+    #         return rotation.semester
+    #     except Rotation.DoesNotExist:
+    #         return self.cleaned_data['semester']   
+    #         #raise forms.ValidationError("Error. Could not edit rotation.")
+
+        
+
+    def clean_start_week(self):
+        rotation = None
+        # try:        
+        #     semester = Semester.objects.get(id=self.data.get('semester'))
+        # except Semester.DoesNotExist:
+        #     semester = None
+        try:        
+            semester = Semester.objects.get(id=self.data.get('semester'))
+        except Semester.DoesNotExist:
+            semester = None
+        #classroom = self.cleaned_data['classroom']
+       # semester = self.cleaned_data['semester']
+        try:
+            classroom = Classroom.objects.get(id=self.data.get('classroom'))  
+        except Classroom.DoesNotExist:
+            classroom = None
+
+        if semester == None:
+            rotation = Rotation.objects.get(id=self.data.get('rotation_pk'))
+            semester = rotation.semester
+            classroom = rotation.classroom            
+
+        # try:
+        #     classroom = Classroom.objects.get(id=self.data.get('classroom'))  
+        # except Classroom.DoesNotExist:
+        #     classroom = None
+
+       # if semester == None: #or clasroom, really
+
+
         rotations = Rotation.objects.filter(semester=semester,classroom=classroom)
-
-        if Rotation.objects.filter(semester=semester,classroom=classroom,start_week=self.cleaned_data['start_week']):
+        if rotation:
+            rotations = rotations.exclude(id=rotation.id)
+      #  raise Exception("what")
+        if rotations.filter(semester=semester,classroom=classroom,start_week=self.cleaned_data['start_week']):
             raise forms.ValidationError("Rotation already exists at this start week.")
         for rotation in rotations:
-            if self.cleaned_data['start_week'] < rotation.start_week+rotation.length:
+            if int(self.cleaned_data['start_week']) < rotation.start_week+rotation.length and int(self.cleaned_data['start_week']) >= rotation.start_week:
                 raise forms.ValidationError("Rotation cannot exist within another rotation.")
-        if int(self.cleaned_data['start_week'])+int(self.data.get('length')) > semester.get_number_weeks():
+        if int(self.data.get('end_week')) > (semester.get_number_weeks()+1):
             raise forms.ValidationError("Rotation cannot be longer than the semester length.")
         return self.cleaned_data['start_week']
+
+    def clean_end_week(self):
+        rotation = None
+        try:        
+            semester = Semester.objects.get(id=self.data.get('semester'))
+        except Semester.DoesNotExist:
+            semester = None
+        #classroom = self.cleaned_data['classroom']
+       # semester = self.cleaned_data['semester']
+        try:
+            classroom = Classroom.objects.get(id=self.data.get('classroom'))  
+        except Classroom.DoesNotExist:
+            classroom = None
+
+        if semester == None: #or clasroom, really
+            rotation = Rotation.objects.get(id=self.data.get('rotation_pk'))
+            semester = rotation.semester
+            classroom = rotation.classroom
+
+        rotations = Rotation.objects.filter(semester=semester,classroom=classroom)
+        if rotation:
+            rotations = rotations.exclude(id=rotation.id)
+
+        if int(self.data.get('start_week')) >= int(self.cleaned_data['end_week']):
+            raise forms.ValidationError("End week cannot be equal to or less than start week.")
+        for rotation in rotations:
+            if int(self.data.get('end_week')) > rotation.start_week and int(self.data.get('start_week')) < rotation.start_week:
+                raise forms.ValidationError("End week cannot be greater than other rotations start week.")            
+        return self.cleaned_data['end_week']
 
 class EditClassroomForm(forms.Form):
     course_code = forms.CharField(required=True)

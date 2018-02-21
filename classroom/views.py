@@ -88,11 +88,48 @@ def register_class(request):
         messages.error(request, form.errors)
         return HttpResponseRedirect('/dashboard/')     
 
+
+class AddEditRotation(SuperuserRequiredMixin,TemplateView):
+
+    def post(self, *args, **kwargs):
+        form = AddEditRotationForm(self.request.POST or None)
+        #raise Exception("what")
+        if form.is_valid():
+            rotation = form.cleaned_data['rotation_pk'] 
+            try:
+                if rotation:
+                    #classroom = rotation.classroom
+                    #semester = rotation.semester
+                    #r = AddEditRotationForm(self.request.POST, instance=rotation)
+                    #r = form.save(commit=False)
+                    rotation.start_week = form.cleaned_data['start_week']
+                    rotation.end_week = form.cleaned_data['end_week']
+                    rotation.length = rotation.end_week - rotation.start_week
+                   # r.classroom = classroom
+                  #  r.semester = semester
+                    #raise Exception("wht")
+                    rotation.save()
+                    messages.add_message(self.request, messages.SUCCESS, 'Successfully edited rotation.')
+                else:
+                    new_rotation = form.save(commit=False)
+                    new_rotation.classroom = form.cleaned_data['classroom']
+                    new_rotation.semester = form.cleaned_data['semester'] 
+                    new_rotation.length = new_rotation.end_week - new_rotation.start_week
+                    new_rotation.save()                    
+                    messages.add_message(self.request, messages.SUCCESS, 'Successfully created rotation.')
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, 'Unable to edit/add rotation.%s' % e)
+        else:
+            messages.error(self.request, form.errors)
+
+        return HttpResponseRedirect('/dashboard/')
+
 def edit_rotation(request):
     form = AddEditRotationForm(request.POST or None)
     if form.is_valid():
         rotation = form.save(commit=False)
-        rotation.end_week = rotation.start_week + rotation.length
+        #rotation.end_week = rotation.start_week + rotation.length
+        rotation.length = rotation.end_week - rotation.start_week
         # try:
             # rotation.classroom = Classroom.objects.getc(id=form.cleaned_data['classroom'])
             # rotation.semester = Semester.objects.get(id=form.cleaned_data['semester'])

@@ -129,11 +129,25 @@
         </ul>
        
         <div class="tab-content">
-            {% for rotation in rotations %}
+            {% if rotations %}
+                {% for rotation in rotations %}
 
-                {% include "_learningassistant_partial.html" %}
 
-            {% endfor %}
+
+                    {% include "_learningassistant_partial.html" %}
+
+                {% endfor %}
+            {% else %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3><i class="fa fa-users"></i> Instructor Assignments</h3>
+                    </div>
+                    <div class="panel-body">
+                        <h3> No rotations exist yet. Please create rotations in dashboard before assigning groups to instructors. </h3>
+                    </div>
+                </div>
+
+            {% endif %}
         </div>
 
 

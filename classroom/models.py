@@ -16,7 +16,7 @@ class Semester(models.Model):
 
     def get_number_weeks(self):
         monday1 = (self.date_begin - timedelta(days=self.date_end.weekday()))
-        monday2 = (self.date_end - timedelta(days=self.date_end.weekday()))        
+        monday2 = (self.date_end - timedelta(days=self.date_end.weekday())+timedelta(weeks=1))        
         return int((monday2 - monday1).days / 7)
 
     def get_year(self):
@@ -100,7 +100,7 @@ class Rotation(models.Model):
         return (self.semester.get_start_date()+time_diff)
 
     def get_end_date(self):
-        time_diff = timedelta(weeks=(self.length-1),days=-1)
+        time_diff = timedelta(weeks=(self.length),days=-1)
 
         return (self.get_start_date() + time_diff)
 

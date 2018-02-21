@@ -9,10 +9,15 @@
 
              <div class="padding-lr">
                 <strong>
-                <h3><span class="fa fa-institution"></span><span> {{classroom}}</span> | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a>
+                <h3><span class="fa fa-institution"></span><span> {{classroom}}</span> | <a href="#" data-toggle="modal" data-target="#edit_classroom_{{classroom.id}}">Edit</a> {% if classroom == current_classroom %}  |
+                Current
+
+                {% endif %}
                 </strong></h3>
+
                 <span>{{classroom.description}}</span>
                 <p>Semester: {{classroom.current_semester}}</p>
+                <p>Number of weeks: {{classroom.current_semester.get_number_weeks}}</p>
                 {% if user.is_superuser %}
 
                 {% endif %}
@@ -38,6 +43,7 @@
               <thead>
                 <tr>
                   <th scope="col">Timeline</th>
+                  <th scope="col">Edit</th>
                   <th scope="col">Remove</th>
                 <!--   <th scope="col">Custom Notes</th> -->
                 </tr>
@@ -53,12 +59,47 @@
                                 </td>
                     <!--     </div> -->
                         <!-- <div class="col-lg-2"> -->
+                        <td>
+                          <a href="#/" data-toggle="modal" data-target="#edit-{{rotation.id}}"><i class="fa fa-edit"></i></a>
+                        </td>
                                 <td>
                                     <a href="#" data-href="{% url "classroom-delete-rotation" rotation.id %}" data-toggle="modal" data-target="#confirm-delete-{{rotation.id}}" value="Delete"><span class="fa fa-remove red-icon"></span></a>
                                 </td>
                             </tr>
                     <!--     </div> -->
                   <!--    </div> -->
+
+                <div class="modal fade" id="edit-{{rotation.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                Edit Rotation
+                            </div>
+                            <form class="form-horizontal" action="{% url "classroom-edit-rotation" %}" method="POST">{% csrf_token %}                            
+                            <div class="modal-body">
+                                {{rotation}}
+
+                              <div class="form-group padding-lr">
+
+                                <label for="start_week">Start Week</label>
+                                <input value="{{rotation.start_week}}"name="start_week" required type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter start week"></input>
+                              </div>  
+                              <div class="form-group padding-lr">
+
+                                <label for="end_week">End Week</label>
+                                <input value="{{rotation.end_week}}" name="end_week" required type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter end week"></input>
+                              </div>  
+                              <input type="hidden" name="rotation_pk" value="{{rotation.id}}"/>
+
+                            </div>    
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary btn-ok">Save</a>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
 
                 <div class="modal fade" id="confirm-delete-{{rotation.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -98,13 +139,19 @@
           <div class="form-group padding-lr">
 
             <label for="start_week">Start Week</label>
-            <input name="start_week" type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter start week"></input>
+            <input name="start_week" required type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter start week"></input>
           </div>  
           <div class="form-group padding-lr">
 
+            <label for="end_week">End Week</label>
+            <input name="end_week" required type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter end week"></input>
+          </div>  
+
+<!--           <div class="form-group padding-lr">
+
             <label for="length">Rotation Length</label>
             <input name="length" type="number" class="form-control" aria-describedby="emailHelp" placeholder="Enter number of weeks of rotation"></input>
-          </div>  
+          </div>   -->
             <input type="hidden" name="classroom" value="{{classroom.id}}"/>
             <input type="hidden" name="semester" value="{{classroom.current_semester.id}}"/>
             
