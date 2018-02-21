@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 
 
 from classroom.models import *
+#from inbox.models import Notification
 
 NOT_SUBMITTED = 0
 SUBMITTED_AWAITING_APPROVAL = 1
@@ -45,15 +46,6 @@ class SubCategory(models.Model):
         return self.name
     class Meta:
         ordering = ["name"]
-
-    # feedback = models.CharField(max_length=200, null=True)
-    # observation = models.CharField(max_length=200, null=True)
-    # problem = models.CharField(max_length=2000, null=True)
-
-    # solution_explanation = models.CharField(max_length=2000, null=True)
-    
-    # def __str__(self):
-    #     return "Problem / Observaton: {} \nSolution: {}".format(self.problem, self.solution)  
 
 class Observation(models.Model):
     sub_category = models.ForeignKey(SubCategory)
@@ -91,12 +83,6 @@ class Explanation(models.Model):
 
     def __str__(self):
         return "{}".format(self.feedback_explanation)
-
-# class FeedbackPiece(models.Model):
-#     sub_category = models.ForeignKey(SubCategory)
-#     observation = models.ForeignKey(Observation)
-#     feedback = models.ForeignKey(Feedback)
-#     feedback_explanation = models.ForeignKey(Explanation)
 
 class Draft(models.Model):
     text = models.CharField(max_length=4096, null=True, blank=True)

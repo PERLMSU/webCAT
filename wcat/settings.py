@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'userprofile',
     'feedback',
     'notes',
+    'inbox',
 ]
 
 DEBUG_TOOLBAR_PANELS = [
