@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from .models import *
+from feedback.models import *
 
 class AddRevisionNotesForm(forms.Form):
     revision_notes = forms.CharField()
