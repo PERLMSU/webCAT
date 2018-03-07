@@ -1,31 +1,5 @@
 
-  // $("#fb-piece-observation").click(function(){
-  //   $("#link").off("click");
-  // });
 
-//$(':checkbox').checkboxpicker();
-
-// checkPwd = function() {
-//     var str = document.getElementById('pass').value;
-//     if (str.length < 6) {
-//         alert("too_short");
-//         return("too_short");
-//     } else if (str.length > 50) {
-//         alert("too_long");
-//         return("too_long");
-//     } else if (str.search(/\d/) == -1) {
-//         alert("no_num");
-//         return("no_num");
-//     } else if (str.search(/[a-zA-Z]/) == -1) {
-//         alert("no_letter");
-//         return("no_letter");
-//     } else if (str.search(/[^a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\.\,\;\:]/) != -1) {
-//         alert("bad_char");
-//         return("bad_char");
-//     }
-//     alert("oukey!!");
-//     return("ok");
-// }
 
 $('.note-radio').on('click', function() {
     $(this).find(':radio').prop('checked', true);
@@ -34,36 +8,16 @@ $('.note-radio').on('click', function() {
 
 
 $(document).on("click", "#save-all-button", function () {
-     // var studentId = $(this).data('id');
-     // $(".feedback-student-writer").hide();
-     // $("#"+studentId).show();
+
      $( ".draft-form" ).submit();
 
     $("#all_saved").fadeTo(2000, 500).slideUp(500, function(){
         $("#all_saved").slideUp(500);
-    }); 
-    // $("#all_saved").fadeTo(2000, 500).slideUp(500, function(){
-    //     $("#all_saved").slideUp(500);
-    // });      
+    });   
 
 });
 
 $(document).ready(function() {
-
-
-    // $('.approve-edits-form').ajaxForm({ 
-    //     //window.location.reload()
-    //     complete: function(data) {
-    //         // if (data.responseJSON["success"] == true)
-    //         // {
-
-    //         // }
-    //         alert(data);
-
-    //     }
-    // }); 
-
-
 
 
 
@@ -156,27 +110,6 @@ $( "#nukeStudentsForm" ).submit(function( event ) {
 
 });
 
-
-
-
-$(document).on('change',".observation-dropdown", function(){
- //alert($(this).val());  // will display selected option's value
- //alert($(this).find('option:selected').text()); //will display selected option's text
-
- if ($(this).find('option:selected').text() == "-")
- {
-    $('.observation-new').prop('disabled', false); 
-    $(".radio-inline input[type=radio]").prop('disabled', false)
-
-   // $('.observation-new-type').prop('disabled', false); 
- }
- else 
- {
-    $('.observation-new').prop('disabled', true); 
-    $(".radio-inline input[type=radio]").prop('disabled', true)
- }
- 
-});  
 
 $('#submit-selected-drafts').click(function(){
      /* when the submit button in the modal is clicked, submit the form */
@@ -289,41 +222,6 @@ $( "#add-instructor-form" ).submit(function() {
   //$( "#add-instructor-form" ).submit();
 });
 
-$(document).on('change',".feedback-dropdown", function(){
- //alert($(this).val());  // will display selected option's value
- //alert($(this).find('option:selected').text()); //will display selected option's text
-
- if ($(this).find('option:selected').text() == "-")
- {
-    $('.feedback-new').prop('disabled', false); 
-
-   // $('.observation-new-type').prop('disabled', false); 
- }
- else 
- {
-    $('.feedback-new').prop('disabled', true); 
- }
- 
-});  
-
-
-
-$(document).on('change',".explanation-dropdown", function(){
- //alert($(this).val());  // will display selected option's value
- //alert($(this).find('option:selected').text()); //will display selected option's text
-
- if ($(this).find('option:selected').text() == "-")
- {
-    $('.explanation-new').prop('disabled', false); 
-
- }
- else 
- {
-    $('.explanation-new').prop('disabled', true); 
- }
- 
-});  
-
 
 
 $(function() {
@@ -337,88 +235,21 @@ $(document).ready(function(){
 });
 
 $(document).ready(function(){
-$(".feedback-student-writer:first").show();
+    $(".feedback-student-writer:first").show();
 
 
 
-    $('.draft-form').submit(function(e){
-        $('.week_number_input').val($('#weekDropDown').val());
+        $('.draft-form').submit(function(e){
+            $('.week_number_input').val($('#weekDropDown').val());
 
+        });
+             
     });
-
-    $('.draft-formm').submit(function(e){
-        e.preventDefault();
-        //var csrftoken = getCookie('csrftoken');
-        var that = $(this);
-          $.ajax({
-            url: "/feedback/edit-draft/",
-            type: 'POST',
-            data: {
-              'student_pk': that.children()[2].value,
-              'text': that.children().find('.form-control').val(),
-              'csrfmiddlewaretoken': that.children()[0].value,
-            },
-            dataType: 'json',
-            success: function (data) {
-                alert("got here, data: ", data);
-              // if (data.is_taken) {
-              //   alert("A user with this username already exists.");
-              // }
-            }
-          });    
-
-
-        // $.post('/feedback/edit_draft', $(this).serialize(), function(data){ ... 
-        //    $('.message').html(data.message);
-        //    // of course you can do something more fancy with your respone
-        // });
-         
-    });
-
-// using jQuery
-// function getCookie(name) {
-//     var cookieValue = null;
-//     if (document.cookie && document.cookie !== '') {
-//         var cookies = document.cookie.split(';');
-//         for (var i = 0; i < cookies.length; i++) {
-//             var cookie = jQuery.trim(cookies[i]);
-//             // Does this cookie string begin with the name we want?
-//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-//                 break;
-//             }
-//         }
-//     }
-//     return cookieValue;
-// }
-
-
-    // $.ajaxSetup({
-    //          beforeSend: function(xhr, settings){
-    //              function getCookie(n) {
-    //                  var cookieValue = null;
-    //                  if(document.cookie&&document.cookie != ''){
-    //                      var cookies = document.cookie.split(';');
-    //                      for(var i = 0; i < cookies.length; i++){
-    //                          var cookie = jQuery.trim(cookies[i]);
-    //                          if(cookie.substring(0, n.length + 1) == (n + '=')){
-    //                              cookieValue = decodeURIComponent(cookie.substring(n.length + 1));
-    //                              break;
-    //                          }
-    //                      }
-    //                  }
-    //                  return cookieValue;
-    //              }
-    //              if(!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))){
-    //                  xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-    //              }
-    //          }
-    //     });
 
 });
 
 $('.noteForm').submit(function() {
-  // your code here
+  
      var that = this;
      var selected = [];
      var index = 0;
@@ -441,13 +272,8 @@ $('.noteForm').submit(function() {
         $('#no-observation-selected-error').show();  
         valid = false;
      }
-      // $('<input />').attr('type', 'hidden')
-      //     .attr('name', "something")
-      //     .attr('value', "something")
-      //     .appendTo(that);
+
       return valid;  
-    // alert(selected);
-     //return false;
 });
 
 
@@ -462,12 +288,8 @@ $(document).on("click", ".add-to-feedback-btn", function () {
     var selected = [];
      $('.add-to-feedback-checkboxes input:checked').each(function() {
 
-          // $(that).append('<input type="hidden" name="student_name'+index.toString()+'" value="'+($(this).attr('value'))+'" /> ');
          selected.push($(this).attr('value'))+' ';         
      });     
-     //alert(selected);
-     // $(".feedback-student-writer").hide();
-     // $("#"+studentId).show();
      $("#draft-student-"+studentID).append(selected); 
      
      $('input:checkbox').removeAttr('checked');
@@ -560,13 +382,11 @@ $('#confirm-send').on('show.bs.modal', function(e) {
     var num = $(e.relatedTarget).data('num')
     if (all == "resend")
     {
-      //  $(this).find('.btn-ok').attr('value', "Resend");
         $("#email_all_text").html("Are you sure you want resend all emails? This will only resend the drafts that have already been marked as sent.");
         $("#email_header").html("Resend All Drafts ("+num+")");
     }
     else
     {
-       // $(this).find('.btn-ok').attr('value', "Send");
        $("#email_header").html("Send All Approved Drafts ("+num+")");
         $("#email_all_text").html("Are you sure you want to email all the approved drafts to students for this week? <p>*This will only email the drafts that have not been sent yet.</p>");
     }

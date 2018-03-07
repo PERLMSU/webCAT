@@ -425,7 +425,8 @@ class UploadStudentsView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateVie
                 initializer = class_semester_func)
 
             self.add_message( str(self.count) + " Students successfully added!")
-            self.add_message(str(self.email_already_exist) + " Students were not added because their email address already exists.")
+            if self.email_already_exist:
+                self.add_message(str(self.email_already_exist) + " Students were not added because their email address already exists.")
 
             return HttpResponseRedirect(reverse('classroom-upload-students'))
         else:
@@ -497,7 +498,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
             assign_instructor_form.fields['instructor_id'].choices = [(la[0],la[1]+' '+la[2]) for la in learning_assistants.values_list('id','first_name','last_name').order_by('last_name')]
           
 
-            add_student_form1 = AddStudentForm()
+            add_student_form = AddStudentForm()
 
             assign_groups_form = AssignMultipleGroupsForm()
             assign_groups_form.fields['group_numbers'].choices = rotation_groups.values_list('id','group_number').order_by('group_number')
@@ -518,7 +519,7 @@ class ClassroomView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
                 'title': "Classroom",
                 'rotation_groups': rotation_groups,
                 'classroom': classroom,
-                'add_student_form': add_student_form1,
+                'add_student_form': add_student_form,
                 'add_group_form': AddGroupForm(),
                 'add_classroom_form': AddClassroomForm(),
                 'assign_multiple_groups_form': assign_groups_form,
