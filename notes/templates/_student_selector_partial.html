@@ -1,76 +1,79 @@
-
- <!--    <div class="container"> -->
+<!--    <div class="container"> -->
 
 <div class="row">
-      <div class="panel panel-default">
-        <div class="panel-heading"> 
+    <div class="panel panel-default">
+        <div class="panel-heading">
 
-          <form class="week-form" action="{% url 'notes-change-week' %}" method="POST">{% csrf_token %}
-            <label for="weekDropDown">Week </label>
-            <select id="weekDropDown" name="weekDropDown">
+            <form class="week-form" action="{% url 'notes-change-week' %}" method="POST">{% csrf_token %}
+                <label for="weekDropDown">Week </label>
+                <select id="weekDropDown" name="weekDropDown">
 
-              {% for i in loop_times %}
-                {% if i == week %}
-                   <option selected value='{{i}}'>{{i}}</option>
-                {% else %}
-                  <option value='{{i}}'>{{i}}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </form>
+                    {% for i in loop_times %}
+                        {% if i == week %}
+                            <option selected value='{{ i }}'>{{ i }}</option>
+                        {% else %}
+                            <option value='{{ i }}'>{{ i }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </form>
 
-          <a class="all-notes-view" href='#'><span title="Activate Notes View" class="glyphicon glyphicon-duplicate"></span></a>
-          |
-          <a class="back-to-main-categories" href='#'><span title="Activate Categories View" class="glyphicon glyphicon-th-large"></span></a>
+            <a class="all-notes-view" href='#'><span title="Activate Notes View"
+                                                     class="glyphicon glyphicon-duplicate"></span></a>
+            |
+            <a class="back-to-main-categories" href='#'><span title="Activate Categories View"
+                                                              class="glyphicon glyphicon-th-large"></span></a>
         </div>
-      </div>
-  <!-- </div> -->
+    </div>
+    <!-- </div> -->
 
-<!-- <div class="row"> -->
-	
-	<div id="groups-view" class="panel panel-info">
-    <div class="panel-heading">
-        <h4>Groups</h4>
-      </div>
+    <!-- <div class="row"> -->
+
+    <div id="groups-view" class="panel panel-info">
+        <div class="panel-heading">
+            <h4>Groups</h4>
+        </div>
         <div class="panel-body">
-    	{% for group in rotation_groups %}
-    		{% if group.students.all %}
-	    		<div class="row">
-	    			
-			<!--     	<div class="panel panel-info"> -->
+            {% for group in rotation_groups %}
+                {% if group.students.all %}
+                    <div class="row">
 
-			      			<span style="float: left;">{{group.group_number}}</span>
-			  <!--     		</div> 		 -->	
-			      	
-			      				<div class="col-xs-12">
-			    		{% for student in group.students.all %}
+                        <!--     	<div class="panel panel-info"> -->
+
+                        <span style="float: left;">{{ group.group_number }}</span>
+                        <!--     		</div> 		 -->
+
+                        <div class="col-xs-12">
+                            {% for student in group.students.all %}
 
 
-				    		<div class="student-checkboxes col-xs-3">
-                <!--   <div class="col-md-3"> -->
-                  <label style="width:100%">
-					    		<div class="padding-bottom-sm">
-									<input class="student-checkbox float-left" type="checkbox" name="student_name_{{forloop.counter}}" value="{{student.id}}"> </input>						    			
-		    						<span class="small-print"> {{student}}</span> 
-						   		</div> 
-                    </label>
-            <!--       </div> -->
-						   	</div>
-           
-			    		{% endfor %}
+                                <div class="student-checkboxes col-xs-3">
+                                    <!--   <div class="col-md-3"> -->
+                                    <label style="width:100%">
+                                        <div class="padding-bottom-sm">
+                                            <input class="student-checkbox float-left" type="checkbox"
+                                                   name="student_name_{{ forloop.counter }}"
+                                                   value="{{ student.id }}"> </input>
+                                            <span class="small-print"> {{ student }}</span>
+                                        </div>
+                                    </label>
+                                    <!--       </div> -->
+                                </div>
 
-					    				</div>
+                            {% endfor %}
+
                         </div>
+                    </div>
 
-              {% if not forloop.last %}
-		    		 <hr>
-             {% endif %}
+                    {% if not forloop.last %}
+                        <hr>
+                    {% endif %}
 
 
-			    {% endif %}
-    	<!-- 	</div> -->
-		{% endfor %}	 
-      </div>   	
-<!-- 	</div> -->
-	</div>
+                {% endif %}
+                <!-- 	</div> -->
+            {% endfor %}
+        </div>
+        <!-- 	</div> -->
+    </div>
 </div>

@@ -1,309 +1,315 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load crispy_forms_tags %}
-{% block content %} 
+{% block content %}
 
 
-<!-- Page Heading -->
-<div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">
-            Dashboard <small>Overview</small>
-        </h1>
-        <ol class="breadcrumb">
-            <li class="active">
-                <i class="fa fa-dashboard"></i> Dashboard
-            </li>
-        </ol>
-    </div>
-</div>
-<!-- /.row -->
-
-<div class="row">
-    <div class="col-lg-12">
-        <h2>Hello {{request.user.get_short_name}}!</h2>
-    </div>
-</div>
-<hr>
-
-<!-- <div class="row">
-    <div class="col-lg-12">
-        <div class="alert alert-info alert-dismissable">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <i class="fa fa-info-circle"></i>  <strong>Admin Alerts</strong> Any important alert for an admin instructor can go here.
+    <!-- Page Heading -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Dashboard
+                <small>Overview</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li class="active">
+                    <i class="fa fa-dashboard"></i> Dashboard
+                </li>
+            </ol>
         </div>
     </div>
-</div> -->
+    <!-- /.row -->
 
-{% if user.is_superuser %}
-            <button class="btn btn-md btn-warning" data-toggle="modal" data-target="#register-new-classroom"><i class="fa fa-fw fa-university"></i>   Register Classroom</button>
-                        <button class="btn btn-md btn-primary margin-right" data-toggle="modal" data-target="#registerSemester"><i class="fa fa-graduation-cap"></i> Register Semester</button>
-<hr>
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>Hello {{ request.user.get_short_name }}!</h2>
+        </div>
+    </div>
+    <hr>
 
-{% endif %}
+    <!-- <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-info alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="fa fa-info-circle"></i>  <strong>Admin Alerts</strong> Any important alert for an admin instructor can go here.
+            </div>
+        </div>
+    </div> -->
 
-<div class="panel panel-default">
-  <div class="panel-heading"><h3>{% if user.is_superuser %} Classrooms {% else %} Classroom - {{current_classroom}} {% endif %}</h3>
-            
-  </div>
+    {% if user.is_superuser %}
+        <button class="btn btn-md btn-warning" data-toggle="modal" data-target="#register-new-classroom"><i
+                class="fa fa-fw fa-university"></i> Register Classroom
+        </button>
+        <button class="btn btn-md btn-primary margin-right" data-toggle="modal" data-target="#registerSemester"><i
+                class="fa fa-graduation-cap"></i> Register Semester
+        </button>
+        <hr>
 
-  <div class="panel-body">
+    {% endif %}
 
+    <div class="panel panel-default">
+        <div class="panel-heading"><h3>{% if user.is_superuser %} Classrooms {% else %} Classroom -
+            {{ current_classroom }} {% endif %}</h3>
 
-        {% if current_classroom %}
+        </div>
 
-        {% with current_classroom as classroom %}
-
-            {% include "_classroom_partial.html" %}
-
-        {% endwith %}
-
-        {% else %}
-        <h3> You are not assigned to any classroom yet.</h3>
-
-        {% endif %}
+        <div class="panel-body">
 
 
-        {% if classrooms and user.is_superuser %}
+            {% if current_classroom %}
 
-            {% for classroom in classrooms %}
-
-                {% if classroom.id != current_classroom.id %}
+                {% with current_classroom as classroom %}
 
                     {% include "_classroom_partial.html" %}
 
-                {% endif %}
+                {% endwith %}
 
-                {% include "_edit_classroom_partial.html" %}
+            {% else %}
+                <h3> You are not assigned to any classroom yet.</h3>
 
-            {% endfor %}
-
-        {% endif %}              
-    </div>
-  </div>
+            {% endif %}
 
 
-<hr>
+            {% if classrooms and user.is_superuser %}
 
-<!-- 
-<div class="row">
+                {% for classroom in classrooms %}
 
-    <div class="col-lg-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Tasks Panel</h3>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="#" class="list-group-item">
-                        <span class="badge">just now</span>
-                        <i class="fa fa-fw fa-calendar"></i> Calendar updated
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">4 minutes ago</span>
-                        <i class="fa fa-fw fa-comment"></i> Commented on a post
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">23 minutes ago</span>
-                        <i class="fa fa-fw fa-truck"></i> Order 392 shipped
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">46 minutes ago</span>
-                        <i class="fa fa-fw fa-money"></i> Invoice 653 has been paid
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">1 hour ago</span>
-                        <i class="fa fa-fw fa-user"></i> A new user has been added
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">2 hours ago</span>
-                        <i class="fa fa-fw fa-check"></i> Completed task: "pick up dry cleaning"
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">yesterday</span>
-                        <i class="fa fa-fw fa-globe"></i> Saved the world
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">two days ago</span>
-                        <i class="fa fa-fw fa-check"></i> Completed task: "fix error on sales page"
-                    </a>
-                </div>
-                <div class="text-right">
-                    <a href="#">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
+                    {% if classroom.id != current_classroom.id %}
 
-    <div class="col-lg-3 col-md-6">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <i class="fa fa-comments fa-5x"></i>
-                    </div>
-                    <div class="col-xs-9 text-right">
-                        <div class="huge">26</div>
-                        <div>New Messages!</div>
-                    </div>
-                </div>
-            </div>
-            <a href="#">
-                <div class="panel-footer">
-                    <span class="pull-left">View Details</span>
-                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                    <div class="clearfix"></div>
-                </div>
-            </a>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="panel panel-green">
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <i class="fa fa-tasks fa-5x"></i>
-                    </div>
-                    <div class="col-xs-9 text-right">
-                        <div class="huge">12</div>
-                        <div>New Tasks!</div>
-                    </div>
-                </div>
-            </div>
-            <a href="#">
-                <div class="panel-footer">
-                    <span class="pull-left">View Details</span>
-                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                    <div class="clearfix"></div>
-                </div>
-            </a>
+                        {% include "_classroom_partial.html" %}
+
+                    {% endif %}
+
+                    {% include "_edit_classroom_partial.html" %}
+
+                {% endfor %}
+
+            {% endif %}
         </div>
     </div>
 
 
+    <hr>
 
+    <!--
+    <div class="row">
 
-    <div class="col-lg-3 col-md-6">
-        <div class="panel panel-yellow">
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <i class="fa fa-exclamation-triangle fa-5x"></i>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Tasks Panel</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item">
+                            <span class="badge">just now</span>
+                            <i class="fa fa-fw fa-calendar"></i> Calendar updated
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <span class="badge">4 minutes ago</span>
+                            <i class="fa fa-fw fa-comment"></i> Commented on a post
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <span class="badge">23 minutes ago</span>
+                            <i class="fa fa-fw fa-truck"></i> Order 392 shipped
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <span class="badge">46 minutes ago</span>
+                            <i class="fa fa-fw fa-money"></i> Invoice 653 has been paid
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <span class="badge">1 hour ago</span>
+                            <i class="fa fa-fw fa-user"></i> A new user has been added
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <span class="badge">2 hours ago</span>
+                            <i class="fa fa-fw fa-check"></i> Completed task: "pick up dry cleaning"
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <span class="badge">yesterday</span>
+                            <i class="fa fa-fw fa-globe"></i> Saved the world
+                        </a>
+                        <a href="#" class="list-group-item">
+                            <span class="badge">two days ago</span>
+                            <i class="fa fa-fw fa-check"></i> Completed task: "fix error on sales page"
+                        </a>
                     </div>
-                    <div class="col-xs-9 text-right">
-                        <div class="huge">3</div>
-                        <div>Pending Drafts!</div>
+                    <div class="text-right">
+                        <a href="#">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-            </div>
-            <a href="#">
-                <div class="panel-footer">
-                    <span class="pull-left">View Details</span>
-                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                    <div class="clearfix"></div>
-                </div>
-            </a>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="panel panel-red">
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <i class="fa fa-support fa-5x"></i>
-                    </div>
-                    <div class="col-xs-9 text-right">
-                        <div class="huge">13</div>
-                        <div>Drafts Rejected!</div>
-                    </div>
-                </div>
-            </div>
-            <a href="#">
-                <div class="panel-footer">
-                    <span class="pull-left">View Details</span>
-                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                    <div class="clearfix"></div>
-                </div>
-            </a>
-        </div>
-    </div>
-</div> -->
-<!-- /.row -->
-
-<!-- <div class="row">
-    <div class="col-lg-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Area Chart</h3>
-            </div>
-            <div class="panel-body">
-                <div id="morris-area-chart"></div>
             </div>
         </div>
-    </div>
-</div> -->
-<!-- /.row -->
 
-<!-- <div class="row"> -->
-<!--     <div class="col-lg-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-long-arrow-right fa-fw"></i> Donut Chart</h3>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-comments fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">26</div>
+                            <div>New Messages!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
             </div>
-            <div class="panel-body">
-                <div id="morris-donut-chart"></div>
-                <div class="text-right">
-                    <a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-green">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-tasks fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">12</div>
+                            <div>New Tasks!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+
+
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-yellow">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-exclamation-triangle fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">3</div>
+                            <div>Pending Drafts!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-red">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-support fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">13</div>
+                            <div>Drafts Rejected!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div> -->
+    <!-- /.row -->
+
+    <!-- <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Area Chart</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="morris-area-chart"></div>
                 </div>
             </div>
         </div>
     </div> -->
- <!--    <div class="col-lg-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Tasks Panel</h3>
-            </div>
-            <div class="panel-body">
-                <div class="list-group">
-                    <a href="#" class="list-group-item">
-                        <span class="badge">just now</span>
-                        <i class="fa fa-fw fa-calendar"></i> Calendar updated
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">4 minutes ago</span>
-                        <i class="fa fa-fw fa-comment"></i> Commented on a post
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">23 minutes ago</span>
-                        <i class="fa fa-fw fa-truck"></i> Order 392 shipped
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">46 minutes ago</span>
-                        <i class="fa fa-fw fa-money"></i> Invoice 653 has been paid
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">1 hour ago</span>
-                        <i class="fa fa-fw fa-user"></i> A new user has been added
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">2 hours ago</span>
-                        <i class="fa fa-fw fa-check"></i> Completed task: "pick up dry cleaning"
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">yesterday</span>
-                        <i class="fa fa-fw fa-globe"></i> Saved the world
-                    </a>
-                    <a href="#" class="list-group-item">
-                        <span class="badge">two days ago</span>
-                        <i class="fa fa-fw fa-check"></i> Completed task: "fix error on sales page"
-                    </a>
+    <!-- /.row -->
+
+    <!-- <div class="row"> -->
+    <!--     <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-long-arrow-right fa-fw"></i> Donut Chart</h3>
                 </div>
-                <div class="text-right">
-                    <a href="#">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
+                <div class="panel-body">
+                    <div id="morris-donut-chart"></div>
+                    <div class="text-right">
+                        <a href="#">View Details <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div> -->
+        </div> -->
+    <!--    <div class="col-lg-4">
+           <div class="panel panel-default">
+               <div class="panel-heading">
+                   <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Tasks Panel</h3>
+               </div>
+               <div class="panel-body">
+                   <div class="list-group">
+                       <a href="#" class="list-group-item">
+                           <span class="badge">just now</span>
+                           <i class="fa fa-fw fa-calendar"></i> Calendar updated
+                       </a>
+                       <a href="#" class="list-group-item">
+                           <span class="badge">4 minutes ago</span>
+                           <i class="fa fa-fw fa-comment"></i> Commented on a post
+                       </a>
+                       <a href="#" class="list-group-item">
+                           <span class="badge">23 minutes ago</span>
+                           <i class="fa fa-fw fa-truck"></i> Order 392 shipped
+                       </a>
+                       <a href="#" class="list-group-item">
+                           <span class="badge">46 minutes ago</span>
+                           <i class="fa fa-fw fa-money"></i> Invoice 653 has been paid
+                       </a>
+                       <a href="#" class="list-group-item">
+                           <span class="badge">1 hour ago</span>
+                           <i class="fa fa-fw fa-user"></i> A new user has been added
+                       </a>
+                       <a href="#" class="list-group-item">
+                           <span class="badge">2 hours ago</span>
+                           <i class="fa fa-fw fa-check"></i> Completed task: "pick up dry cleaning"
+                       </a>
+                       <a href="#" class="list-group-item">
+                           <span class="badge">yesterday</span>
+                           <i class="fa fa-fw fa-globe"></i> Saved the world
+                       </a>
+                       <a href="#" class="list-group-item">
+                           <span class="badge">two days ago</span>
+                           <i class="fa fa-fw fa-check"></i> Completed task: "fix error on sales page"
+                       </a>
+                   </div>
+                   <div class="text-right">
+                       <a href="#">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
+                   </div>
+               </div>
+           </div>
+       </div> -->
     <!-- <div class="col-lg-4">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -376,15 +382,15 @@
                     <a href="#">View All Transactions <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div> -->
- <!--        </div>
-    </div> -->
-<!-- </div> -->
-<!-- /.row -->
+    <!--        </div>
+       </div> -->
+    <!-- </div> -->
+    <!-- /.row -->
 
 
- {% include "_register_classroom_partial.html" %}
- 
- {% include "_register_semester_partial.html" %}
+    {% include "_register_classroom_partial.html" %}
+
+    {% include "_register_semester_partial.html" %}
 
 
 

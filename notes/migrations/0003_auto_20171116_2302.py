@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('feedback', '0016_auto_20171116_2302'),
         ('classroom', '0009_auto_20171109_1824'),

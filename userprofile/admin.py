@@ -1,10 +1,9 @@
 from django.contrib import admin
 
 from .models import (
-                    Profile,
-                    ConfirmationKey
-                )
+    Profile,
+    ConfirmationKey
+)
 
 admin.site.register(Profile)
 admin.site.register(ConfirmationKey)
-

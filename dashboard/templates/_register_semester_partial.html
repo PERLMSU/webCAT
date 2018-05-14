@@ -1,47 +1,52 @@
-    <div class="modal fade" id="registerSemester" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+<div class="modal fade" id="registerSemester" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title" id="myModalLabel"><i class="fa fa-graduation-cap"></i> Register Semester</h4>
-          </div>
-          <div class="modal-body">
-            <h5> Semester: </h5>
-            <form class="form-horizontal" id="createStudentForm" action="{% url "dash-add-semester" %}" method="POST">{% csrf_token %}
-        <div style="padding-left: 20px; padding-right: 20px;">
-          <div class="form-group">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-graduation-cap"></i> Register Semester</h4>
+            </div>
+            <div class="modal-body">
+                <h5> Semester: </h5>
+                <form class="form-horizontal" id="createStudentForm" action="{% url "dash-add-semester" %}"
+                      method="POST">{% csrf_token %}
+                    <div style="padding-left: 20px; padding-right: 20px;">
+                        <div class="form-group">
 
-        <div style="padding-left: 20px; padding-right: 20px;">
-          <div class="form-group">
+                            <div style="padding-left: 20px; padding-right: 20px;">
+                                <div class="form-group">
 
-            <label for="title">Semester Title</label>
-            <input name="title" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter semester title here"></input>
-          </div>     
-        </div>   
+                                    <label for="title">Semester Title</label>
+                                    <input name="title" type="text" class="form-control" aria-describedby="emailHelp"
+                                           placeholder="Enter semester title here"></input>
+                                </div>
+                            </div>
 
-            <label for="date_begin">Beginning of Semester</label>
-            <input name="date_begin" type="date" class="form-control" aria-describedby="emailHelp" placeholder="Enter semester beginning date"></input>
-          </div>     
-        </div>  
-        <div style="padding-left: 20px; padding-right: 20px;">
-          <div class="form-group">
+                            <label for="date_begin">Beginning of Semester</label>
+                            <input name="date_begin" type="date" class="form-control" aria-describedby="emailHelp"
+                                   placeholder="Enter semester beginning date"></input>
+                        </div>
+                    </div>
+                    <div style="padding-left: 20px; padding-right: 20px;">
+                        <div class="form-group">
 
-            <label for="date_end">End of Semester</label>
-            <input name="date_end" type="date" class="form-control" aria-describedby="emailHelp" placeholder="Enter semester ending date"></input>
-          </div>     
-        </div> 
-                
+                            <label for="date_end">End of Semester</label>
+                            <input name="date_end" type="date" class="form-control" aria-describedby="emailHelp"
+                                   placeholder="Enter semester ending date"></input>
+                        </div>
+                    </div>
 
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <input type="submit" value="Save" class="btn btn-primary"/>      
-            </form>
-          </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" value="Save" class="btn btn-primary"/>
+                </form>
+            </div>
         </div>
-      </div>
-    </div>   
+    </div>
+</div>
 
 

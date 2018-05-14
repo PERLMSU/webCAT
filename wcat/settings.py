@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-from django.contrib.messages import constants as message_constants
 import os
+
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +21,7 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',
                 message_constants.SUCCESS: 'success',
                 message_constants.WARNING: 'warning',
-                message_constants.ERROR: 'danger',}
+                message_constants.ERROR: 'danger', }
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -32,19 +33,18 @@ SECRET_KEY = '85ljgze!)at0xw=ql5ky*jh!#8&$oi**l=5=%@=xbflpzhavzs'
 DEBUG = True
 
 # if DEBUG:
-    
-ALLOWED_HOSTS = ['webcat-p3.herokuapp.com','127.0.0.1']
+
+ALLOWED_HOSTS = ['webcat-p3.herokuapp.com', '127.0.0.1']
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
-ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
-REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.
+ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window; you may, of course, use a different value.
+REGISTRATION_AUTO_LOGIN = True  # Automatically log the user in.
 # Application definition
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
-
 
 AUTH_USER_MODEL = 'userprofile.Profile'
 
@@ -58,8 +58,8 @@ INSTALLED_APPS = [
     'mathfilters',
     'crispy_forms',
     'corsheaders',
-    'widget_tweaks', 
-    'star_ratings',   
+    'widget_tweaks',
+    'star_ratings',
     'dashboard',
     'classroom',
     'userprofile',
@@ -124,7 +124,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wcat.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
@@ -141,6 +140,7 @@ DATABASES = {
 }
 
 import dj_database_url
+
 db_from_env = dj_database_url.config()
 DATABASES['default'].update(db_from_env)
 
@@ -165,7 +165,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
@@ -180,7 +179,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 LANGUAGE_CODE = 'en-us'
 
-#TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
 TIME_ZONE = 'America/Indiana/Indianapolis'
 
 USE_I18N = True

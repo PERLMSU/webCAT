@@ -1,4 +1,5 @@
 from django.conf.urls import url
+
 from classroom import views
 
 urlpatterns = [
@@ -14,7 +15,8 @@ urlpatterns = [
     url(r'^upload/student/$', views.UploadStudentsView.as_view(), name='classroom-upload-students'),
     url(r'^assign/$', views.AssignGroupsView.as_view(), name='classroom-assign-groups'),
     url(r'^assign/(?P<pk>\d+)/$', views.AssignMultipleGroupsView.as_view(), name='classroom-assign-multiple-groups'),
-    url(r'^assign_students/(?P<pk>\d+)/$', views.AssignMultipleStudentsView.as_view(), name='classroom-assign-multiple-students'),
+    url(r'^assign_students/(?P<pk>\d+)/$', views.AssignMultipleStudentsView.as_view(),
+        name='classroom-assign-multiple-students'),
     url(r'^students/delete/(?P<pk>\d+)/$', views.DeleteStudent.as_view(), name="delete-student"),
     url(r'^groups/delete/(?P<pk>\d+)/$', views.DeleteGroup.as_view(), name="delete-group"),
 ]

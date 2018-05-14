@@ -1,23 +1,15 @@
-from django import forms
-from django.utils.translation import ugettext_lazy as _
-
-from collections import OrderedDict
-from django.conf import settings
-
-import string
-
-from django.contrib.auth import authenticate
-from django.contrib.auth.forms import AuthenticationForm
-
-from django.core.files.base import ContentFile
-
 import base64
 
-
+from django import forms
+from django.conf import settings
+from django.contrib.auth import authenticate
+from django.core.files.base import ContentFile
+from django.utils.translation import ugettext_lazy as _
+from localflavor.us.forms import USStateField
+from localflavor.us.us_states import STATE_CHOICES
 
 from .models import Profile
-from localflavor.us.us_states import STATE_CHOICES
-from localflavor.us.forms import USStateField
+
 
 class AddImageForm(forms.Form):
     image = forms.ImageField()
@@ -32,6 +24,7 @@ class AddImageForm(forms.Form):
     #   else:
     #       raise ValidationError("Couldn't read uploaded image")
 
+
 class UpdateProfileForm(forms.Form):
     nick_name = forms.CharField(max_length=15)
     city = forms.CharField(max_length=15)
@@ -41,10 +34,10 @@ class UpdateProfileForm(forms.Form):
 
 class ProfileForm(forms.ModelForm):
     birth_date = forms.DateField(
-                    widget=forms.DateInput({'type': 'date'}), 
-                    input_formats=settings.DATE_INPUT_FORMATS, 
-                    required=False)
-    email = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+        widget=forms.DateInput({'type': 'date'}),
+        input_formats=settings.DATE_INPUT_FORMATS,
+        required=False)
+    email = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 
     class Meta:
         model = Profile
@@ -64,12 +57,11 @@ class ProfileForm(forms.ModelForm):
     YOUR_STATE_CHOICES = list(STATE_CHOICES)
     YOUR_STATE_CHOICES.insert(0, ('', '---------'))
     state = USStateField(
-                widget=forms.Select(choices=YOUR_STATE_CHOICES), 
-                required=False)
+        widget=forms.Select(choices=YOUR_STATE_CHOICES),
+        required=False)
 
 
 class ProfileImageForm(forms.ModelForm):
-
     image = forms.ImageField(required=False)
 
     class Meta:
@@ -88,7 +80,6 @@ class ProfileImageForm(forms.ModelForm):
 
 
 class AccountSettingsForm(forms.ModelForm):
-    
     class Meta:
         model = Profile
         fields = ('email',)
@@ -103,12 +94,12 @@ class AccountSettingsForm(forms.ModelForm):
 
 class AccountEmailForm(forms.ModelForm):
     email = forms.CharField(
-                            widget=forms.TextInput(attrs={'readonly':'readonly'}),
-                            label=_("Current Address"))
+        widget=forms.TextInput(attrs={'readonly': 'readonly'}),
+        label=_("Current Address"))
     new_email = forms.EmailField(
-                            widget=forms.TextInput(attrs=dict(required=False,
-                            max_length=30, render_value=False)),
-                            label=_("New Email Address"))
+        widget=forms.TextInput(attrs=dict(required=False,
+                                          max_length=30, render_value=False)),
+        label=_("New Email Address"))
 
     class Meta:
         model = Profile
@@ -132,30 +123,31 @@ class AccountEmailForm(forms.ModelForm):
 class ChangePasswordForm(forms.ModelForm):
     """ form for changing password
     """
+
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('user',None)
-        return super(ChangePasswordForm, self).__init__(*args,**kwargs)
+        self.request = kwargs.pop('user', None)
+        return super(ChangePasswordForm, self).__init__(*args, **kwargs)
 
     password = forms.CharField(widget=forms.PasswordInput({
-        'class':'input form-control',
+        'class': 'input form-control',
         'placeholder': 'Enter current password'
-        }))
+    }))
     new_password = forms.CharField(widget=forms.PasswordInput({
-        'class':'input form-control',
+        'class': 'input form-control',
         'placeholder': 'Enter new password'
-        }))
+    }))
     confirm_password = forms.CharField(widget=forms.PasswordInput({
-        'class':'input form-control',
+        'class': 'input form-control',
         'placeholder': 'Enter corfirm password'
-        }))
-    
+    }))
+
     class Meta:
         model = Profile
         fields = (
-            'password', 
-            'new_password', 
+            'password',
+            'new_password',
             'confirm_password'
-            )
+        )
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
@@ -170,11 +162,13 @@ class ChangePasswordForm(forms.ModelForm):
             # At least MIN_LENGTH long
             if len(self.cleaned_data['new_password']) < 6:
                 raise forms.ValidationError("Password must be at least %d characters long." % 6)
-            
-            if all(c.isupper() == self.cleaned_data['new_password'].isupper() for c in self.cleaned_data['new_password']):
+
+            if all(c.isupper() == self.cleaned_data['new_password'].isupper() for c in
+                   self.cleaned_data['new_password']):
                 raise forms.ValidationError("Password must contain at least one uppercase letter")
 
-            if all(c.isdigit() == self.cleaned_data['new_password'].isdigit() for c in self.cleaned_data['new_password']):
+            if all(c.isdigit() == self.cleaned_data['new_password'].isdigit() for c in
+                   self.cleaned_data['new_password']):
                 raise forms.ValidationError("Password must contain at least one digit")
 
             if self.cleaned_data['new_password'] != self.cleaned_data['confirm_password']:
@@ -187,4 +181,3 @@ class ChangePasswordForm(forms.ModelForm):
             instance.set_password(self.data['new_password'])
             user = instance.save()
         return instance
-

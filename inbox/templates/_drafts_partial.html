@@ -1,36 +1,38 @@
 <ul class="nav nav-tabs">
-  <li class="active"><a data-toggle="tab" href="#all_instructors_{{status}}">All Instructors ({{drafts.count}})</a></li>
-  {% for instructor in instructors %}
-    <li><a data-toggle="tab" href="#instructor_{{status}}_{{instructor.id}}">{{instructor.get_full_name}} ({{drafts|filter_draft_count_by_instructor:instructor}})</a></li>
-  {% endfor %}
+    <li class="active"><a data-toggle="tab" href="#all_instructors_{{ status }}">All Instructors
+        ({{ drafts.count }})</a></li>
+    {% for instructor in instructors %}
+        <li><a data-toggle="tab" href="#instructor_{{ status }}_{{ instructor.id }}">{{ instructor.get_full_name }}
+            ({{ drafts|filter_draft_count_by_instructor:instructor }})</a></li>
+    {% endfor %}
 </ul>
 
 <div class="tab-content">
-  <div id="all_instructors_{{status}}" class="tab-pane fade in active">
-    <h3>All Instructors</h3>
+    <div id="all_instructors_{{ status }}" class="tab-pane fade in active">
+        <h3>All Instructors</h3>
 
         {% for draft in drafts %}
-  
-
-          {% include "_view_draft_partial.html" %}
 
 
-        {% endfor %}
-
-  </div>
-  {% for instructor in instructors %}
-  <div id="instructor_{{status}}_{{instructor.id}}" class="tab-pane fade">
-
-    <h3>{{instructor.get_full_name}}</h3>
-
-        {% for draft in drafts|filter_drafts_by_instructor:instructor %}
-  
-
-          {% include "_view_draft_partial.html" %}
+            {% include "_view_draft_partial.html" %}
 
 
         {% endfor %}
 
-  </div>
-  {% endfor %}
+    </div>
+    {% for instructor in instructors %}
+        <div id="instructor_{{ status }}_{{ instructor.id }}" class="tab-pane fade">
+
+            <h3>{{ instructor.get_full_name }}</h3>
+
+            {% for draft in drafts|filter_drafts_by_instructor:instructor %}
+
+
+                {% include "_view_draft_partial.html" %}
+
+
+            {% endfor %}
+
+        </div>
+    {% endfor %}
 </div>

@@ -1,36 +1,41 @@
 {% load crispy_forms_tags %}
-  <div class="modal fade" id="createSubCategory_{{category.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="createSubCategory_{{ category.id }}" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <div class="modal-content">
+        <div class="modal-content">
 
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pie-chart"></i> Add Subcategory to {{category.name}}</h4>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pie-chart"></i> Add Subcategory
+                    to {{ category.name }}</h4>
+            </div>
+
+            <div class="modal-body">
+                <h5> Subcategory: </h5>
+                <form class="form-horizontal" id="createSubCategoryForm"
+                      action="{% url "category-create-subcategory" category.id %}" method="POST">{% csrf_token %}
+                    <div class="form-group padding-lr">
+                        <label for="name">Name: </label>
+                        <input name="name" type="text" class="form-control" aria-describedby="emailHelp"
+                               placeholder="Enter subcategory name here"></input>
+
+                    </div>
+                    <div class="form-group padding-lr">
+                        <label for="description">Description: </label>
+                        <textarea name="description" type="text" class="form-control" aria-describedby="emailHelp"
+                                  placeholder="Enter subcategory description/notes here"></textarea>
+                    </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" value="Create" class="btn btn-primary"/>
+                </form>
+            </div>
+
         </div>
-
-        <div class="modal-body">
-          <h5> Subcategory: </h5>
-          <form class="form-horizontal" id="createSubCategoryForm" action="{% url "category-create-subcategory" category.id %}" method="POST">{% csrf_token %}        
-               <div class="form-group padding-lr">
-            <label for="name">Name: </label>
-<input name="name" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter subcategory name here"></input>              
-
-          </div>
-           <div class="form-group padding-lr">
-            <label for="description">Description: </label>
-          <textarea name="description" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter subcategory description/notes here"></textarea>            
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <input type="submit" value="Create" class="btn btn-primary"/>      
-          </form>
-        </div>
-
-      </div>
     </div>
-  </div>
+</div>

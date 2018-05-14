@@ -6,5 +6,4 @@ register = template.Library()
 
 @register.filter
 def get_image(image):
-    return image.url if image else settings.STATIC_URL  + 'img/avatar.jpg'
-
+    return image.url if image else settings.STATIC_URL + 'img/avatar.jpg'

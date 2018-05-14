@@ -1,23 +1,22 @@
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
-from django.contrib.auth.models import Permission
-from django.core.urlresolvers import reverse
-from django.db import models
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from django.template.loader import render_to_string
-
 from uuid import uuid4
 
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.mail import EmailMultiAlternatives
+from django.core.urlresolvers import reverse
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
+
 from classroom.models import *
+
 
 class ProfileManager(BaseUserManager):
     """ Manager that contains methods used
         by the profile
     """
-    def create_user(self, first_name, last_name, email, permission = 0, password=None, **kwargs):
+
+    def create_user(self, first_name, last_name, email, permission=0, password=None, **kwargs):
         if not email:
             raise ValueError("Email address is required.")
 
@@ -32,7 +31,7 @@ class ProfileManager(BaseUserManager):
         return profile
 
     def create_superuser(self, first_name, last_name, email, password, **kwargs):
-        profile = self.create_user(first_name, last_name, email, 1,password, **kwargs)
+        profile = self.create_user(first_name, last_name, email, 1, password, **kwargs)
         profile.is_admin = True
         profile.is_staff = True
         profile.is_superuser = True
@@ -44,8 +43,9 @@ class ProfileManager(BaseUserManager):
 class Profile(AbstractBaseUser, PermissionsMixin):
     """ User's model
     """
+
     class Meta:
-       ordering = ['permission_level', 'last_name', 'first_name']
+        ordering = ['permission_level', 'last_name', 'first_name']
 
     email = models.EmailField(max_length=150, unique=True)
     username = models.CharField(max_length=150, unique=True)
@@ -53,7 +53,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=80, null=True, blank=True)
 
     nick_name = models.CharField(max_length=15, null=True, blank=True)
-  #  image = models.ImageField(upload_to='images/')
+    #  image = models.ImageField(upload_to='images/')
     bio = models.TextField(null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
@@ -69,7 +69,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     permission_level = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False, help_text=_('Designates whether the user can log into this admin '
-                    'dashboard.'))
+                                                              'dashboard.'))
     is_active = models.BooleanField(_('active'), default=True)
 
     current_classroom = models.ForeignKey(Classroom, blank=True, null=True)
@@ -77,7 +77,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     objects = ProfileManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS  = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self):
         return self.email
@@ -106,13 +106,13 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         confirm_key = self.generate_confirm_key()
         url_path = request.build_absolute_uri(reverse('account-activate', args=(confirm_key.key,)))
         host_email = settings.EMAIL_HOST_USER
-        subject =   "Confirmation Key"
+        subject = "Confirmation Key"
         email_to = confirm_key.user.email
-        html_content = render_to_string('email/activate.html',{
-                                                        'subject': subject,
-                                                        'url': url_path,
-                                                    })
-        subject, from_email, title='User Account', host_email, email_to
+        html_content = render_to_string('email/activate.html', {
+            'subject': subject,
+            'url': url_path,
+        })
+        subject, from_email, title = 'User Account', host_email, email_to
         msg = EmailMultiAlternatives(subject, html_content, from_email, [title])
         msg.content_subtype = "html"
         msg.send()
@@ -154,4 +154,3 @@ class ResetPasswordKey(models.Model):
 
     def _generate_key(self):
         return uuid4().hex
-
