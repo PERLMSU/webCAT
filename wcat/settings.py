@@ -34,7 +34,7 @@ DEBUG = True
 
 # if DEBUG:
 
-ALLOWED_HOSTS = ['webcat-p3.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['webcat-p3.herokuapp.com', '127.0.0.1', 'localhost']
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
@@ -130,10 +130,10 @@ WSGI_APPLICATION = 'wcat.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'wcat1',
-        'USER': 'helena',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'NAME': 'wcat',
+        'USER': 'wcat',
+        'PASSWORD': 'wcat',
+        'HOST': 'db',
         'PORT': '',
 
     }
