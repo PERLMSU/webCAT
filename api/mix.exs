@@ -19,8 +19,8 @@ defmodule WebCAT.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {WebCAT.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      mod: {WebCAT, []},
+      extra_applications: ~w(logger runtime_tools)a
     ]
   end
 

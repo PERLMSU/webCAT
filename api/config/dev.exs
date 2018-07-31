@@ -37,8 +37,8 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :webcat, WebCAT.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "webcat",
+  password: "webcat",
   database: "webcat_dev",
   hostname: "localhost",
   pool_size: 10

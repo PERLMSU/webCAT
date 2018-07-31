@@ -1,0 +1,11 @@
+version: '3'
+services:
+  db:
+    image: postgres:10-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: webcat
+      POSTGRES_PASSWORD: webcat
+      POSTGRES_DB: webcat_dev
+    ports:
+      - 5432:5432

@@ -12,8 +12,8 @@ config :logger, level: :warn
 # Configure your database
 config :webcat, WebCAT.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "webcat",
+  password: "webcat",
   database: "webcat_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
