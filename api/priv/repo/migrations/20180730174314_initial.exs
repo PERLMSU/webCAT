@@ -11,6 +11,8 @@ defmodule WebCAT.Repo.Migrations.Initial do
   def change do
     execute("CREATE EXTENSION pgcrypto;", "DROP EXTENSION pgcrypto;")
 
+    # Accounts
+
     create table(:users) do
       add_req(:first_name, :string)
       add_req(:last_name, :string)
@@ -57,6 +59,8 @@ defmodule WebCAT.Repo.Migrations.Initial do
 
       timestamps()
     end
+
+    # Rotations
 
     create table(:semesters) do
       add_req(:start_date, :date)
@@ -108,6 +112,8 @@ defmodule WebCAT.Repo.Migrations.Initial do
 
       timestamps()
     end
+
+    # Feedback
 
     create table(:categories) do
       add_req(:name, :string)
