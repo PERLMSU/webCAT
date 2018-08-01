@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>WebCAT</title>
+    <%= for stylesheet_path <- Path.wildcard("priv/static/css/*.css") do %>
+    <link rel="stylesheet" href="<%= static_path(@conn, "/" <> Path.relative_to(stylesheet_path, "priv/static")) %>">
+    <% end %>
+</head>
+<body>
+    <%= render @view_module, @view_template, assigns %>
+    <%= for script_path <- Path.wildcard("priv/static/js/*.js") do %>
+    <script src="<%= static_path(@conn, "/" <> Path.relative_to(script_path, "priv/static")) %>"></script>
+    <% end %>
+</body>
+</html>

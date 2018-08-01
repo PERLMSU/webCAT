@@ -24,8 +24,16 @@ config :webcat, WebCAT.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: []
-
+  watchers: [
+    {"node",
+     [
+       "node_modules/webpack/bin/webpack.js",
+       "--mode",
+       "development",
+       "--watch",
+       cd: Path.expand("../assets", __DIR__)
+     ]}
+  ]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
