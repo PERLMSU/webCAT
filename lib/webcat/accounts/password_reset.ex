@@ -13,13 +13,18 @@ defmodule WebCAT.Accounts.PasswordReset do
     timestamps()
   end
 
+  def gen_token do
+    :crypto.strong_rand_bytes(32)
+    |> Base.encode32()
+  end
+
   @doc """
   Build a changeset for a password reset
   """
   def changeset(reset, attrs \\ %{}) do
     reset
     |> cast(attrs, ~w(token user_id)a)
-    |> validate_required(~w(user_id)a)
+    |> validate_required(~w(token user_id)a)
     |> foreign_key_constraint(:user_id)
     |> unique_constraint(:token)
   end

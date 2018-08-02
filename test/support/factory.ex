@@ -30,13 +30,15 @@ defmodule WebCAT.Factory do
 
   def password_reset_factory do
     %PasswordReset{
-      user: Factory.build(:user)
+      user: Factory.build(:user),
+      token: PasswordReset.gen_token()
     }
   end
 
   def confirmation_factory do
     %Confirmation{
-      user: Factory.build(:user)
+      user: Factory.build(:user),
+      token: Confirmation.gen_token()
     }
   end
 

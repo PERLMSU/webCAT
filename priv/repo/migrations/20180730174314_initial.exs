@@ -37,7 +37,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:confirmations) do
-      add_req(:token, :text, default: fragment("gen_random_uuid()"))
+      add_req(:token, :text)
       add_req(:user_id, references(:users))
       add_req(:verified, :boolean, default: false)
 
@@ -45,7 +45,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:password_resets) do
-      add_req(:token, :text, default: fragment("gen_random_uuid()"))
+      add_req(:token, :text)
       add_req(:user_id, references(:users))
 
       timestamps()
