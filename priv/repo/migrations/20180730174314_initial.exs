@@ -10,6 +10,8 @@ defmodule WebCAT.Repo.Migrations.Initial do
 
   def change do
     execute("CREATE EXTENSION pgcrypto;", "DROP EXTENSION pgcrypto;")
+    execute("CREATE TYPE user_role AS ENUM ('instructor', 'admin');", "DROP TYPE IF EXISTS user_role;")
+    execute("CREATE TYPE draft_status AS ENUM ('review', 'needs_revision', 'approved', 'emailed');", "DROP TYPE IF EXISTS draft_status;")
 
     # Accounts
 
@@ -28,6 +30,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
       add(:country, :string)
       add(:birthday, :date)
       add_req(:active, :boolean, default: true)
+      add_req(:role, :user_role, default: "instructor")
 
       timestamps()
     end
@@ -47,19 +50,6 @@ defmodule WebCAT.Repo.Migrations.Initial do
       timestamps()
     end
 
-    create table(:role_groups) do
-      add_req(:name, :string)
-
-      timestamps()
-    end
-
-    create table(:role_group_users, primary_key: false) do
-      add_req(:role_group_id, references(:role_groups), primary_key: true)
-      add_req(:user_id, references(:users), primary_key: true)
-
-      timestamps()
-    end
-
     # Rotations
 
     create table(:semesters) do
@@ -71,17 +61,25 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:classrooms) do
-      add(:course_code, :string)
-      add(:course_number, :string)
-      add(:course_description, :string)
+      add_req(:course_code, :string)
+      add_req(:course_number, :string)
+      add(:description, :string)
+      add(:section, :string)
       add_req(:semester_id, references(:semesters))
 
       timestamps()
     end
 
+    create table(:user_classrooms, primary_key: false) do
+      add_req(:user_id, references(:users), primary_key: true)
+      add_req(:classroom_id, references(:classrooms), primary_key: true)
+
+      timestamps()
+    end
+
     create table(:rotations) do
-      add_req(:start_week, :integer)
-      add_req(:end_week, :integer)
+      add_req(:start_date, :date)
+      add_req(:end_date, :date)
       add_req(:classroom_id, references(:classrooms))
 
       timestamps()
@@ -125,8 +123,6 @@ defmodule WebCAT.Repo.Migrations.Initial do
 
     create table(:observations) do
       add_req(:content, :string)
-      add_req(:feedback, :string)
-      add_req(:explanation, :string)
       add_req(:type, :string)
       add(:category_id, references(:categories))
       add(:rotation_group_id, references(:rotation_groups))
@@ -134,18 +130,33 @@ defmodule WebCAT.Repo.Migrations.Initial do
       timestamps()
     end
 
+    create table(:feedback) do
+      add_req(:content, :string)
+      add_req(:observation_id, references(:observations))
+
+      timestamps()
+    end
+
+    create table(:explanations) do
+      add_req(:content, :string)
+      add_req(:feedback_id, references(:feedback))
+
+      timestamps()
+    end
+
     create table(:notes) do
       add_req(:content, :string)
-      add_req(:student_id, references(:students))
+      add(:student_id, references(:students))
       add(:observation_id, references(:observations))
+      add(:rotation_group_id, references(:observations))
 
       timestamps()
     end
 
     create table(:drafts) do
       add_req(:content, :string)
-      add_req(:status, :integer)
-      add_req(:user_id, references(:users))
+      add_req(:status, :draft_status)
+      add_req(:instructor_id, references(:users))
       add_req(:student_id, references(:students))
       add_req(:rotation_group_id, references(:rotation_groups))
 
@@ -179,7 +190,6 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create(unique_index(:users, ~w(email username)a))
     create(unique_index(:confirmations, ~w(token)a))
     create(unique_index(:password_resets, ~w(token)a))
-    create(unique_index(:role_groups, ~w(name)a))
     create(unique_index(:categories, ~w(name)a))
     create(unique_index(:students, ~w(email)a))
   end

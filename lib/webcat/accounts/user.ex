@@ -20,16 +20,17 @@ defmodule WebCAT.Accounts.User do
     field(:country, :string)
     field(:birthday, :date)
     field(:active, :boolean)
+    field(:role, :string)
 
-    has_many(:rotation_groups, WebCAT.Rotations.RotationGroup)
+    has_many(:rotation_groups, WebCAT.Rotations.RotationGroup, foreign_key: :instructor_id)
     has_many(:drafts, WebCAT.Feedback.Draft)
     has_many(:notifications, WebCAT.Feedback.Notification)
-    many_to_many(:role_groups, WebCAT.Accounts.RoleGroup, join_through: "role_group_users")
+    many_to_many(:classrooms, WebCAT.Rotations.Classroom, join_through: "user_classrooms")
 
     timestamps()
   end
 
-  @required ~w(first_name last_name email username password active inserted_at updated_at)a
+  @required ~w(first_name last_name email username password active inserted_at updated_at role)a
   @optional ~w(middle_name nickname bio phone city state country)a
 
   @doc """
