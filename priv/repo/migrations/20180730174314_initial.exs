@@ -12,6 +12,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     execute("CREATE EXTENSION pgcrypto;", "DROP EXTENSION pgcrypto;")
     execute("CREATE TYPE user_role AS ENUM ('instructor', 'admin');", "DROP TYPE IF EXISTS user_role;")
     execute("CREATE TYPE draft_status AS ENUM ('review', 'needs_revision', 'approved', 'emailed');", "DROP TYPE IF EXISTS draft_status;")
+    execute("CREATE TYPE observation_type AS ENUM ('positive', 'neutral', 'negative');", "DROP TYPE IF EXISTS observation_type;")
 
     # Accounts
 
@@ -62,9 +63,8 @@ defmodule WebCAT.Repo.Migrations.Initial do
 
     create table(:classrooms) do
       add_req(:course_code, :string)
-      add_req(:course_number, :string)
+      add_req(:section, :string)
       add(:description, :string)
-      add(:section, :string)
       add_req(:semester_id, references(:semesters))
 
       timestamps()
@@ -123,7 +123,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
 
     create table(:observations) do
       add_req(:content, :string)
-      add_req(:type, :string)
+      add_req(:type, :observation_type)
       add(:category_id, references(:categories))
       add(:rotation_group_id, references(:rotation_groups))
 

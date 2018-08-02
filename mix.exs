@@ -49,6 +49,7 @@ defmodule WebCAT.Mixfile do
       {:comeonin, "~> 4.0"},
       {:pbkdf2_elixir, "~> 0.12"},
       {:ex_machina, "~> 2.2", only: :test},
+      {:elixilorem, "~> 0.0.1", only: :test},
       {:distillery, "~> 1.5", runtime: false},
       {:dialyxir, git: "https://github.com/jeremyjh/dialyxir.git", only: [:dev], runtime: false}
     ]

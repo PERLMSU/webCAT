@@ -23,7 +23,7 @@ defmodule WebCAT.Accounts.User do
     field(:role, :string)
 
     has_many(:rotation_groups, WebCAT.Rotations.RotationGroup, foreign_key: :instructor_id)
-    has_many(:drafts, WebCAT.Feedback.Draft)
+    has_many(:drafts, WebCAT.Feedback.Draft, foreign_key: :instructor_id)
     has_many(:notifications, WebCAT.Feedback.Notification)
     many_to_many(:classrooms, WebCAT.Rotations.Classroom, join_through: "user_classrooms")
 
@@ -40,6 +40,14 @@ defmodule WebCAT.Accounts.User do
     user
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
+    |> validate_format(:email, ~r/(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)/)
+    # 999-999-9999 format numbers for simplicity
+    |> validate_format(:phone, ~r/^\d{3}-\d{3}-\d{4}$/)
+    # MI, AZ, AK, etc.
+    |> validate_format(:state, ~r/^[A-Z]{2}$/)
+    # letters and numbers up to 24 characters
+    |> validate_format(:username, ~r/^[\w\d]{1,24}$/)
+    |> validate_inclusion(:role, ~w(learning_assistant admin))
     |> unique_constraint(:email)
     |> unique_constraint(:username)
   end

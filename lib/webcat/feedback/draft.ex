@@ -20,6 +20,7 @@ defmodule WebCAT.Feedback.Draft do
     draft
     |> cast(attrs, ~w(content status instructor_id student_id rotation_group_id)a)
     |> validate_required(~w(content status instructor_id student_id rotation_group_id)a)
+    |> validate_inclusion(:status, ~w(review needs_revision approved emailed))
     |> foreign_key_constraint(:instructor_id)
     |> foreign_key_constraint(:student_id)
     |> foreign_key_constraint(:rotation_group_id)

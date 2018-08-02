@@ -1,6 +1,7 @@
 defmodule WebCAT.Rotations.Semester do
   use Ecto.Schema
   import Ecto.Changeset
+  import WebCAT.Validators
 
   schema "semesters" do
     field(:start_date, :date)
@@ -19,5 +20,6 @@ defmodule WebCAT.Rotations.Semester do
     semester
     |> cast(attrs, ~w(start_date end_date title)a)
     |> validate_required(~w(start_date end_date title)a)
+    |> validate_dates_after(:start_date, :end_date)
   end
 end

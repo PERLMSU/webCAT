@@ -1,4 +1,4 @@
-defmodule WebCAT.Feedback.Notification do
+defmodule WebCAT.Accounts.Notification do
   use Ecto.Schema
   import Ecto.Changeset
 
