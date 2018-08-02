@@ -15,14 +15,16 @@ defmodule WebCAT.Factory do
       username: sequence(:username, &"user#{&1}"),
       password: Comeonin.Pbkdf2.hashpwsalt("password"),
       nickname: sequence(:nickname, ~w(John Jane)),
-      bio: Elixilorem.paragraph(),
+      bio: Elixilorem.sentence(),
       phone: "989-992-9183",
       city: "East Lansing",
       state: "MI",
       country: "USA",
       birthday: Timex.to_date(Timex.shift(Timex.now(), years: -18)),
       active: true,
-      role: sequence(:role, ~w(learning_assistant admin))
+      role: sequence(:role, ~w(instructor admin)),
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now(),
     }
   end
 
@@ -56,7 +58,7 @@ defmodule WebCAT.Factory do
 
   def draft_factory do
     %Draft{
-      content: Elixilorem.paragraph(),
+      content: Elixilorem.sentence(),
       status: sequence(:status, ~w(review needs_revision approved emailed)),
       instructor: Factory.build(:user),
       student: Factory.build(:student),
@@ -74,14 +76,14 @@ defmodule WebCAT.Factory do
 
   def explanation_factory do
     %Explanation{
-      content: Elixilorem.paragraph(),
+      content: Elixilorem.sentence(),
       feedback: Factory.build(:feedback)
     }
   end
 
   def feedback_factory do
     %Feedback{
-      content: Elixilorem.paragraph(),
+      content: Elixilorem.sentence(),
       observation: Factory.build(:observation)
     }
   end
@@ -96,34 +98,34 @@ defmodule WebCAT.Factory do
 
   def misc_note_factory do
     %Note{
-      content: Elixilorem.paragraph()
+      content: Elixilorem.sentence()
     }
   end
 
   def student_note_factory do
     %Note{
-      content: Elixilorem.paragraph(),
+      content: Elixilorem.sentence(),
       student: Factory.build(:student)
     }
   end
 
   def observation_note_factory do
     %Note{
-      content: Elixilorem.paragraph(),
+      content: Elixilorem.sentence(),
       observation: Factory.build(:observation)
     }
   end
 
   def rotation_group_note_factory do
     %Note{
-      content: Elixilorem.paragraph(),
+      content: Elixilorem.sentence(),
       rotation_group: Factory.build(:rotation_group)
     }
   end
 
   def observation_factory do
     %Observation{
-      content: Elixilorem.paragraph(),
+      content: Elixilorem.sentence(),
       type: "positive",
       category: Factory.build(:category),
       rotation_group: Factory.build(:rotation_group)

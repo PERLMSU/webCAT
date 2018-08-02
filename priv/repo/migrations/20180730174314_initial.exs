@@ -17,18 +17,18 @@ defmodule WebCAT.Repo.Migrations.Initial do
     # Accounts
 
     create table(:users) do
-      add_req(:first_name, :string)
-      add_req(:last_name, :string)
-      add(:middle_name, :string)
-      add_req(:email, :string)
-      add_req(:username, :string)
-      add_req(:password, :string)
-      add(:nickname, :string)
-      add(:bio, :string)
-      add(:phone, :string)
-      add(:city, :string)
-      add(:state, :string)
-      add(:country, :string)
+      add_req(:first_name, :text)
+      add_req(:last_name, :text)
+      add(:middle_name, :text)
+      add_req(:email, :text)
+      add_req(:username, :text)
+      add_req(:password, :text)
+      add(:nickname, :text)
+      add(:bio, :text)
+      add(:phone, :text)
+      add(:city, :text)
+      add(:state, :text)
+      add(:country, :text)
       add(:birthday, :date)
       add_req(:active, :boolean, default: true)
       add_req(:role, :user_role, default: "instructor")
@@ -37,7 +37,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:confirmations) do
-      add_req(:token, :string, default: fragment("gen_random_uuid()"))
+      add_req(:token, :text, default: fragment("gen_random_uuid()"))
       add_req(:user_id, references(:users))
       add_req(:verified, :boolean, default: false)
 
@@ -45,7 +45,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:password_resets) do
-      add_req(:token, :string, default: fragment("gen_random_uuid()"))
+      add_req(:token, :text, default: fragment("gen_random_uuid()"))
       add_req(:user_id, references(:users))
 
       timestamps()
@@ -56,15 +56,15 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create table(:semesters) do
       add_req(:start_date, :date)
       add_req(:end_date, :date)
-      add_req(:title, :string)
+      add_req(:title, :text)
 
       timestamps()
     end
 
     create table(:classrooms) do
-      add_req(:course_code, :string)
-      add_req(:section, :string)
-      add(:description, :string)
+      add_req(:course_code, :text)
+      add_req(:section, :text)
+      add(:description, :text)
       add_req(:semester_id, references(:semesters))
 
       timestamps()
@@ -86,17 +86,17 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:students) do
-      add_req(:first_name, :string)
-      add_req(:last_name, :string)
-      add(:middle_name, :string)
-      add(:notes, :string)
-      add(:email, :string)
+      add_req(:first_name, :text)
+      add_req(:last_name, :text)
+      add(:middle_name, :text)
+      add(:notes, :text)
+      add(:email, :text)
 
       timestamps()
     end
 
     create table(:rotation_groups) do
-      add(:description, :string)
+      add(:description, :text)
       add_req(:number, :integer)
       add_req(:classroom_id, references(:classrooms))
       add_req(:instructor_id, references(:users))
@@ -114,15 +114,15 @@ defmodule WebCAT.Repo.Migrations.Initial do
     # Feedback
 
     create table(:categories) do
-      add_req(:name, :string)
-      add(:description, :string)
+      add_req(:name, :text)
+      add(:description, :text)
       add(:parent_category_id, references(:categories))
 
       timestamps()
     end
 
     create table(:observations) do
-      add_req(:content, :string)
+      add_req(:content, :text)
       add_req(:type, :observation_type)
       add(:category_id, references(:categories))
       add(:rotation_group_id, references(:rotation_groups))
@@ -131,21 +131,21 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:feedback) do
-      add_req(:content, :string)
+      add_req(:content, :text)
       add_req(:observation_id, references(:observations))
 
       timestamps()
     end
 
     create table(:explanations) do
-      add_req(:content, :string)
+      add_req(:content, :text)
       add_req(:feedback_id, references(:feedback))
 
       timestamps()
     end
 
     create table(:notes) do
-      add_req(:content, :string)
+      add_req(:content, :text)
       add(:student_id, references(:students))
       add(:observation_id, references(:observations))
       add(:rotation_group_id, references(:observations))
@@ -154,7 +154,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:drafts) do
-      add_req(:content, :string)
+      add_req(:content, :text)
       add_req(:status, :draft_status)
       add_req(:instructor_id, references(:users))
       add_req(:student_id, references(:students))
@@ -164,8 +164,8 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:emails) do
-      add_req(:status, :string)
-      add(:status_message, :string)
+      add_req(:status, :text)
+      add(:status_message, :text)
       add_req(:draft_id, references(:drafts))
 
       timestamps()
@@ -179,7 +179,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     end
 
     create table(:notifications) do
-      add_req(:content, :string)
+      add_req(:content, :text)
       add_req(:seen, :boolean, default: false)
       add_req(:draft_id, references(:drafts))
       add_req(:user_id, references(:users))
@@ -187,7 +187,8 @@ defmodule WebCAT.Repo.Migrations.Initial do
       timestamps()
     end
 
-    create(unique_index(:users, ~w(email username)a))
+    create(unique_index(:users, ~w(email)a))
+    create(unique_index(:users, ~w(username)a))
     create(unique_index(:confirmations, ~w(token)a))
     create(unique_index(:password_resets, ~w(token)a))
     create(unique_index(:categories, ~w(name)a))

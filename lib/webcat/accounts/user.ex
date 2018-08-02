@@ -47,7 +47,7 @@ defmodule WebCAT.Accounts.User do
     |> validate_format(:state, ~r/^[A-Z]{2}$/)
     # letters and numbers up to 24 characters
     |> validate_format(:username, ~r/^[\w\d]{1,24}$/)
-    |> validate_inclusion(:role, ~w(learning_assistant admin))
+    |> validate_inclusion(:role, ~w(instructor admin))
     |> unique_constraint(:email)
     |> unique_constraint(:username)
   end
