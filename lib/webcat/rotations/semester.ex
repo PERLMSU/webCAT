@@ -8,7 +8,7 @@ defmodule WebCAT.Rotations.Semester do
     field(:end_date, :date)
     field(:title, :string)
 
-    has_many(:classrooms, InTheDoor.Rotations.Classroom)
+    has_many(:classrooms, WebCAT.Rotations.Classroom)
 
     timestamps()
   end

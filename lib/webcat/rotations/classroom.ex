@@ -7,9 +7,9 @@ defmodule WebCAT.Rotations.Classroom do
     field(:section, :string)
     field(:description, :string)
 
-    belongs_to(:semester, InTheDoor.Rotations.Semester)
-    has_many(:rotations, InTheDoor.Rotations.Rotation)
-    has_many(:students, InTheDoor.Rotations.Student)
+    belongs_to(:semester, WebCAT.Rotations.Semester)
+    has_many(:rotations, WebCAT.Rotations.Rotation)
+    has_many(:students, WebCAT.Rotations.Student)
 
     timestamps()
   end

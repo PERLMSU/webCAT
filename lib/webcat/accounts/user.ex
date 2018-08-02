@@ -24,7 +24,7 @@ defmodule WebCAT.Accounts.User do
 
     has_many(:rotation_groups, WebCAT.Rotations.RotationGroup, foreign_key: :instructor_id)
     has_many(:drafts, WebCAT.Feedback.Draft, foreign_key: :instructor_id)
-    has_many(:notifications, WebCAT.Feedback.Notification)
+    has_many(:notifications, WebCAT.Accounts.Notification)
     many_to_many(:classrooms, WebCAT.Rotations.Classroom, join_through: "user_classrooms")
 
     timestamps()

@@ -6,7 +6,7 @@ defmodule WebCAT.Feedback.Draft do
     field(:content, :string)
     field(:status, :string)
 
-    belongs_to(:instructor, WebCAT.Feedback.User)
+    belongs_to(:instructor, WebCAT.Accounts.User)
     belongs_to(:student, WebCAT.Rotations.Student)
     belongs_to(:rotation_group, WebCAT.Rotations.RotationGroup)
 
