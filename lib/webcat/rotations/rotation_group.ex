@@ -9,6 +9,10 @@ defmodule WebCAT.Rotations.RotationGroup do
     belongs_to(:rotation, WebCAT.Rotations.Rotation)
     belongs_to(:instructor, WebCAT.Accounts.User, foreign_key: :instructor_id)
 
+    has_many(:drafts, WebCAT.Feedback.Draft)
+
+    many_to_many(:students, WebCAT.Rotations.Student, join_through: "student_groups")
+
     timestamps()
   end
 

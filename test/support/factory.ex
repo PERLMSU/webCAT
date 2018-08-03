@@ -24,7 +24,7 @@ defmodule WebCAT.Factory do
       active: true,
       role: sequence(:role, ~w(instructor admin)),
       inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
     }
   end
 
@@ -62,7 +62,6 @@ defmodule WebCAT.Factory do
     %Draft{
       content: Elixilorem.sentence(),
       status: sequence(:status, ~w(review needs_revision approved emailed)),
-      instructor: Factory.build(:user),
       student: Factory.build(:student),
       rotation_group: Factory.build(:rotation_group)
     }

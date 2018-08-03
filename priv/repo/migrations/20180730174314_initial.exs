@@ -73,8 +73,6 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create table(:user_classrooms, primary_key: false) do
       add_req(:user_id, references(:users), primary_key: true)
       add_req(:classroom_id, references(:classrooms), primary_key: true)
-
-      timestamps()
     end
 
     create table(:rotations) do
@@ -89,8 +87,9 @@ defmodule WebCAT.Repo.Migrations.Initial do
       add_req(:first_name, :text)
       add_req(:last_name, :text)
       add(:middle_name, :text)
-      add(:notes, :text)
+      add(:description, :text)
       add(:email, :text)
+      add_req(:classroom_id, references(:classrooms))
 
       timestamps()
     end
@@ -98,7 +97,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create table(:rotation_groups) do
       add(:description, :text)
       add_req(:number, :integer)
-      add_req(:classroom_id, references(:classrooms))
+      add_req(:rotation_id, references(:rotations))
       add_req(:instructor_id, references(:users))
 
       timestamps()
@@ -107,8 +106,6 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create table(:student_groups, primary_key: false) do
       add_req(:rotation_group_id, references(:rotation_groups), primary_key: true)
       add_req(:student_id, references(:students), primary_key: true)
-
-      timestamps()
     end
 
     # Feedback
@@ -156,7 +153,6 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create table(:drafts) do
       add_req(:content, :text)
       add_req(:status, :draft_status)
-      add_req(:instructor_id, references(:users))
       add_req(:student_id, references(:students))
       add_req(:rotation_group_id, references(:rotation_groups))
 
