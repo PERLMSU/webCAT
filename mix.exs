@@ -25,8 +25,8 @@ defmodule WebCAT.Mixfile do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ~w(lib web test/support)
-  defp elixirc_paths(_), do: ~w(lib web)
+  defp elixirc_paths(:test), do: ~w(lib test/support)
+  defp elixirc_paths(_), do: ~w(lib)
 
   # Specifies your project dependencies.
   #
