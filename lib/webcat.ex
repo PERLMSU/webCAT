@@ -11,7 +11,7 @@ defmodule WebCAT do
       # Start the Ecto repository
       supervisor(WebCAT.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(WebCAT.Endpoint, []),
+      supervisor(WebCATWeb.Endpoint, []),
       # Start your own worker by calling: WebCAT.Worker.start_link(arg1, arg2, arg3)
       # worker(WebCAT.Worker, [arg1, arg2, arg3]),
     ]
@@ -25,7 +25,7 @@ defmodule WebCAT do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    WebCAT.Endpoint.config_change(changed, removed)
+    WebCATWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

@@ -9,13 +9,14 @@ use Mix.Config
 config :webcat,
   ecto_repos: [WebCAT.Repo]
 
+config :ecto, json_library: Jason
+
 # Configures the endpoint
-config :webcat, WebCAT.Endpoint,
+config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "s9GTMEgc/xgeVdIwZ3VZy3kTo/1xPo6k7NezFUo0Oe+vomSV4eJDes3GQnwJp4rh",
-  render_errors: [view: WebCAT.ErrorView, accepts: ~w(json)],
-  pubsub: [name: WebCAT.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(json)],
+  pubsub: [name: WebCATWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -24,4 +25,4 @@ config :logger, :console,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

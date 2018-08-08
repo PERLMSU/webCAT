@@ -19,20 +19,29 @@ use Mix.Config
 # If desired, both `http:` and `https:` keys can be
 # configured to run both http and https servers on
 # different ports.
-config :webcat, WebCAT.Endpoint,
+config :webcat, WebCATWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
   watchers: [
-    {"node",
-     [
-       "node_modules/webpack/bin/webpack.js",
-       "--mode",
-       "development",
-       "--watch",
-       cd: Path.expand("../assets", __DIR__)
-     ]}
+    node: [
+      "node_modules/brunch/bin/brunch",
+      "watch",
+      "--stdin",
+      cd: Path.expand("../assets", __DIR__)
+    ]
+  ]
+
+# Watch static and templates for browser reloading.
+config :webcat, WebCATWeb.Endpoint,
+  live_reload: [
+    patterns: [
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      ~r{priv/gettext/.*(po)$},
+      ~r{lib/webcat_web/views/.*(ex)$},
+      ~r{lib/webcat_web/templates/.*(eex)$}
+    ]
   ]
 
 # Do not include metadata nor timestamps in development logs

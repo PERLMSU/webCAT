@@ -2,7 +2,7 @@ use Mix.Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :webcat, WebCAT.Endpoint,
+config :webcat, WebCATWeb.Endpoint,
   http: [port: 4001],
   server: false
 
@@ -17,3 +17,5 @@ config :webcat, WebCAT.Repo,
   database: "webcat_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :pbkdf2_elixir, rounds: 1
