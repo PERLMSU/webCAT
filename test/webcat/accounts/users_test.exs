@@ -94,7 +94,7 @@ defmodule WebCAT.Accounts.UsersTest do
       Factory.insert_list(5, :rotation_group)
       user = Factory.insert(:user, rotation_groups: Factory.insert_list(4, :rotation_group))
 
-      groups = Users.rotation_groups(user.id)
+      {:ok, groups} = Users.rotation_groups(user.id)
       assert Enum.count(groups) == 4
     end
   end
@@ -104,7 +104,7 @@ defmodule WebCAT.Accounts.UsersTest do
       Factory.insert_list(5, :notification)
       user = Factory.insert(:user, notifications: Factory.insert_list(4, :notification))
 
-      notifications = Users.notifications(user.id)
+      {:ok, notifications} = Users.notifications(user.id)
       assert Enum.count(notifications) == 4
     end
   end
@@ -114,7 +114,7 @@ defmodule WebCAT.Accounts.UsersTest do
       Factory.insert_list(5, :classroom)
       user = Factory.insert(:user, classrooms: Factory.insert_list(4, :classroom))
 
-      classrooms = Users.classrooms(user.id)
+      {:ok, classrooms} = Users.classrooms(user.id)
       assert Enum.count(classrooms) == 4
     end
   end

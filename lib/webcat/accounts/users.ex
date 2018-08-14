@@ -13,6 +13,20 @@ defmodule WebCAT.Accounts.Users do
   import Ecto.Query
 
   @doc """
+  List users in the system
+  """
+  @spec get(Keyword.t()) :: [User.t()]
+  def list(options \\ []) do
+    users =
+      User
+      |> limit(^Keyword.get(options, :limit, 25))
+      |> offset(^Keyword.get(options, :offset, 0))
+      |> Repo.all()
+
+    {:ok, users}
+  end
+
+  @doc """
   Get a user by its id
   """
   @spec get(integer()) :: {:ok, User.t()} | {:error, :not_found, String.t()}
@@ -80,37 +94,52 @@ defmodule WebCAT.Accounts.Users do
   end
 
   @doc """
-  Get all associated rotation_groups for a user
+  Get all associated rotation groups for a user
   """
   @spec rotation_groups(integer) :: [RotationGroup.t()]
-  def rotation_groups(user_id) do
-    RotationGroup
-    |> where([g], g.instructor_id == ^user_id)
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
+  def rotation_groups(user_id, options \\ []) do
+    groups =
+      RotationGroup
+      |> where([g], g.instructor_id == ^user_id)
+      |> limit(^Keyword.get(options, :limit, 25))
+      |> offset(^Keyword.get(options, :offset, 0))
+      |> order_by(desc: :inserted_at)
+      |> Repo.all()
+
+    {:ok, groups}
   end
 
   @doc """
   Get all associated notifications for a user
   """
-  def notifications(user_id) do
-    Notification
-    |> where([n], n.user_id == ^user_id)
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
+  def notifications(user_id, options \\ []) do
+    notifications =
+      Notification
+      |> where([n], n.user_id == ^user_id)
+      |> limit(^Keyword.get(options, :limit, 25))
+      |> offset(^Keyword.get(options, :offset, 0))
+      |> order_by(desc: :inserted_at)
+      |> Repo.all()
+
+    {:ok, notifications}
   end
 
   @doc """
   Get all of the classrooms a user belongs to
   """
   @spec classrooms(integer) :: [Classroom.t()]
-  def classrooms(user_id) do
-    Classroom
-    |> join(:inner, [c], uc in "user_classrooms", uc.classroom_id == c.id)
-    |> where([_, uc], uc.user_id == ^user_id)
-    |> order_by([c, _], desc: c.inserted_at)
-    |> select([c, _], c)
-    |> Repo.all()
+  def classrooms(user_id, options \\ []) do
+    classrooms =
+      Classroom
+      |> join(:inner, [c], uc in "user_classrooms", uc.classroom_id == c.id)
+      |> where([_, uc], uc.user_id == ^user_id)
+      |> limit(^Keyword.get(options, :limit, 25))
+      |> offset(^Keyword.get(options, :offset, 0))
+      |> order_by([c, _], desc: c.inserted_at)
+      |> select([c, _], c)
+      |> Repo.all()
+
+    {:ok, classrooms}
   end
 
   @doc """

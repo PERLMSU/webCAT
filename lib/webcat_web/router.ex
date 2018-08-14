@@ -13,6 +13,9 @@ defmodule WebCATWeb.Router do
   pipeline :api do
     plug(:accepts, ["json"])
     plug(ProperCase.Plug.SnakeCaseParams)
+  end
+
+  pipeline :secure do
     plug(WebCATWeb.Auth.Pipeline)
   end
 
@@ -21,6 +24,15 @@ defmodule WebCATWeb.Router do
 
     post("/login", AuthController, :login)
     post("/signup", AuthController, :signup)
+  end
+
+  scope "/users", WebCATWeb do
+    pipe_through(~w(api secure)a)
+
+    resources("/", UserController, only: ~w(index show update)a)
+    get("/:id/notifications", UserController, :notifications)
+    get("/:id/classrooms", UserController, :classrooms)
+    get("/:id/rotation_groups", UserController, :rotation_groups)
   end
 
   scope "/", WebCATWeb do
