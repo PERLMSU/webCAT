@@ -147,7 +147,7 @@ defmodule WebCAT.Factory do
       description: Elixilorem.sentence(),
       number: sequence(:number, & &1),
       rotation: Factory.build(:rotation),
-      instructor: Factory.build(:user, role: "learning_assistant")
+      instructor: Factory.build(:user, role: "instructor")
     }
   end
 

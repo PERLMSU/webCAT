@@ -1,5 +1,5 @@
 defmodule WebCAT.Accounts.PasswordResetTest do
-  use WebCAT.ModelCase, async: true
+  use WebCAT.DataCase, async: true
 
   alias WebCAT.Accounts.PasswordReset
   alias WebCAT.Factory

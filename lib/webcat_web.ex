@@ -38,7 +38,6 @@ defmodule WebCATWeb do
       use Phoenix.HTML
 
       import WebCATWeb.Router.Helpers
-      import WebCATWeb.ErrorHelpers
       import WebCATWeb.Gettext
     end
   end

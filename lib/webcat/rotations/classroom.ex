@@ -10,6 +10,7 @@ defmodule WebCAT.Rotations.Classroom do
     belongs_to(:semester, WebCAT.Rotations.Semester)
     has_many(:rotations, WebCAT.Rotations.Rotation)
     has_many(:students, WebCAT.Rotations.Student)
+    many_to_many(:instructors, WebCAT.Accounts.User, join_through: "user_classrooms")
 
     timestamps()
   end

@@ -18,6 +18,14 @@ config :webcat, WebCATWeb.Endpoint,
   render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: WebCATWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
+config :webcat, WebCATWeb.Auth.Guardian,
+  issuer: "webcat",
+  secret_key: "kQeiAAeH0pWGrvZSqwghRwWe+t2hkXXBiWn6OiagghxzJwejPhiqHG+h1C3r1bsw"
+
+config :phoenix, :format_encoders, json: WebCATWeb.JSONEncoder
+
+config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

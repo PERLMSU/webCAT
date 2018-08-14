@@ -1,5 +1,5 @@
 defmodule WebCAT.Accounts.ConfirmationTest do
-  use WebCAT.ModelCase, async: true
+  use WebCAT.DataCase, async: true
 
   alias WebCAT.Accounts.Confirmation
   alias WebCAT.Factory

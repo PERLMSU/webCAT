@@ -1,4 +1,4 @@
-defmodule WebcatWeb.ChannelCase do
+defmodule WebCATWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -21,15 +21,15 @@ defmodule WebcatWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint WebcatWeb.Endpoint
+      @endpoint WebCATWeb.Endpoint
     end
   end
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Webcat.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(WebCAT.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Webcat.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(WebCAT.Repo, {:shared, self()})
     end
     :ok
   end

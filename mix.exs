@@ -33,6 +33,8 @@ defmodule WebCAT.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:anaphora, "~> 0.1.2"},
+      {:bamboo, "~> 1.0"},
       {:comeonin, "~> 4.0"},
       {:cowboy, "~> 1.0"},
       {:distillery, "~> 1.5", runtime: false},
@@ -41,6 +43,7 @@ defmodule WebCAT.Mixfile do
       {:elixilorem, "~> 0.0.1", exclude: :prod},
       {:ex_machina, "~> 2.2", exclude: :prod},
       {:gettext, "~> 0.11"},
+      {:guardian, "~> 1.0"},
       {:jason, ">= 1.0.0"},
       {:pbkdf2_elixir, "~> 0.12"},
       {:phoenix, "~> 1.3.0"},
@@ -49,6 +52,7 @@ defmodule WebCAT.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:postgrex, ">= 0.0.0"},
+      {:proper_case, "~> 1.0.2"},
       {:timex, "~> 3.1"}
     ]
   end
@@ -61,7 +65,7 @@ defmodule WebCAT.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]

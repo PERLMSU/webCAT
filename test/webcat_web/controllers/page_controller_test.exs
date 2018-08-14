@@ -1,8 +1,8 @@
-defmodule WebcatWeb.PageControllerTest do
-  use WebcatWeb.ConnCase
+defmodule WebCATWeb.PageControllerTest do
+  use WebCATWeb.ConnCase
 
   test "GET /", %{conn: conn} do
-    conn = get conn, "/"
-    assert html_response(conn, 200) =~ "Welcome to Phoenix!"
+    get(conn, "/")
+    |> html_response(200)
   end
 end

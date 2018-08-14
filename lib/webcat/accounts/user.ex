@@ -3,6 +3,7 @@ defmodule WebCAT.Accounts.User do
   Schema for user accounts
   """
   use Ecto.Schema
+  alias Comeonin.Pbkdf2
   import Ecto.Changeset
 
   schema "users" do
@@ -29,8 +30,8 @@ defmodule WebCAT.Accounts.User do
     timestamps()
   end
 
-  @required ~w(first_name last_name email username password active inserted_at updated_at role)a
-  @optional ~w(middle_name nickname bio phone city state country)a
+  @required ~w(first_name last_name email username password inserted_at updated_at role)a
+  @optional ~w(middle_name nickname bio phone city state country active)a
 
   @doc """
   Build a changeset for a user
@@ -50,4 +51,18 @@ defmodule WebCAT.Accounts.User do
     |> unique_constraint(:email)
     |> unique_constraint(:username)
   end
+
+  @doc """
+  Build a changeset for creating a user
+  """
+  def create_changeset(user, attrs \\ %{}) do
+    changeset(user, attrs)
+    |> put_pass_hash()
+  end
+
+  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
+    change(changeset, password: Pbkdf2.hashpwsalt(password))
+  end
+
+  defp put_pass_hash(changeset), do: changeset
 end

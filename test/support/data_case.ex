@@ -1,4 +1,4 @@
-defmodule Webcat.DataCase do
+defmodule WebCAT.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -16,20 +16,20 @@ defmodule Webcat.DataCase do
 
   using do
     quote do
-      alias Webcat.Repo
+      alias WebCAT.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Webcat.DataCase
+      import WebCAT.DataCase
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Webcat.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(WebCAT.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Webcat.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(WebCAT.Repo, {:shared, self()})
     end
 
     :ok

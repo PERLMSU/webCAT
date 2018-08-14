@@ -1,5 +1,5 @@
 defmodule WebCAT.Accounts.UserTest do
-  use WebCAT.ModelCase, async: true
+  use WebCAT.DataCase, async: true
 
   alias WebCAT.Accounts.User
   alias WebCAT.Factory
