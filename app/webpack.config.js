@@ -13,8 +13,8 @@ module.exports = {
         "./scss/styles.scss"
     ],
     output: {
-        filename: "js/[name].[hash].js",
-        path: path.join(__dirname, '../priv/static'),
+        filename: "[name].[hash].js",
+        path: path.join(__dirname, './dist'),
     },
 
     // Enable sourcemaps for debugging webpack's output.
@@ -53,12 +53,12 @@ module.exports = {
     },
 
     plugins: [
-        new CleanWebpackPlugin(['priv/static'], { root: path.join(__dirname, '..') }),
+        new CleanWebpackPlugin(['dist'], { root: path.join(__dirname, '.') }),
         new CheckerPlugin({
             useCache: true
         }),
         new MiniCSSExtractPlugin({
-            filename: 'css/styles.css'
+            filename: 'styles.css'
         }),
         new HardSourceWebpackPlugin(),
         new CopyWebpackPlugin([{ from: path.join(__dirname, 'static') }])
@@ -66,9 +66,5 @@ module.exports = {
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-        alias: {
-            phoenix: path.join(__dirname, '../deps/phoenix/priv/static/phoenix.js'),
-            phoenix_html: path.join(__dirname, '../deps/phoenix_html/priv/static/phoenix_html.js')
-        }
     }
 };
