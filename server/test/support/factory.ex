@@ -44,7 +44,7 @@ defmodule WebCAT.Factory do
 
   def notification_factory do
     %Notification{
-      content: ElixiFaker.Lorem.Shakespeare.hamlet(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       seen: false,
       draft: Factory.build(:draft),
       user: Factory.build(:user)

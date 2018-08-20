@@ -1,14 +1,6 @@
 defmodule WebCATWeb.Router do
   use WebCATWeb, :router
-  #use Plug.ErrorHandler
-
-  pipeline :browser do
-    plug(:accepts, ["html"])
-    plug(:fetch_session)
-    plug(:fetch_flash)
-    plug(:protect_from_forgery)
-    plug(:put_secure_browser_headers)
-  end
+  use Plug.ErrorHandler
 
   pipeline :api do
     plug(:accepts, ["json"])
@@ -29,10 +21,5 @@ defmodule WebCATWeb.Router do
     get("/:id/notifications", UserController, :notifications)
     get("/:id/classrooms", UserController, :classrooms)
     get("/:id/rotation_groups", UserController, :rotation_groups)
-  end
-
-  scope "/", WebCATWeb do
-    pipe_through(:browser)
-    get("/*path", PageController, :index)
   end
 end

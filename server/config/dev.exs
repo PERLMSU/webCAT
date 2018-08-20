@@ -24,25 +24,14 @@ config :webcat, WebCATWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: [
-    {"node",
-     [
-       "node_modules/webpack/bin/webpack.js",
-       "--mode",
-       "development",
-       "--watch",
-       cd: Path.expand("../assets", __DIR__)
-     ]}
-  ]
+  watchers: []
 
 # Watch static and templates for browser reloading.
 config :webcat, WebCATWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/webcat_web/views/.*(ex)$},
-      ~r{lib/webcat_web/templates/.*(eex)$}
     ]
   ]
 

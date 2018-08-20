@@ -45,16 +45,6 @@ defmodule WebCATWeb.UserController do
     end
   end
 
-  def notifications(conn, %{"id" => id} = params) do
-    limit = Map.get(params, "limit", 25)
-    offset = Map.get(params, "offset", 0)
-
-    with {:ok, notifications} <- Users.notifications(id, limit: limit, offset: offset) do
-      conn
-      |> render(NotificationView, "list.json", notifications: notifications)
-    end
-  end
-
   def classrooms(conn, %{"id" => id} = params) do
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)

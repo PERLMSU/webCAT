@@ -3,18 +3,6 @@ defmodule WebCATWeb.Endpoint do
 
   socket("/socket", WebCATWeb.UserSocket)
 
-  # Serve at "/" the static files from "priv/static" directory.
-  #
-  # You should set gzip to true if you are running phoenix.digest
-  # when deploying your static files in production.
-
-  plug(Plug.Static,
-    at: "/",
-    from: :webcat,
-    gzip: true,
-    only: ~w(css fonts images js favicon.ico robots.txt)
-  )
-
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
@@ -33,12 +21,6 @@ defmodule WebCATWeb.Endpoint do
 
   plug(Plug.MethodOverride)
   plug(Plug.Head)
-
-  plug(Plug.Session,
-    store: :cookie,
-    key: "_webcat_key",
-    signing_salt: "HSDLKHB1"
-  )
 
   plug(WebCATWeb.Router)
 
