@@ -1,0 +1,39 @@
+.main > .container {
+    padding-bottom: 30px;
+  }
+  
+  .navbar {
+    border-radius: 0;
+  }
+  
+  .navbar-brand {
+    padding: 20px;
+    height: 60px;
+    font-size: 20px;
+  }
+  
+  .navbar-nav > li > a {
+    font-size: 18px;
+  }
+  
+  @media (min-width: 768px) {
+    .navbar-nav > li > a {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+  }
+  
+  .table td, .table th {
+    vertical-align: middle;
+  }
+  
+  .pass-table .btn-view {
+    margin-right: 5px;
+  }
+  
+  h1 {
+    padding-bottom: 5px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ccc;
+  }
+  
