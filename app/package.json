@@ -1,25 +1,18 @@
 {
-  "name": "inthedoor_web",
+  "name": "webcat",
   "version": "0.1.0",
-  "description": "Web app for InTheDoor",
+  "description": "WebCAT",
   "author": "Ben Buscarino",
   "license": "N/A",
   "private": true,
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
-  "sideEffects": [
-    "*.css"
-  ],
   "engineStrict": true,
   "engines": {
-    "node": "~10.4.1"
+    "node": "^10.0.0"
   },
   "scripts": {
     "build": "webpack --mode development",
     "build:prod": "webpack --mode production",
-    "start": "webpack-dev-server --mode development",
+    "start": "webpack-dev-server --mode development --hot",
     "lint": "tslint --fix --project tsconfig.json --type-check 'js/**/*.{ts,tsx}'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -26,6 +27,8 @@ module.exports = {
     },
 
     devServer: {
+        contentBase: './dist',
+        hot: true,
         historyApiFallback: true,
     },
 
@@ -60,8 +63,13 @@ module.exports = {
         new MiniCSSExtractPlugin({
             filename: 'styles.css'
         }),
+        new HtmlWebpackPlugin({
+            title: "WebCAT",
+            template: "index.html"
+        }),
         new HardSourceWebpackPlugin(),
-        new CopyWebpackPlugin([{ from: path.join(__dirname, 'static') }])
+        new CopyWebpackPlugin([{ from: path.join(__dirname, 'static') }]),
+        new webpack.HotModuleReplacementPlugin()
     ],
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
