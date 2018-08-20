@@ -1,6 +1,6 @@
 defmodule WebCATWeb.Router do
   use WebCATWeb, :router
-  use Plug.ErrorHandler
+  #use Plug.ErrorHandler
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -15,10 +15,6 @@ defmodule WebCATWeb.Router do
     plug(ProperCase.Plug.SnakeCaseParams)
   end
 
-  pipeline :secure do
-    plug(WebCATWeb.Auth.Pipeline)
-  end
-
   scope "/auth", WebCATWeb do
     pipe_through(:api)
 
@@ -27,7 +23,7 @@ defmodule WebCATWeb.Router do
   end
 
   scope "/users", WebCATWeb do
-    pipe_through(~w(api secure)a)
+    pipe_through(:api)
 
     resources("/", UserController, only: ~w(index show update)a)
     get("/:id/notifications", UserController, :notifications)

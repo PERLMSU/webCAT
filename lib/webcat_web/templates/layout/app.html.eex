@@ -9,11 +9,15 @@
     <meta name="csrf-token" content="<%= Plug.CSRFProtection.get_csrf_token() %>">
 
     <title>Phoenix+React Playground</title>
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+    <%= for sheet <- Path.wildcard(~s(priv/static/css/*.css)) do %>
+    <link rel="stylesheet" href="<%= static_path(@conn, ~s(/) <> Path.relative_to(sheet, ~s(priv/static))) %>">
+    <% end %>
   </head>
 
   <body>
     <%= render @view_module, @view_template, assigns %>
-    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+    <%= for script <- Path.wildcard(~s(priv/static/js/*.js)) do %>
+    <script src="<%= static_path(@conn, ~s(/) <> Path.relative_to(script, ~s(priv/static))) %>"></script>
+    <% end %>
   </body>
 </html>

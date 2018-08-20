@@ -31,7 +31,7 @@ defmodule WebCAT.Accounts.User do
   end
 
   @required ~w(first_name last_name email username password inserted_at updated_at role)a
-  @optional ~w(middle_name nickname bio phone city state country active)a
+  @optional ~w(middle_name nickname bio phone city state country birthday active)a
 
   @doc """
   Build a changeset for a user

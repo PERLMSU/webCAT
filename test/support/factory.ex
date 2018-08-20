@@ -15,7 +15,7 @@ defmodule WebCAT.Factory do
       username: sequence(:username, &"user#{&1}"),
       password: Comeonin.Pbkdf2.hashpwsalt("password"),
       nickname: sequence(:nickname, ~w(John Jane)),
-      bio: Elixilorem.sentence(),
+      bio: Faker.Lorem.Shakespeare.hamlet(),
       phone: "989-992-9183",
       city: "East Lansing",
       state: "MI",
@@ -44,7 +44,7 @@ defmodule WebCAT.Factory do
 
   def notification_factory do
     %Notification{
-      content: Elixilorem.sentences(2),
+      content: ElixiFaker.Lorem.Shakespeare.hamlet(),
       seen: false,
       draft: Factory.build(:draft),
       user: Factory.build(:user)
@@ -54,13 +54,13 @@ defmodule WebCAT.Factory do
   def category_factory do
     %Category{
       name: sequence(:name, &"category#{&1}"),
-      description: Elixilorem.sentence()
+      description: Faker.Lorem.Shakespeare.hamlet()
     }
   end
 
   def draft_factory do
     %Draft{
-      content: Elixilorem.sentence(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       status: sequence(:status, ~w(review needs_revision approved emailed)),
       student: Factory.build(:student),
       rotation_group: Factory.build(:rotation_group)
@@ -77,14 +77,14 @@ defmodule WebCAT.Factory do
 
   def explanation_factory do
     %Explanation{
-      content: Elixilorem.sentence(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       feedback: Factory.build(:feedback)
     }
   end
 
   def feedback_factory do
     %Feedback{
-      content: Elixilorem.sentence(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       observation: Factory.build(:observation)
     }
   end
@@ -99,34 +99,34 @@ defmodule WebCAT.Factory do
 
   def misc_note_factory do
     %Note{
-      content: Elixilorem.sentence()
+      content: Faker.Lorem.Shakespeare.hamlet()
     }
   end
 
   def student_note_factory do
     %Note{
-      content: Elixilorem.sentence(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       student: Factory.build(:student)
     }
   end
 
   def observation_note_factory do
     %Note{
-      content: Elixilorem.sentence(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       observation: Factory.build(:observation)
     }
   end
 
   def rotation_group_note_factory do
     %Note{
-      content: Elixilorem.sentence(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       rotation_group: Factory.build(:rotation_group)
     }
   end
 
   def observation_factory do
     %Observation{
-      content: Elixilorem.sentence(),
+      content: Faker.Lorem.Shakespeare.hamlet(),
       type: "positive",
       category: Factory.build(:category),
       rotation_group: Factory.build(:rotation_group)
@@ -137,14 +137,14 @@ defmodule WebCAT.Factory do
     %Classroom{
       course_code: "PHY183",
       section: sequence(:section, &Integer.to_string/1),
-      description: Elixilorem.sentence(),
+      description: Faker.Lorem.Shakespeare.hamlet(),
       semester: Factory.build(:semester)
     }
   end
 
   def rotation_group_factory do
     %RotationGroup{
-      description: Elixilorem.sentence(),
+      description: Faker.Lorem.Shakespeare.hamlet(),
       number: sequence(:number, & &1),
       rotation: Factory.build(:rotation),
       instructor: Factory.build(:user, role: "instructor")
@@ -172,7 +172,7 @@ defmodule WebCAT.Factory do
       first_name: sequence(:first_name, ~w(John Jane)),
       last_name: "Doe",
       middle_name: sequence(:middle_name, ~w(James Renee)),
-      description: Elixilorem.sentences(2),
+      description: Faker.Lorem.Shakespeare.hamlet(),
       email: sequence(:email, &"email-#{&1}@msu.edu"),
       classroom: Factory.build(:classroom)
     }
