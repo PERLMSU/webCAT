@@ -18,8 +18,16 @@ defmodule WebCATWeb.Router do
     pipe_through(:api)
 
     resources("/", UserController, only: ~w(index show update)a)
-    get("/:id/notifications", UserController, :notifications)
-    get("/:id/classrooms", UserController, :classrooms)
-    get("/:id/rotation_groups", UserController, :rotation_groups)
+
+    get("/confirmations/:token", ConfirmationController, :show)
+    patch("/confirmations/:token", ConfirmationController, :update)
+
+    get("/resets/:token", ResetController, :show)
+    patch("/resets/:token", ResetController, :update)
+
+    resources("/me", ProfileController, only: ~w(show update)a)
+    get("/me/notifications", ProfileController, :notifications)
+    get("/me/classrooms", ProfileController, :classrooms)
+    get("/me/rotation_groups", ProfileController, :rotation_groups)
   end
 end

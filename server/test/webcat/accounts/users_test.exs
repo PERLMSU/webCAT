@@ -49,7 +49,7 @@ defmodule WebCAT.Accounts.UsersTest do
       assert user.city == update.city
       assert user.state == update.state
       assert user.country == update.country
-      assert user.birthday == update.birthday
+      assert user.birthday == Date.from_iso8601!(update.birthday)
       assert user.active == update.active
       assert user.role == update.role
 

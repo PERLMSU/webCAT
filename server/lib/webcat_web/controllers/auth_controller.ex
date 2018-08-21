@@ -8,7 +8,7 @@ defmodule WebCATWeb.AuthController do
   alias WebCAT.Accounts.Users
   alias WebCATWeb.AuthView
 
-  action_fallback(InTheDoor.Web.FallbackController)
+  action_fallback(WebCATWeb.FallbackController)
 
   def signup(conn, params) do
     case params do
@@ -19,8 +19,8 @@ defmodule WebCATWeb.AuthController do
         "first_name" => _,
         "last_name" => _
       } ->
-        # Ensure they can't pass an admin role on signup
-        with {:ok, user} <- Users.signup(Map.drop(params, ["role"])),
+        # TODO Ensure they can't pass an admin role on signup
+        with {:ok, user} <- Users.signup(params),
              {:ok, token, _} <-
                WebCATWeb.Auth.Guardian.encode_and_sign(user, %{}, token_type: "access") do
           conn
@@ -29,7 +29,7 @@ defmodule WebCATWeb.AuthController do
         end
 
       _ ->
-        {:error, %{error: "Invalid signup request"}}
+        {:error, "Invalid signup request"}
     end
   end
 
@@ -45,7 +45,7 @@ defmodule WebCATWeb.AuthController do
         end
 
       _ ->
-        {:error, %{error: "Invalid login request"}}
+        {:error, "Invalid login request"}
     end
   end
 end

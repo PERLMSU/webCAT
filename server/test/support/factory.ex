@@ -20,11 +20,11 @@ defmodule WebCAT.Factory do
       city: "East Lansing",
       state: "MI",
       country: "USA",
-      birthday: Timex.to_date(Timex.shift(Timex.now(), years: -18)),
+      birthday: Date.to_iso8601(Timex.to_date(Timex.shift(Timex.now(), years: -18))),
       active: true,
       role: sequence(:role, ~w(instructor admin)),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.to_iso8601(NaiveDateTime.utc_now()),
+      updated_at: NaiveDateTime.to_iso8601(NaiveDateTime.utc_now())
     }
   end
 

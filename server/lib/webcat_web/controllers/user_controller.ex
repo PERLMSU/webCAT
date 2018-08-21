@@ -1,6 +1,6 @@
 defmodule WebCATWeb.UserController do
   @moduledoc """
-  Handle authentication tasks
+  Handle user actions
   """
 
   use WebCATWeb, :controller
@@ -8,7 +8,7 @@ defmodule WebCATWeb.UserController do
   alias WebCAT.Accounts.Users
   alias WebCATWeb.UserView
 
-  action_fallback(InTheDoor.Web.FallbackController)
+  action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, params) do
     limit = Map.get(params, "limit", 25)
