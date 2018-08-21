@@ -1,8 +1,6 @@
 defmodule WebCATWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :webcat
 
-  socket("/socket", WebCATWeb.UserSocket)
-
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

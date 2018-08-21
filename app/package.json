@@ -24,6 +24,7 @@
     "bulma": "0.7.1",
     "bulmaswatch": "0.7.1",
     "class-validator": "0.9.1",
+    "formik": "1.0.3",
     "history": "4.7.2",
     "immutable": "3.8.2",
     "lodash": "4.17.10",
@@ -43,7 +44,8 @@
     "tsmonad": "0.8.0",
     "typesafe-actions": "2.0.4",
     "universal-cookie": "2.1.5",
-    "utility-types": "2.0.0"
+    "utility-types": "2.0.0",
+    "yup": "0.26.2"
   },
   "devDependencies": {
     "@types/axios": "0.14.0",
@@ -58,6 +60,7 @@
     "@types/react-router": "4.0.26",
     "@types/react-router-dom": "4.2.7",
     "@types/webpack-env": "1.13.5",
+    "@types/yup": "0.24.9",
     "autoprefixer": "9.1.1",
     "ava": "0.25.0",
     "awesome-typescript-loader": "5.2.0",
