@@ -6,62 +6,95 @@ defmodule WebCATWeb.UserController do
   use WebCATWeb, :controller
 
   alias WebCAT.Accounts.Users
-  alias WebCATWeb.UserView
+  alias WebCATWeb.{UserView, NotificationView, ClassroomView, RotationGroupView}
 
   action_fallback(WebCATWeb.FallbackController)
 
+  plug(WebCATWeb.Auth.Pipeline)
+
   def index(conn, params) do
+    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, users} <- Users.list(limit: limit, offset: offset) do
+    with :ok <- Bodyguard.permit(WebCAT.Accounts, :list_users, user),
+         {:ok, users} <- Users.list(limit: limit, offset: offset) do
       conn
       |> render(UserView, "list.json", users: users)
     end
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, user} <- Users.get(id) do
+    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+
+    with {:ok, subject_user} <- Users.get(id),
+         :ok <- Bodyguard.permit(WebCAT.Accounts, :show_user, user, subject_user) do
       conn
-      |> render(UserView, "show.json", user: user)
+      |> render(UserView, "show.json", user: subject_user)
     end
   end
 
   def update(conn, %{"id" => id} = params) do
-    # TODO: Authenticate user updates much better, this is a blatant rush job
-    with {:ok, updated} <- Users.update(id, Map.drop(params, ["id"])) do
+    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+
+    with {:ok, subject_user} <- Users.get(id),
+         :ok <- Bodyguard.permit(WebCAT.Accounts, :update_user, user, subject_user),
+         {:ok, updated} <- Users.update(subject_user.id, Map.drop(params, ~w(id))) do
       conn
       |> render(UserView, "show.json", user: updated)
     end
   end
 
   def notifications(conn, %{"id" => id} = params) do
+    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, notifications} <- Users.notifications(id, limit: limit, offset: offset) do
+    with {:ok, subject_user} <- Users.get(id),
+         :ok <- Bodyguard.permit(WebCAT.Accounts, :list_notifications, user, subject_user),
+         {:ok, notifications} <- Users.notifications(subject_user.id, limit: limit, offset: offset) do
       conn
       |> render(NotificationView, "list.json", notifications: notifications)
     end
   end
 
   def classrooms(conn, %{"id" => id} = params) do
+    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, classrooms} <- Users.classrooms(id, limit: limit, offset: offset) do
+    with {:ok, subject_user} <- Users.get(id),
+         :ok <- Bodyguard.permit(WebCAT.Accounts, :list_classrooms, user, subject_user),
+         {:ok, classrooms} <- Users.classrooms(subject_user.id, limit: limit, offset: offset) do
       conn
       |> render(ClassroomView, "list.json", classrooms: classrooms)
     end
   end
 
   def rotation_groups(conn, %{"id" => id} = params) do
+    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, groups} <- Users.rotation_groups(id, limit: limit, offset: offset) do
+    with {:ok, subject_user} <- Users.get(id),
+         :ok <- Bodyguard.permit(WebCAT.Accounts, :list_rotation_groups, user, subject_user),
+         {:ok, groups} <- Users.rotation_groups(subject_user.id, limit: limit, offset: offset) do
       conn
       |> render(RotationGroupView, "list.json", rotation_groups: groups)
     end
   end
+
+  def show_confirmation(conn, %{"token" => token}) do
+
+  end
+
+  def confirm(conn, %{"token" => token}) do
+
+  end
+
+
 end

@@ -31,9 +31,14 @@ config :webcat, WebCATWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r{priv/gettext/.*(po)$},
-      ~r{lib/webcat_web/views/.*(ex)$},
+      ~r{lib/webcat_web/views/.*(ex)$}
     ]
   ]
+
+config :cors_plug,
+  origin: ["*"],
+  max_age: 86_400,
+  methods: ["GET", "POST", "PATCH", "DELETE"]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

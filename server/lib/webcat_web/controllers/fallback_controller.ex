@@ -13,22 +13,28 @@ defmodule WebCATWeb.FallbackController do
     |> render(ChangesetView, "error.json", changeset: changeset)
   end
 
-  def call(conn, {:error, :unauthorized, message}) do
+  def call(conn, {:error, :unauthorized}) do
     conn
     |> put_status(:unauthorized)
-    |> render(ErrorView, "401.json", %{message: message})
+    |> render(ErrorView, "401.json", %{message: "unauthorized"})
   end
 
-  def call(conn, {:error, :forbidden, message}) do
+  def call(conn, {:error, :forbidden}) do
     conn
     |> put_status(:forbidden)
-    |> render(ErrorView, "403.json", %{message: message})
+    |> render(ErrorView, "403.json", %{message: "forbidden"})
   end
 
-  def call(conn, {:error, :not_found, message}) do
+  def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
-    |> render(ErrorView, "404.json", %{message: message})
+    |> render(ErrorView, "404.json", %{message: "not found"})
+  end
+
+  def call(conn, {:error, :bad_request}) do
+    conn
+    |> put_status(:not_found)
+    |> render(ErrorView, "400.json", %{message: "bad request"})
   end
 
   def call(conn, {:error, message}) when is_binary(message) or is_map(message) do

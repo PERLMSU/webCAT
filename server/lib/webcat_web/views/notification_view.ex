@@ -18,5 +18,6 @@ defmodule WebCATWeb.NotificationView do
   def render("notification.json", %{notification: %Notification{} = notification}) do
     notification
     |> Map.from_struct()
+    |> Map.take(~w(id content seen draft_id user_id inserted_at updated_at)a)
   end
 end

@@ -19,6 +19,11 @@ config :webcat, WebCATWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :cors_plug,
+  origin: ["webcat.cedr.io"],
+  max_age: 86_400,
+  methods: ["GET", "POST", "PATCH", "DELETE"]
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

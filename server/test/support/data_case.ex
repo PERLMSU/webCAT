@@ -17,11 +17,13 @@ defmodule WebCAT.DataCase do
   using do
     quote do
       alias WebCAT.Repo
+      alias WebCAT.Factory
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
       import WebCAT.DataCase
+
     end
   end
 

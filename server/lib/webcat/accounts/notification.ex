@@ -12,13 +12,16 @@ defmodule WebCAT.Accounts.Notification do
     timestamps()
   end
 
+  @required ~w(content draft_id user_id)a
+  @optional ~w(seen)a
+
   @doc """
   Create a changeset for a grade
   """
   def changeset(grade, attrs \\ %{}) do
     grade
-    |> cast(attrs, ~w(content seen draft_id user_id)a)
-    |> validate_required(~w(content draft_id user_id)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> foreign_key_constraint(:draft_id)
     |> foreign_key_constraint(:user_id)
   end

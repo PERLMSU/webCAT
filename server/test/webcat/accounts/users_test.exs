@@ -12,22 +12,9 @@ defmodule WebCAT.Accounts.UsersTest do
 
       {:ok, user} = Users.get(inserted.id)
       assert user.id == inserted.id
-      assert user.first_name == inserted.first_name
-      assert user.last_name == inserted.last_name
-      assert user.middle_name == inserted.middle_name
       assert user.email == inserted.email
-      assert user.username == inserted.username
-      assert user.nickname == inserted.nickname
-      assert user.bio == inserted.bio
-      assert user.phone == inserted.phone
-      assert user.city == inserted.city
-      assert user.state == inserted.state
-      assert user.country == inserted.country
-      assert user.birthday == inserted.birthday
-      assert user.active == inserted.active
-      assert user.role == inserted.role
 
-      {:error, :not_found, _} = Users.get(123_456)
+      {:error, :not_found} = Users.get(123_456)
     end
   end
 
@@ -53,7 +40,7 @@ defmodule WebCAT.Accounts.UsersTest do
       assert user.active == update.active
       assert user.role == update.role
 
-      {:error, :not_found, _} = Users.update(123_456, update)
+      {:error, :not_found} = Users.update(123_456, update)
     end
 
     test "fails on changeset errors" do
@@ -69,16 +56,16 @@ defmodule WebCAT.Accounts.UsersTest do
 
       assert inserted.email == user.email
 
-      {:error, :unauthorized, _} = Users.login(inserted.email, "password1")
-      {:error, :unauthorized, _} = Users.login("email@email.edm", "password")
+      {:error, :unauthorized} = Users.login(inserted.email, "password1")
+      {:error, :unauthorized} = Users.login("email@email.edm", "password")
     end
   end
 
-  describe "signup/2" do
+  describe "sign_up/2" do
     test "behaves as expected" do
       params = Factory.params_for(:user, password: "password")
 
-      {:ok, user} = Users.signup(params)
+      {:ok, user} = Users.sign_up(params)
       {:ok, logged_in} = Users.login(user.email, "password")
 
       assert user.id == logged_in.id
@@ -154,10 +141,10 @@ defmodule WebCAT.Accounts.UsersTest do
 
       # Ensure the password has been changed
       {:ok, _} = Users.login(user.email, "password1")
-      {:error, :unauthorized, _} = Users.login(user.email, "password")
+      {:error, :unauthorized} = Users.login(user.email, "password")
 
       # Ensure it can't be changed twice with the same token
-      {:error, :not_found, _} = Users.reset(reset.token, "password")
+      {:error, :not_found} = Users.reset(reset.token, "password")
     end
   end
 end

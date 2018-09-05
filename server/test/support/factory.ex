@@ -22,7 +22,7 @@ defmodule WebCAT.Factory do
       country: "USA",
       birthday: Date.to_iso8601(Timex.to_date(Timex.shift(Timex.now(), years: -18))),
       active: true,
-      role: sequence(:role, ~w(instructor admin)),
+      role: "instructor",
       inserted_at: NaiveDateTime.to_iso8601(NaiveDateTime.utc_now()),
       updated_at: NaiveDateTime.to_iso8601(NaiveDateTime.utc_now())
     }

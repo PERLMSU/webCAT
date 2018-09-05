@@ -8,7 +8,7 @@ defmodule WebCATWeb.RotationGroupView do
   alias WebCAT.Rotations.RotationGroup
 
   def render("list.json", %{rotation_groups: rotation_groups}) do
-    render_many(rotation_groups, __MODULE__, "notification.json")
+    render_many(rotation_groups, __MODULE__, "rotation_group.json")
   end
 
   def render("show.json", %{rotation_group: rotation_group}) do
@@ -18,5 +18,6 @@ defmodule WebCATWeb.RotationGroupView do
   def render("rotation_group.json", %{rotation_group: %RotationGroup{} = rotation_group}) do
     rotation_group
     |> Map.from_struct()
+    |> Map.take(~w(id description number rotation_id instructor_id inserted_at updated_at)a)
   end
 end

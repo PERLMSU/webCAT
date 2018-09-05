@@ -18,6 +18,8 @@ defmodule WebCATWeb.UserView do
   def render("user.json", %{user: %User{} = user}) do
     user
     |> Map.from_struct()
-    |> Map.drop(~w(password)a)
+    |> Map.take(
+      ~w(id first_name last_name middle_name email username nickname bio phone city state country birthday active role inserted_at updated_at)a
+    )
   end
 end

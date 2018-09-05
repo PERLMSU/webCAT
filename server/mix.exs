@@ -35,7 +35,9 @@ defmodule WebCAT.Mixfile do
     [
       {:anaphora, "~> 0.1.2"},
       {:bamboo, "~> 1.0"},
+      {:bodyguard, "~> 2.2"},
       {:comeonin, "~> 4.0"},
+      {:cors_plug, "~> 1.5"},
       {:cowboy, "~> 1.0"},
       {:distillery, "~> 1.5", runtime: false},
       {:dialyxir, git: "https://github.com/jeremyjh/dialyxir.git", only: [:dev], runtime: false},

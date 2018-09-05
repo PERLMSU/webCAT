@@ -20,7 +20,7 @@ defmodule WebCATWeb.AuthController do
         "last_name" => _
       } ->
         # TODO Ensure they can't pass an admin role on signup
-        with {:ok, user} <- Users.signup(params),
+        with {:ok, user} <- Users.sign_up(params),
              {:ok, token, _} <-
                WebCATWeb.Auth.Guardian.encode_and_sign(user, %{}, token_type: "access") do
           conn

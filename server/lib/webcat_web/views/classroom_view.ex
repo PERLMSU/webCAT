@@ -18,5 +18,6 @@ defmodule WebCATWeb.ClassroomView do
   def render("classroom.json", %{classroom: %Classroom{} = classroom}) do
     classroom
     |> Map.from_struct()
+    |> Map.take(~w(id course_code section description semester_id inserted_at updated_at)a)
   end
 end

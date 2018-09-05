@@ -15,13 +15,16 @@ defmodule WebCAT.Rotations.Classroom do
     timestamps()
   end
 
+  @required ~w(course_code section semester_id)a
+  @optional ~w(description)a
+
   @doc """
   Build a changeset for a classroom
   """
   def changeset(classroom, attrs \\ %{}) do
     classroom
-    |> cast(attrs, ~w(course_code section description semester_id)a)
-    |> validate_required(~w(course_code section semester_id)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> foreign_key_constraint(:semester_id)
   end
 end
