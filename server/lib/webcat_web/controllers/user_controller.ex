@@ -35,6 +35,17 @@ defmodule WebCATWeb.UserController do
     end
   end
 
+  def create(conn, params) do
+    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+
+    with :ok <- Bodyguard.permit(WebCAT.Accounts, :create_user, user),
+         {:ok, created} <- Users.create(params) do
+      conn
+      |> put_status(:created)
+      |> render(UserView, "show.json", user: created)
+    end
+  end
+
   def update(conn, %{"id" => id} = params) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
@@ -54,7 +65,8 @@ defmodule WebCATWeb.UserController do
 
     with {:ok, subject_user} <- Users.get(id),
          :ok <- Bodyguard.permit(WebCAT.Accounts, :list_notifications, user, subject_user),
-         {:ok, notifications} <- Users.notifications(subject_user.id, limit: limit, offset: offset) do
+         {:ok, notifications} <-
+           Users.notifications(subject_user.id, limit: limit, offset: offset) do
       conn
       |> render(NotificationView, "list.json", notifications: notifications)
     end
@@ -87,14 +99,4 @@ defmodule WebCATWeb.UserController do
       |> render(RotationGroupView, "list.json", rotation_groups: groups)
     end
   end
-
-  def show_confirmation(conn, %{"token" => token}) do
-
-  end
-
-  def confirm(conn, %{"token" => token}) do
-
-  end
-
-
 end

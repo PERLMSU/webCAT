@@ -3,12 +3,15 @@ defmodule WebCAT.Accounts do
 
   @behaviour Bodyguard.Policy
 
-  def authorize(:list_users, _user, _), do: :ok
-
-  def authorize(:show_user, _user, _subject_user), do: :ok
+  def authorize(action, _user, _subject_user) when action in ~w(list_users show_user)a, do: :ok
 
   @doc """
-  Administrators have full privileges
+  Only administrators can create accounts
+  """
+  def authorize(:create_user, %User{role: "admin"}, _), do: :ok
+
+  @doc """
+  Administrators have full privileges over non-administrators
   """
   def authorize(_, %User{role: "admin"}, %User{role: "instructor"}), do: :ok
 

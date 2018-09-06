@@ -15,17 +15,4 @@ defmodule WebCATWeb.AuthControllerTest do
       assert Map.has_key?(response, "token")
     end
   end
-
-  describe "signup/2" do
-    test "behaves as expected", %{conn: conn} do
-      user = Factory.string_params_for(:user)
-
-      response =
-        conn
-        |> post(Helpers.auth_path(conn, :signup), user)
-        |> json_response(201)
-
-      assert Map.has_key?(response, "token")
-    end
-  end
 end

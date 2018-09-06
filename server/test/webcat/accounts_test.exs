@@ -10,6 +10,14 @@ defmodule WebCATWeb.AccountsTest do
       assert :ok == Bodyguard.permit(WebCAT.Accounts, :show_user, user, user2)
     end
 
+    test "only admins can create accounts" do
+      admin = Factory.insert(:user, role: "admin")
+      user = Factory.insert(:user)
+
+      assert :ok == Bodyguard.permit(WebCAT.Accounts, :create_user, admin)
+      assert {:error, :unauthorized} == Bodyguard.permit(WebCAT.Accounts, :create_user, user)
+    end
+
     test "allows admins full control over non-admins" do
       admin = Factory.insert(:user, role: "admin")
       admin2 = Factory.insert(:user, role: "admin")

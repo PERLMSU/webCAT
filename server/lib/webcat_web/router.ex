@@ -27,7 +27,5 @@ defmodule WebCATWeb.Router do
 
     get("/resets/:token", ResetController, :show)
     patch("/resets/:token", ResetController, :update)
-
-
   end
 end

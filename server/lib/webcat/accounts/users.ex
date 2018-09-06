@@ -15,7 +15,7 @@ defmodule WebCAT.Accounts.Users do
   @doc """
   List users in the system
   """
-  @spec get(Keyword.t()) :: [User.t()]
+  @spec list(Keyword.t()) :: [User.t()]
   def list(options \\ []) do
     users =
       User
@@ -34,6 +34,42 @@ defmodule WebCAT.Accounts.Users do
     case Repo.get(User, id) do
       %User{} = user -> {:ok, user}
       nil -> {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Get a user by their email
+  """
+  @spec by_email(String.t()) :: {:ok, User.t()} | {:error, any}
+  def by_email(email) do
+    case Repo.get_by(User, email: email) do
+      %User{} = user -> {:ok, user}
+      nil -> {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Use supplied attributes to sign up a new user
+  """
+  @spec create(map()) :: {:ok, User.t()} | {:error, Changeset.t()}
+  def create(attrs) do
+    Multi.new()
+    |> Multi.insert(:user, User.create_changeset(%User{}, attrs))
+    |> Multi.run(:confirmation, fn %{user: user} ->
+      %Confirmation{}
+      |> Confirmation.changeset(%{user_id: user.id, token: Confirmation.gen_token()})
+      |> Repo.insert()
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, result} ->
+        WebCAT.Email.confirmation(result.user.email, result.confirmation.token)
+        |> WebCAT.Mailer.deliver_later()
+
+        {:ok, result.user}
+
+      {:error, _, changeset, %{}} ->
+        {:error, changeset}
     end
   end
 
@@ -77,34 +113,9 @@ defmodule WebCAT.Accounts.Users do
   end
 
   @doc """
-  Use supplied attributes to sign up a new user
-  """
-  @spec sign_up(map()) :: {:ok, User.t()} | {:error, Changeset.t()}
-  def sign_up(attrs) do
-    Multi.new()
-    |> Multi.insert(:user, User.create_changeset(%User{}, attrs))
-    |> Multi.run(:confirmation, fn %{user: user} ->
-      %Confirmation{}
-      |> Confirmation.changeset(%{user_id: user.id, token: Confirmation.gen_token()})
-      |> Repo.insert()
-    end)
-    |> Repo.transaction()
-    |> case do
-      {:ok, result} ->
-        WebCAT.Email.confirmation(result.user.email, result.confirmation.token)
-        |> WebCAT.Mailer.deliver_later()
-
-        {:ok, result.user}
-
-      {:error, _, changeset, %{}} ->
-        {:error, changeset}
-    end
-  end
-
-  @doc """
   Get all associated rotation groups for a user
   """
-  @spec rotation_groups(integer, Keyword.t) :: {:ok, [RotationGroup.t()]}
+  @spec rotation_groups(integer, Keyword.t()) :: {:ok, [RotationGroup.t()]}
   def rotation_groups(user_id, options \\ []) do
     groups =
       RotationGroup
@@ -120,7 +131,7 @@ defmodule WebCAT.Accounts.Users do
   @doc """
   Get all associated notifications for a user
   """
-  @spec notifications(integer, Keyword.t) :: {:ok, [Notification.t]}
+  @spec notifications(integer, Keyword.t()) :: {:ok, [Notification.t()]}
   def notifications(user_id, options \\ []) do
     notifications =
       Notification
@@ -149,84 +160,6 @@ defmodule WebCAT.Accounts.Users do
       |> Repo.all()
 
     {:ok, classrooms}
-  end
-
-  @doc """
-  Confirm a user based on a token
-  """
-  @spec confirm(String.t()) :: {:ok, Confirmation.t()} | {:error, any}
-  def confirm(token) do
-    case Repo.get_by(Confirmation, token: token) do
-      %Confirmation{} = confirmation ->
-        if confirmation.verified do
-          {:error, :bad_request}
-        else
-          confirmation
-          |> Confirmation.changeset(%{verified: true})
-          |> Repo.update()
-        end
-
-      nil ->
-        {:error, :not_found}
-    end
-  end
-
-  @doc """
-  Start the password reset process
-  """
-  @spec start_reset(integer) :: {:ok, PasswordReset.t()} | {:error, any}
-  def start_reset(user_id) do
-    # Delete an existing reset if it exists
-    aif(Repo.get_by(PasswordReset, user_id: user_id), do: Repo.delete(it))
-
-    with {:ok, user} <- get(user_id) do
-      inserted =
-        %PasswordReset{}
-        |> PasswordReset.changeset(%{user_id: user_id, token: PasswordReset.gen_token()})
-        |> Repo.insert()
-
-      case inserted do
-        {:ok, reset} ->
-          WebCAT.Email.password_reset(user.email, reset.token)
-          |> WebCAT.Mailer.deliver_later()
-
-          {:ok, reset}
-
-        {:error, changeset} ->
-          {:error, changeset}
-      end
-    end
-  end
-
-  @doc """
-  Reset a user's password
-  """
-  @spec reset(String.t(), String.t()) :: {:ok, User.t()} | {:error, Changeset.t()} | {:error, any}
-  def reset(token, new_password) do
-    case Repo.get_by(PasswordReset, token: token) do
-      %PasswordReset{} = reset ->
-        # Delete if reset older than 24 hours
-        if Timex.before?(reset.inserted_at, Timex.shift(Timex.now(), days: -1)) do
-          Repo.delete(reset)
-          {:error, :not_found}
-        else
-          with {:ok, user} <- get(reset.user_id) do
-            user_changeset = User.changeset(user, %{password: Pbkdf2.hashpwsalt(new_password)})
-
-            Multi.new()
-            |> Multi.update(:user, user_changeset)
-            |> Multi.delete(:reset, reset)
-            |> Repo.transaction()
-            |> case do
-              {:ok, result} -> {:ok, result.user}
-              {:error, _, changeset, %{}} -> {:error, changeset}
-            end
-          end
-        end
-
-      nil ->
-        {:error, :not_found}
-    end
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect username or password"}
