@@ -5,7 +5,6 @@ defmodule WebCATWeb.ResetController do
   use WebCATWeb, :controller
 
   alias WebCAT.Accounts.PasswordResets
-  alias WebCATWeb.PasswordResetView
 
   action_fallback(WebCATWeb.FallbackController)
 
