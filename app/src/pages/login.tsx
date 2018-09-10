@@ -2,6 +2,9 @@ import * as React from "react";
 import * as Yup from 'yup';
 import { InjectedFormikProps, withFormik } from 'formik';
 import { Section, Container, Field, Label, Input, Control, Button, Help, Title, Box, Hero, HeroBody, Column, Subtitle } from 'bloomer';
+import { authLogin } from '../common/client';
+import { LoginDTO } from '../common/domain/dto';
+import API from '../common/state/auth';
 
 
 // Adapted from https://gist.github.com/oukayuka/1ef7278c466fe926496ac2181a029f97
@@ -36,6 +39,7 @@ const InnerForm: React.SFC<InjectedFormikProps<FormProps, FormValues>> = (
             <Field>
                 <Control>
                     <Button type="submit" isColor='primary' disabled={props.isSubmitting}>Submit</Button>
+                    {props.error && <Help isColor="danger">{props.error}</Help>}
                 </Control>
             </Field>
         </form>
@@ -51,8 +55,18 @@ const LoginForm = withFormik<FormProps, FormValues>({
             .required("Please enter your password")
     },
     ),
-    handleSubmit: (values, { setSubmitting }) => {
-        
+    handleSubmit: async (values: FormValues, { setSubmitting, setError }) => {
+        const result = await authLogin(new LoginDTO(values.email, values.password))
+        result.caseOf({
+            left: token => {
+                setSubmitting(false);
+                API.login(token);
+            },
+            right: error => {
+                setError(error);
+                setSubmitting(false);
+            }
+        })
     },
 })(InnerForm);
 

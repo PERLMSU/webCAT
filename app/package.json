@@ -12,6 +12,7 @@
   "scripts": {
     "build": "webpack --mode development",
     "build:prod": "webpack --mode production",
+    "deploy": "yarn build:prod && gcloud app deploy",
     "start": "webpack-dev-server --mode development --hot",
     "lint": "tslint --fix --project tsconfig.json --type-check 'js/**/*.{ts,tsx}'",
     "test": "echo \"Error: no test specified\" && exit 1"

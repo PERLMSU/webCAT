@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 import { validate } from "class-validator";
-import { Either } from "tsmonad/lib/src";
+import { Either } from "tsmonad";
 
 import { Error } from "../types";
 import { LoginDTO, SignupDTO, TokenDTO } from "../../domain/dto"
@@ -35,7 +35,7 @@ export class Auth {
     public static async login(client: AxiosInstance, body: LoginDTO): Promise<Either<TokenDTO, Error>> {
         try {
             await validate(body);
-            const response = await client.post<TokenDTO>("/auth/signup", body);
+            const response = await client.post<TokenDTO>("/auth/login", body);
             return Either.left(response.data);
         } catch (error) {
             return error.response != undefined ? Either.right({ message: error.response.data }) : Either.right({ message: error });
