@@ -39,12 +39,12 @@ defmodule WebCAT.Mixfile do
       {:comeonin, "~> 4.0"},
       {:cors_plug, "~> 1.5"},
       {:cowboy, "~> 1.0"},
-      {:distillery, "~> 1.5", runtime: false},
+      {:distillery, "~> 2.0", runtime: false},
       {:dialyxir, git: "https://github.com/jeremyjh/dialyxir.git", only: [:dev], runtime: false},
       {:ecto, "~> 2.2.10"},
       {:faker, "~> 0.10", exclude: :prod},
       {:ex_machina, "~> 2.2", exclude: :prod},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.16"},
       {:guardian, "~> 1.0"},
       {:jason, ">= 1.0.0"},
       {:pbkdf2_elixir, "~> 0.12"},
@@ -53,7 +53,7 @@ defmodule WebCAT.Mixfile do
       {:phoenix_ecto, "~> 3.2"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
-      {:postgrex, ">= 0.0.0"},
+      {:postgrex, "~> 0.13.5"},
       {:proper_case, "~> 1.0.2"},
       {:timex, "~> 3.1"}
     ]

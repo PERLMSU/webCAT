@@ -1,7 +1,7 @@
 #=================================
 # Build Stage
 #=================================
-FROM elixir:1.6-alpine as build
+FROM elixir:1.7-alpine as build
 
 #Copy the source folder into the Docker image
 COPY . .
@@ -37,9 +37,9 @@ RUN apk add --no-cache bash && \
 WORKDIR /srv/webcat
 
 # Set environment variables and expose port
-EXPOSE 4000
+EXPOSE 8080
 ENV REPLACE_OS_VARS=true \
-    PORT=4000
+    PORT=8080
 
 # Copy and extract .tar.gz Release file from the previous stage
 COPY --from=build /export/ .

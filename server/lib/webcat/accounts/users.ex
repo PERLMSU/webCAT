@@ -5,7 +5,7 @@ defmodule WebCAT.Accounts.Users do
   use Anaphora
 
   alias WebCAT.Repo
-  alias WebCAT.Accounts.{User, PasswordReset, Confirmation, Notification}
+  alias WebCAT.Accounts.{User, Confirmation, Notification}
   alias WebCAT.Rotations.{Classroom, RotationGroup}
   alias Comeonin.Pbkdf2
   alias Ecto.Changeset
@@ -15,7 +15,7 @@ defmodule WebCAT.Accounts.Users do
   @doc """
   List users in the system
   """
-  @spec list(Keyword.t()) :: [User.t()]
+  @spec list(Keyword.t()) :: {:ok, [User.t()]}
   def list(options \\ []) do
     users =
       User
@@ -23,7 +23,7 @@ defmodule WebCAT.Accounts.Users do
       |> offset(^Keyword.get(options, :offset, 0))
       |> Repo.all()
 
-    {:ok, users}
+      {:ok, users}
   end
 
   @doc """
@@ -108,7 +108,7 @@ defmodule WebCAT.Accounts.Users do
 
     case user do
       {:ok, _} -> user
-      {:error, message} -> {:error, :unauthorized}
+      {:error, _} -> {:error, :unauthorized}
     end
   end
 

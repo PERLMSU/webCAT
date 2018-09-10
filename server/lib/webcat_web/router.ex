@@ -7,6 +7,16 @@ defmodule WebCATWeb.Router do
     plug(ProperCase.Plug.SnakeCaseParams)
   end
 
+  pipeline :browser do
+    plug(:accepts, ~w(html json))
+  end
+
+  scope "/healthcheck", WebCATWeb do
+    pipe_through(:browser)
+
+    get("/", MetricsController, :index)
+  end
+
   scope "/", WebCATWeb do
     pipe_through(:api)
 

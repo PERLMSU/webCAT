@@ -31,12 +31,16 @@ environment :dev do
   set dev_mode: true
   set include_erts: false
   set cookie: :"Wa8Uv%w?^7)%[N.ZCRE:QQ(&ln`WsaF9|O{;$M<}@t)>1p(Pbq4|_H|NuwWl}|l2"
+
+  set post_start_hooks: "rel/hooks/"
 end
 
 environment :prod do
   set include_erts: true
   set include_src: false
   set cookie: :"LfVHobU1pTCdqZPAROhtdrr)/8b<9P;X`DOznS4W^>cb)cNS&v$a^k.]TB/K$e8L"
+
+  set post_start_hooks: "rel/hooks/"
 end
 
 # You may define one or more releases in this file.
