@@ -20,7 +20,7 @@ $(document).ready(function () {
     $('.draft-form').ajaxForm({
         //window.location.reload()
         complete: function (data) {
-            if (data.responseJSON["success"] == true) {
+            if (data.responseJSON["success"] === true) {
                 var student_id = data.responseJSON["student_id"];
                 var last_updated = data.responseJSON["last_updated"];
 
@@ -38,7 +38,7 @@ $(document).ready(function () {
                 //   $('#feedback_'+String(student_id)).show();
                 $('#feedbackupdated_' + String(student_id)).html(last_updated);
                 // $("#saved_"+String(student_id)).show();
-                if (data.responseJSON["saved_draft"] == true) {
+                if (data.responseJSON["saved_draft"] === true) {
                     $("#saved_" + String(student_id)).fadeTo(2000, 500).slideUp(500, function () {
                         $("#saved_" + String(student_id)).slideUp(500);
                     });
@@ -101,7 +101,7 @@ $("#nukeStudentsForm").submit(function (event) {
 $('#submit-selected-drafts').click(function () {
     /* when the submit button in the modal is clicked, submit the form */
     //alert('submitting');
-    if ($('.draft-checkbox-row input:checked').length == 0) {
+    if ($('.draft-checkbox-row input:checked').length === 0) {
         $("#confirm-approve-selected").modal('toggle');
         $("#no-draft-selected-error").show();
         //   alert("No drafts to approve are selected");
@@ -115,7 +115,7 @@ $('#submit-selected-drafts').click(function () {
 $('#confirm-send-selected-drafts').click(function () {
     /* when the submit button in the modal is clicked, submit the form */
     //alert('submitting');
-    if ($('.draft-send-checkbox-row input:checked').length == 0) {
+    if ($('.draft-send-checkbox-row input:checked').length === 0) {
         $("#confirm-send-selected").modal('toggle');
         $("#no-draft-selected-error").show();
         //   alert("No drafts to approve are selected");
@@ -130,7 +130,7 @@ $('#confirm-send-selected-drafts').click(function () {
 $('#confirm-resend-selected-drafts').click(function () {
     /* when the submit button in the modal is clicked, submit the form */
     //alert('submitting');
-    if ($('.draft-resend-checkbox-row input:checked').length == 0) {
+    if ($('.draft-resend-checkbox-row input:checked').length === 0) {
         $("#confirm-resend-selected").modal('toggle');
         $("#no-draft-selected-error").show();
         //   alert("No drafts to approve are selected");
@@ -169,11 +169,11 @@ $("#add-instructor-form").submit(function () {
         pw_valid = false;
     } else if (pw.length > 50) {
         pw_valid = false;
-    } else if (pw.search(/\d/) == -1) {
+    } else if (pw.search(/\d/) === -1) {
         pw_valid = false;
-    } else if (pw.search(/[a-zA-Z]/) == -1) {
+    } else if (pw.search(/[a-zA-Z]/) === -1) {
         pw_valid = false;
-    } else if (pw.search(/[^a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\.\,\;\:]/) != -1) {
+    } else if (pw.search(/[^a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\.\,\;\:]/) !== -1) {
         pw_valid = false;
     }
 
@@ -241,7 +241,7 @@ $('.noteForm').submit(function () {
     }
 
 
-    if ($(this).find("input:radio:checked").length != 1 && $(this).find("input:text").val().length == 0) {
+    if ($(this).find("input:radio:checked").length !== 1 && $(this).find("input:text").val().length === 0) {
         $('#no-observation-selected-error').show();
         valid = false;
     }

@@ -1,1 +1,0 @@
-web: gunicorn wcat.wsgi --log-file -
