@@ -43,15 +43,10 @@ defmodule WebCATWeb.Router do
     resources("/drafts", DraftController, only: ~w(index show create update delete)a)
     resources("/emails", EmailController, only: ~w(show create)a)
     resources("/explanations", ExplanationController, only: ~w(index show create update delete)a)
-
-    resources("/feedback", FeedbackController, only: ~w(index show create update delete)a)
-    get("/feedback/:id/explanations", FeedbackController, :explanations)
-
-    resources("/grades", GradeController, only: ~w(index show create update delete)a)
     resources("/notes", NoteController, only: ~w(index show create update delete)a)
 
     resources("/observations", ObservationController, only: ~w(index show create update delete)a)
-    get("/observations/:id/feedback", ObservationController, :feedback)
+    get("/observations/:id/explanations", ObservationController, :feedback)
     get("/observations/:id/notes", ObservationController, :notes)
   end
 
