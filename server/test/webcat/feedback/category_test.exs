@@ -2,7 +2,6 @@ defmodule WebCAT.Feedback.CategoryTest do
   use WebCAT.DataCase, async: true
 
   alias WebCAT.Feedback.Category
-  alias WebCAT.Factory
 
   describe "changeset/2" do
     test "behaves as expected" do

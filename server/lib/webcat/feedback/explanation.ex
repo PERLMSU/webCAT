@@ -15,8 +15,8 @@ defmodule WebCAT.Feedback.Explanation do
   """
   def changeset(explanation, attrs \\ %{}) do
     explanation
-    |> cast(attrs, ~w(content feedback_id)a)
-    |> validate_required(~w(content feedback_id)a)
-    |> foreign_key_constraint(:feedback_id)
+    |> cast(attrs, ~w(content observation_id)a)
+    |> validate_required(~w(content observation_id)a)
+    |> foreign_key_constraint(:observation_id)
   end
 end

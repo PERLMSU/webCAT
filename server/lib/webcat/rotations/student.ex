@@ -23,7 +23,7 @@ defmodule WebCAT.Rotations.Student do
   def changeset(student, attrs \\ %{}) do
     student
     |> cast(attrs, ~w(first_name last_name middle_name description email classroom_id)a)
-    |> validate_required(~w(first_name flast_name classroom_id)a)
+    |> validate_required(~w(first_name last_name classroom_id)a)
     |> foreign_key_constraint(:classroom_id)
     |> unique_constraint(:email)
   end

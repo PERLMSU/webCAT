@@ -2,7 +2,6 @@ defmodule WebCAT.Accounts.UserTest do
   use WebCAT.DataCase, async: true
 
   alias WebCAT.Accounts.User
-  alias WebCAT.Factory
 
   describe "changeset/2" do
     test "behaves as expected" do

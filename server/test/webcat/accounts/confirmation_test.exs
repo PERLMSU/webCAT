@@ -2,7 +2,6 @@ defmodule WebCAT.Accounts.ConfirmationTest do
   use WebCAT.DataCase, async: true
 
   alias WebCAT.Accounts.Confirmation
-  alias WebCAT.Factory
 
   describe "changeset/2" do
     test "behaves as expected" do

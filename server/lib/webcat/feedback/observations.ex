@@ -8,6 +8,7 @@ defmodule WebCAT.Feedback.Observations do
 
   import Ecto.Query
 
+  @spec notes(any(), keyword()) :: any()
   def notes(observation_id, options \\ []) do
     Note
     |> where([n], n.observation_id == ^observation_id)
