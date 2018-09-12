@@ -1,7 +1,8 @@
 defmodule WebCATWeb.CategoryController do
   use WebCATWeb, :controller
 
-  alias WebCAT.Feedback.Categories
+  alias WebCAT.CRUD
+  alias WebCAT.Feedback.{Categories, Category}
   alias WebCATWeb.{CategoryView, ObservationView}
 
   action_fallback(WebCATWeb.FallbackController)
@@ -15,7 +16,7 @@ defmodule WebCATWeb.CategoryController do
     offset = Map.get(params, "offset", 0)
 
     with :ok <- Bodyguard.permit(WebCAT.Feedback, :list_categories, user),
-         categories <- Categories.list(limit: limit, offset: offset) do
+         categories <- CRUD.list(Category, limit: limit, offset: offset) do
       conn
       |> render(CategoryView, "list.json", categories: categories)
     end
@@ -24,7 +25,7 @@ defmodule WebCATWeb.CategoryController do
   def show(conn, %{"id" => id}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    with {:ok, category} <- Categories.get(id),
+    with {:ok, category} <- CRUD.get(Category, id),
          :ok <- Bodyguard.permit(WebCAT.Feedback, :show_category, user, category) do
       conn
       |> render(CategoryView, "show.json", category: category)
@@ -35,7 +36,7 @@ defmodule WebCATWeb.CategoryController do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
     with :ok <- Bodyguard.permit(WebCAT.Feedback, :create_category, user),
-         {:ok, category} <- Categories.create(params) do
+         {:ok, category} <- CRUD.create(Category, params) do
       conn
       |> put_status(:created)
       |> render(CategoryView, "show.json", category: category)
@@ -45,9 +46,9 @@ defmodule WebCATWeb.CategoryController do
   def update(conn, %{"id" => id} = params) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    with {:ok, subject_category} <- Categories.get(id),
+    with {:ok, subject_category} <- CRUD.get(Category, id),
          :ok <- Bodyguard.permit(WebCAT.Feedback, :update_category, user, subject_category),
-         {:ok, updated} <- Categories.update(subject_category.id, params) do
+         {:ok, updated} <- CRUD.update(Category, subject_category.id, params) do
       conn
       |> render(CategoryView, "show.json", category: updated)
     end
@@ -56,9 +57,9 @@ defmodule WebCATWeb.CategoryController do
   def delete(conn, %{"id" => id}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    with {:ok, subject_category} <- Categories.get(id),
+    with {:ok, subject_category} <- CRUD.get(Category, id),
          :ok <- Bodyguard.permit(WebCAT.Feedback, :delete_category, user, subject_category),
-         {:ok, _} <- Categories.delete(subject_category.id) do
+         {:ok, _} <- CRUD.delete(Category, subject_category.id) do
       send_resp(conn, :ok, "")
     end
   end
@@ -69,9 +70,9 @@ defmodule WebCATWeb.CategoryController do
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, subject_category} <- Categories.get(id),
+    with {:ok, subject_category} <- CRUD.get(Category, id),
          :ok <- Bodyguard.permit(WebCAT.Feedback, :delete_category, user, subject_category),
-         {:ok, observations} <-
+         observations <-
            Categories.observations(subject_category.id, limit: limit, offset: offset) do
       conn
       |> render(ObservationView, "list.json", observations: observations)

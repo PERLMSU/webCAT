@@ -5,7 +5,8 @@ defmodule WebCATWeb.UserController do
 
   use WebCATWeb, :controller
 
-  alias WebCAT.Accounts.Users
+  alias WebCAT.CRUD
+  alias WebCAT.Accounts.{User, Users}
   alias WebCATWeb.{UserView, NotificationView, ClassroomView, RotationGroupView}
 
   action_fallback(WebCATWeb.FallbackController)
@@ -19,7 +20,7 @@ defmodule WebCATWeb.UserController do
     offset = Map.get(params, "offset", 0)
 
     with :ok <- Bodyguard.permit(WebCAT.Accounts, :list_users, user),
-         users <- Users.list(limit: limit, offset: offset) do
+         users <- CRUD.list(User, limit: limit, offset: offset) do
       conn
       |> render(UserView, "list.json", users: users)
     end
@@ -28,7 +29,7 @@ defmodule WebCATWeb.UserController do
   def show(conn, %{"id" => id}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    with {:ok, subject_user} <- Users.get(id),
+    with {:ok, subject_user} <- CRUD.get(User, id),
          :ok <- Bodyguard.permit(WebCAT.Accounts, :show_user, user, subject_user) do
       conn
       |> render(UserView, "show.json", user: subject_user)
@@ -49,9 +50,9 @@ defmodule WebCATWeb.UserController do
   def update(conn, %{"id" => id} = params) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    with {:ok, subject_user} <- Users.get(id),
+    with {:ok, subject_user} <- CRUD.get(User, id),
          :ok <- Bodyguard.permit(WebCAT.Accounts, :update_user, user, subject_user),
-         {:ok, updated} <- Users.update(subject_user.id, Map.drop(params, ~w(id))) do
+         {:ok, updated} <- CRUD.update(User, subject_user.id, Map.drop(params, ~w(id))) do
       conn
       |> render(UserView, "show.json", user: updated)
     end
@@ -63,10 +64,9 @@ defmodule WebCATWeb.UserController do
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, subject_user} <- Users.get(id),
+    with {:ok, subject_user} <- CRUD.get(User, id),
          :ok <- Bodyguard.permit(WebCAT.Accounts, :list_notifications, user, subject_user),
-         {:ok, notifications} <-
-           Users.notifications(subject_user.id, limit: limit, offset: offset) do
+         notifications <- Users.notifications(subject_user.id, limit: limit, offset: offset) do
       conn
       |> render(NotificationView, "list.json", notifications: notifications)
     end
@@ -78,9 +78,9 @@ defmodule WebCATWeb.UserController do
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, subject_user} <- Users.get(id),
+    with {:ok, subject_user} <- CRUD.get(User, id),
          :ok <- Bodyguard.permit(WebCAT.Accounts, :list_classrooms, user, subject_user),
-         {:ok, classrooms} <- Users.classrooms(subject_user.id, limit: limit, offset: offset) do
+         classrooms <- Users.classrooms(subject_user.id, limit: limit, offset: offset) do
       conn
       |> render(ClassroomView, "list.json", classrooms: classrooms)
     end
@@ -92,9 +92,9 @@ defmodule WebCATWeb.UserController do
     limit = Map.get(params, "limit", 25)
     offset = Map.get(params, "offset", 0)
 
-    with {:ok, subject_user} <- Users.get(id),
+    with {:ok, subject_user} <- CRUD.get(User, id),
          :ok <- Bodyguard.permit(WebCAT.Accounts, :list_rotation_groups, user, subject_user),
-         {:ok, groups} <- Users.rotation_groups(subject_user.id, limit: limit, offset: offset) do
+         groups <- Users.rotation_groups(subject_user.id, limit: limit, offset: offset) do
       conn
       |> render(RotationGroupView, "list.json", rotation_groups: groups)
     end

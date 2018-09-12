@@ -1,7 +1,8 @@
 defmodule WebCATWeb.Auth.Guardian do
   use Guardian, otp_app: :webcat
 
-  alias WebCAT.Accounts.{User, Users}
+  alias WebCAT.CRUD
+  alias WebCAT.Accounts.User
 
   @spec subject_for_token(User.t(), map()) :: {:error, String.t()} | {:ok, any()}
   def subject_for_token(%User{} = user, _claims) do
@@ -14,7 +15,7 @@ defmodule WebCATWeb.Auth.Guardian do
 
   @spec resource_from_claims(map()) :: {:error, any()} | {:ok, any()}
   def resource_from_claims(%{"sub" => user_id}) do
-    Users.get(user_id)
+    CRUD.get(User, user_id)
   end
 
   def resource_from_claims(_claims) do

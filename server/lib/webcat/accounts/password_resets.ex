@@ -5,6 +5,7 @@ defmodule WebCAT.Accounts.PasswordResets do
 
   use Anaphora
   alias WebCAT.Repo
+  alias WebCAT.CRUD
   alias WebCAT.Accounts.{PasswordReset, User, Users}
   alias Comeonin.Pbkdf2
   alias Ecto.Multi
@@ -57,7 +58,7 @@ defmodule WebCAT.Accounts.PasswordResets do
           Repo.delete(reset)
           {:error, :not_found}
         else
-          with {:ok, user} <- Users.get(reset.user_id) do
+          with {:ok, user} <- CRUD.get(User, reset.user_id) do
             user_changeset = User.changeset(user, %{password: Pbkdf2.hashpwsalt(new_password)})
 
             Multi.new()

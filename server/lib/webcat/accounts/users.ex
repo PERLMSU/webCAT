@@ -13,28 +13,6 @@ defmodule WebCAT.Accounts.Users do
   import Ecto.Query
 
   @doc """
-  List users in the system
-  """
-  @spec list(Keyword.t()) :: {:ok, [User.t()]}
-  def list(options \\ []) do
-      User
-      |> limit(^Keyword.get(options, :limit, 25))
-      |> offset(^Keyword.get(options, :offset, 0))
-      |> Repo.all()
-  end
-
-  @doc """
-  Get a user by its id
-  """
-  @spec get(integer()) :: {:ok, User.t()} | {:error, any}
-  def get(id) do
-    case Repo.get(User, id) do
-      %User{} = user -> {:ok, user}
-      nil -> {:error, :not_found}
-    end
-  end
-
-  @doc """
   Get a user by their email
   """
   @spec by_email(String.t()) :: {:ok, User.t()} | {:error, any}
@@ -71,28 +49,6 @@ defmodule WebCAT.Accounts.Users do
   end
 
   @doc """
-  Update a user by their `user_id`
-  """
-  @spec update(integer, map()) :: {:ok, User.t()} | {:error, any}
-  def update(user_id, update) do
-    with {:ok, user} <- get(user_id) do
-      user
-      |> User.changeset(update)
-      |> Repo.update()
-    end
-  end
-
-  @doc """
-  Delete a user by their `user_id`
-  """
-  @spec delete(integer) :: {:ok, User.t()} | {:error, any}
-  def delete(user_id) do
-    with {:ok, user} <- get(user_id) do
-      Repo.delete(user)
-    end
-  end
-
-  @doc """
   Login a user, returning the user if the authentication is successful
   """
   @spec login(String.t(), String.t()) :: {:ok, User.t()} | {:error, :unauthorized, String.t()}
@@ -112,41 +68,34 @@ defmodule WebCAT.Accounts.Users do
   @doc """
   Get all associated rotation groups for a user
   """
-  @spec rotation_groups(integer, Keyword.t()) :: {:ok, [RotationGroup.t()]}
+  @spec rotation_groups(integer, Keyword.t()) :: [RotationGroup.t()]
   def rotation_groups(user_id, options \\ []) do
-    groups =
       RotationGroup
       |> where([g], g.instructor_id == ^user_id)
       |> limit(^Keyword.get(options, :limit, 25))
       |> offset(^Keyword.get(options, :offset, 0))
       |> order_by(desc: :inserted_at)
       |> Repo.all()
-
-    {:ok, groups}
   end
 
   @doc """
   Get all associated notifications for a user
   """
-  @spec notifications(integer, Keyword.t()) :: {:ok, [Notification.t()]}
+  @spec notifications(integer, Keyword.t()) :: [Notification.t()]
   def notifications(user_id, options \\ []) do
-    notifications =
       Notification
       |> where([n], n.user_id == ^user_id)
       |> limit(^Keyword.get(options, :limit, 25))
       |> offset(^Keyword.get(options, :offset, 0))
       |> order_by(desc: :inserted_at)
       |> Repo.all()
-
-    {:ok, notifications}
   end
 
   @doc """
   Get all of the classrooms a user belongs to
   """
-  @spec classrooms(integer) :: {:ok, [Classroom.t()]}
+  @spec classrooms(integer) :: [Classroom.t()]
   def classrooms(user_id, options \\ []) do
-    classrooms =
       Classroom
       |> join(:inner, [c], uc in "user_classrooms", uc.classroom_id == c.id)
       |> where([_, uc], uc.user_id == ^user_id)
@@ -155,8 +104,6 @@ defmodule WebCAT.Accounts.Users do
       |> order_by([c, _], desc: c.inserted_at)
       |> select([c, _], c)
       |> Repo.all()
-
-    {:ok, classrooms}
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect username or password"}
