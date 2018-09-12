@@ -135,6 +135,4 @@ defmodule WebCATWeb.StudentController do
       |> render(RotationGroupView, "list.json", rotation_groups: rotation_groups)
     end
   end
-
-
 end

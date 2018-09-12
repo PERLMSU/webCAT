@@ -71,7 +71,7 @@ defmodule WebCATWeb.CategoryController do
     offset = Map.get(params, "offset", 0)
 
     with {:ok, subject_category} <- CRUD.get(Category, id),
-         :ok <- Bodyguard.permit(WebCAT.Feedback, :delete_category, user, subject_category),
+         :ok <- Bodyguard.permit(WebCAT.Feedback, :list_category_observations, user, subject_category),
          observations <-
            Categories.observations(subject_category.id, limit: limit, offset: offset) do
       conn
