@@ -7,7 +7,7 @@ defmodule WebCAT.Feedback.CategoriesTest do
     test "behaves as expected" do
       Factory.insert_list(12, :category)
 
-      {:ok, categories} = Categories.list(limit: 6, offset: 10)
+      categories = Categories.list(limit: 6, offset: 10)
       assert Enum.count(categories) == 2
     end
   end
@@ -58,7 +58,7 @@ defmodule WebCAT.Feedback.CategoriesTest do
       inserted = Factory.insert(:category)
       Factory.insert_list(5, :observation, category: inserted)
 
-      {:ok, observations} = Categories.observations(inserted.id, limit: 2, offset: 1)
+      observations = Categories.observations(inserted.id, limit: 2, offset: 1)
       assert Enum.count(observations) == 2
     end
   end

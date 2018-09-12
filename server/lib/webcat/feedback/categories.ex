@@ -10,13 +10,10 @@ defmodule WebCAT.Feedback.Categories do
 
   @spec list(Keyword.t()) :: {:ok, [Category.t()]}
   def list(options \\ []) do
-    categories =
-      Category
-      |> limit(^Keyword.get(options, :limit, 25))
-      |> offset(^Keyword.get(options, :offset, 0))
-      |> Repo.all()
-
-    {:ok, categories}
+    Category
+    |> limit(^Keyword.get(options, :limit, 25))
+    |> offset(^Keyword.get(options, :offset, 0))
+    |> Repo.all()
   end
 
   @spec get(integer) :: {:error, :not_found} | {:ok, Category.t()}
@@ -48,14 +45,11 @@ defmodule WebCAT.Feedback.Categories do
   end
 
   def observations(category_id, options \\ []) do
-    observations =
-      Observation
-      |> where([o], o.category_id == ^category_id)
-      |> limit(^Keyword.get(options, :limit, 25))
-      |> offset(^Keyword.get(options, :offset, 0))
-      |> order_by(desc: :inserted_at)
-      |> Repo.all()
-
-    {:ok, observations}
+    Observation
+    |> where([o], o.category_id == ^category_id)
+    |> limit(^Keyword.get(options, :limit, 25))
+    |> offset(^Keyword.get(options, :offset, 0))
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
   end
 end

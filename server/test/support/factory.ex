@@ -2,7 +2,7 @@ defmodule WebCAT.Factory do
   use ExMachina.Ecto, repo: WebCAT.Repo
 
   alias WebCAT.Accounts.{User, PasswordReset, Confirmation, Notification}
-  alias WebCAT.Feedback.{Category, Draft, Email, Explanation, Feedback, Grade, Note, Observation}
+  alias WebCAT.Feedback.{Category, Draft, Explanation, Email, Note, Observation}
   alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Student}
   alias WebCAT.Factory
 
@@ -42,6 +42,7 @@ defmodule WebCAT.Factory do
     }
   end
 
+  @spec notification_factory() :: WebCAT.Accounts.Notification.t()
   def notification_factory do
     %Notification{
       content: Faker.Lorem.Shakespeare.hamlet(),
@@ -62,6 +63,7 @@ defmodule WebCAT.Factory do
     %Draft{
       content: Faker.Lorem.Shakespeare.hamlet(),
       status: sequence(:status, ~w(review needs_revision approved emailed)),
+      score: Float.round(:rand.uniform() * 5, 2),
       student: Factory.build(:student),
       rotation_group: Factory.build(:rotation_group)
     }
@@ -78,22 +80,7 @@ defmodule WebCAT.Factory do
   def explanation_factory do
     %Explanation{
       content: Faker.Lorem.Shakespeare.hamlet(),
-      feedback: Factory.build(:feedback)
-    }
-  end
-
-  def feedback_factory do
-    %Feedback{
-      content: Faker.Lorem.Shakespeare.hamlet(),
       observation: Factory.build(:observation)
-    }
-  end
-
-  def grade_factory do
-    %Grade{
-      # Random number up to 5, rounded to two decimal places
-      score: Float.round(:rand.uniform() * 5, 2),
-      draft: Factory.build(:draft)
     }
   end
 

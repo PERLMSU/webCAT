@@ -17,13 +17,10 @@ defmodule WebCAT.Accounts.Users do
   """
   @spec list(Keyword.t()) :: {:ok, [User.t()]}
   def list(options \\ []) do
-    users =
       User
       |> limit(^Keyword.get(options, :limit, 25))
       |> offset(^Keyword.get(options, :offset, 0))
       |> Repo.all()
-
-      {:ok, users}
   end
 
   @doc """

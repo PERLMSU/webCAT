@@ -127,16 +127,9 @@ defmodule WebCAT.Repo.Migrations.Initial do
       timestamps()
     end
 
-    create table(:feedback) do
-      add_req(:content, :text)
-      add_req(:observation_id, references(:observations))
-
-      timestamps()
-    end
-
     create table(:explanations) do
       add_req(:content, :text)
-      add_req(:feedback_id, references(:feedback))
+      add_req(:observation_id, references(:observations))
 
       timestamps()
     end
@@ -153,6 +146,7 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create table(:drafts) do
       add_req(:content, :text)
       add_req(:status, :draft_status)
+      add_req(:score, :float)
       add_req(:student_id, references(:students))
       add_req(:rotation_group_id, references(:rotation_groups))
 
@@ -162,13 +156,6 @@ defmodule WebCAT.Repo.Migrations.Initial do
     create table(:emails) do
       add_req(:status, :text)
       add(:status_message, :text)
-      add_req(:draft_id, references(:drafts))
-
-      timestamps()
-    end
-
-    create table(:grades) do
-      add_req(:score, :float)
       add_req(:draft_id, references(:drafts))
 
       timestamps()

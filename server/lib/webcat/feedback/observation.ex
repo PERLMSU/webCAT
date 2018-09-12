@@ -10,7 +10,7 @@ defmodule WebCAT.Feedback.Observation do
     belongs_to(:rotation_group, WebCAT.Rotations.RotationGroup)
 
     has_many(:notes, WebCAT.Feedback.Note)
-    has_many(:feedback, WebCAT.Feedback.Feedback)
+    has_many(:explanations, WebCAT.Feedback.Explanation)
 
     timestamps()
   end

@@ -5,7 +5,7 @@ defmodule WebCAT.Feedback.Explanation do
   schema "explanations" do
     field(:content, :string)
 
-    belongs_to(:feedback, WebCAT.Feedback.Feedback)
+    belongs_to(:observation, WebCAT.Feedback.Observation)
 
     timestamps()
   end

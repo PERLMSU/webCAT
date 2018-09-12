@@ -18,6 +18,6 @@ defmodule WebCATWeb.DraftView do
   def render("draft.json", %{draft: %Draft{} = draft}) do
     draft
     |> Map.from_struct()
-    |> Map.take(~w(id content status student_id rotation_group_id inserted_at updated_at)a)
+    |> Map.take(~w(id content score status student_id rotation_group_id inserted_at updated_at)a)
   end
 end

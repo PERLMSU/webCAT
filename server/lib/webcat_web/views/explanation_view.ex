@@ -18,6 +18,6 @@ defmodule WebCATWeb.ExplanationView do
   def render("explanation.json", %{explanation: %Explanation{} = explanation}) do
     explanation
     |> Map.from_struct()
-    |> Map.take(~w(id content feedback_id inserted_at updated_at)a)
+    |> Map.take(~w(id content observation_id inserted_at updated_at)a)
   end
 end

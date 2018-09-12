@@ -5,6 +5,7 @@ defmodule WebCAT.Feedback.Draft do
   schema "drafts" do
     field(:content, :string)
     field(:status, :string)
+    field(:score, :float)
 
     belongs_to(:student, WebCAT.Rotations.Student)
     belongs_to(:rotation_group, WebCAT.Rotations.RotationGroup)

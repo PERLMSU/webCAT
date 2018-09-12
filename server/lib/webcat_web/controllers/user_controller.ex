@@ -19,7 +19,7 @@ defmodule WebCATWeb.UserController do
     offset = Map.get(params, "offset", 0)
 
     with :ok <- Bodyguard.permit(WebCAT.Accounts, :list_users, user),
-         {:ok, users} <- Users.list(limit: limit, offset: offset) do
+         users <- Users.list(limit: limit, offset: offset) do
       conn
       |> render(UserView, "list.json", users: users)
     end

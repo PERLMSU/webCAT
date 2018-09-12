@@ -15,7 +15,7 @@ defmodule WebCATWeb.CategoryController do
     offset = Map.get(params, "offset", 0)
 
     with :ok <- Bodyguard.permit(WebCAT.Feedback, :list_categories, user),
-         {:ok, categories} <- Categories.list(limit: limit, offset: offset) do
+         categories <- Categories.list(limit: limit, offset: offset) do
       conn
       |> render(CategoryView, "list.json", categories: categories)
     end
