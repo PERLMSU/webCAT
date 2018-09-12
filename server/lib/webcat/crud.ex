@@ -5,7 +5,6 @@ defmodule WebCAT.CRUD do
   use Anaphora
 
   alias WebCAT.Repo
-  alias Ecto.{Changeset, Schema}
 
   import Ecto.Query
 
