@@ -3,7 +3,6 @@ import * as Yup from 'yup';
 import { InjectedFormikProps, withFormik } from 'formik';
 import { Field, Label, Input, Control, Button, Help } from 'bloomer';
 import { authLogin } from '../../common/client';
-import API from '../../common/state/auth';
 
 
 // Adapted from https://gist.github.com/oukayuka/1ef7278c466fe926496ac2181a029f97
@@ -58,7 +57,6 @@ export const LoginForm = withFormik<FormProps, FormValues>({
         result.caseOf({
             left: token => {
                 setSubmitting(false);
-                API.login(token);
             },
             right: error => {
                 this.props.error = error;

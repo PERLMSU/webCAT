@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Redirect, Route } from "react-router-dom";
-import API from '../state/auth';
+import { withCookies, Cookies } from "react-cookie";
 
 
 const ProtectedRoute = ({ component: Component, ...rest }) => (
     <Route
         {...rest}
         render={(props) =>
-            API.isAuthenticated() ? (
+            true ? (
                 <Component {...props} />
             ) : (
                     <Redirect
