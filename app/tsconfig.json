@@ -4,8 +4,6 @@
     "moduleResolution": "node",
     "target": "es5",
     "jsx": "react",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "importHelpers": true,
     "sourceMap": true,
     "skipDefaultLibCheck": true,
@@ -15,7 +13,6 @@
     ],
     "types": [
       "webpack-env",
-      "reflect-metadata"
     ],
     "paths": {
       // Fix "Duplicate identifier" errors caused by multiple dependencies fetching their own copies of type definitions.

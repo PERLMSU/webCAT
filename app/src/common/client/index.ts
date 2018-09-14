@@ -1,10 +1,8 @@
-import "reflect-metadata";
 import Axios, { AxiosInstance } from 'axios';
 
-import { SignupDTO, LoginDTO, TokenDTO } from "../domain/dto"
 import { Either } from 'tsmonad';
 import { Error } from './types';
-import { Auth } from './resources/auth';
+import { Auth, LoginDTO, TokenDTO } from './resources/auth';
 
 /**
  * Create a configured Axios instance for use
@@ -20,20 +18,6 @@ export function create(token: string, baseURL: string = "http://localhost:4000/"
         },
         timeout: 5000,
     });
-}
-
-/**
- * Sign up a user
- * @param signUp Sign up details to send
- * @param baseURL URL of the API endpoint
- */
-export async function signUp(signUp: SignupDTO, baseURL: string = "http://localhost:4000/"): Promise<Either<TokenDTO, Error>> {
-    const client = Axios.create({
-        baseURL,
-        timeout: 5000,
-    });
-
-    return await Auth.signUp(client, signUp);
 }
 
 /**

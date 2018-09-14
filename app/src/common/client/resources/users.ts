@@ -1,11 +1,24 @@
 import { AxiosInstance } from "axios";
-import { validate } from "class-validator";
 import { Either } from "tsmonad/lib/src";
 
 import { Error } from "../types";
 import { Classroom, Notification, RotationGroup, User } from "../../domain"
-import { UserUpdate } from "../../domain/updates"
 import { ListQueryOptions } from '../types';
+
+export interface UserUpdate {
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+    email: string;
+    username: string;
+    nickname?: string;
+    bio?: string;
+    phone?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    birthday?: Date;
+}
 
 /**
  * Represents all of the possible actions for user authentication
@@ -49,7 +62,6 @@ export class Users {
      */
     public static async update(client: AxiosInstance, id: number, update: UserUpdate): Promise<Either<User, Error>> {
         try {
-            await validate(update);
             const response = await client.put<User>(`/users/${id}`, update);
             return Either.left(response.data);
         } catch (error) {

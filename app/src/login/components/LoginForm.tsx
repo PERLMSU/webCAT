@@ -1,10 +1,9 @@
 import * as React from "react";
 import * as Yup from 'yup';
 import { InjectedFormikProps, withFormik } from 'formik';
-import { Section, Container, Field, Label, Input, Control, Button, Help, Title, Box, Hero, HeroBody, Column, Subtitle } from 'bloomer';
-import { authLogin } from '../common/client';
-import { LoginDTO } from '../common/domain/dto';
-import API from '../common/state/auth';
+import { Field, Label, Input, Control, Button, Help } from 'bloomer';
+import { authLogin } from '../../common/client';
+import API from '../../common/state/auth';
 
 
 // Adapted from https://gist.github.com/oukayuka/1ef7278c466fe926496ac2181a029f97
@@ -39,13 +38,12 @@ const InnerForm: React.SFC<InjectedFormikProps<FormProps, FormValues>> = (
             <Field>
                 <Control>
                     <Button type="submit" isColor='primary' disabled={props.isSubmitting}>Submit</Button>
-                    {props.error && <Help isColor="danger">{props.error}</Help>}
                 </Control>
             </Field>
         </form>
     );
 
-const LoginForm = withFormik<FormProps, FormValues>({
+export const LoginForm = withFormik<FormProps, FormValues>({
     mapPropsToValues: () => ({ email: '', password: '' }),
     validationSchema: Yup.object().shape({
         email: Yup.string()
@@ -56,39 +54,16 @@ const LoginForm = withFormik<FormProps, FormValues>({
     },
     ),
     handleSubmit: async (values: FormValues, { setSubmitting, setError }) => {
-        const result = await authLogin(new LoginDTO(values.email, values.password))
+        const result = await authLogin({email: values.email, password: values.password})
         result.caseOf({
             left: token => {
                 setSubmitting(false);
                 API.login(token);
             },
             right: error => {
-                setError(error);
+                this.props.error = error;
                 setSubmitting(false);
             }
         })
     },
 })(InnerForm);
-
-export default class Login extends React.Component {
-    public render() {
-        return (
-            <Hero isColor="primary" isFullHeight>
-                <HeroBody>
-                    <Container hasTextAlign="centered">
-                        <Column isSize="1/2" isOffset="1/4">
-                            <Box>
-                                <figure className="avatar">
-                                    <img src={require("../../static/images/physics.png")}></img>
-                                </figure>
-                                <Title hasTextColor="dark">WebCAT</Title>
-                                <Subtitle hasTextColor="dark">Please Log In</Subtitle>
-                                <LoginForm />
-                            </Box>
-                        </Column>
-                    </Container>
-                </HeroBody>
-            </Hero>
-        );
-    }
-}

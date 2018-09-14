@@ -1,5 +1,5 @@
 import * as Cookies from "universal-cookie";
-import { TokenDTO } from '../domain/dto';
+import { TokenDTO } from '../client/resources/auth';
 
 export default class API {
     private static cookies = new Cookies();
