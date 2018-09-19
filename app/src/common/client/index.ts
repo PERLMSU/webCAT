@@ -10,7 +10,7 @@ import { Auth, LoginDTO, TokenDTO } from './resources/auth';
  * @param {string} baseURL URL of the API endpoint
  * @returns {AxiosInstance}
  */
-export function create(token: string, baseURL: string = "http://localhost:4000/"): AxiosInstance {
+export function create(token: string, baseURL: string = "http://localhost:8080/"): AxiosInstance {
     return Axios.create({
         baseURL,
         headers: {
@@ -25,7 +25,7 @@ export function create(token: string, baseURL: string = "http://localhost:4000/"
  * @param login Log in details to send
  * @param baseURL URL of the API endpoint
  */
-export async function authLogin(login: LoginDTO, baseURL: string = "http://localhost:4000/"): Promise<Either<TokenDTO, Error>> {
+export async function authLogin(login: LoginDTO, baseURL: string = "http://localhost:8080/"): Promise<Either<TokenDTO, Error>> {
     const client = Axios.create({
         baseURL,
         timeout: 5000,

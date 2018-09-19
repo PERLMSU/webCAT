@@ -119,4 +119,13 @@ export class Users {
             return error.response != undefined ? Either.right({ message: error.response.data }) : Either.right({ message: error });
         }
     }
+
+    public static async me(client: AxiosInstance): Promise<Either<User, Error>> {
+        try {
+            const response = await client.get<User>(`/users/me`);
+            return Either.left(response.data);
+        } catch (error) {
+            return error.response != undefined ? Either.right({ message: error.response.data }) : Either.right({ message: error });
+        }
+    }
 }
