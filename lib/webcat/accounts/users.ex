@@ -12,6 +12,14 @@ defmodule WebCAT.Accounts.Users do
   alias Ecto.Multi
   import Ecto.Query
 
+  def list(options \\ []) do
+    User
+    |> limit(^Keyword.get(options, :limit, 25))
+    |> offset(^Keyword.get(options, :offset, 0))
+    |> order_by(desc: :email)
+    |> Repo.all()
+  end
+
   @doc """
   Get a user by their email
   """
@@ -51,16 +59,14 @@ defmodule WebCAT.Accounts.Users do
   @doc """
   Login a user, returning the user if the authentication is successful
   """
-  @spec login(String.t(), String.t()) :: {:ok, User.t()} | {:error, :unauthorized, String.t()}
+  @spec login(String.t(), String.t()) :: {:ok, User.t()} | {:error, :unauthorized}
   def login(email, password) do
-    user =
-      User
-      |> where([u], u.email == ^email)
-      |> Repo.one()
-      |> check_password(password)
-
-    case user do
-      {:ok, _} -> user
+    User
+    |> where([u], u.email == ^email)
+    |> Repo.one()
+    |> check_password(password)
+    |> acase do
+      {:ok, _} -> it
       {:error, _} -> {:error, :unauthorized}
     end
   end
@@ -70,12 +76,12 @@ defmodule WebCAT.Accounts.Users do
   """
   @spec rotation_groups(integer, Keyword.t()) :: [RotationGroup.t()]
   def rotation_groups(user_id, options \\ []) do
-      RotationGroup
-      |> where([g], g.instructor_id == ^user_id)
-      |> limit(^Keyword.get(options, :limit, 25))
-      |> offset(^Keyword.get(options, :offset, 0))
-      |> order_by(desc: :inserted_at)
-      |> Repo.all()
+    RotationGroup
+    |> where([g], g.instructor_id == ^user_id)
+    |> limit(^Keyword.get(options, :limit, 25))
+    |> offset(^Keyword.get(options, :offset, 0))
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
   end
 
   @doc """
@@ -83,12 +89,12 @@ defmodule WebCAT.Accounts.Users do
   """
   @spec notifications(integer, Keyword.t()) :: [Notification.t()]
   def notifications(user_id, options \\ []) do
-      Notification
-      |> where([n], n.user_id == ^user_id)
-      |> limit(^Keyword.get(options, :limit, 25))
-      |> offset(^Keyword.get(options, :offset, 0))
-      |> order_by(desc: :inserted_at)
-      |> Repo.all()
+    Notification
+    |> where([n], n.user_id == ^user_id)
+    |> limit(^Keyword.get(options, :limit, 25))
+    |> offset(^Keyword.get(options, :offset, 0))
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
   end
 
   @doc """
@@ -96,14 +102,14 @@ defmodule WebCAT.Accounts.Users do
   """
   @spec classrooms(integer) :: [Classroom.t()]
   def classrooms(user_id, options \\ []) do
-      Classroom
-      |> join(:inner, [c], uc in "user_classrooms", uc.classroom_id == c.id)
-      |> where([_, uc], uc.user_id == ^user_id)
-      |> limit(^Keyword.get(options, :limit, 25))
-      |> offset(^Keyword.get(options, :offset, 0))
-      |> order_by([c, _], desc: c.inserted_at)
-      |> select([c, _], c)
-      |> Repo.all()
+    Classroom
+    |> join(:inner, [c], uc in "user_classrooms", uc.classroom_id == c.id)
+    |> where([_, uc], uc.user_id == ^user_id)
+    |> limit(^Keyword.get(options, :limit, 25))
+    |> offset(^Keyword.get(options, :offset, 0))
+    |> order_by([c, _], desc: c.inserted_at)
+    |> select([c, _], c)
+    |> Repo.all()
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect username or password"}

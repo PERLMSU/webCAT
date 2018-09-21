@@ -4,7 +4,8 @@ defmodule WebCATWeb.Auth.Pipeline do
     error_handler: WebCATWeb.Auth.ErrorHandler,
     module: WebCATWeb.Auth.Guardian
 
-    plug(Guardian.Plug.VerifyHeader)
-    plug(Guardian.Plug.LoadResource)
-    plug(Guardian.Plug.EnsureAuthenticated)
+  plug(Guardian.Plug.VerifySession)
+  plug(Guardian.Plug.VerifyHeader)
+  plug(Guardian.Plug.LoadResource)
+  plug(Guardian.Plug.EnsureAuthenticated)
 end

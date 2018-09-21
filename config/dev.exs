@@ -20,7 +20,7 @@ use Mix.Config
 # configured to run both http and https servers on
 # different ports.
 config :webcat, WebCATWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: 8080],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -31,7 +31,8 @@ config :webcat, WebCATWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r{priv/gettext/.*(po)$},
-      ~r{lib/webcat_web/views/.*(ex)$}
+      ~r{lib/webcat_web/views/.*(ex)$},
+      ~r{lib/yeet_web/templates/.*(eex)$}
     ]
   ]
 

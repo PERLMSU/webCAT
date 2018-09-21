@@ -30,7 +30,7 @@ defmodule WebCAT.Accounts.User do
     timestamps()
   end
 
-  @required ~w(first_name last_name email username password inserted_at updated_at role)a
+  @required ~w(first_name last_name email username password role)a
   @optional ~w(middle_name nickname bio phone city state country birthday active)a
 
   @doc """

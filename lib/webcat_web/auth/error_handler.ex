@@ -1,9 +1,9 @@
 defmodule WebCATWeb.Auth.ErrorHandler do
-  import Plug.Conn
+  use WebCATWeb, :controller
 
-  def auth_error(conn, {type, _reason}, _opts) do
+  def auth_error(conn, {_type, _reason}, _opts) do
     conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(401, to_string(type))
+    |> put_flash(:error, "please log in to view this page")
+    |> redirect(to: login_path(conn, :index))
   end
 end

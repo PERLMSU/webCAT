@@ -15,7 +15,7 @@ config :ecto, json_library: Jason
 config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "s9GTMEgc/xgeVdIwZ3VZy3kTo/1xPo6k7NezFUo0Oe+vomSV4eJDes3GQnwJp4rh",
-  render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(json)],
+  render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(html)],
   pubsub: [name: WebCATWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
 config :webcat, WebCATWeb.Auth.Guardian,
