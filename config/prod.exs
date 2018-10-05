@@ -14,7 +14,7 @@ use Mix.Config
 config :webcat, WebCATWeb.Endpoint,
   load_from_system_env: false,
   server: true,
-  url: [host: "valid-reflector-214820.appspot.com", port: 80]
+  url: [host: "valid-reflector-214820.appspot.com", port: 80],
   version: "0.4.0",
   http: [
     :inet6,

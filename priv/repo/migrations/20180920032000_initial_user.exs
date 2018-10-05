@@ -3,6 +3,7 @@ defmodule WebCAT.Repo.Migrations.InitialUser do
 
   alias WebCAT.Repo
   alias WebCAT.Accounts.User
+  alias WebCAT.Rotations.Semester
 
   def change do
     Repo.insert!(User.create_changeset(%User{}, %{
@@ -16,7 +17,15 @@ defmodule WebCAT.Repo.Migrations.InitialUser do
       state: "MI",
       country: "USA",
       active: true,
-      role: "instructor",
+      role: "admin",
+    }))
+
+    Application.ensure_all_started(:timex)
+
+    Repo.insert!(Semester.changeset(%Semester{}, %{
+      start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: -3)),
+      end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 9)),
+      title: "Fall Semester"
     }))
   end
 end
