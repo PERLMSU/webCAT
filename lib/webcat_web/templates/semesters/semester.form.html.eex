@@ -1,0 +1,10 @@
+<%= form_for @changeset, (if @changeset.data.id == nil, do: semesters_path(@conn, :create), else: semesters_path(@conn, :update, @changeset.data.id)), fn f -> %>
+<%= form_field(f, :title, :text) %>
+<%= form_field(f, :start_date, :date) %>
+<%= form_field(f, :end_date, :date) %>
+<div class="field">
+    <div class="control">
+        <%= submit "Submit", class: "button" %>
+    </div>
+</div>
+<% end %>

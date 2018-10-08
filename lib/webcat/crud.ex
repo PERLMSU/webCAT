@@ -15,14 +15,20 @@ defmodule WebCAT.CRUD do
     schema
     |> limit(^Keyword.get(options, :limit, 25))
     |> offset(^Keyword.get(options, :offset, 0))
+    |> preload(^Keyword.get(options, :preload, []))
+    |> order_by(~w(inserted_at updated_at))
     |> Repo.all()
   end
 
   @doc """
   Get by id
   """
-  def get(schema, id) do
-    acase Repo.get(schema, id) do
+  def get(schema, id, options \\ []) do
+    schema
+    |> where([s], s.id == ^id)
+    |> preload(^Keyword.get(options, :preload, []))
+    |> Repo.one()
+    |> acase do
       nil -> {:error, :not_found}
       _ -> {:ok, it}
     end

@@ -1,0 +1,42 @@
+<table class="table">
+    <%= if Enum.count(@classrooms) > 0 do %>
+    <thead>
+        <th>Course Code</th>
+        <th>Section</th>
+        <th>Description</th>
+        <th></th>
+    </thead>
+    <%= if Enum.count(@classrooms) > 25 do %>
+    <tfoot>
+        <th>Course Code</th>
+        <th>Section</th>
+        <th>Description</th>
+        <th></th>
+    </tfoot>
+    <% end %>
+
+    <tbody>
+        <%= for classroom <- Enum.map(@classrooms, &clean_classroom/1) do %>
+        <tr>
+            <td>
+                <%= link((html_escape(classroom.course_code) |> safe_to_string()), to: classrooms_path(@conn, :show, classroom.id)) %>
+            </td>
+            <td>
+                <%= html_escape(classroom.section) |> safe_to_string() %>
+            </td>
+            <td>
+                <%= html_escape(classroom.description) |> safe_to_string() %>
+            </td>
+            <td>
+                <%= icon_button("Edit", "wrench", to: classrooms_path(@conn, :edit, classroom.id), class: "is-primary") %>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+
+    <% else %>
+    <tr>
+        <td>There are no classrooms currently</td>
+    </tr>
+    <% end %>
+</table>

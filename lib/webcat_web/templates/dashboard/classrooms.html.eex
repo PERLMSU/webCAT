@@ -1,0 +1,52 @@
+<nav class="panel">
+    <p class="panel-heading">
+        Classrooms
+    </p>
+    <div class="panel-block">
+        <%= icon_button("New", "plus", to: semesters_path(@conn, :new), class: "is-primary") %>
+    </div>
+    <div class="panel-block">
+        <table class="table">
+            <%= if Enum.count(@semesters) > 0 do %>
+            <thead>
+                <th>Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+            </thead>
+            <%= if Enum.count(@semesters) > 25 do %>
+            <tfoot>
+                <th>Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+            </tfoot>
+            <% end %>
+
+            <tbody>
+                <%= for semester <- @semesters do %>
+                <tr>
+                    <td>
+                        <%= html_escape(semester[:title]) |> safe_to_string() %>
+                    </td>
+                    <td>
+                        <%= semester[:start_date] %>
+                    </td>
+                    <td>
+                        <%= semester[:end_date] %>
+                    </td>
+                    <td>
+                        <%= icon_button("Edit", "wrench", to: semesters_path(@conn, :edit, semester[:id]), class: "is-primary") %>
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+
+            <% else %>
+            <tr>
+                <td>There are no semesters currently</td>
+            </tr>
+            <% end %>
+        </table>
+    </div>
+</nav>

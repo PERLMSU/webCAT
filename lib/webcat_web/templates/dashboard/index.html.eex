@@ -1,0 +1,10 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">Dashboard</h1>
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :dashboard) %>
+            </div>
+        </div>
+    </div>
+</section>

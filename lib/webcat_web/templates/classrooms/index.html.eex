@@ -1,0 +1,30 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">Dashboard</h1>
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :classrooms) %>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <h2 class="subtitle">
+                                    Classrooms
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <%= icon_button("New", "plus", to: classrooms_path(@conn, :new), class: "is-primary") %>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <%= render(WebCATWeb.ClassroomsView, "classrooms.html", conn: @conn, classrooms: @classrooms) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

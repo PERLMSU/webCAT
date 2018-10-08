@@ -3,7 +3,10 @@ defmodule WebCATWeb.IndexController do
 
   alias WebCAT.Accounts.User
 
-  def index(conn, _assigns) do
+  action_fallback(WebCATWeb.FallbackController)
+
+
+  def index(conn, _params) do
     case WebCATWeb.Auth.Guardian.Plug.current_resource(conn) do
       %User{} ->
         conn

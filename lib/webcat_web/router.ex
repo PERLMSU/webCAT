@@ -21,15 +21,22 @@ defmodule WebCATWeb.Router do
     post("/", LoginController, :login)
   end
 
-  scope "/dashboard", WebCATWeb do
-    pipe_through(~w(browser authenticated)a)
-
-    get("/", DashboardController, :index)
-  end
-
   scope "/", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
     get("/", IndexController, :index)
+    get("/dashboard", DashboardController, :index)
+    get("/dashboard/import_export", DashboardController, :import_export)
+
+    resources("/semesters", SemestersController)
+    resources("/classrooms", ClassroomsController)
+    resources("/rotations", RotationsController)
+    resources("/rotation_groups", RotationGroupsController)
+
+    resources("/categories", CategoriesController)
+
+    resources("/users", UsersController)
+
+    get("/logout", LoginController, :logout)
   end
 end

@@ -7,6 +7,8 @@ defmodule WebCATWeb.LoginController do
 
   alias WebCAT.Accounts.Users
 
+  action_fallback(WebCATWeb.FallbackController)
+
   def index(conn, _params) do
     render(conn, "login.html")
   end
@@ -35,5 +37,11 @@ defmodule WebCATWeb.LoginController do
         |> put_flash(:error, "unknown error")
         |> redirect(to: login_path(conn, :login))
     end
+  end
+
+  def logout(conn, _params) do
+    conn
+    |> WebCATWeb.Auth.Guardian.Plug.sign_out()
+    |> redirect(to: login_path(conn, :login))
   end
 end

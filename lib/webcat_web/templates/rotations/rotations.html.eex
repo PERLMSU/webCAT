@@ -1,0 +1,37 @@
+<table class="table">
+        <%= if Enum.count(@rotations) > 0 do %>
+        <thead>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+        </thead>
+        <%= if Enum.count(@rotations) > 25 do %>
+        <tfoot>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+        </tfoot>
+        <% end %>
+
+        <tbody>
+                <%= for rotation <- Enum.map(@rotations, &clean_rotation/1) do %>
+                <tr>
+                        <td>
+                                <%= link(escape(rotation.start_date), to: rotations_path(@conn, :show, rotation.id)) %>
+                        </td>
+                        <td>
+                                <%= escape(rotation.end_date) %>
+                        </td>
+                        <td>
+                                <%= icon_button("Edit", "wrench", to: rotations_path(@conn, :edit, rotation.id), class: "is-primary") %>
+                        </td>
+                </tr>
+                <% end %>
+        </tbody>
+
+        <% else %>
+        <tr>
+                <td>There are no rotations currently</td>
+        </tr>
+        <% end %>
+</table>

@@ -1,0 +1,28 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">Dashboard</h1>
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :semesters) %>
+            </div>
+            <div class="column">
+                <div class="level">
+                    <div class="level-left">
+                        <h1 class="subtitle is-1">
+                            <%= (html_escape(@semester.title) |> safe_to_string()) %>
+                        </h1>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <%= icon_button("Edit", "wrench", to: semesters_path(@conn, :edit, @semester.id), class: "is-primary") %>
+                        </div>
+                        <div class="level-item">
+                            <%= icon_button("Delete", "times-square", to: semesters_path(@conn, :delete, @semester.id), class: "is-error") %>
+                        </div>
+                    </div>
+                </div>
+                <%= render(WebCATWeb.SemestersView, "semester.html", conn: @conn, semester: clean_semester(@semester)) %>
+            </div>
+        </div>
+    </div>
+</section>

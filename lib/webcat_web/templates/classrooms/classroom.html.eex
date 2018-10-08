@@ -1,0 +1,10 @@
+<p>Course Code:
+    <%= @classroom.course_code%>
+</p>
+<p>Section:
+    <%= @classroom.section%>
+</p>
+<p>Description:
+    <%= @classroom.description%>
+</p>
+<p>Semester: <%= link(escape(@classroom.semester.title), to: semesters_path(@conn, :show, @classroom.semester.id)) %></p>

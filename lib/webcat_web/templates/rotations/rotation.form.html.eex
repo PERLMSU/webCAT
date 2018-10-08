@@ -1,0 +1,15 @@
+<%= form_for @changeset, (if @changeset.data.id == nil, do: rotations_path(@conn, :create), else: rotations_path(@conn, :update, @changeset.data.id)), fn f -> %>
+<%= form_field(f, :start_date, :date) %>
+<%= form_field(f, :end_date, :date) %>
+<div class="field">
+    <%= label(f, :classroom, "Classroom", class: "label") %>
+    <div class="control">
+        <%= select(f, :classroom_id, Enum.map(@classrooms, &({"#{&1.course_code} #{&1.section}", &1.id})), selected: (if @changeset.data.classroom_id != nil, do: Integer.to_string(@changeset.data.classroom_id)), class: "input") %>
+    </div>
+</div>
+<div class="field">
+    <div class="control">
+        <%= submit "Submit", class: "button" %>
+    </div>
+</div>
+<% end %>

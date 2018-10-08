@@ -9,11 +9,15 @@ defmodule WebCAT.Validators do
     {_, from_value} = fetch_field(changeset, from)
     {_, to_value} = fetch_field(changeset, to)
 
-    if Timex.before?(from_value, to_value) do
+    if from_value == nil or to_value == nil do
       changeset
     else
-      message = msg(opts, "must be before #{to}")
-      add_error(changeset, from, message, to_field: to)
+      if Timex.before?(from_value, to_value) do
+        changeset
+      else
+        message = msg(opts, "must be before #{to}")
+        add_error(changeset, from, message, to_field: to)
+      end
     end
   end
 
