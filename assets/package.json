@@ -1,0 +1,30 @@
+{
+  "repository": {},
+  "license": "ISC",
+  "sideEffects": false,
+  "scripts": {
+    "build": "webpack --mode production",
+    "start": "yarn run watch",
+    "watch": "webpack --mode development --watch-stdin"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-pro": "5.4.1",
+    "bulma": "0.7.2",
+    "bulmaswatch": "0.7.2",
+    "phoenix": "file:../deps/phoenix",
+    "phoenix_html": "file:../deps/phoenix_html"
+  },
+  "devDependencies": {
+    "@babel/core": "7.1.2",
+    "@babel/preset-env": "7.1.0",
+    "babel-cli": "6.26.0",
+    "babel-loader": "8.0.4",
+    "copy-webpack-plugin": "4.5.3",
+    "css-loader": "1.0.0",
+    "mini-css-extract-plugin": "0.4.4",
+    "node-sass": "4.9.4",
+    "sass-loader": "7.1.0",
+    "webpack": "4.21.0",
+    "webpack-cli": "3.1.2"
+  }
+}

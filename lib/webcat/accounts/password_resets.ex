@@ -40,8 +40,17 @@ defmodule WebCAT.Accounts.PasswordResets do
   @spec get(any()) :: {:error, :not_found} | {:ok, WebCAT.Accounts.PasswordReset.t()}
   def get(token) when is_binary(token) do
     case Repo.get_by(PasswordReset, token: token) do
-      %PasswordReset{} = reset -> {:ok, reset}
-      nil -> {:error, :not_found}
+      %PasswordReset{} = reset ->
+        # Delete if reset older than 24 hours
+        if Timex.before?(reset.inserted_at, Timex.shift(Timex.now(), days: -1)) do
+          Repo.delete(reset)
+          {:error, :not_found}
+        else
+          {:ok, reset}
+        end
+
+      nil ->
+        {:error, :not_found}
     end
   end
 
@@ -53,22 +62,16 @@ defmodule WebCAT.Accounts.PasswordResets do
   def finish_reset(token, new_password) when is_binary(token) and is_binary(new_password) do
     case Repo.get_by(PasswordReset, token: token) do
       %PasswordReset{} = reset ->
-        # Delete if reset older than 24 hours
-        if Timex.before?(reset.inserted_at, Timex.shift(Timex.now(), days: -1)) do
-          Repo.delete(reset)
-          {:error, :not_found}
-        else
-          with {:ok, user} <- CRUD.get(User, reset.user_id) do
-            user_changeset = User.changeset(user, %{password: Pbkdf2.hashpwsalt(new_password)})
+        with {:ok, user} <- CRUD.get(User, reset.user_id) do
+          user_changeset = User.changeset(user, %{password: Pbkdf2.hashpwsalt(new_password)})
 
-            Multi.new()
-            |> Multi.update(:user, user_changeset)
-            |> Multi.delete(:reset, reset)
-            |> Repo.transaction()
-            |> case do
-              {:ok, result} -> {:ok, result.user}
-              {:error, _, changeset, %{}} -> {:error, changeset}
-            end
+          Multi.new()
+          |> Multi.update(:user, user_changeset)
+          |> Multi.delete(:reset, reset)
+          |> Repo.transaction()
+          |> case do
+            {:ok, result} -> {:ok, result.user}
+            {:error, _, changeset, %{}} -> {:error, changeset}
           end
         end
 

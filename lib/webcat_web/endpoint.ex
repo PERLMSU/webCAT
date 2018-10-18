@@ -1,6 +1,8 @@
 defmodule WebCATWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :webcat
 
+  plug(Plug.Static, at: "/", from: :webcat, gzip: false, only: ~w(css js images favicon.ico robots.txt))
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
@@ -9,7 +11,9 @@ defmodule WebCATWeb.Endpoint do
     plug(Phoenix.CodeReloader)
   end
 
+  plug Plug.RequestId
   plug(Plug.Logger)
+
 
   plug(Plug.Parsers,
     parsers: ~w(urlencoded multipart json)a,

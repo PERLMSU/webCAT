@@ -1,5 +1,6 @@
 defmodule WebCAT.Email do
   import Bamboo.Email
+  import WebCATWeb.Router.Helpers
 
   @doc """
   Create an email to be sent in the case of a password beimg reset
@@ -10,7 +11,7 @@ defmodule WebCAT.Email do
     |> to(email)
     |> from("no-reply@webcat.io")
     |> subject("Password Reset")
-    |> html_body(~s(<a href="http://localhost:4000/profile/reset?token=#{token}">))
+    |> html_body(~s(<a href="#{password_reset_url(WebCATWeb.Endpoint, :reset, token)}">))
     |> text_body("Token: #{token}")
   end
 
@@ -23,7 +24,7 @@ defmodule WebCAT.Email do
     |> to(email)
     |> from("no-reply@webcat.io")
     |> subject("Password Reset")
-    |> html_body(~s(<a href="http://localhost:4000/confirm?token=#{token}">))
+    |> html_body(~s(<a href="#{email_confirmation_url(WebCATWeb.Endpoint, :confirm, token)}">))
     |> text_body("Token: #{token}")
   end
 end

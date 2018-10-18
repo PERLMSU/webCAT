@@ -24,12 +24,13 @@ config :webcat, WebCATWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: []
+  watchers: [yarn: ["run", "watch", cd: Path.expand("../assets", __DIR__)]]
 
 # Watch static and templates for browser reloading.
 config :webcat, WebCATWeb.Endpoint,
   live_reload: [
     patterns: [
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/webcat_web/views/.*(ex)$},
       ~r{lib/yeet_web/templates/.*(eex)$}

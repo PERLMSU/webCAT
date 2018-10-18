@@ -3,14 +3,28 @@
 #=================================
 FROM elixir:1.7-alpine as build
 
+# Install yarn
+RUN apk add --no-cache yarn --fresh
+
 #Copy the source folder into the Docker image
 COPY . .
 
-#Install dependencies and build Release
+#Install dependencies
 RUN mix local.hex --force && \
     mix local.rebar --force && \
-    mix deps.get --only prod && \
+    mix deps.get --only prod 
+
+
+# Build assets and release
+RUN cd ./assets && \
+    yarn && \
+    yarn run build
+
+# Build release
+RUN MIX_ENV=prod mix phx.digest && \
     MIX_ENV=prod mix release
+
+
 
 #Extract Release archive to /rel for copying in next stage
 RUN APP_NAME="webcat" && \

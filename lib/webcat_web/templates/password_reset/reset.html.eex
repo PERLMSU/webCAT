@@ -1,0 +1,32 @@
+<section class="hero is-primary is-fullheight">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <div class="columns is-centered">
+                <div class="column is-half">
+                    <div class="box">
+                        <h1 class="title has-text-dark">Reset Password</h1>
+                        <%= form_for @conn, password_reset_path(@conn, :finish_reset, @token), fn f ->%>
+                        <div class="field has-addons">
+                            <div class="control is-expanded has-icons-left">
+                                <%= password_input(f, :password, placeholder: "Password", class: "input") %>
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                            </div>
+                            <div class="control">
+                                <%= submit "Change Password", class: "button is-primary" %>
+                            </div>
+                        </div>
+                        <% end %>
+                        <p class="help is-primary">
+                            <%= get_flash(@conn, :info) %>
+                        </p>
+                        <p class="help is-danger">
+                            <%= get_flash(@conn, :error) %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

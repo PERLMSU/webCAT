@@ -19,6 +19,13 @@ defmodule WebCATWeb.Router do
 
     get("/", LoginController, :index)
     post("/", LoginController, :login)
+
+    get("/reset", PasswordResetController, :index)
+    post("/reset", PasswordResetController, :create)
+    get("/reset/:token", PasswordResetController, :reset)
+    post("/reset/:token", PasswordResetController, :finish_reset)
+
+    get("/confirm/:token", EmailConfirmationController, :confirm)
   end
 
   scope "/", WebCATWeb do

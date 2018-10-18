@@ -5,33 +5,39 @@
                 <div class="column is-half">
                     <div class="box">
                         <figure class="avatar">
-                            <img src="https://raw.githubusercontent.com/PERLMSU/webCAT/3cd1faf191cd0959e1cf9717f61903ba8a7df247/app/static/images/physics.png"/>
+                            <img src="https://raw.githubusercontent.com/PERLMSU/webCAT/3cd1faf191cd0959e1cf9717f61903ba8a7df247/app/static/images/physics.png" />
                         </figure>
                         <h1 class="title has-text-dark">WebCAT</h1>
                         <h2 class="subtitle has-text-dark">Please Log In</h2>
                         <%= form_for @conn, login_path(@conn, :login), fn f -> %>
-                            <div class="field">
-                                <label class="label">Email</label>
-                                <div class="control has-icons-left">
-                                  <input name="email" class="input" type="email" placeholder="Email Address">
-                                  <span class="icon is-small is-left">
+                        <div class="field">
+                            <label class="label">Email</label>
+                            <div class="control has-icons-left">
+                                <input name="email" class="input" type="email" placeholder="Email Address">
+                                <span class="icon is-small is-left">
                                     <i class="fas fa-envelope"></i>
-                                  </span>
-                                </div>
-                              </div>
-                              <div class="field">
-                                <p class="control has-icons-left">
-                                  <input name="password" class="input" type="password" placeholder="Password">
-                                  <span class="icon is-small is-left">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <p class="control has-icons-left">
+                                <input name="password" class="input" type="password" placeholder="Password">
+                                <span class="icon is-small is-left">
                                     <i class="fas fa-lock"></i>
-                                  </span>
-                                </p>
-                              </div>
-                              <p class="help is-danger"><%= get_flash(@conn, :error) %></p>
-
-                              <div class="control">
-                                <button class="button is-primary">Login</button>
-                              </div>
+                                </span>
+                            </p>
+                        </div>
+                        <p class="help is-danger">
+                            <%= get_flash(@conn, :error) %>
+                        </p>
+                        <div class="field is-grouped">
+                            <p class="control">
+                                <%= submit "Login", class: "button is-primary" %>
+                            </p>
+                            <p class="control">
+                                <%= link("Reset Password", to: password_reset_path(@conn, :index), class: "button is-link") %>
+                            </p>
+                        </div>
                         <% end %>
                     </div>
                 </div>
