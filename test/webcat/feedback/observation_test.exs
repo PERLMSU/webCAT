@@ -3,9 +3,7 @@ defmodule WebCAT.Feedback.ObservationTest do
 
   alias WebCAT.Feedback.Observation
 
-  describe "changeset/2" do
-    test "behaves as expected" do
-      assert Observation.changeset(%Observation{}, Factory.params_with_assocs(:observation)).valid?
-    end
+  test "changeset/2 behaves as expected" do
+    assert Observation.changeset(%Observation{}, Factory.params_with_assocs(:observation)).valid?
   end
 end

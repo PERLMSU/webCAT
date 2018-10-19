@@ -3,13 +3,11 @@ defmodule WebCAT.Rotations.SemestersTest do
 
   alias WebCAT.Rotations.Semesters
 
-  describe "classrooms/2" do
-    test "behaves as expected" do
-      inserted = Factory.insert(:semester)
-      Factory.insert_list(5, :classroom, semester: inserted)
+  test "classrooms/2 behaves as expected" do
+    inserted = Factory.insert(:semester)
+    Factory.insert_list(5, :classroom, semester: inserted)
 
-      classrooms = Semesters.classrooms(inserted.id, limit: 2, offset: 1)
-      assert Enum.count(classrooms) == 2
-    end
+    classrooms = Semesters.classrooms(inserted.id, limit: 2, offset: 1)
+    assert Enum.count(classrooms) == 2
   end
 end

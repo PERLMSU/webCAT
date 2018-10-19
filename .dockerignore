@@ -3,4 +3,5 @@ _build
 deps
 test
 .git
-./assets/node_modules
+assets/node_modules
+cover

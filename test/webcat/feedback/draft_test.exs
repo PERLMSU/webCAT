@@ -3,9 +3,7 @@ defmodule WebCAT.Feedback.DraftTest do
 
   alias WebCAT.Feedback.Draft
 
-  describe "changeset/2" do
-    test "behaves as expected" do
-      assert Draft.changeset(%Draft{}, Factory.params_with_assocs(:draft)).valid?
-    end
+  test "changeset/2 behaves as expected" do
+    assert Draft.changeset(%Draft{}, Factory.params_with_assocs(:draft)).valid?
   end
 end

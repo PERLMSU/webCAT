@@ -3,9 +3,7 @@ defmodule WebCAT.Feedback.EmailTest do
 
   alias WebCAT.Feedback.Email
 
-  describe "changeset/2" do
-    test "behaves as expected" do
-      assert Email.changeset(%Email{}, Factory.params_with_assocs(:email)).valid?
-    end
+  test "changeset/2 behaves as expected" do
+    assert Email.changeset(%Email{}, Factory.params_with_assocs(:email)).valid?
   end
 end

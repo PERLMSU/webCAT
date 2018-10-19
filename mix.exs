@@ -10,7 +10,8 @@ defmodule WebCAT.Mixfile do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: Coverex.Task]
     ]
   end
 
@@ -39,6 +40,7 @@ defmodule WebCAT.Mixfile do
       {:comeonin, "~> 4.0"},
       {:cors_plug, "~> 1.5"},
       {:cowboy, "~> 1.0"},
+      {:coverex, "~> 1.4.10", only: :test},
       {:distillery, "~> 2.0", runtime: false},
       {:dialyxir, git: "https://github.com/jeremyjh/dialyxir.git", only: [:dev], runtime: false},
       {:ecto, "~> 2.2.10"},

@@ -7,61 +7,53 @@ defmodule WebCAT.Accounts.UsersTest do
   alias WebCAT.Accounts.{Users, Confirmation}
   alias WebCAT.Repo
 
-  describe "login/2" do
-    test "behaves as expected" do
-      inserted = Factory.insert(:user)
+  test "login/2 behaves as expected" do
+    inserted = Factory.insert(:user)
 
-      {:ok, user} = Users.login(inserted.email, "password")
+    {:ok, user} = Users.login(inserted.email, "password")
 
-      assert inserted.email == user.email
+    assert inserted.email == user.email
 
-      {:error, :unauthorized} = Users.login(inserted.email, "password1")
-      {:error, :unauthorized} = Users.login("email@email.edm", "password")
-    end
+    {:error, :unauthorized} = Users.login(inserted.email, "password1")
+    {:error, :unauthorized} = Users.login("email@email.edm", "password")
   end
 
-  describe "create/2" do
-    test "behaves as expected" do
-      params = Factory.params_for(:user, password: "password")
+  test "create/2 behaves as expected" do
+    params = Factory.params_for(:user, password: "password")
 
-      {:ok, user} = Users.create(params)
-      {:ok, logged_in} = Users.login(user.email, "password")
+    {:ok, user} = Users.create(params)
+    {:ok, logged_in} = Users.login(user.email, "password")
 
-      assert user.id == logged_in.id
-      assert user.email == logged_in.email
+    assert user.id == logged_in.id
+    assert user.email == logged_in.email
 
-      email = WebCAT.Email.confirmation(user.email, Repo.get_by(Confirmation, user_id: user.id).token)
-      assert_delivered_email email
-    end
+    email =
+      WebCAT.Email.confirmation(user.email, Repo.get_by(Confirmation, user_id: user.id).token)
+
+    assert_delivered_email(email)
   end
 
-  describe "rotation_groups/1" do
-    test "behaves as expected" do
-      Factory.insert_list(5, :rotation_group)
-      user = Factory.insert(:user, rotation_groups: Factory.insert_list(4, :rotation_group))
+  test "rotation_groups/1 behaves as expected" do
+    Factory.insert_list(5, :rotation_group)
+    user = Factory.insert(:user, rotation_groups: Factory.insert_list(4, :rotation_group))
 
-      groups = Users.rotation_groups(user.id)
-      assert Enum.count(groups) == 4
-    end
+    groups = Users.rotation_groups(user.id)
+    assert Enum.count(groups) == 4
   end
 
-  describe "notification/1" do
-    test "behaves as expected" do
-      Factory.insert_list(5, :notification)
-      user = Factory.insert(:user, notifications: Factory.insert_list(4, :notification))
+  test "notification/1 behaves as expected" do
+    Factory.insert_list(5, :notification)
+    user = Factory.insert(:user, notifications: Factory.insert_list(4, :notification))
 
-      notifications = Users.notifications(user.id)
-      assert Enum.count(notifications) == 4
-    end
+    notifications = Users.notifications(user.id)
+    assert Enum.count(notifications) == 4
   end
 
-  describe "classrooms/1" do
-    test "behaves as expected" do
-      Factory.insert_list(5, :classroom)
-      user = Factory.insert(:user, classrooms: Factory.insert_list(4, :classroom))
+  test "classrooms/1 behaves as expected" do
+    Factory.insert_list(5, :classroom)
+    user = Factory.insert(:user, classrooms: Factory.insert_list(4, :classroom))
 
-      classrooms = Users.classrooms(user.id)
-      assert Enum.count(classrooms) == 4
-    end
+    classrooms = Users.classrooms(user.id)
+    assert Enum.count(classrooms) == 4
   end
 end

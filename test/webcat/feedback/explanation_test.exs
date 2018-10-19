@@ -3,9 +3,7 @@ defmodule WebCAT.Feedback.ExplanationTest do
 
   alias WebCAT.Feedback.Explanation
 
-  describe "changeset/2" do
-    test "behaves as expected" do
-      assert Explanation.changeset(%Explanation{}, Factory.params_with_assocs(:explanation)).valid?
-    end
+  test "changeset/2 behaves as expected" do
+    assert Explanation.changeset(%Explanation{}, Factory.params_with_assocs(:explanation)).valid?
   end
 end
