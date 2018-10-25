@@ -11,8 +11,8 @@
                         <h2 class="subtitle"><%= escape(@classroom.course_code <> " " <> @classroom.section) %></h2>
                     </div>
                     <div class="level-right">
-                        <div class="level-item"><%= icon_button("Edit", "wrench", to: classrooms_path(@conn, :edit, @classroom.id), class: "is-primary") %></div>                        
-                        <div class="level-item"><%= icon_button("Delete", "times-square", to: classrooms_path(@conn, :delete, @classroom.id), class: "is-error") %></div>                        
+                        <div class="level-item"><%= icon_button("Edit", "wrench", to: Routes.classrooms_path(@conn, :edit, @classroom.id), class: "is-primary") %></div>                        
+                        <div class="level-item"><%= icon_button("Delete", "times-square", to: Routes.classrooms_path(@conn, :delete, @classroom.id), class: "is-error") %></div>                        
                     </div>
                 </div>
                 <%= render(WebCATWeb.ClassroomsView, "classroom.html", conn: @conn, classroom: clean_classroom(@classroom)) %>

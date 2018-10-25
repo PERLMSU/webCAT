@@ -46,10 +46,10 @@ defmodule WebCATWeb.RotationsController do
 
     with :ok <- Bodyguard.permit(WebCAT.Rotations, :create_rotation, user) do
       case CRUD.create(Rotation, params) do
-        {:ok, rotation} ->
+        {:ok, _rotation} ->
           conn
           |> put_flash(:info, "Rotation created!")
-          |> redirect(to: dashboard_path(conn, :index))
+          |> redirect(to: Routes.dashboard_path(conn, :index))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "new.html", changeset: changeset, user: user)
@@ -75,10 +75,10 @@ defmodule WebCATWeb.RotationsController do
 
     with :ok <- Bodyguard.permit(WebCAT.Rotations, :update_rotation, user) do
       case CRUD.update(Rotation, id, params) do
-        {:ok, rotation} ->
+        {:ok, _rotation} ->
           conn
           |> put_flash(:info, "Rotation updated!")
-          |> redirect(to: dashboard_path(conn, :index))
+          |> redirect(to: Routes.dashboard_path(conn, :index))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html", changeset: changeset, user: user)
@@ -90,10 +90,10 @@ defmodule WebCATWeb.RotationsController do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
     with :ok <- Bodyguard.permit(WebCAT.Rotations, :delete_rotation, user),
-         {:ok, rotation} <- CRUD.delete(Rotation, id) do
+         {:ok, _rotation} <- CRUD.delete(Rotation, id) do
       conn
       |> put_flash(:info, "Rotation deleted!")
-      |> redirect(to: dashboard_path(conn, :index))
+      |> redirect(to: Routes.dashboard_path(conn, :index))
     end
   end
 end

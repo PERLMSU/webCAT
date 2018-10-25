@@ -19,7 +19,7 @@
         <%= for semester <- Enum.map(@semesters, &clean_semester/1) do %>
         <tr>
             <td>
-                <%= link((html_escape(semester.title) |> safe_to_string()), to: semesters_path(@conn, :show, semester.id)) %>
+                <%= link((html_escape(semester.title) |> safe_to_string()), to: Routes.semesters_path(@conn, :show, semester.id)) %>
             </td>
             <td>
                 <%= semester.start_date %>
@@ -28,7 +28,7 @@
                 <%= semester.end_date %>
             </td>
             <td>
-                <%= icon_button("Edit", "wrench", to: semesters_path(@conn, :edit, semester.id), class: "is-primary") %>
+                <%= icon_button("Edit", "wrench", to: Routes.semesters_path(@conn, :edit, semester.id), class: "is-primary") %>
             </td>
         </tr>
         <% end %>

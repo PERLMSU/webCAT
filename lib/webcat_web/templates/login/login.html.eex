@@ -9,7 +9,7 @@
                         </figure>
                         <h1 class="title has-text-dark">WebCAT</h1>
                         <h2 class="subtitle has-text-dark">Please Log In</h2>
-                        <%= form_for @conn, login_path(@conn, :login), fn f -> %>
+                        <%= form_for @conn, Routes.login_path(@conn, :login), fn f -> %>
                         <div class="field">
                             <label class="label">Email</label>
                             <div class="control has-icons-left">
@@ -35,7 +35,7 @@
                                 <%= submit "Login", class: "button is-primary" %>
                             </p>
                             <p class="control">
-                                <%= link("Reset Password", to: password_reset_path(@conn, :index), class: "button is-link") %>
+                                <%= link("Reset Password", to: Routes.password_reset_path(@conn, :index), class: "button is-link") %>
                             </p>
                         </div>
                         <% end %>

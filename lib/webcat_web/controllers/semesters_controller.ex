@@ -43,7 +43,7 @@ defmodule WebCATWeb.SemestersController do
         {:ok, semester} ->
           conn
           |> put_flash(:info, ~s(Semester "#{semester.title}" created!))
-          |> redirect(to: semesters_path(conn, :index))
+          |> redirect(to: Routes.semesters_path(conn, :index))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "new.html", changeset: changeset, user: user)
@@ -68,7 +68,7 @@ defmodule WebCATWeb.SemestersController do
         {:ok, semester} ->
           conn
           |> put_flash(:info, ~s(Semester "#{semester.title}" updated!))
-          |> redirect(to: semesters_path(conn, :index))
+          |> redirect(to: Routes.semesters_path(conn, :index))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html", changeset: changeset, user: user)
@@ -83,7 +83,7 @@ defmodule WebCATWeb.SemestersController do
          {:ok, semester} <- CRUD.delete(Semester, id) do
       conn
       |> put_flash(:info, ~s(Semester "#{semester.title}" deleted!))
-      |> redirect(to: semesters_path(conn, :index))
+      |> redirect(to: Routes.semesters_path(conn, :index))
     end
   end
 end

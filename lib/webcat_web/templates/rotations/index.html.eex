@@ -17,7 +17,7 @@
                         </div>
                         <div class="level-right">
                             <div class="level-item">
-                                <%= icon_button("New", "plus", to: rotations_path(@conn, :new), class: "is-primary") %>
+                                <%= icon_button("New", "plus", to: Routes.rotations_path(@conn, :new), class: "is-primary") %>
                             </div>
                         </div>
                     </div>

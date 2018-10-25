@@ -7,4 +7,4 @@
 <p>Description:
     <%= @classroom.description%>
 </p>
-<p>Semester: <%= link(escape(@classroom.semester.title), to: semesters_path(@conn, :show, @classroom.semester.id)) %></p>
+<p>Semester: <%= link(escape(@classroom.semester.title), to: Routes.semesters_path(@conn, :show, @classroom.semester.id)) %></p>

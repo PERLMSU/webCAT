@@ -13,7 +13,7 @@
         <div class="navbar-menu">
             <div class="navbar-start">
                 <%= if @user.role == "admin" do %>
-                <%= link("Dashboard", to: dashboard_path(@conn, :index), class: "navbar-item") %>
+                <%= link("Dashboard", to: Routes.dashboard_path(@conn, :index), class: "navbar-item") %>
                 <% end %>
                 <%= link("Inbox", to: "", class: "navbar-item") %>
                 <%= link("Feedback", to: "", class: "navbar-item") %>
@@ -24,9 +24,9 @@
                         <%= @user.first_name <> " " <> @user.last_name %>
                     </a>
                     <div class="navbar-dropdown">
-                        <%= link("Profile", to: users_path(@conn, :show, @user.id), class: "navbar-item") %>
+                        <%= link("Profile", to: Routes.users_path(@conn, :show, @user.id), class: "navbar-item") %>
                         <hr class="navbar-divider">
-                        <%= link("Log Out", to: login_path(@conn, :logout), class: "navbar-item") %>
+                        <%= link("Log Out", to: Routes.login_path(@conn, :logout), class: "navbar-item") %>
                     </div>
                 </div>
             </div>

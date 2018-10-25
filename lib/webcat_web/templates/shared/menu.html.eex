@@ -3,28 +3,28 @@
         General
     </p>
     <ul class="menu-list">
-        <li><%= link("Dashboard", to: dashboard_path(@conn, :index), class: (if @selected == :dashboard, do: "is-active", else: "")) %></li>
-        <li><%= link("Import/Export", to: dashboard_path(@conn, :import_export), class: (if @selected == :import_export, do: "is-active", else: "")) %></li>
+        <li><%= link("Dashboard", to: Routes.dashboard_path(@conn, :index), class: (if @selected == :dashboard, do: "is-active", else: "")) %></li>
+        <li><%= link("Import/Export", to: Routes.dashboard_path(@conn, :import_export), class: (if @selected == :import_export, do: "is-active", else: "")) %></li>
     </ul>
     <p class="menu-label">
         Rotations
     </p>
     <ul class="menu-list">
-        <li><%= link("Semesters", to: semesters_path(@conn, :index), class: (if @selected == :semesters, do: "is-active", else: "")) %></li>
-        <li><%= link("Classrooms", to: classrooms_path(@conn, :index), class: (if @selected == :classrooms, do: "is-active", else: "")) %></li>
-        <li><%= link("Rotations", to: rotations_path(@conn, :index), class: (if @selected == :rotations, do: "is-active", else: "")) %></li>
-        <li><%= link("Rotation Groups", to: rotation_groups_path(@conn, :index), class: (if @selected == :rotation_groups, do: "is-active", else: "")) %></li>
+        <li><%= link("Semesters", to: Routes.semesters_path(@conn, :index), class: (if @selected == :semesters, do: "is-active", else: "")) %></li>
+        <li><%= link("Classrooms", to: Routes.classrooms_path(@conn, :index), class: (if @selected == :classrooms, do: "is-active", else: "")) %></li>
+        <li><%= link("Rotations", to: Routes.rotations_path(@conn, :index), class: (if @selected == :rotations, do: "is-active", else: "")) %></li>
+        <li><%= link("Rotation Groups", to: Routes.rotation_groups_path(@conn, :index), class: (if @selected == :rotation_groups, do: "is-active", else: "")) %></li>
     </ul>
     <p class="menu-label">
         Feedback
     </p>
     <ul class="menu-list">
-        <li><%= link("Categories", to: categories_path(@conn, :index), class: (if @selected == :categories, do: "is-active", else: "")) %></li>
+        <li><%= link("Categories", to: Routes.categories_path(@conn, :index), class: (if @selected == :categories, do: "is-active", else: "")) %></li>
     </ul>
     <p class="menu-label">
         Accounts
     </p>
     <ul class="menu-list">
-        <li><%= link("Users", to: users_path(@conn, :index), class: (if @selected == :users, do: "is-active", else: "")) %></li>
+        <li><%= link("Users", to: Routes.users_path(@conn, :index), class: (if @selected == :users, do: "is-active", else: "")) %></li>
     </ul>
 </aside>

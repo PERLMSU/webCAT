@@ -5,7 +5,7 @@
                 <div class="column is-half">
                     <div class="box">
                         <h1 class="title has-text-dark">Reset Password</h1>
-                        <%= form_for @conn, password_reset_path(@conn, :finish_reset, @token), fn f ->%>
+                        <%= form_for @conn, Routes.password_reset_path(@conn, :finish_reset, @token), fn f ->%>
                         <div class="field has-addons">
                             <div class="control is-expanded has-icons-left">
                                 <%= password_input(f, :password, placeholder: "Password", class: "input") %>

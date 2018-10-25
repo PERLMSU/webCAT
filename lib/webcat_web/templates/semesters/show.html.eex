@@ -14,10 +14,10 @@
                     </div>
                     <div class="level-right">
                         <div class="level-item">
-                            <%= icon_button("Edit", "wrench", to: semesters_path(@conn, :edit, @semester.id), class: "is-primary") %>
+                            <%= icon_button("Edit", "wrench", to: Routes.semesters_path(@conn, :edit, @semester.id), class: "is-primary") %>
                         </div>
                         <div class="level-item">
-                            <%= icon_button("Delete", "times-square", to: semesters_path(@conn, :delete, @semester.id), class: "is-error") %>
+                            <%= icon_button("Delete", "times-square", to: Routes.semesters_path(@conn, :delete, @semester.id), class: "is-error") %>
                         </div>
                     </div>
                 </div>

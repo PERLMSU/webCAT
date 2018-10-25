@@ -1,4 +1,4 @@
-<%= form_for @changeset, (if @changeset.data.id == nil, do: rotations_path(@conn, :create), else: rotations_path(@conn, :update, @changeset.data.id)), fn f -> %>
+<%= form_for @changeset, (if @changeset.data.id == nil, do: Routes.rotations_path(@conn, :create), else: Routes.rotations_path(@conn, :update, @changeset.data.id)), fn f -> %>
 <%= form_field(f, :start_date, :date) %>
 <%= form_field(f, :end_date, :date) %>
 <div class="field">

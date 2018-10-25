@@ -10,11 +10,11 @@ defmodule WebCATWeb.IndexController do
     case WebCATWeb.Auth.Guardian.Plug.current_resource(conn) do
       %User{} ->
         conn
-        |> redirect(to: dashboard_path(conn, :index))
+        |> redirect(to: Routes.dashboard_path(conn, :index))
       _ ->
         conn
         |> put_flash(:error, "please log in")
-        |> redirect(to: login_path(conn, :index))
+        |> redirect(to: Routes.login_path(conn, :index))
     end
   end
 end

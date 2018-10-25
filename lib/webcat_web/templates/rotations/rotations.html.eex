@@ -17,13 +17,13 @@
                 <%= for rotation <- Enum.map(@rotations, &clean_rotation/1) do %>
                 <tr>
                         <td>
-                                <%= link(escape(rotation.start_date), to: rotations_path(@conn, :show, rotation.id)) %>
+                                <%= link(escape(rotation.start_date), to: Routes.rotations_path(@conn, :show, rotation.id)) %>
                         </td>
                         <td>
                                 <%= escape(rotation.end_date) %>
                         </td>
                         <td>
-                                <%= icon_button("Edit", "wrench", to: rotations_path(@conn, :edit, rotation.id), class: "is-primary") %>
+                                <%= icon_button("Edit", "wrench", to: Routes.rotations_path(@conn, :edit, rotation.id), class: "is-primary") %>
                         </td>
                 </tr>
                 <% end %>

@@ -22,7 +22,8 @@ defmodule WebCATWeb.ClassroomsController do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
     with :ok <- Bodyguard.permit(WebCAT.Rotations, :show_classroom, user),
-         {:ok, classroom} <- CRUD.get(Classroom, id, preload: [:semester, :rotations, :students, :instructors]) do
+         {:ok, classroom} <-
+           CRUD.get(Classroom, id, preload: [:semester, :rotations, :students, :instructors]) do
       render(conn, "show.html", classroom: classroom, user: user)
     end
   end
@@ -48,7 +49,7 @@ defmodule WebCATWeb.ClassroomsController do
         {:ok, classroom} ->
           conn
           |> put_flash(:info, ~s(Classroom "#{classroom.course_code}" created!))
-          |> redirect(to: classrooms_path(conn, :index))
+          |> redirect(to: Routes.classrooms_path(conn, :index))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "new.html",
@@ -81,7 +82,7 @@ defmodule WebCATWeb.ClassroomsController do
         {:ok, classroom} ->
           conn
           |> put_flash(:info, ~s(Classroom "#{classroom.course_code}" updated!))
-          |> redirect(to: classrooms_path(conn, :index))
+          |> redirect(to: Routes.classrooms_path(conn, :index))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -100,7 +101,7 @@ defmodule WebCATWeb.ClassroomsController do
          {:ok, classroom} <- CRUD.delete(Classroom, id) do
       conn
       |> put_flash(:info, ~s(Classroom "#{classroom.course_code}" deleted!))
-      |> redirect(to: classrooms_path(conn, :index))
+      |> redirect(to: Routes.classrooms_path(conn, :index))
     end
   end
 end

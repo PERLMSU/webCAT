@@ -17,7 +17,7 @@ defmodule WebCATWeb.PasswordResetController do
 
     conn
     |> put_flash(:info, "Password reset sent!")
-    |> redirect(to: password_reset_path(conn, :index))
+    |> redirect(to: Routes.password_reset_path(conn, :index))
   end
 
   def reset(conn, %{"token" => token}) do
@@ -25,7 +25,7 @@ defmodule WebCATWeb.PasswordResetController do
       {:error, _} ->
         conn
         |> put_flash(:error, "Password reset token not recognized.")
-        |> redirect(to: login_path(conn, :index))
+        |> redirect(to: Routes.login_path(conn, :index))
 
       _ ->
         render(conn, "reset.html", conn: conn, token: token)
@@ -38,17 +38,17 @@ defmodule WebCATWeb.PasswordResetController do
       {:error, :not_found} ->
         conn
         |> put_flash(:error, "Password reset token not recognized.")
-        |> redirect(to: login_path(conn, :index))
+        |> redirect(to: Routes.login_path(conn, :index))
 
       {:error, changeset} ->
         conn
         |> put_flash(:error, "Problem resetting password")
-        |> redirect(to: login_path(conn, :index))
+        |> redirect(to: Routes.login_path(conn, :index))
 
       {:ok, user} ->
         conn
         |> put_flash(:info, "Password for user #{user.username} reset successfully")
-        |> redirect(to: login_path(conn, :index))
+        |> redirect(to: Routes.login_path(conn, :index))
     end
   end
 end

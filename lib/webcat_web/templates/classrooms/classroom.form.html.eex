@@ -1,4 +1,4 @@
-<%= form_for @changeset, (if @changeset.data.id == nil, do: classrooms_path(@conn, :create), else: classrooms_path(@conn, :update, @changeset.data.id)), fn f -> %>
+<%= form_for @changeset, (if @changeset.data.id == nil, do: Routes.classrooms_path(@conn, :create), else: Routes.classrooms_path(@conn, :update, @changeset.data.id)), fn f -> %>
 <%= form_field(f, :course_code, :text) %>
 <%= form_field(f, :section, :text) %>
 <%= form_field(f, :description, :textarea) %>
