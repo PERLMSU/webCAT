@@ -21,8 +21,8 @@ defmodule WebCATWeb do
     quote do
       use Phoenix.Controller, namespace: WebCATWeb
       import Plug.Conn
-      import WebCATWeb.Router.Helpers
       import WebCATWeb.Gettext
+      alias WebCATWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -37,7 +37,7 @@ defmodule WebCATWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import WebCATWeb.Router.Helpers
+      alias WebCATWeb.Router.Helpers, as: Routes
       import WebCATWeb.ViewHelpers
     end
   end

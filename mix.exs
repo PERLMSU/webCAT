@@ -10,8 +10,7 @@ defmodule WebCAT.Mixfile do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps(),
-      test_coverage: [tool: Coverex.Task]
+      deps: deps()
     ]
   end
 
@@ -39,23 +38,23 @@ defmodule WebCAT.Mixfile do
       {:bodyguard, "~> 2.2"},
       {:comeonin, "~> 4.0"},
       {:cors_plug, "~> 1.5"},
-      {:cowboy, "~> 1.0"},
-      {:coverex, "~> 1.4.10", only: :test},
+      {:plug_cowboy, "~> 2.0"},
+      {:plug, "~> 1.7"},
       {:distillery, "~> 2.0", runtime: false},
       {:dialyxir, git: "https://github.com/jeremyjh/dialyxir.git", only: [:dev], runtime: false},
       {:ecto, "~> 2.2.10"},
       {:faker, "~> 0.10", exclude: :prod},
       {:ex_machina, "~> 2.2", exclude: :prod},
       {:gettext, "~> 0.16"},
-      {:guardian, "~> 1.0"},
+      {:guardian, git: "https://github.com/bbuscarino/guardian"},
       {:jason, ">= 1.0.0"},
       {:pbkdf2_elixir, "~> 0.12"},
-      {:phoenix, "~> 1.3.2"},
+      {:phoenix, "~> 1.4.0-rc.2", override: true},
       {:phoenix_pubsub, "~> 1.0"},
-      {:phoenix_ecto, "~> 3.2"},
+      {:phoenix_ecto, "~> 3.5"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
-      {:postgrex, "~> 0.13.5"},
+      {:postgrex, "~> 0.13.5", override: true},
       {:proper_case, "~> 1.0.2"},
       {:timex, "~> 3.1"}
     ]

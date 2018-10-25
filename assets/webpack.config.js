@@ -1,13 +1,23 @@
 const path = require('path');
+const glob = require('glob');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCSSExtractPlugin = require("mini-css-extract-plugin");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
-module.exports = {
-    entry: ['./js/app.js', './scss/styles.scss'],
+module.exports = (env, options) => ({
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({ cache: true, parallel: true, sourceMap: false }),
+            new OptimizeCSSAssetsPlugin({})
+        ]
+    },
+    entry: {
+        app: './js/app.js',
+    },
     output: {
-        filename: 'js/main.js',
-        path: path.resolve(__dirname, '../priv/static'),
-        publicPath: "/static"
+        filename: '[name].js',
+        path: path.resolve(__dirname, '../priv/static/js')
     },
     module: {
         rules: [
@@ -15,30 +25,24 @@ module.exports = {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'babel-loader',
-                },
+                    loader: 'babel-loader'
+                }
             },
             {
                 test: /\.scss$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
-                    "css-loader",
-                    "sass-loader"
+                    MiniCSSExtractPlugin.loader,
+                    {loader: 'css-loader', options: {importLoaders: 1}},
+                    'postcss-loader',
+                    'sass-loader'
                 ]
-            }
-        ],
-    },
-    resolve: {
-        modules: ['node_modules', path.resolve(__dirname, 'js')],
-        extensions: ['.js'],
+            },
+
+            {test: /\.css$/, use: [MiniCSSExtractPlugin.loader, 'css-loader']},
+        ]
     },
     plugins: [
-        new CopyWebpackPlugin([{ from: "./static", to: path.resolve(__dirname, "../priv/static/") }]),
-        new MiniCssExtractPlugin({
-            // Options similar to the same options in webpackOptions.output
-            // both options are optional
-            filename: "css/[name].css",
-            chunkFilename: "css/[id].css"
-        })
+        new MiniCSSExtractPlugin({ filename: '../css/[name].css' }),
+        new CopyWebpackPlugin([{ from: 'static/', to: '../' }])
     ]
-};
+});
