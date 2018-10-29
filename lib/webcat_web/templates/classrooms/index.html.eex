@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     <hr>
-                    <%= render(WebCATWeb.ClassroomsView, "classrooms.html", conn: @conn, classrooms: @classrooms) %>
+                    <%= render(WebCATWeb.CRUDView, "table.html", conn: @conn, data: Enum.map(@classrooms, &clean_classroom/1), route_function: &Routes.classrooms_path/3, keys: ~w(id course_code section description)a) %>
                 </div>
             </div>
         </div>

@@ -4,5 +4,6 @@ defmodule WebCATWeb.ClassroomsView do
   def clean_classroom(classroom) do
     classroom
     |> Map.from_struct()
+    |> Map.drop(~w(__meta__)a)
   end
 end

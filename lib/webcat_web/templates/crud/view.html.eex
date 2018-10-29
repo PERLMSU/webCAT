@@ -1,0 +1,13 @@
+<p>Name:
+    <%= @semester.title%>
+</p>
+<p>Start Date:
+    <%= @semester.start_date%>
+</p>
+<p>End Date:
+    <%= @semester.end_date%>
+</p>
+<%= if is_list(@semester.classrooms) do %>
+<h2 class="subtitle is-2">Classrooms</h2>
+<%= render(WebCATWeb.ClassroomsView, "classrooms.html", conn: @conn, classrooms: @semester.classrooms) %>
+<% end %>

@@ -1,0 +1,9 @@
+<table class="table">
+    <%= if Enum.count(@data) > 0 do %>
+    <%= table_header(@keys) %>
+    <%= if Enum.count(@data) > 25 do %>
+    <%= table_footer(@keys)%>
+    <% end %>
+    <% end %>
+    <%= table_body(@data, @route_function, keys: @keys)%>
+</table>

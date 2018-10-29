@@ -1,30 +1,30 @@
 <section class="section">
-        <div class="container">
-            <h1 class="title">Dashboard</h1>
-            <div class="columns">
-                <div class="column is-one-fifth">
-                    <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :rotation_groups) %>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <div class="level">
-                            <div class="level-left">
-                                <div class="level-item">
-                                    <h2 class="subtitle">
-                                        Rotation Groups
-                                    </h2>
-                                </div>
-                            </div>
-                            <div class="level-right">
-                                <div class="level-item">
-                                    <%= icon_button("New", "plus", to: Routes.rotation_groups_path(@conn, :new), class: "is-primary") %>
-                                </div>
+    <div class="container">
+        <h1 class="title">Dashboard</h1>
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :rotation_groups) %>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <h2 class="subtitle">
+                                    Rotation Groups
+                                </h2>
                             </div>
                         </div>
-                        <hr>
-                        <%= render(WebCATWeb.RotationGroupsView, "rotation_groups.html", conn: @conn, rotation_groups: @rotation_groups) %>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <%= icon_button("New", "plus", to: Routes.rotation_groups_path(@conn, :new), class: "is-primary") %>
+                            </div>
+                        </div>
                     </div>
+                    <hr>
+                    <%= render(WebCATWeb.CRUDView, "table.html", conn: @conn, data: Enum.map(@rotation_groups, &clean_rotation_group/1), route_function: &Routes.rotation_groups_path/3, keys: ~w(id number description)a) %>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>

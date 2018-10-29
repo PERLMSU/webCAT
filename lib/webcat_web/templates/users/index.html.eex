@@ -3,7 +3,7 @@
         <h1 class="title">Dashboard</h1>
         <div class="columns">
             <div class="column is-one-fifth">
-                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :semesters) %>
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :rotation_groups) %>
             </div>
             <div class="column">
                 <div class="box">
@@ -11,18 +11,18 @@
                         <div class="level-left">
                             <div class="level-item">
                                 <h2 class="subtitle">
-                                    Semesters
+                                    Users
                                 </h2>
                             </div>
                         </div>
                         <div class="level-right">
                             <div class="level-item">
-                                <%= icon_button("New", "plus", to: Routes.semesters_path(@conn, :new), class: "is-primary") %>
+                                <%= icon_button("New", "plus", to: Routes.rotation_groups_path(@conn, :new), class: "is-primary") %>
                             </div>
                         </div>
                     </div>
                     <hr>
-                    <%= render(WebCATWeb.CRUDView, "table.html", conn: @conn, data: Enum.map(@semesters, &clean_semester/1), route_function: &Routes.semesters_path/3, keys: ~w(id title start_date end_date)a) %>
+                    <%= render(WebCATWeb.CRUDView, "table.html", conn: @conn, data: Enum.map(@users, &clean_user/1), route_function: &Routes.users_path/3, keys: ~w(id username first_name last_name)a) %>
                 </div>
             </div>
         </div>

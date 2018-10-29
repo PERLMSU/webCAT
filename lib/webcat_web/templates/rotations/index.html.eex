@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     <hr>
-                    <%= render(WebCATWeb.RotationsView, "rotations.html", conn: @conn, rotations: @rotations) %>
+                    <%= render(WebCATWeb.CRUDView, "table.html", conn: @conn, data: Enum.map(@rotations, &clean_rotation/1), route_function: &Routes.rotations_path/3, keys: ~w(id start_date end_date)a) %>
                 </div>
             </div>
         </div>

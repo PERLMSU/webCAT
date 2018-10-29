@@ -4,7 +4,7 @@ defmodule WebCATWeb.PasswordResetController do
 
   use WebCATWeb, :controller
 
-  alias WebCAT.Accounts.{PasswordReset, PasswordResets}
+  alias WebCAT.Accounts.PasswordResets
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -40,7 +40,7 @@ defmodule WebCATWeb.PasswordResetController do
         |> put_flash(:error, "Password reset token not recognized.")
         |> redirect(to: Routes.login_path(conn, :index))
 
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Problem resetting password")
         |> redirect(to: Routes.login_path(conn, :index))

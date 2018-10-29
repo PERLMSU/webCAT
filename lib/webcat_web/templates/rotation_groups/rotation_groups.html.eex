@@ -1,0 +1,37 @@
+<table class="table">
+    <%= if Enum.count(@rotation_groups) > 0 do %>
+    <thead>
+        <th>Number</th>
+        <th>Description</th>
+        <th></th>
+    </thead>
+    <%= if Enum.count(@rotation_groups) > 25 do %>
+    <tfoot>
+        <th>Number</th>
+        <th>Description</th>
+        <th></th>
+    </tfoot>
+    <% end %>
+
+    <tbody>
+        <%= for rotation_group <- Enum.map(@rotation_groups, &clean_rotation_group/1) do %>
+        <tr>
+            <td>
+                <%= link((html_escape(rotation_group.number) |> safe_to_string()), to: Routes.rotation_groups_path(@conn, :show, rotation_group.id)) %>
+            </td>
+            <td>
+                <%= html_escape(rotation_group.description) |> safe_to_string() %>
+            </td>
+            <td>
+                <%= icon_button("Edit", "wrench", to: Routes.rotation_groups_path(@conn, :edit, rotation_group.id), class: "is-primary") %>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+
+    <% else %>
+    <tr>
+        <td>There are no rotation groups currently</td>
+    </tr>
+    <% end %>
+</table>

@@ -7,9 +7,6 @@ defmodule WebCATWeb.DashboardController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  alias WebCAT.Rotations.{Semester, Classroom}
-  alias WebCAT.CRUD
-
   def index(conn, _params) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 

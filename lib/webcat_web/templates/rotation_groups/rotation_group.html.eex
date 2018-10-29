@@ -1,0 +1,12 @@
+<p>Number:
+    <%= @rotation_group.number%>
+</p>
+<p>Description:
+    <%= @rotation_group.description%>
+</p>
+<p>Rotation: <%= link(escape(@rotation_group.rotation.title), to: Routes.semesters_path(@conn, :show, @rotation_group.semester.id)) %></p>
+<p>Instructor: <%= link(escape(@rotation_group.instructor.title), to: Routes.semesters_path(@conn, :show, @rotation_group.semester.id)) %></p>
+<%= if is_list(@rotation_group.students) do %>
+<h2 class="subtitle is-2">Students</h2>
+<%= render(WebCATWeb.StudentsView, "students.html", conn: @conn, students: @rotation_group.students) %>
+<% end %>
