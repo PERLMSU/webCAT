@@ -26,4 +26,8 @@ defmodule WebCAT.Rotations.RotationGroup do
     |> foreign_key_constraint(:rotation_id)
     |> foreign_key_constraint(:instructor_id)
   end
+
+  def title_for(rotation_group) do
+    "Group #{rotation_group.number}"
+  end
 end

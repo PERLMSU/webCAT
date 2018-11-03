@@ -1,0 +1,6 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">Create New User</h1>
+        <%= render(WebCATWeb.CRUDView, "form.html", conn: @conn, changeset: @changeset, route_name: "users") %>
+    </div>
+</section>

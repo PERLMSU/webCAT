@@ -22,4 +22,8 @@ defmodule WebCAT.Feedback.Category do
     |> foreign_key_constraint(:parent_category_id)
     |> unique_constraint(:name)
   end
+
+  def title_for(category) do
+    category.name
+  end
 end

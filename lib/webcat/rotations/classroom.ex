@@ -27,4 +27,8 @@ defmodule WebCAT.Rotations.Classroom do
     |> validate_required(@required)
     |> foreign_key_constraint(:semester_id)
   end
+
+  def title_for(classroom) do
+    "#{classroom.course_code} - #{classroom.section}"
+  end
 end

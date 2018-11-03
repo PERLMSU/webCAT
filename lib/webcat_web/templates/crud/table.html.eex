@@ -5,5 +5,5 @@
     <%= table_footer(@keys)%>
     <% end %>
     <% end %>
-    <%= table_body(@data, @route_function, keys: @keys)%>
+    <%= table_body(@data, keys: @keys, route_function: @route_function)%>
 </table>

@@ -65,4 +65,8 @@ defmodule WebCAT.Accounts.User do
   end
 
   defp put_pass_hash(changeset), do: changeset
+
+  def title_for(user) do
+    "#{user.first_name} #{user.last_name}"
+  end
 end

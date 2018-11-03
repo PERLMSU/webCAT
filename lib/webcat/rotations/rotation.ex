@@ -23,4 +23,8 @@ defmodule WebCAT.Rotations.Rotation do
     |> validate_dates_after(:start_date, :end_date)
     |> foreign_key_constraint(:classroom_id)
   end
+
+  def title_for(rotation) do
+    "Rotation #{Timex.format!(rotation.start_date, "{M} {D}, {YYYY}")} - #{Timex.format!(rotation.end_date, "{M} {D}, {YYYY}")}"
+  end
 end

@@ -4,6 +4,8 @@ defmodule WebCATWeb.ViewHelpers do
   """
   use Phoenix.HTML
 
+  alias WebCAT.CRUD
+
   @doc """
   Generates tag for inlined form input errors.
   """
@@ -30,7 +32,9 @@ defmodule WebCATWeb.ViewHelpers do
     end
   end
 
-  def table_body(data, route_function, options \\ []) do
+  def table_body(data, options \\ []) do
+    route_function = Keyword.fetch!(options, :route_function)
+
     if not Enum.empty?(data) do
       keys = Keyword.get(options, :keys, Map.keys(hd(data)))
 
@@ -87,22 +91,74 @@ defmodule WebCATWeb.ViewHelpers do
 
   @doc """
   Uses schema reflection to create a form for a given changeset
+
+  ## Options
+
+    * `:route_name` - The function for getting the route
   """
-  def generate_form(changeset, route_function, options \\ []) do
-    form_for(
-      changeset,
-      route_function.(WebCATWeb.Endpoint, Keyword.get(options, :action, :create)),
-      fn form ->
-        changeset.data
-        |> Map.from_struct()
-        |> Map.drop(~w(id updated_at inserted_at)a)
-        |> Map.keys()
-        |> Enum.map(fn field ->
-          type = apply(changeset.data.__struct__, :__schema__, [:type, field])
-          form_field(form, field, type)
-        end)
+  def generate_form(changeset, options \\ []) do
+    # Grab schema information using reflection
+    schema_module = changeset.data.__struct__
+    schema_fields = apply(schema_module, :__schema__, [:fields])
+    schema_associations = apply(schema_module, :__schema__, [:associations])
+
+    # Use all fields besides auto generated
+    keys =
+      changeset.data
+      |> Map.drop(~w(id updated_at inserted_at)a)
+      |> Map.keys()
+
+    fields =
+      keys
+      |> Enum.filter(fn field ->
+        field in schema_fields
+      end)
+      |> Enum.sort()
+
+    associations =
+      keys
+      |> Enum.filter(fn field ->
+        field in schema_associations
+      end)
+      |> Enum.map(fn association ->
+        apply(schema_module, :__schema__, [:association, association])
+      end)
+      |> Enum.filter(fn association ->
+        association.relationship == :parent
+      end)
+      |> Enum.sort()
+
+    route_name = Keyword.fetch!(options, :route_name)
+
+    route =
+      case changeset.data.id do
+        nil ->
+          apply(WebCATWeb.Router.Helpers, String.to_atom("#{route_name}_path"), [
+            WebCATWeb.Endpoint,
+            :create
+          ])
+
+        _ ->
+          apply(WebCATWeb.Router.Helpers, String.to_atom("#{route_name}_path"), [
+            WebCATWeb.Endpoint,
+            :update,
+            changeset.data.id
+          ])
       end
-    )
+
+    form_for(changeset, route, fn form ->
+      Enum.map(fields, fn field ->
+        type = apply(schema_module, :__schema__, [:type, field])
+        form_field(form, field, type)
+      end) ++
+        Enum.map(associations, fn association ->
+          association_field(form, association, changeset)
+        end) ++ content_tag(:div, class: "field") do
+          content_tag(:div, class: "control") do
+            submit("Submit", class: "button")
+          end
+        end
+    end)
   end
 
   @doc """
@@ -120,6 +176,35 @@ defmodule WebCATWeb.ViewHelpers do
           end
         end,
         error_tag(form, field)
+      ]
+    end
+  end
+
+  @doc """
+  Generates the html for an association field
+
+  ## Options
+
+    * `:route_function` - The function for getting the route
+  """
+  def association_field(form, association, changeset) do
+    module = association.queryable
+    data = CRUD.list(module)
+
+    content_tag(:div, class: "field") do
+      [
+        label(form, association, title_case(association), class: "label"),
+        content_tag(:div, class: "control") do
+          select(
+            form,
+            association.owner_key,
+            Enum.map(data, &{apply(module, :title_for, [&1]), &1.id}),
+            selected:
+              if(changeset.data[association.owner_key] != nil,
+                do: Integer.to_string(changeset.data[association.owner_key])
+              )
+          )
+        end
       ]
     end
   end

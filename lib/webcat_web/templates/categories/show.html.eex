@@ -3,25 +3,25 @@
         <h1 class="title">Dashboard</h1>
         <div class="columns">
             <div class="column is-one-fifth">
-                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :semesters) %>
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: :categories) %>
             </div>
             <div class="column">
                 <div class="level">
                     <div class="level-left">
                         <h1 class="subtitle is-1">
-                            <%= (html_escape(@semester.title) |> safe_to_string()) %>
+                            <%= (html_escape(@category.name) |> safe_to_string()) %>
                         </h1>
                     </div>
                     <div class="level-right">
                         <div class="level-item">
-                            <%= icon_button("Edit", "wrench", to: Routes.semesters_path(@conn, :edit, @semester.id), class: "is-primary") %>
+                            <%= icon_button("Edit", "wrench", to: Routes.categories_path(@conn, :edit, @category.id), class: "is-primary") %>
                         </div>
                         <div class="level-item">
-                            <%= icon_button("Delete", "times-square", to: Routes.semesters_path(@conn, :delete, @semester.id), class: "is-error") %>
+                            <%= icon_button("Delete", "times-square", to: Routes.categories_path(@conn, :delete, @category.id), class: "is-error") %>
                         </div>
                     </div>
                 </div>
-                <%= render(WebCATWeb.CRUDView, "view.html", conn: @conn, data: clean_semester(@semester)) %>
+                <%= render(WebCATWeb.CRUDView, "view.html", conn: @conn, data: clean_category(@category)) %>
             </div>
         </div>
     </div>

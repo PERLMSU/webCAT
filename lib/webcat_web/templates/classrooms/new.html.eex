@@ -1,6 +1,6 @@
 <section class="section">
     <div class="container">
         <h1 class="title">Create New Classroom</h1>
-        <%= render(WebCATWeb.ClassroomsView, "classroom.form.html", conn: @conn, changeset: @changeset, semesters: @semesters) %>
+        <%= render(WebCATWeb.CRUDView, "form.html", conn: @conn, changeset: @changeset, route_name: "classrooms") %>
     </div>
 </section>

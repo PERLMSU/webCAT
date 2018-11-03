@@ -8,14 +8,20 @@
             <div class="column">
                 <div class="level">
                     <div class="level-left">
-                        <h2 class="subtitle"><%= escape(@classroom.course_code <> " " <> @classroom.section) %></h2>
+                        <h1 class="subtitle is-1">
+                            <%= (html_escape(WebCAT.Rotations.Classroom.title_for(@classroom)) |> safe_to_string()) %>
+                        </h1>
                     </div>
                     <div class="level-right">
-                        <div class="level-item"><%= icon_button("Edit", "wrench", to: Routes.classrooms_path(@conn, :edit, @classroom.id), class: "is-primary") %></div>                        
-                        <div class="level-item"><%= icon_button("Delete", "times-square", to: Routes.classrooms_path(@conn, :delete, @classroom.id), class: "is-error") %></div>                        
+                        <div class="level-item">
+                            <%= icon_button("Edit", "wrench", to: Routes.classrooms_path(@conn, :edit, @classroom.id), class: "is-primary") %>
+                        </div>
+                        <div class="level-item">
+                            <%= icon_button("Delete", "times-square", to: Routes.classrooms_path(@conn, :delete, @classroom.id), class: "is-error") %>
+                        </div>
                     </div>
                 </div>
-                <%= render(WebCATWeb.ClassroomsView, "classroom.html", conn: @conn, classroom: clean_classroom(@classroom)) %>
+                <%= render(WebCATWeb.CRUDView, "view.html", conn: @conn, data: clean_classroom(@classroom)) %>
             </div>
         </div>
     </div>
