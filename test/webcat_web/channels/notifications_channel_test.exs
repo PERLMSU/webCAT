@@ -1,10 +1,10 @@
-defmodule WebcatWeb.NotificationsChannelTest do
-  use WebcatWeb.ChannelCase
+defmodule WebCATWeb.NotificationsChannelTest do
+  use WebCATWeb.ChannelCase
 
   setup do
     {:ok, _, socket} =
-      socket(WebcatWeb.UserSocket, "user_id", %{some: :assign})
-      |> subscribe_and_join(WebcatWeb.NotificationsChannel, "notifications:lobby")
+      socket(WebCATWeb.UserSocket, "user_id", %{some: :assign})
+      |> subscribe_and_join(WebCATWeb.NotificationsChannel, "notifications:lobby")
 
     {:ok, socket: socket}
   end
