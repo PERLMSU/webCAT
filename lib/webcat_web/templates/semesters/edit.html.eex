@@ -1,6 +1,0 @@
-<section class="section">
-    <div class="container">
-        <h1 class="title">Edit Semester</h1>
-        <%= render(WebCATWeb.CRUDView, "form.html", conn: @conn, changeset: @changeset, route_name: "semesters") %>
-    </div>
-</section>

@@ -1,6 +1,10 @@
 defmodule WebCAT.Rotations.Classroom do
+  @behaviour WebCAT.Dashboardable
+  @behaviour Bodyguard.Policy
+
   use Ecto.Schema
   import Ecto.Changeset
+  alias WebCAT.Accounts.User
 
   schema "classrooms" do
     field(:course_code, :string)
@@ -28,7 +32,27 @@ defmodule WebCAT.Rotations.Classroom do
     |> foreign_key_constraint(:semester_id)
   end
 
-  def title_for(classroom) do
-    "#{classroom.course_code} - #{classroom.section}"
+  # Dashboardable behavior
+
+  def title_for(classroom), do: "#{classroom.course_code} - #{classroom.section}"
+
+  def table_fields(), do: ~w(course_code section description)a
+
+  def display(classroom) do
+    classroom
+    |> Map.from_struct()
+    |> Map.drop(~w(__meta__)a)
   end
+
+  # Policy behavior
+
+  def authorize(action, %User{}, _)
+      when action in ~w(list_classrooms show_classroom)a,
+      do: true
+
+  def authorize(action, %User{role: "admin"}, _)
+      when action in ~w(create_classroom update_classroom delete_classroom)a,
+      do: true
+
+  def authorize(_, _, _), do: false
 end

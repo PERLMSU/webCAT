@@ -49,7 +49,7 @@ defmodule WebCAT.Mixfile do
       {:guardian, git: "https://github.com/bbuscarino/guardian"},
       {:jason, ">= 1.0.0"},
       {:pbkdf2_elixir, "~> 0.12"},
-      {:phoenix, "~> 1.4.0-rc.2", override: true},
+      {:phoenix, "~> 1.4.0", override: true},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.5"},
       {:phoenix_html, "~> 2.12"},

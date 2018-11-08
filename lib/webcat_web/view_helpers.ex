@@ -5,6 +5,7 @@ defmodule WebCATWeb.ViewHelpers do
   use Phoenix.HTML
 
   alias WebCAT.CRUD
+  alias WebCATWeb.Router.Helpers, as: Routes
 
   @doc """
   Generates tag for inlined form input errors.
@@ -33,10 +34,12 @@ defmodule WebCATWeb.ViewHelpers do
   end
 
   def table_body(data, options \\ []) do
-    route_function = Keyword.fetch!(options, :route_function)
+    conn = Keyword.get(options, :conn, WebCATWeb.Endpoint)
+    module = Keyword.fetch!(options, :module)
+    collection_name = module.__schema__(:source)
 
     if not Enum.empty?(data) do
-      keys = Keyword.get(options, :keys, Map.keys(hd(data)))
+      keys = module.table_fields()
 
       content_tag(:tbody) do
         Enum.map(data, fn element ->
@@ -45,17 +48,17 @@ defmodule WebCATWeb.ViewHelpers do
               if field == :id do
                 content_tag(:td) do
                   icon_button("Show", "wrench",
-                    to: route_function.(WebCATWeb.Endpoint, :show, element.id),
+                    to: Routes.crud_path(conn, :show, collection_name, element.id),
                     class: "is-primary"
                   )
                 end
               else
-                content_tag(:td, element[field])
+                content_tag(:td, Map.get(element, field))
               end
             end) ++
               content_tag(:td) do
                 icon_button("Edit", "wrench",
-                  to: route_function.(WebCATWeb.Endpoint, :edit, element.id),
+                  to: Routes.crud_path(conn, :edit, collection_name, element.id),
                   class: "is-primary"
                 )
               end
@@ -64,7 +67,7 @@ defmodule WebCATWeb.ViewHelpers do
       end
     else
       content_tag(:tr) do
-        content_tag(:td, "There are no #{Keyword.get(options, :collection, "entries")} currently")
+        content_tag(:td, "There are no #{collection_name |> String.split("_") |> Enum.join(" ") } currently")
       end
     end
   end
@@ -97,21 +100,25 @@ defmodule WebCATWeb.ViewHelpers do
     * `:route_name` - The function for getting the route
   """
   def generate_form(changeset, options \\ []) do
+    conn = Keyword.get(options, :conn, WebCATWeb.Endpoint)
+
     # Grab schema information using reflection
     schema_module = changeset.data.__struct__
-    schema_fields = apply(schema_module, :__schema__, [:fields])
-    schema_associations = apply(schema_module, :__schema__, [:associations])
+    schema_fields = schema_module.__schema__(:fields)
+    schema_associations = schema_module.__schema__(:associations)
+    collection_name = schema_module.__schema__(:source)
 
     # Use all fields besides auto generated
     keys =
       changeset.data
-      |> Map.drop(~w(id updated_at inserted_at)a)
+      |> Map.drop(~w(id updated_at inserted_at password)a)
       |> Map.keys()
 
     fields =
       keys
       |> Enum.filter(fn field ->
-        field in schema_fields
+        # TODO: Find a better way to get fields
+        field in schema_fields and not String.ends_with?(Atom.to_string(field), "_id")
       end)
       |> Enum.sort()
 
@@ -121,39 +128,29 @@ defmodule WebCATWeb.ViewHelpers do
         field in schema_associations
       end)
       |> Enum.map(fn association ->
-        apply(schema_module, :__schema__, [:association, association])
+        schema_module.__schema__(:association, association)
       end)
       |> Enum.filter(fn association ->
+        # TODO: Support other relationships
         association.relationship == :parent
       end)
       |> Enum.sort()
 
-    route_name = Keyword.fetch!(options, :route_name)
-
     route =
       case changeset.data.id do
-        nil ->
-          apply(WebCATWeb.Router.Helpers, String.to_atom("#{route_name}_path"), [
-            WebCATWeb.Endpoint,
-            :create
-          ])
-
-        _ ->
-          apply(WebCATWeb.Router.Helpers, String.to_atom("#{route_name}_path"), [
-            WebCATWeb.Endpoint,
-            :update,
-            changeset.data.id
-          ])
+        nil -> Routes.crud_path(conn, :create, collection_name)
+        _ -> Routes.crud_path(conn, :update, collection_name, changeset.data.id)
       end
 
     form_for(changeset, route, fn form ->
       Enum.map(fields, fn field ->
-        type = apply(schema_module, :__schema__, [:type, field])
+        type = schema_module.__schema__(:type, field)
         form_field(form, field, type)
       end) ++
         Enum.map(associations, fn association ->
           association_field(form, association, changeset)
-        end) ++ content_tag(:div, class: "field") do
+        end) ++
+        content_tag(:div, class: "field") do
           content_tag(:div, class: "control") do
             submit("Submit", class: "button")
           end
@@ -164,15 +161,17 @@ defmodule WebCATWeb.ViewHelpers do
   @doc """
 
   """
-  def form_field(form, field, type) when type in ~w(string datetime date)a do
+  def form_field(form, field, type) when type in ~w(string integer datetime date boolean)a do
     content_tag(:div, class: "field") do
       [
         label(form, field, title_case(field), class: "label"),
         content_tag(:div, class: "control") do
           case type do
             :string -> text_input(form, field, class: "input")
+            :integer -> number_input(form, field, class: "input")
             :date -> date_input(form, field, class: "input")
             :datetime -> date_input(form, field, class: "input")
+            :boolean -> checkbox(form, field)
           end
         end,
         error_tag(form, field)
@@ -193,15 +192,17 @@ defmodule WebCATWeb.ViewHelpers do
 
     content_tag(:div, class: "field") do
       [
-        label(form, association, title_case(association), class: "label"),
+        label(form, association.field, title_case(association.field), class: "label"),
         content_tag(:div, class: "control") do
           select(
             form,
             association.owner_key,
-            Enum.map(data, &{apply(module, :title_for, [&1]), &1.id}),
+            [{"None", nil}] ++ (Enum.map(data, &{apply(module, :title_for, [&1]), &1.id}) |> Enum.filter(fn {_title, id} ->
+              Map.get(changeset.data, association.owner_key) != id
+            end)),
             selected:
-              if(changeset.data[association.owner_key] != nil,
-                do: Integer.to_string(changeset.data[association.owner_key])
+              if(Map.get(changeset.data, association.owner_key) != nil,
+                do: Integer.to_string(Map.get(changeset.data, association.owner_key))
               )
           )
         end

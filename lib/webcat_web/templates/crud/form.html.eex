@@ -1,1 +1,7 @@
-<%= generate_form(@changeset, route_name: @route_name)%>
+<%# @changeset holds the changeset %>
+<section class="section">
+    <div class="container">
+        <h1 class="title"><%= if @changeset.data.id, do: "Edit", else: "Create New" %> <%= @changeset.data.__struct__ |> to_string() |> String.split(".") |> List.last() %></h1>
+        <%= generate_form(@changeset)%>
+    </div>
+</section>

@@ -35,14 +35,7 @@ defmodule WebCATWeb.Router do
     get("/dashboard", DashboardController, :index)
     get("/dashboard/import_export", DashboardController, :import_export)
 
-    resources("/semesters", SemestersController)
-    resources("/classrooms", ClassroomsController)
-    resources("/rotations", RotationsController)
-    resources("/rotation_groups", RotationGroupsController)
-
-    resources("/categories", CategoriesController)
-
-    resources("/users", UsersController)
+    resources("/:resource", CRUDController)
 
     get("/logout", LoginController, :logout)
   end

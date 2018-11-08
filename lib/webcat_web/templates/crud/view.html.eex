@@ -1,3 +1,0 @@
-<%= for key <- (Map.drop(@data, ~w(id)a) |> Map.keys() |> Enum.sort) do %>
-    <p><strong><%= title_case(key) %>:</strong> <%= @data[key] %></p>
-<% end %>

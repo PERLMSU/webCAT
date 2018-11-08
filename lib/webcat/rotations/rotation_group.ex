@@ -1,6 +1,10 @@
 defmodule WebCAT.Rotations.RotationGroup do
+  @behaviour WebCAT.Dashboardable
+  @behaviour Bodyguard.Policy
+
   use Ecto.Schema
   import Ecto.Changeset
+  alias WebCAT.Accounts.User
 
   schema "rotation_groups" do
     field(:description, :string)
@@ -27,7 +31,25 @@ defmodule WebCAT.Rotations.RotationGroup do
     |> foreign_key_constraint(:instructor_id)
   end
 
-  def title_for(rotation_group) do
-    "Group #{rotation_group.number}"
+  def title_for(rotation_group), do: "Group #{rotation_group.number}"
+
+  def table_fields(), do: ~w(number description)a
+
+  def display(rotation_group) do
+    rotation_group
+    |> Map.from_struct()
+    |> Map.drop(~w(__meta__)a)
   end
+
+  # Policy behavior
+
+  def authorize(action, %User{}, _)
+      when action in ~w(list_rotation_groups show_rotation_group)a,
+      do: true
+
+  def authorize(action, %User{role: "admin"}, _)
+      when action in ~w(create_rotation_group update_rotation_group delete_rotation_group)a,
+      do: true
+
+  def authorize(_, _, _), do: false
 end

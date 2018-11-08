@@ -1,6 +1,9 @@
 defmodule WebCAT.Rotations.Student do
+  @behaviour WebCAT.Dashboardable
+
   use Ecto.Schema
   import Ecto.Changeset
+  alias WebCAT.Accounts.User
 
   schema "students" do
     field(:first_name, :string)
@@ -27,4 +30,26 @@ defmodule WebCAT.Rotations.Student do
     |> foreign_key_constraint(:classroom_id)
     |> unique_constraint(:email)
   end
+
+  def title_for(student), do: "#{student.first_name} #{student.last_name}"
+
+  def table_fields(), do: ~w(last_name first_name email description)a
+
+  def display(student) do
+    student
+    |> Map.from_struct()
+    |> Map.drop(~w(__meta__))
+  end
+
+  # Policy behavior
+
+  def authorize(action, %User{}, _)
+      when action in ~w(list_students show_student)a,
+      do: true
+
+  def authorize(action, %User{role: "admin"}, _)
+      when action in ~w(create_student update_student delete_student)a,
+      do: true
+
+  def authorize(_, _, _), do: false
 end

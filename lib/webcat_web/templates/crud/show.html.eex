@@ -1,0 +1,35 @@
+<% module = @data.__struct__ %>
+<% collection_name = module.__schema__(:source) %>
+<section class="section">
+    <div class="container">
+        <h1 class="title">Dashboard</h1>
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: collection_name) %>
+            </div>
+            <div class="column">
+                <div class="level">
+                    <div class="level-left">
+                        <h1 class="subtitle is-1">
+                            <%= (html_escape(module.title_for(@data)) |> safe_to_string()) %>
+                        </h1>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <%= icon_button("Edit", "wrench", to: Routes.crud_path(@conn, :edit, collection_name, @data.id), class: "is-primary") %>
+                        </div>
+                        <div class="level-item">
+                            <%= icon_button("Delete", "times-square", to: Routes.crud_path(@conn, :delete, collection_name, @data.id), class: "is-error") %>
+                        </div>
+                    </div>
+                </div>
+                <%= for key <- (@data |> @data.__struct__.display() |> Map.drop(~w(id)a) |> Map.keys() |> Enum.sort) do %>
+                <p><strong>
+                        <%= title_case(key) %>:</strong>
+                    <%= @data[key] %>
+                </p>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</section>

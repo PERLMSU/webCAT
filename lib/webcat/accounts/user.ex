@@ -1,10 +1,14 @@
 defmodule WebCAT.Accounts.User do
+  @behaviour WebCAT.Dashboardable
+  @behaviour Bodyguard.Policy
+
   @moduledoc """
   Schema for user accounts
   """
   use Ecto.Schema
   alias Comeonin.Pbkdf2
   import Ecto.Changeset
+  alias WebCAT.Accounts.User
 
   schema "users" do
     field(:first_name, :string)
@@ -66,7 +70,25 @@ defmodule WebCAT.Accounts.User do
 
   defp put_pass_hash(changeset), do: changeset
 
-  def title_for(user) do
-    "#{user.first_name} #{user.last_name}"
+  def title_for(user), do: "#{user.first_name} #{user.last_name}"
+
+  def table_fields(), do: ~w(last_name first_name username email role)a
+
+  def display(user) do
+    user
+    |> Map.from_struct()
+    |> Map.take(~w(id first_name last_name username)a)
   end
+
+  # Policy behavior
+
+  def authorize(action, %User{}, _)
+      when action in ~w(list_users show_user)a,
+      do: true
+
+  def authorize(action, %User{role: "admin"}, _)
+      when action in ~w(create_user update_user delete_user)a,
+      do: true
+
+  def authorize(_, _, _), do: false
 end
