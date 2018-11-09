@@ -33,7 +33,7 @@ defmodule WebCAT.Rotations.Semester do
   def display(semester) do
     semester
     |> Map.from_struct()
-    |> Map.take(~w(id title start_date end_date)a)
+    |> Map.take(~w(title start_date end_date)a)
     |> Map.update!(:start_date, fn value ->
       "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
         Timex.format!(value, "{relative}", :relative)

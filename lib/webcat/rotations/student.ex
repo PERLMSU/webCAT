@@ -38,7 +38,7 @@ defmodule WebCAT.Rotations.Student do
   def display(student) do
     student
     |> Map.from_struct()
-    |> Map.drop(~w(__meta__))
+    |> Map.take(~w(first_name last_name middle_name description email))
   end
 
   # Policy behavior

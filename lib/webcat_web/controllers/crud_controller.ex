@@ -17,46 +17,46 @@ defmodule WebCATWeb.CRUDController do
   def index(conn, %{"resource" => resource}) when resource in @resources do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    {module, data} =
+    result =
       case resource do
         "categories" ->
           with :ok <- Bodyguard.permit(Category, :list_categories, user),
-               do: {Category, CRUD.list(Category)}
+               do: {:ok, Category, CRUD.list(Category)}
 
         "classrooms" ->
           with :ok <- Bodyguard.permit(Classroom, :list_classrooms, user),
-               do: {Classroom, CRUD.list(Classroom)}
+               do: {:ok, Classroom, CRUD.list(Classroom)}
 
         "rotation_groups" ->
           with :ok <- Bodyguard.permit(RotationGroup, :list_rotation_groups, user),
-               do: {RotationGroup, CRUD.list(RotationGroup)}
+               do: {:ok, RotationGroup, CRUD.list(RotationGroup)}
 
         "rotations" ->
           with :ok <- Bodyguard.permit(Rotation, :list_rotations, user),
-               do: {Rotation, CRUD.list(Rotation)}
+               do: {:ok, Rotation, CRUD.list(Rotation)}
 
         "semesters" ->
           with :ok <- Bodyguard.permit(Semester, :list_semesters, user),
-               do: {Semester, CRUD.list(Semester)}
+               do: {:ok, Semester, CRUD.list(Semester)}
 
         "students" ->
-          with :ok <- Bodyguard.permit(Student, :list_student, user),
-               do: {Student, CRUD.list(Student)}
+          with :ok <- Bodyguard.permit(Student, :list_students, user),
+               do: {:ok, Student, CRUD.list(Student)}
 
         "users" ->
-          with :ok <- Bodyguard.permit(User, :list_users, user), do: {User, CRUD.list(User)}
+          with :ok <- Bodyguard.permit(User, :list_users, user), do: {:ok, User, CRUD.list(User)}
       end
 
-    case data do
-      :error -> {:error, :not_authorized}
-      _ -> render(conn, "index.html", user: user, data: data, module: module)
+    case result do
+      {:error, _} -> result
+      {:ok, module, data} -> render(conn, "index.html", user: user, data: data, module: module)
     end
   end
 
   def show(conn, %{"resource" => resource, "id" => id}) when resource in @resources do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    data =
+    result =
       case resource do
         "categories" ->
           with :ok <- Bodyguard.permit(Category, :show_category, user), do: CRUD.get(Category, id)
@@ -82,17 +82,17 @@ defmodule WebCATWeb.CRUDController do
           with :ok <- Bodyguard.permit(User, :show_user, user), do: CRUD.get(User, id)
       end
 
-    case data do
-      :error -> {:error, :not_authorized}
+    case result do
+      {:error, _} -> result
       nil -> {:error, :not_found}
-      _ -> render(conn, "show.html", user: user, data: data)
+      {:ok, data} -> render(conn, "show.html", user: user, data: data)
     end
   end
 
   def new(conn, %{"resource" => resource}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    changeset =
+    result =
       case resource do
         "categories" ->
           with :ok <- Bodyguard.permit(Category, :create_category, user),
@@ -122,51 +122,54 @@ defmodule WebCATWeb.CRUDController do
           with :ok <- Bodyguard.permit(User, :create_user, user), do: User.changeset(%User{})
       end
 
-    case changeset do
-      :error -> {:error, :not_authorized}
-      _ -> render(conn, "form.html", user: user, changeset: changeset)
+    case result do
+      {:error, _} -> result
+      %Ecto.Changeset{} = changeset -> render(conn, "form.html", user: user, changeset: changeset)
     end
   end
 
   def create(conn, %{"resource" => resource} = assigns) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    {module, params} =
+    result =
       case resource do
         "categories" ->
           with :ok <- Bodyguard.permit(Category, :create_category, user),
-               do: {Category, Map.get(assigns, "category")}
+               do: {:ok, Category, Map.get(assigns, "category")}
 
         "classrooms" ->
           with :ok <- Bodyguard.permit(Classroom, :create_classroom, user),
-               do: {Category, Map.get(assigns, "classroom")}
+               do: {:ok, Classroom, Map.get(assigns, "classroom")}
 
         "rotation_groups" ->
           with :ok <- Bodyguard.permit(RotationGroup, :create_rotation_group, user),
-               do: {RotationGroup, Map.get(assigns, "rotation_group")}
+               do: {:ok, RotationGroup, Map.get(assigns, "rotation_group")}
 
         "rotations" ->
           with :ok <- Bodyguard.permit(Rotation, :create_rotation, user),
-               do: {Rotation, Map.get(assigns, "rotation")}
+               do: {:ok, Rotation, Map.get(assigns, "rotation")}
 
         "semesters" ->
           with :ok <- Bodyguard.permit(Semester, :create_semester, user),
-               do: {Semester, Map.get(assigns, "semester")}
+               do: {:ok, Semester, Map.get(assigns, "semester")}
 
         "students" ->
           with :ok <- Bodyguard.permit(Student, :create_student, user),
-               do: {Student, Map.get(assigns, "student")}
+               do: {:ok, Student, Map.get(assigns, "student")}
 
         "users" ->
           with :ok <- Bodyguard.permit(User, :create_user, user),
-               do: {User, Map.get(assigns, "user")}
+               do: {:ok, User, Map.get(assigns, "user")}
       end
 
-    case params do
-      nil ->
+    case result do
+      {:error, _} ->
+        result
+
+      {:ok, _, nil} ->
         {:error, :bad_request}
 
-      %{} ->
+      {:ok, module, %{} = params} ->
         case CRUD.create(module, params) do
           {:ok, data} ->
             conn
@@ -178,7 +181,6 @@ defmodule WebCATWeb.CRUDController do
             )
             |> redirect(to: Routes.crud_path(conn, :index, module.__schema__(:source)))
 
-
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "form.html", changeset: changeset, user: user)
         end
@@ -188,7 +190,7 @@ defmodule WebCATWeb.CRUDController do
   def edit(conn, %{"resource" => resource, "id" => id}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    changeset =
+    result =
       case resource do
         "categories" ->
           with :ok <- Bodyguard.permit(Category, :create_category, user),
@@ -226,52 +228,55 @@ defmodule WebCATWeb.CRUDController do
                do: User.changeset(user)
       end
 
-    case changeset do
-      :error -> {:error, :not_authorized}
+    case result do
+      {:error, _} -> result
       nil -> {:error, :not_found}
-      _ -> render(conn, "form.html", user: user, changeset: changeset)
+      %Ecto.Changeset{} = changeset -> render(conn, "form.html", user: user, changeset: changeset)
     end
   end
 
   def update(conn, %{"resource" => resource, "id" => id} = assigns) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    {module, params} =
+    result =
       case resource do
         "categories" ->
           with :ok <- Bodyguard.permit(Category, :create_category, user),
-               do: {Category, Map.get(assigns, "category")}
+               do: {:ok, Category, Map.get(assigns, "category")}
 
         "classrooms" ->
           with :ok <- Bodyguard.permit(Classroom, :create_classroom, user),
-               do: {Category, Map.get(assigns, "classroom")}
+               do: {:ok, Classroom, Map.get(assigns, "classroom")}
 
         "rotation_groups" ->
           with :ok <- Bodyguard.permit(RotationGroup, :create_rotation_group, user),
-               do: {RotationGroup, Map.get(assigns, "rotation_group")}
+               do: {:ok, RotationGroup, Map.get(assigns, "rotation_group")}
 
         "rotations" ->
           with :ok <- Bodyguard.permit(Rotation, :create_rotation, user),
-               do: {Rotation, Map.get(assigns, "rotation")}
+               do: {:ok, Rotation, Map.get(assigns, "rotation")}
 
         "semesters" ->
           with :ok <- Bodyguard.permit(Semester, :create_semester, user),
-               do: {Semester, Map.get(assigns, "semester")}
+               do: {:ok, Semester, Map.get(assigns, "semester")}
 
         "students" ->
           with :ok <- Bodyguard.permit(Student, :create_student, user),
-               do: {Student, Map.get(assigns, "student")}
+               do: {:ok, Student, Map.get(assigns, "student")}
 
         "users" ->
           with :ok <- Bodyguard.permit(User, :create_user, user),
-               do: {User, Map.get(assigns, "user")}
+               do: {:ok, User, Map.get(assigns, "user")}
       end
 
-    case params do
-      nil ->
+    case result do
+      {:error, _} ->
+        result
+
+      {:ok, _, nil} ->
         {:error, :bad_request}
 
-      %{} ->
+      {:ok, module, %{} = params} ->
         case CRUD.update(module, id, params) do
           {:ok, data} ->
             conn
@@ -283,7 +288,6 @@ defmodule WebCATWeb.CRUDController do
             )
             |> redirect(to: Routes.crud_path(conn, :index, module.__schema__(:source)))
 
-
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "form.html", changeset: changeset, user: user)
         end
@@ -293,54 +297,48 @@ defmodule WebCATWeb.CRUDController do
   def delete(conn, %{"resource" => resource, "id" => id}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    {module, data} =
+    result =
       case resource do
         "categories" ->
-          with :ok <- Bodyguard.permit(Category, :list_categories, user),
-               do: {Category, CRUD.delete(Category, id)}
+          with :ok <- Bodyguard.permit(Category, :delete_category, user),
+               do: {:ok, Category, CRUD.delete(Category, id)}
 
         "classrooms" ->
-          with :ok <- Bodyguard.permit(Classroom, :list_classrooms, user),
-               do: {Classroom, CRUD.delete(Classroom, id)}
+          with :ok <- Bodyguard.permit(Classroom, :delete_classroom, user),
+               do: {:ok, Classroom, CRUD.delete(Classroom, id)}
 
         "rotation_groups" ->
-          with :ok <- Bodyguard.permit(RotationGroup, :list_rotation_groups, user),
-               do: {RotationGroup, CRUD.delete(RotationGroup, id)}
+          with :ok <- Bodyguard.permit(RotationGroup, :delete_rotation_group, user),
+               do: {:ok, RotationGroup, CRUD.delete(RotationGroup, id)}
 
         "rotations" ->
-          with :ok <- Bodyguard.permit(Rotation, :list_rotations, user),
-               do: {Rotation, CRUD.delete(Rotation, id)}
+          with :ok <- Bodyguard.permit(Rotation, :delete_rotation, user),
+               do: {:ok, Rotation, CRUD.delete(Rotation, id)}
 
         "semesters" ->
-          with :ok <- Bodyguard.permit(Semester, :list_semesters, user),
-               do: {Semester, CRUD.delete(Semester, id)}
+          with :ok <- Bodyguard.permit(Semester, :delete_semester, user),
+               do: {:ok, Semester, CRUD.delete(Semester, id)}
 
         "students" ->
-          with :ok <- Bodyguard.permit(Student, :list_student, user),
-               do: {Student, CRUD.delete(Student, id)}
+          with :ok <- Bodyguard.permit(Student, :delete_student, user),
+               do: {:ok, Student, CRUD.delete(Student, id)}
 
         "users" ->
-          with :ok <- Bodyguard.permit(User, :list_users, user), do: {User, CRUD.delete(User, id)}
+          with :ok <- Bodyguard.permit(User, :delete_user, user),
+               do: {:ok, User, CRUD.delete(User, id)}
       end
 
-    case data do
-      {:ok, data} ->
+    case result do
+      {:error, _} ->
+        result
+
+      {:ok, module, {:ok, data}} ->
         conn
         |> put_flash(
           :info,
           ~s(#{module |> to_string |> String.split(".") |> List.last()} #{
             Dashboardable.title_for(module, data)
           } deleted!)
-        )
-        |> redirect(to: Routes.crud_path(conn, :index, module.__schema__(:source)))
-
-      _ ->
-        conn
-        |> put_flash(
-          :error,
-          ~s(#{module |> to_string |> String.split(".") |> List.last()} #{
-            Dashboardable.title_for(module, data)
-          } could not be deleted!)
         )
         |> redirect(to: Routes.crud_path(conn, :index, module.__schema__(:source)))
     end

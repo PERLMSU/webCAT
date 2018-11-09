@@ -18,7 +18,9 @@ defmodule WebCATWeb.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      alias WebCATWeb.Router.Helpers
+      alias WebCATWeb.Router.Helpers, as: Routes
+      alias WebCATWeb.Auth.Guardian.Plug, as: Auth
+      alias WebCAT.Accounts.Users
       alias WebCAT.Factory
 
       # The default endpoint for testing

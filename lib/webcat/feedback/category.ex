@@ -34,7 +34,7 @@ defmodule WebCAT.Feedback.Category do
   def display(category) do
     category
     |> Map.from_struct()
-    |> Map.take(~w(id name description)a)
+    |> Map.take(~w(name description)a)
   end
 
   # Policy behavior

@@ -38,7 +38,7 @@ defmodule WebCAT.Rotations.RotationGroup do
   def display(rotation_group) do
     rotation_group
     |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
+    |> Map.take(~w(description number)a)
   end
 
   # Policy behavior

@@ -22,10 +22,10 @@ defmodule WebCAT.Rotations.Rotation do
   """
   def changeset(rotation, attrs \\ %{}) do
     rotation
-    |> cast(attrs, ~w(start_date end_date rotation_id)a)
-    |> validate_required(~w(start_date end_date rotation_id)a)
+    |> cast(attrs, ~w(start_date end_date classroom_id)a)
+    |> validate_required(~w(start_date end_date classroom_id)a)
     |> validate_dates_after(:start_date, :end_date)
-    |> foreign_key_constraint(:rotation_id)
+    |> foreign_key_constraint(:classroom_id)
   end
 
   def title_for(rotation), do:  "Rotation #{Timex.format!(rotation.start_date, "{M} {D}, {YYYY}")} - #{Timex.format!(rotation.end_date, "{M} {D}, {YYYY}")}"
@@ -35,7 +35,7 @@ defmodule WebCAT.Rotations.Rotation do
   def display(rotation) do
     rotation
     |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
+    |> Map.take(~w(start_date end_date)a)
     |> Map.update!(:start_date, fn value ->
       "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
         Timex.format!(value, "{relative}", :relative)

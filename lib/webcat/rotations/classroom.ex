@@ -41,7 +41,7 @@ defmodule WebCAT.Rotations.Classroom do
   def display(classroom) do
     classroom
     |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
+    |> Map.take(~w(course_code section description)a)
   end
 
   # Policy behavior

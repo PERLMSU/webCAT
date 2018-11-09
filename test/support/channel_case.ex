@@ -25,7 +25,6 @@ defmodule WebCATWeb.ChannelCase do
     end
   end
 
-
   setup tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(WebCAT.Repo)
 
@@ -35,5 +34,4 @@ defmodule WebCATWeb.ChannelCase do
 
     :ok
   end
-
 end

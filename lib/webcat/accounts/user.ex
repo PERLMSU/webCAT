@@ -77,7 +77,8 @@ defmodule WebCAT.Accounts.User do
   def display(user) do
     user
     |> Map.from_struct()
-    |> Map.take(~w(id first_name last_name username)a)
+    |> Map.take(@required ++ @optional)
+    |> Map.drop(~w(password)a)
   end
 
   # Policy behavior
@@ -88,6 +89,18 @@ defmodule WebCAT.Accounts.User do
 
   def authorize(action, %User{role: "admin"}, _)
       when action in ~w(create_user update_user delete_user)a,
+      do: true
+
+  def authorize(action, %User{role: "admin"}, %User{role: "instructor"})
+      when action in ~w(update_user delete_user)a,
+      do: true
+
+  def authorize(action, %User{role: "admin"}, %User{role: "instructor"})
+      when action in ~w(list_notifications list_classrooms list_rotation_groups)a,
+      do: true
+
+  def authorize(action, %User{id: id}, %User{id: id})
+      when action in ~w(update_user list_notifications list_classrooms list_rotation_groups)a,
       do: true
 
   def authorize(_, _, _), do: false

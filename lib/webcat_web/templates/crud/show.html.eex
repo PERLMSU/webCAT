@@ -23,10 +23,11 @@
                         </div>
                     </div>
                 </div>
-                <%= for key <- (@data |> @data.__struct__.display() |> Map.drop(~w(id)a) |> Map.keys() |> Enum.sort) do %>
+                <% data = @data.__struct__.display(@data)%>
+                <%= for key <- (data |> Map.drop(~w(id)a) |> Map.keys() |> Enum.sort()) do %>
                 <p><strong>
                         <%= title_case(key) %>:</strong>
-                    <%= @data[key] %>
+                    <%= data[key] %>
                 </p>
                 <% end %>
             </div>
