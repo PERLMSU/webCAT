@@ -4,7 +4,7 @@
 FROM elixir:1.7-alpine as build
 
 # Install yarn
-RUN apk add --no-cache yarn --fresh
+RUN apk add --no-cache yarn git --fresh
 
 #Copy the source folder into the Docker image
 COPY . .
