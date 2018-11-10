@@ -4,7 +4,6 @@
     </p>
     <ul class="menu-list">
         <li><%= link("Dashboard", to: Routes.dashboard_path(@conn, :index), class: (if @selected == "dashboard", do: "is-active", else: "")) %></li>
-        <li><%= link("Import/Export", to: Routes.dashboard_path(@conn, :import_export), class: (if @selected == "import_export", do: "is-active", else: "")) %></li>
     </ul>
     <p class="menu-label">
         Rotations

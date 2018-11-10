@@ -33,7 +33,6 @@ defmodule WebCATWeb.Router do
 
     get("/", IndexController, :index)
     get("/dashboard", DashboardController, :index)
-    get("/dashboard/import_export", DashboardController, :import_export)
 
     resources("/:resource", CRUDController)
 

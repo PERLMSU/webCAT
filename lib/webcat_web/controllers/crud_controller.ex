@@ -12,9 +12,7 @@ defmodule WebCATWeb.CRUDController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  @resources ~w(categories classrooms rotation_groups rotations semesters students users)
-
-  def index(conn, %{"resource" => resource}) when resource in @resources do
+  def index(conn, %{"resource" => resource}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
     result =
@@ -45,6 +43,9 @@ defmodule WebCATWeb.CRUDController do
 
         "users" ->
           with :ok <- Bodyguard.permit(User, :list_users, user), do: {:ok, User, CRUD.list(User)}
+
+        _ ->
+          {:error, :not_found}
       end
 
     case result do
@@ -53,7 +54,7 @@ defmodule WebCATWeb.CRUDController do
     end
   end
 
-  def show(conn, %{"resource" => resource, "id" => id}) when resource in @resources do
+  def show(conn, %{"resource" => resource, "id" => id}) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
     result =
@@ -80,6 +81,9 @@ defmodule WebCATWeb.CRUDController do
 
         "users" ->
           with :ok <- Bodyguard.permit(User, :show_user, user), do: CRUD.get(User, id)
+
+        _ ->
+          {:error, :not_found}
       end
 
     case result do
@@ -120,6 +124,9 @@ defmodule WebCATWeb.CRUDController do
 
         "users" ->
           with :ok <- Bodyguard.permit(User, :create_user, user), do: User.changeset(%User{})
+
+        _ ->
+          {:error, :not_found}
       end
 
     case result do
@@ -160,6 +167,9 @@ defmodule WebCATWeb.CRUDController do
         "users" ->
           with :ok <- Bodyguard.permit(User, :create_user, user),
                do: {:ok, User, Map.get(assigns, "user")}
+
+        _ ->
+          {:error, :not_found}
       end
 
     case result do
@@ -226,6 +236,9 @@ defmodule WebCATWeb.CRUDController do
           with :ok <- Bodyguard.permit(User, :create_user, user),
                {:ok, user} <- CRUD.get(User, id),
                do: User.changeset(user)
+
+        _ ->
+          {:error, :not_found}
       end
 
     case result do
@@ -267,6 +280,9 @@ defmodule WebCATWeb.CRUDController do
         "users" ->
           with :ok <- Bodyguard.permit(User, :create_user, user),
                do: {:ok, User, Map.get(assigns, "user")}
+
+        _ ->
+          {:error, :not_found}
       end
 
     case result do
@@ -326,6 +342,9 @@ defmodule WebCATWeb.CRUDController do
         "users" ->
           with :ok <- Bodyguard.permit(User, :delete_user, user),
                do: {:ok, User, CRUD.delete(User, id)}
+
+        _ ->
+          {:error, :not_found}
       end
 
     case result do
