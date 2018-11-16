@@ -22,7 +22,7 @@ config :webcat, WebCATWeb.Auth.Guardian,
   issuer: "webcat",
   secret_key: "kQeiAAeH0pWGrvZSqwghRwWe+t2hkXXBiWn6OiagghxzJwejPhiqHG+h1C3r1bsw"
 
-config :phoenix, :format_encoders, json: WebCATWeb.JSONEncoder
+config :phoenix, :json_library, Jason
 
 config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
 

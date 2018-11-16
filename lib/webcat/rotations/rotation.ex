@@ -8,8 +8,8 @@ defmodule WebCAT.Rotations.Rotation do
   alias WebCAT.Accounts.User
 
   schema "rotations" do
-    field(:start_date, :date)
     field(:end_date, :date)
+    field(:start_date, :date)
 
     belongs_to(:classroom, WebCAT.Rotations.Classroom)
     has_many(:rotation_groups, WebCAT.Rotations.RotationGroup)
