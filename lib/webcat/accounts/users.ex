@@ -38,7 +38,7 @@ defmodule WebCAT.Accounts.Users do
   def create(attrs) do
     Multi.new()
     |> Multi.insert(:user, User.create_changeset(%User{}, attrs))
-    |> Multi.run(:confirmation, fn %{user: user} ->
+    |> Multi.run(:confirmation, fn _repo, %{user: user} ->
       %Confirmation{}
       |> Confirmation.changeset(%{user_id: user.id, token: Confirmation.gen_token()})
       |> Repo.insert()
@@ -103,7 +103,7 @@ defmodule WebCAT.Accounts.Users do
   @spec classrooms(integer) :: [Classroom.t()]
   def classrooms(user_id, options \\ []) do
     Classroom
-    |> join(:inner, [c], uc in "user_classrooms", uc.classroom_id == c.id)
+    |> join(:inner, [c], uc in "user_classrooms", on: uc.classroom_id == c.id)
     |> where([_, uc], uc.user_id == ^user_id)
     |> limit(^Keyword.get(options, :limit, 25))
     |> offset(^Keyword.get(options, :offset, 0))
