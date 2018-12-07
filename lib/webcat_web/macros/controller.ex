@@ -115,7 +115,7 @@ defmodule WebCATWeb.Macros.Controller do
       @doc """
       Create a #{unquote(String.capitalize(item_name))}
       """
-      def create(conn, %{unquote(item_name) => form_data}) do
+      def create(conn, %{unquote(route_name) => form_data}) do
         user = Auth.current_resource(conn)
 
         with :ok <- Bodyguard.permit(unquote(schema), :create, user) do
@@ -167,7 +167,7 @@ defmodule WebCATWeb.Macros.Controller do
       @doc """
       Do the actual update of the #{unquote(String.capitalize(item_name))}
       """
-      def update(conn, %{"id" => id, unquote(item_name) => form_data}) do
+      def update(conn, %{"id" => id, unquote(route_name) => form_data}) do
         user = Auth.current_resource(conn)
 
         with {:ok, data} <- CRUD.get(unquote(schema), id),
@@ -196,7 +196,7 @@ defmodule WebCATWeb.Macros.Controller do
 
     quote do
       @doc """
-      Delete a #{String.capitalize(unquote(item_name))}
+      Delete a #{unquote(String.capitalize(item_name))}
       """
       def delete(conn, %{"id" => id}) do
         user = Auth.current_resource(conn)
