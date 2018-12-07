@@ -20,7 +20,7 @@ defmodule WebCATWeb.LoginController do
         with {:ok, user} <- Users.login(email, password) do
           conn
           |> WebCATWeb.Auth.Guardian.Plug.sign_in(user)
-          |> redirect(to: Routes.dashboard_path(conn, :index))
+          |> redirect(to: Routes.index_path(conn, :index))
         else
           {:error, _} ->
             conn

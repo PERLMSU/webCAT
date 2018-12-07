@@ -84,15 +84,15 @@ defmodule WebCAT.Accounts.User do
   # Policy behavior
 
   def authorize(action, %User{}, _)
-      when action in ~w(list_users show_user)a,
+      when action in ~w(list show)a,
       do: true
 
   def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create_user update_user delete_user)a,
+      when action in ~w(create update delete)a,
       do: true
 
   def authorize(action, %User{role: "admin"}, %User{role: "instructor"})
-      when action in ~w(update_user delete_user)a,
+      when action in ~w(update delete)a,
       do: true
 
   def authorize(action, %User{role: "admin"}, %User{role: "instructor"})
@@ -100,7 +100,7 @@ defmodule WebCAT.Accounts.User do
       do: true
 
   def authorize(action, %User{id: id}, %User{id: id})
-      when action in ~w(update_user list_notifications list_classrooms list_rotation_groups)a,
+      when action in ~w(update list_notifications list_classrooms list_rotation_groups)a,
       do: true
 
   def authorize(_, _, _), do: false

@@ -44,11 +44,11 @@ defmodule WebCAT.Rotations.RotationGroup do
   # Policy behavior
 
   def authorize(action, %User{}, _)
-      when action in ~w(list_rotation_groups show_rotation_group)a,
+      when action in ~w(list show)a,
       do: true
 
   def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create_rotation_group update_rotation_group delete_rotation_group)a,
+      when action in ~w(create update delete)a,
       do: true
 
   def authorize(_, _, _), do: false

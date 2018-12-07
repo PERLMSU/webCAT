@@ -1,0 +1,2 @@
+<%= @current_rotation_group == nil %>
+<%= @rotation_groups == [] %>

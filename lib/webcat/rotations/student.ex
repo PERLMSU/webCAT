@@ -44,11 +44,11 @@ defmodule WebCAT.Rotations.Student do
   # Policy behavior
 
   def authorize(action, %User{}, _)
-      when action in ~w(list_students show_student)a,
+      when action in ~w(list show)a,
       do: true
 
   def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create_student update_student delete_student)a,
+      when action in ~w(create update delete)a,
       do: true
 
   def authorize(_, _, _), do: false

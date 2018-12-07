@@ -37,25 +37,29 @@ defmodule WebCAT.Rotations.Rotation do
     |> Map.from_struct()
     |> Map.take(~w(start_date end_date)a)
     |> Map.update!(:start_date, fn value ->
-      "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
-        Timex.format!(value, "{relative}", :relative)
-      })"
+      if Timex.is_valid?(value) do
+        "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
+          Timex.format!(value, "{relative}", :relative)
+        })"
+      end
     end)
     |> Map.update!(:end_date, fn value ->
-      "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
-        Timex.format!(value, "{relative}", :relative)
-      })"
+      if Timex.is_valid?(value) do
+        "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
+          Timex.format!(value, "{relative}", :relative)
+        })"
+      end
     end)
   end
 
   # Policy behavior
 
   def authorize(action, %User{}, _)
-      when action in ~w(list_rotations show_rotation)a,
+      when action in ~w(list show)a,
       do: true
 
   def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create_rotation update_rotation delete_rotation)a,
+      when action in ~w(create update delete)a,
       do: true
 
   def authorize(_, _, _), do: false

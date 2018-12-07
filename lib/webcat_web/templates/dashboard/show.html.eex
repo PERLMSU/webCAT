@@ -1,0 +1,28 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">Dashboard</h1>
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: collection()) %>
+            </div>
+            <div class="column">
+                <div class="level">
+                    <div class="level-left">
+                        <h1 class="subtitle is-1">
+                            <%= title_for(@data) %>
+                        </h1>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <%= action_button(:edit, conn: @conn, id: @data.id) %>
+                        </div>
+                        <div class="level-item">
+                            <%= action_button(:delete, conn: @conn, id: @data.id) %>
+                        </div>
+                    </div>
+                </div>
+                <%= display(@data) %>
+            </div>
+        </div>
+    </div>
+</section>

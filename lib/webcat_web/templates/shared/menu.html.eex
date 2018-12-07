@@ -3,27 +3,27 @@
         General
     </p>
     <ul class="menu-list">
-        <li><%= link("Dashboard", to: Routes.dashboard_path(@conn, :index), class: (if @selected == "dashboard", do: "is-active", else: "")) %></li>
+        <li><%= link("Dashboard", to: Routes.index_path(@conn, :index), class: (if @selected == "dashboard", do: "is-active", else: "")) %></li>
     </ul>
     <p class="menu-label">
         Rotations
     </p>
     <ul class="menu-list">
-        <li><%= link("Semesters", to: Routes.crud_path(@conn, :index, "semesters"), class: (if @selected == "semesters", do: "is-active", else: "")) %></li>
-        <li><%= link("Classrooms", to: Routes.crud_path(@conn, :index, "classrooms"), class: (if @selected == "classrooms", do: "is-active", else: "")) %></li>
-        <li><%= link("Rotations", to: Routes.crud_path(@conn, :index, "rotations"), class: (if @selected == "rotations", do: "is-active", else: "")) %></li>
-        <li><%= link("Rotation Groups", to: Routes.crud_path(@conn, :index, "rotation_groups"), class: (if @selected == "rotation_groups", do: "is-active", else: "")) %></li>
+        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index), class: (if @selected == "semesters", do: "is-active", else: "")) %></li>
+        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index), class: (if @selected == "classrooms", do: "is-active", else: "")) %></li>
+        <li><%= link("Rotations", to: Routes.rotation_path(@conn, :index), class: (if @selected == "rotations", do: "is-active", else: "")) %></li>
+        <li><%= link("Rotation Groups", to: Routes.rotation_group_path(@conn, :index), class: (if @selected == "rotation_groups", do: "is-active", else: "")) %></li>
     </ul>
     <p class="menu-label">
         Feedback
     </p>
     <ul class="menu-list">
-        <li><%= link("Categories", to: Routes.crud_path(@conn, :index, "categories"), class: (if @selected == "categories", do: "is-active", else: "")) %></li>
+        <li><%= link("Categories", to: Routes.category_path(@conn, :index), class: (if @selected == "categories", do: "is-active", else: "")) %></li>
     </ul>
     <p class="menu-label">
         Accounts
     </p>
     <ul class="menu-list">
-        <li><%= link("Users", to: Routes.crud_path(@conn, :index, "users"), class: (if @selected == "users", do: "is-active", else: "")) %></li>
+        <li><%= link("Users", to: Routes.user_path(@conn, :index), class: (if @selected == "users", do: "is-active", else: "")) %></li>
     </ul>
 </aside>

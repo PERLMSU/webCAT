@@ -102,13 +102,6 @@ defmodule WebCAT.Factory do
     }
   end
 
-  def rotation_group_note_factory do
-    %Note{
-      content: Faker.Lorem.Shakespeare.hamlet(),
-      rotation_group: Factory.build(:rotation_group)
-    }
-  end
-
   def observation_factory do
     %Observation{
       content: Faker.Lorem.Shakespeare.hamlet(),

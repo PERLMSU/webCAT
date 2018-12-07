@@ -8,6 +8,10 @@
             "type": "mix_task",
             "name": "mix (Default task)",
             "request": "launch",
+            "taskArgs": [
+                "--trace"
+            ],
+            "startApps": true,
             "projectDir": "${workspaceRoot}"
         },
         {
@@ -24,6 +28,18 @@
                 "test/**/test_helper.exs",
                 "test/**/*_test.exs"
             ]
+        },
+        {
+            "type": "mix_task",
+            "name": "run seeds",
+            "request": "launch",
+            "task": "run",
+            "taskArgs": [
+                "priv/repo/seeds.exs",
+                "--trace"
+            ],
+            "startApps": true,
+            "projectDir": "${workspaceRoot}"
         }
     ]
 }

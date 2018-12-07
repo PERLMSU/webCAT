@@ -28,13 +28,25 @@ defmodule WebCATWeb.Router do
     get("/confirm/:token", EmailConfirmationController, :confirm)
   end
 
+  scope "/feedback", WebCATWeb do
+    pipe_through(~w(browser authenticated)a)
+
+    get("/", FeedbackController, :index)
+    get("/:rotation_group_id", FeedbackController, :show_rotation_group)
+  end
+
   scope "/", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
-    get("/", IndexController, :index)
-    get("/dashboard", DashboardController, :index)
+    resources("/categories", CategoryController)
+    resources("/classrooms", ClassroomController)
+    resources("/rotations", RotationController)
+    resources("/rotation_groups", RotationGroupController)
+    resources("/semesters", SemesterController)
+    resources("/students", StudentController)
+    resources("/users", UserController)
 
-    resources("/:resource", CRUDController)
+    get("/", IndexController, :index)
 
     get("/logout", LoginController, :logout)
   end
