@@ -1,6 +1,9 @@
 defmodule WebCAT.Accounts.Notification do
+  @behaviour Bodyguard.Policy
+
   use Ecto.Schema
   import Ecto.Changeset
+  alias WebCAT.Accounts.User
 
   schema "notifications" do
     field(:content, :string)
@@ -25,4 +28,16 @@ defmodule WebCAT.Accounts.Notification do
     |> foreign_key_constraint(:draft_id)
     |> foreign_key_constraint(:user_id)
   end
+
+  def title_for(notification) do
+    String.slice(notification.content, 0..15) <> "..."
+  end
+
+  # Policy behavior
+
+  def authorize(action, %User{id: id}, %__MODULE__{user_id: id})
+      when action in ~w(list show)a,
+      do: true
+
+  def authorize(_, _, _), do: false
 end

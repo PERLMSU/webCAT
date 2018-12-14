@@ -9,7 +9,8 @@
                         </figure>
                         <h1 class="title has-text-dark">WebCAT</h1>
                         <h2 class="subtitle has-text-dark">Please Log In</h2>
-                        <%= form_for @conn, Routes.login_path(@conn, :login), fn _f -> %>
+                        <%= form_for @conn, Routes.login_path(@conn, :login), fn f -> %>
+                        <%= hidden_input(f, :redirect, value: @redirect) %>
                         <div class="field">
                             <label class="label">Email</label>
                             <div class="control has-icons-left">

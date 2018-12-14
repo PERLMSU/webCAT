@@ -5,8 +5,6 @@ defmodule WebCATWeb.FeedbackController do
 
   use WebCATWeb, :controller
 
-  alias WebCAT.CRUD
-  alias WebCAT.Feedback.{Observation, Explanation}
   alias WebCAT.Rotations.{RotationGroup, Rotation}
 
   alias Timex.Interval

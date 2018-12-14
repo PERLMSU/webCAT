@@ -7,7 +7,10 @@ defmodule WebCATWeb.IndexController do
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, _params) do
+
+
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+    
 
     # Grab simple statistics
     counts = %{

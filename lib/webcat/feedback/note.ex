@@ -25,6 +25,10 @@ defmodule WebCAT.Feedback.Note do
     |> foreign_key_constraint(:observation_id)
   end
 
+  def title_for(note) do
+    String.slice(note.content, 0..15) <> "..."
+  end
+
   # Policy behavior
 
   def authorize(action, %User{}, _)

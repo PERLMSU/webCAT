@@ -22,7 +22,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> get(Routes.rotation_group_path(conn, :index))
         |> redirected_to(302)
 
-      assert redirect == Routes.login_path(conn, :login)
+      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -49,7 +49,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> get(Routes.rotation_group_path(conn, :show, data.id))
         |> redirected_to(302)
 
-      assert redirect == Routes.login_path(conn, :login)
+      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -73,7 +73,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> get(Routes.rotation_group_path(conn, :new))
         |> redirected_to(302)
 
-      assert redirect == Routes.login_path(conn, :login)
+      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -100,7 +100,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> post(Routes.rotation_group_path(conn, :create), %{rotation_group: data})
         |> redirected_to(302)
 
-      assert redirect == Routes.login_path(conn, :login)
+      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -127,7 +127,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> get(Routes.rotation_group_path(conn, :edit, data.id))
         |> redirected_to(302)
 
-      assert redirect == Routes.login_path(conn, :login)
+      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -156,7 +156,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> put(Routes.rotation_group_path(conn, :update, data.id), %{rotation_group: update})
         |> redirected_to(302)
 
-      assert redirect == Routes.login_path(conn, :login)
+      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -183,7 +183,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> delete(Routes.rotation_group_path(conn, :delete, data.id))
         |> redirected_to(302)
 
-      assert redirect == Routes.login_path(conn, :login)
+      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 

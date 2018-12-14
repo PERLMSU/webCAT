@@ -10,8 +10,15 @@ defmodule WebCATWeb.Router do
     plug(:put_secure_browser_headers)
   end
 
+  pipeline :not_authenticated do
+    plug(WebCATWeb.Auth.Pipeline)
+    plug(Guardian.Plug.EnsureNotAuthenticated)
+  end
+
   pipeline :authenticated do
     plug(WebCATWeb.Auth.Pipeline)
+    plug(Guardian.Plug.EnsureAuthenticated)
+    plug(Guardian.Plug.LoadResource)
   end
 
   scope "/login", WebCATWeb do

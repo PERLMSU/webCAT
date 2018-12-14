@@ -9,23 +9,25 @@ defmodule WebCATWeb.LoginController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, _params) do
-    render(conn, "login.html")
+  def index(conn, params) do
+    render(conn, "login.html",
+      redirect: Map.get(params, "redirect", Routes.index_path(conn, :index))
+    )
   end
 
   def login(conn, params) do
     case params do
       %{"email" => email, "password" => password} ->
-        IO.inspect(params)
         with {:ok, user} <- Users.login(email, password) do
           conn
-          |> WebCATWeb.Auth.Guardian.Plug.sign_in(user)
-          |> redirect(to: Routes.index_path(conn, :index))
+          |> Auth.sign_in(user)
+          |> redirect(to: Map.get(params, "redirect", Routes.index_path(conn, :index)))
         else
           {:error, _} ->
             conn
             |> put_flash(:error, "invalid email or password")
             |> redirect(to: Routes.login_path(conn, :login))
+
           _ ->
             conn
             |> put_flash(:error, "unknown error")
@@ -41,7 +43,7 @@ defmodule WebCATWeb.LoginController do
 
   def logout(conn, _params) do
     conn
-    |> WebCATWeb.Auth.Guardian.Plug.sign_out()
+    |> Auth.sign_out()
     |> redirect(to: Routes.login_path(conn, :login))
   end
 end

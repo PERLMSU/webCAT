@@ -1,4 +1,6 @@
 defmodule WebCAT.Feedback.Draft do
+  @behaviour Bodyguard.Policy
+
   use Ecto.Schema
   import Ecto.Changeset
   alias WebCAT.Accounts.User
@@ -26,6 +28,10 @@ defmodule WebCAT.Feedback.Draft do
     |> validate_inclusion(:status, ~w(unreviewed review needs_revision approved emailed))
     |> foreign_key_constraint(:student_id)
     |> foreign_key_constraint(:rotation_group_id)
+  end
+
+  def title_for(draft) do
+    String.slice(draft.content, 0..15) <> "..."
   end
 
   # Policy behavior
