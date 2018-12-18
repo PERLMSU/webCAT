@@ -8,7 +8,7 @@ defmodule WebCAT.CRUDTest do
     Factory.insert_list(12, :category)
 
     categories = CRUD.list(Category, limit: 6, offset: 10)
-    assert Enum.count(categories) == 3
+    assert Enum.count(categories) == 2
   end
 
   test "get/2 behaves as expected" do

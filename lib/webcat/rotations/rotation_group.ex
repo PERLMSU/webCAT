@@ -11,24 +11,25 @@ defmodule WebCAT.Rotations.RotationGroup do
     field(:number, :integer)
 
     belongs_to(:rotation, WebCAT.Rotations.Rotation)
-    belongs_to(:instructor, WebCAT.Accounts.User, foreign_key: :instructor_id)
-
-    has_many(:drafts, WebCAT.Feedback.Draft)
 
     many_to_many(:students, WebCAT.Rotations.Student, join_through: "student_groups")
+    many_to_many(:users, WebCAT.Accounts.User, join_through: "rotation_group_users")
+    has_many(:observations, WebCAT.Feedback.Observation)
 
     timestamps()
   end
+
+  @required ~w(number rotation_id)a
+  @optional ~w(description)a
 
   @doc """
   Build a changeset for a rotation group
   """
   def changeset(group, attrs \\ %{}) do
     group
-    |> cast(attrs, ~w(description number rotation_id instructor_id)a)
-    |> validate_required(~w(number rotation_id instructor_id)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> foreign_key_constraint(:rotation_id)
-    |> foreign_key_constraint(:instructor_id)
   end
 
   def title_for(rotation_group), do: "Group #{rotation_group.number}"

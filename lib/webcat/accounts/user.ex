@@ -27,9 +27,10 @@ defmodule WebCAT.Accounts.User do
     field(:active, :boolean)
     field(:role, :string)
 
-    has_many(:rotation_groups, WebCAT.Rotations.RotationGroup, foreign_key: :instructor_id)
-    has_many(:notifications, WebCAT.Accounts.Notification)
+    many_to_many(:rotation_groups, WebCAT.Rotations.RotationGroup, join_through: "rotation_group_users")
     many_to_many(:classrooms, WebCAT.Rotations.Classroom, join_through: "user_classrooms")
+    many_to_many(:sections, WebCAT.Rotations.Section, join_through: "user_sections")
+    has_many(:notifications, WebCAT.Accounts.Notification)
 
     timestamps()
   end

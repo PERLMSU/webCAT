@@ -8,6 +8,7 @@ defmodule WebCAT.Accounts.Users do
   alias WebCAT.Accounts.{User, Confirmation, Notification}
   alias WebCAT.Rotations.{Classroom, RotationGroup}
   alias Comeonin.Pbkdf2
+  alias WebCAT.CRUD
   alias Ecto.Changeset
   alias Ecto.Multi
   import Ecto.Query
@@ -76,12 +77,7 @@ defmodule WebCAT.Accounts.Users do
   """
   @spec rotation_groups(integer, Keyword.t()) :: [RotationGroup.t()]
   def rotation_groups(user_id, options \\ []) do
-    RotationGroup
-    |> where([g], g.instructor_id == ^user_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
+
   end
 
   @doc """

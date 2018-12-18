@@ -8,24 +8,29 @@ defmodule WebCAT.Rotations.Rotation do
   alias WebCAT.Accounts.User
 
   schema "rotations" do
+    field(:number, :integer)
+    field(:description, :string)
     field(:end_date, :date)
     field(:start_date, :date)
 
-    belongs_to(:classroom, WebCAT.Rotations.Classroom)
+    belongs_to(:section, WebCAT.Rotations.Section)
     has_many(:rotation_groups, WebCAT.Rotations.RotationGroup)
 
     timestamps()
   end
+
+  @required ~w(number start_date end_date section_id)a
+  @optional ~w(description)a
 
   @doc """
   Build a changeset for a rotation
   """
   def changeset(rotation, attrs \\ %{}) do
     rotation
-    |> cast(attrs, ~w(start_date end_date classroom_id)a)
-    |> validate_required(~w(start_date end_date classroom_id)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> validate_dates_after(:start_date, :end_date)
-    |> foreign_key_constraint(:classroom_id)
+    |> foreign_key_constraint(:section_id)
   end
 
   def title_for(rotation), do:  "Rotation #{Timex.format!(rotation.start_date, "{M} {D}, {YYYY}")} - #{Timex.format!(rotation.end_date, "{M} {D}, {YYYY}")}"

@@ -3,7 +3,7 @@ defmodule WebCAT.Factory do
 
   alias WebCAT.Accounts.{User, PasswordReset, Confirmation, Notification}
   alias WebCAT.Feedback.{Category, Draft, Explanation, Email, Note, Observation}
-  alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Student}
+  alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Student, Section}
   alias WebCAT.Factory
 
   def user_factory do
@@ -22,7 +22,7 @@ defmodule WebCAT.Factory do
       country: "USA",
       birthday: Date.to_iso8601(Timex.to_date(Timex.shift(Timex.now(), years: -18))),
       active: true,
-      role: "instructor",
+      role: "instructor"
     }
   end
 
@@ -40,7 +40,6 @@ defmodule WebCAT.Factory do
     }
   end
 
-  @spec notification_factory() :: WebCAT.Accounts.Notification.t()
   def notification_factory do
     %Notification{
       content: Faker.Lorem.Shakespeare.hamlet(),
@@ -58,12 +57,14 @@ defmodule WebCAT.Factory do
   end
 
   def draft_factory do
+    student = Factory.insert(:student)
+    rotation_group = Factory.insert(:rotation_group, students: [student])
+
     %Draft{
       content: Faker.Lorem.Shakespeare.hamlet(),
-      status: sequence(:status, ~w(review needs_revision approved emailed)),
-      score: Float.round(:rand.uniform() * 5, 2),
-      student: Factory.build(:student),
-      rotation_group: Factory.build(:rotation_group)
+      status: sequence(:status, ~w(unreviewed reviewing needs_revision approved emailed)),
+      student: student,
+      rotation_group: rotation_group
     }
   end
 
@@ -114,9 +115,8 @@ defmodule WebCAT.Factory do
   def classroom_factory do
     %Classroom{
       course_code: "PHY183",
-      section: sequence(:section, &Integer.to_string/1),
-      description: Faker.Lorem.Shakespeare.hamlet(),
-      semester: Factory.build(:semester)
+      title: "Physics for Scientists and Engineers I",
+      description: Faker.Lorem.Shakespeare.hamlet()
     }
   end
 
@@ -124,16 +124,17 @@ defmodule WebCAT.Factory do
     %RotationGroup{
       description: Faker.Lorem.Shakespeare.hamlet(),
       number: sequence(:number, & &1),
-      rotation: Factory.build(:rotation),
-      instructor: Factory.build(:user, role: "instructor")
+      rotation: Factory.build(:rotation)
     }
   end
 
   def rotation_factory do
     %Rotation{
+      number: sequence(:number, & &1),
       start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: -1)),
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 2)),
-      classroom: Factory.build(:classroom)
+      description: Faker.Lorem.Shakespeare.hamlet(),
+      section: Factory.build(:section)
     }
   end
 
@@ -141,7 +142,16 @@ defmodule WebCAT.Factory do
     %Semester{
       start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: -3)),
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 9)),
+      classroom: Factory.build(:classroom),
       title: "Fall"
+    }
+  end
+
+  def section_factory do
+    %Section{
+      number: sequence(:number, &Integer.to_string/1),
+      description: Faker.Lorem.Shakespeare.hamlet(),
+      semester: Factory.build(:semester)
     }
   end
 
@@ -151,8 +161,7 @@ defmodule WebCAT.Factory do
       last_name: "Doe",
       middle_name: sequence(:middle_name, ~w(James Renee)),
       description: Faker.Lorem.Shakespeare.hamlet(),
-      email: sequence(:email, &"email-#{&1}@msu.edu"),
-      classroom: Factory.build(:classroom)
+      email: sequence(:email, &"email-#{&1}@msu.edu")
     }
   end
 end

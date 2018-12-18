@@ -11,19 +11,24 @@ defmodule WebCAT.Rotations.Semester do
     field(:end_date, :date)
     field(:title, :string)
 
-    has_many(:classrooms, WebCAT.Rotations.Classroom)
+    belongs_to(:classroom, WebCAT.Rotations.Classroom)
+    has_many(:sections, WebCAT.Rotations.Section)
 
     timestamps()
   end
+
+  @required ~w(title start_date end_date classroom_id)a
+  @optional ~w()a
 
   @doc """
   Build a changeset for a semester
   """
   def changeset(semester, attrs \\ %{}) do
     semester
-    |> cast(attrs, ~w(start_date end_date title)a)
-    |> validate_required(~w(start_date end_date title)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> validate_dates_after(:start_date, :end_date)
+    |> foreign_key_constraint(:classroom_id)
   end
 
   def title_for(semester), do: semester.title

@@ -17,16 +17,16 @@ defmodule WebCATWeb.FeedbackController do
   def index(conn, _params) do
     user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
 
-    with :ok <- Bodyguard.permit(RotationGroup, :list_rotation_groups, user),
-         :ok <- Bodyguard.permit(Rotation, :list_rotations, user) do
+    with :ok <- Bodyguard.permit(RotationGroup, :list, user),
+         :ok <- Bodyguard.permit(Rotation, :list, user) do
       rotation_groups =
         RotationGroup
         |> where([rotation_group], rotation_group.instructor_id == ^user.id)
         |> join(:inner, [rotation_group], rotation in "rotations",
           on: rotation.id == rotation_group.rotation_id
         )
-        |> order_by([rotation], rotation.number)
-        |> preload([rotation], rotation: rotation)
+        |> order_by([_, rotation], rotation.number)
+        |> preload([_, rotation], rotation: rotation)
         |> Repo.all()
 
       # Find the current rotation group based on which interval the current time is included in

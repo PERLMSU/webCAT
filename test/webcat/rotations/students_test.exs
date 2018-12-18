@@ -3,14 +3,6 @@ defmodule WebCAT.Rotations.StudentsTest do
 
   alias WebCAT.Rotations.Students
 
-  test "drafts/2 behaves as expected" do
-    inserted = Factory.insert(:student)
-    Factory.insert_list(5, :draft, student: inserted)
-
-    drafts = Students.drafts(inserted.id, limit: 2, offset: 1)
-    assert Enum.count(drafts) == 2
-  end
-
   test "notes/2 behaves as expected" do
     inserted = Factory.insert(:student)
     Factory.insert_list(5, :student_note, student: inserted)

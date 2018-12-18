@@ -11,10 +11,15 @@ defmodule WebCAT.Feedback.Category do
     field(:description, :string)
 
     belongs_to(:parent_category, WebCAT.Feedback.Category)
+    belongs_to(:classroom, WebCAT.Rotations.Classroom)
+    has_many(:sub_categories, WebCAT.Feedback.Category, foreign_key: :parent_category_id)
     has_many(:observations, WebCAT.Feedback.Observation)
 
     timestamps()
   end
+
+  @required ~w(name)a
+  @optional ~w(description parent_category_id)a
 
   @doc """
   Create a changeset for a category

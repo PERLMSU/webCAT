@@ -31,15 +31,11 @@
         },
         {
             "type": "mix_task",
-            "name": "run seeds",
+            "name": "Phoenix Server",
             "request": "launch",
-            "task": "run",
-            "taskArgs": [
-                "priv/repo/seeds.exs",
-                "--trace"
-            ],
+            "task": "phx.server",
             "startApps": true,
-            "projectDir": "${workspaceRoot}"
-        }
+            "projectDir": "${workspaceRoot}",
+        },
     ]
 }

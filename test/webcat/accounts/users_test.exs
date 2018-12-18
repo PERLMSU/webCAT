@@ -33,14 +33,6 @@ defmodule WebCAT.Accounts.UsersTest do
     assert_delivered_email(email)
   end
 
-  test "rotation_groups/1 behaves as expected" do
-    Factory.insert_list(5, :rotation_group)
-    user = Factory.insert(:user, rotation_groups: Factory.insert_list(4, :rotation_group))
-
-    groups = Users.rotation_groups(user.id)
-    assert Enum.count(groups) == 4
-  end
-
   test "notification/1 behaves as expected" do
     Factory.insert_list(5, :notification)
     user = Factory.insert(:user, notifications: Factory.insert_list(4, :notification))

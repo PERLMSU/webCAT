@@ -29,7 +29,7 @@ defmodule WebCAT.Rotations.Students do
 
   def rotation_groups(student_id, options \\ []) do
     RotationGroup
-    |> join(:inner, [rg], sg in "student_groups", sg.rotation_group_id == rg.id)
+    |> join(:inner, [rg], sg in "student_groups", on: sg.rotation_group_id == rg.id)
     |> where([_, sg], sg.student_id == ^student_id)
     |> limit(^Keyword.get(options, :limit, 25))
     |> offset(^Keyword.get(options, :offset, 0))

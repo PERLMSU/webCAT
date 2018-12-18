@@ -9,15 +9,6 @@ defmodule WebCAT.Rotations.RotationGroups do
 
   import Ecto.Query
 
-  def drafts(rotation_group_id, options \\ []) do
-    Draft
-    |> where([d], d.rotation_group_id == ^rotation_group_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
-  end
-
   def students(rotation_group_id, options \\ []) do
     Student
     |> join(:inner, [s], sg in "student_groups", sg.student_id == s.id)

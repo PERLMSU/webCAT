@@ -1,5 +1,6 @@
 defmodule WebCAT.Rotations.Student do
   @behaviour WebCAT.Dashboardable
+  @behaviour Bodyguard.Policy
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -12,21 +13,23 @@ defmodule WebCAT.Rotations.Student do
     field(:description, :string)
     field(:email, :string)
 
-    belongs_to(:classroom, WebCAT.Rotations.Classroom)
-    has_many(:notes, WebCAT.Feedback.Note)
-    has_many(:drafts, WebCAT.Feedback.Draft)
     many_to_many(:rotation_groups, WebCAT.Rotations.RotationGroup, join_through: "student_groups")
+    many_to_many(:sections, WebCAT.Rotations.Section, join_through: "student_sections")
+    has_many(:notes, WebCAT.Feedback.Note)
 
     timestamps()
   end
+
+  @required ~w(first_name last_name)a
+  @optional ~w(middle_name description email)a
 
   @doc """
   Build a changeset for a student
   """
   def changeset(student, attrs \\ %{}) do
     student
-    |> cast(attrs, ~w(first_name last_name middle_name description email classroom_id)a)
-    |> validate_required(~w(first_name last_name classroom_id)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> foreign_key_constraint(:classroom_id)
     |> unique_constraint(:email)
   end

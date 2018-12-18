@@ -8,18 +8,16 @@ defmodule WebCAT.Rotations.Classroom do
 
   schema "classrooms" do
     field(:course_code, :string)
-    field(:section, :string)
+    field(:title, :string)
     field(:description, :string)
 
-    belongs_to(:semester, WebCAT.Rotations.Semester)
-    has_many(:rotations, WebCAT.Rotations.Rotation)
-    has_many(:students, WebCAT.Rotations.Student)
-    many_to_many(:instructors, WebCAT.Accounts.User, join_through: "user_classrooms")
+    has_many(:semesters, WebCAT.Rotations.Semester)
+    many_to_many(:users, WebCAT.Accounts.User, join_through: "user_classrooms")
 
     timestamps()
   end
 
-  @required ~w(course_code section semester_id)a
+  @required ~w(course_code title)a
   @optional ~w(description)a
 
   @doc """
@@ -29,19 +27,18 @@ defmodule WebCAT.Rotations.Classroom do
     classroom
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
-    |> foreign_key_constraint(:semester_id)
   end
 
   # Dashboardable behavior
 
-  def title_for(classroom), do: "#{classroom.course_code} - #{classroom.section}"
+  def title_for(classroom), do: "#{classroom.course_code} - #{classroom.title}"
 
-  def table_fields(), do: ~w(course_code section description)a
+  def table_fields(), do: ~w(course_code title description)a
 
   def display(classroom) do
     classroom
     |> Map.from_struct()
-    |> Map.take(~w(course_code section description)a)
+    |> Map.take(~w(course_code title description)a)
   end
 
   # Policy behavior
