@@ -1,5 +1,4 @@
 defmodule WebCAT.Rotations.Student do
-  @behaviour WebCAT.Dashboardable
   @behaviour Bodyguard.Policy
 
   use Ecto.Schema
@@ -34,15 +33,6 @@ defmodule WebCAT.Rotations.Student do
     |> unique_constraint(:email)
   end
 
-  def title_for(student), do: "#{student.first_name} #{student.last_name}"
-
-  def table_fields(), do: ~w(last_name first_name email description)a
-
-  def display(student) do
-    student
-    |> Map.from_struct()
-    |> Map.take(~w(first_name last_name middle_name description email))
-  end
 
   # Policy behavior
 

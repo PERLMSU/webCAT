@@ -3,7 +3,7 @@
         <h1 class="title">Dashboard</h1>
         <div class="columns">
             <div class="column is-one-fifth">
-                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: collection()) %>
+                <%= dashboard_menu(@conn, item_name(@schema)) %>
             </div>
             <div class="column">
                 <div class="box">
@@ -11,25 +11,28 @@
                         <div class="level-left">
                             <div class="level-item">
                                 <h2 class="subtitle">
-                                    <%= collection_name() %>
+                                    <%= collection_name(@schema) %>
                                 </h2>
                             </div>
                         </div>
                         <div class="level-right">
                             <div class="level-item">
-                                <%= action_button(:new, conn: @conn) %>
+                                <%= action_button(@schema, :import, conn: @conn) %>
                             </div>
-                        </div> 
+                            <div class="level-item">
+                                <%= action_button(@schema, :new, conn: @conn) %>
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <table class="table">
                         <%= if Enum.count(@data) > 0 do %>
-                        <%= table_header() %>
+                        <%= table_header(@schema) %>
                         <%= if Enum.count(@data) > 25 do %>
-                        <%= table_footer()%>
+                        <%= table_footer(@schema)%>
                         <% end %>
                         <% end %>
-                        <%= table_body(@data)%>
+                        <%= table_body(@schema, @data)%>
                     </table>
                 </div>
             </div>

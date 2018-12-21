@@ -24,7 +24,7 @@
                         <%= @user.first_name <> " " <> @user.last_name %>
                     </a>
                     <div class="navbar-dropdown">
-                        <%= link("Profile", to: Routes.user_path(@conn, :show, @user.id), class: "navbar-item") %>
+                        <%= link("Profile", to: DashboardRoutes.user_path(@conn, :show, @user.id), class: "navbar-item") %>
                         <hr class="navbar-divider">
                         <%= link("Log Out", to: Routes.login_path(@conn, :logout), class: "navbar-item") %>
                     </div>

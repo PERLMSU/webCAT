@@ -1,8 +1,6 @@
 defmodule WebCATWeb.ClassroomControllerTest do
   use WebCATWeb.ConnCase
 
-  alias WebCAT.Rotations.Classroom
-
   describe "index/2" do
     setup ~w(login_user)a
 
@@ -10,7 +8,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :index))
+        |> get(DashboardRoutes.classroom_path(conn, :index))
         |> html_response(200)
 
       assert response =~ "Classrooms"
@@ -19,7 +17,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "redirects user when not logged in", %{conn: conn} do
       redirect =
         conn
-        |> get(Routes.classroom_path(conn, :index))
+        |> get(DashboardRoutes.classroom_path(conn, :index))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -32,13 +30,11 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "displays classroom", %{conn: conn, user: user} do
       data = Factory.insert(:classroom)
 
-      response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :show, data.id))
+        |> get(DashboardRoutes.classroom_path(conn, :show, data.id))
         |> html_response(200)
 
-      response =~ Classroom.title_for(data)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -46,7 +42,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       redirect =
         conn
-        |> get(Routes.classroom_path(conn, :show, data.id))
+        |> get(DashboardRoutes.classroom_path(conn, :show, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -60,17 +56,17 @@ defmodule WebCATWeb.ClassroomControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :new))
+        |> get(DashboardRoutes.classroom_path(conn, :new))
         |> html_response(200)
 
 
-      response =~ "Create New Category"
+      response =~ "Create New Classroom"
     end
 
     test "redirects user when not logged in", %{conn: conn} do
       redirect =
         conn
-        |> get(Routes.classroom_path(conn, :new))
+        |> get(DashboardRoutes.classroom_path(conn, :new))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -86,10 +82,10 @@ defmodule WebCATWeb.ClassroomControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.classroom_path(conn, :create), %{classroom: data})
+        |> post(DashboardRoutes.classroom_path(conn, :create), %{classroom: data})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.classroom_path(conn, :index)
+      assert redirect =~ DashboardRoutes.classroom_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -97,7 +93,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       redirect =
         conn
-        |> post(Routes.classroom_path(conn, :create), %{classroom: data})
+        |> post(DashboardRoutes.classroom_path(conn, :create), %{classroom: data})
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -113,10 +109,10 @@ defmodule WebCATWeb.ClassroomControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :edit, data.id))
+        |> get(DashboardRoutes.classroom_path(conn, :edit, data.id))
         |> html_response(200)
 
-      response =~ "Edit Rotation Group"
+      response =~ "Edit Classroom"
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -124,7 +120,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       redirect =
         conn
-        |> get(Routes.classroom_path(conn, :edit, data.id))
+        |> get(DashboardRoutes.classroom_path(conn, :edit, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -141,10 +137,10 @@ defmodule WebCATWeb.ClassroomControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.classroom_path(conn, :update, data.id), %{classroom: update})
+        |> put(DashboardRoutes.classroom_path(conn, :update, data.id), %{classroom: update})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.classroom_path(conn, :index)
+      assert redirect =~ DashboardRoutes.classroom_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -153,7 +149,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       redirect =
         conn
-        |> put(Routes.classroom_path(conn, :update, data.id), %{classroom: update})
+        |> put(DashboardRoutes.classroom_path(conn, :update, data.id), %{classroom: update})
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -169,10 +165,10 @@ defmodule WebCATWeb.ClassroomControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> delete(Routes.classroom_path(conn, :delete, data.id))
+        |> delete(DashboardRoutes.classroom_path(conn, :delete, data.id))
         |> redirected_to(302)
 
-      assert redirect =~ Routes.classroom_path(conn, :index)
+      assert redirect =~ DashboardRoutes.classroom_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -180,7 +176,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       redirect =
         conn
-        |> delete(Routes.classroom_path(conn, :delete, data.id))
+        |> delete(DashboardRoutes.classroom_path(conn, :delete, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)

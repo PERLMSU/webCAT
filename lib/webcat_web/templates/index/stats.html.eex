@@ -3,7 +3,7 @@
         <h1 class="title">Dashboard</h1>
         <div class="columns">
             <div class="column is-one-fifth">
-                <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: "dashboard") %>
+                <%= dashboard_menu(@conn, "dashboard") %>
             </div>
             <div class="column">
                 <div class="box">
@@ -12,25 +12,33 @@
                         <div class="level-item has-text-centered">
                             <div>
                                 <p class="heading">Students</p>
-                                <p class="title"><%= @counts.students %></p>
+                                <p class="title">
+                                    <%= @counts.students %>
+                                </p>
                             </div>
                         </div>
                         <div class="level-item has-text-centered">
                             <div>
                                 <p class="heading">Observations</p>
-                                <p class="title"><%= @counts.observations %></p>
+                                <p class="title">
+                                    <%= @counts.observations %>
+                                </p>
                             </div>
                         </div>
                         <div class="level-item has-text-centered">
                             <div>
                                 <p class="heading">Feedback Emails Sent</p>
-                                <p class="title"><%= @counts.emails %></p>
+                                <p class="title">
+                                    <%= @counts.emails %>
+                                </p>
                             </div>
                         </div>
                         <div class="level-item has-text-centered">
                             <div>
                                 <p class="heading">Users</p>
-                                <p class="title"><%= @counts.users %></p>
+                                <p class="title">
+                                    <%= @counts.users %>
+                                </p>
                             </div>
                         </div>
                     </nav>

@@ -29,18 +29,6 @@ defmodule WebCAT.Rotations.Classroom do
     |> validate_required(@required)
   end
 
-  # Dashboardable behavior
-
-  def title_for(classroom), do: "#{classroom.course_code} - #{classroom.title}"
-
-  def table_fields(), do: ~w(course_code title description)a
-
-  def display(classroom) do
-    classroom
-    |> Map.from_struct()
-    |> Map.take(~w(course_code title description)a)
-  end
-
   # Policy behavior
 
   def authorize(action, %User{}, _)

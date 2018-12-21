@@ -1,8 +1,6 @@
 defmodule WebCATWeb.RotationGroupControllerTest do
   use WebCATWeb.ConnCase
 
-  alias WebCAT.Rotations.RotationGroup
-
   describe "index/2" do
     setup ~w(login_user)a
 
@@ -10,7 +8,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_group_path(conn, :index))
+        |> get(DashboardRoutes.rotation_group_path(conn, :index))
         |> html_response(200)
 
       assert response =~ "Rotation Groups"
@@ -19,7 +17,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
     test "redirects user when not logged in", %{conn: conn} do
       redirect =
         conn
-        |> get(Routes.rotation_group_path(conn, :index))
+        |> get(DashboardRoutes.rotation_group_path(conn, :index))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -32,13 +30,11 @@ defmodule WebCATWeb.RotationGroupControllerTest do
     test "displays rotation group", %{conn: conn, user: user} do
       data = Factory.insert(:rotation_group)
 
-      response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_group_path(conn, :show, data.id))
+        |> get(DashboardRoutes.rotation_group_path(conn, :show, data.id))
         |> html_response(200)
 
-      response =~ RotationGroup.title_for(data)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -46,7 +42,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       redirect =
         conn
-        |> get(Routes.rotation_group_path(conn, :show, data.id))
+        |> get(DashboardRoutes.rotation_group_path(conn, :show, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -60,17 +56,17 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_group_path(conn, :new))
+        |> get(DashboardRoutes.rotation_group_path(conn, :new))
         |> html_response(200)
 
 
-      response =~ "Create New Category"
+      response =~ "Create New Rotation Group"
     end
 
     test "redirects user when not logged in", %{conn: conn} do
       redirect =
         conn
-        |> get(Routes.rotation_group_path(conn, :new))
+        |> get(DashboardRoutes.rotation_group_path(conn, :new))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -86,10 +82,10 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.rotation_group_path(conn, :create), %{rotation_group: data})
+        |> post(DashboardRoutes.rotation_group_path(conn, :create), %{rotation_group: data})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.rotation_group_path(conn, :index)
+      assert redirect =~ DashboardRoutes.rotation_group_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -97,7 +93,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       redirect =
         conn
-        |> post(Routes.rotation_group_path(conn, :create), %{rotation_group: data})
+        |> post(DashboardRoutes.rotation_group_path(conn, :create), %{rotation_group: data})
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -113,7 +109,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_group_path(conn, :edit, data.id))
+        |> get(DashboardRoutes.rotation_group_path(conn, :edit, data.id))
         |> html_response(200)
 
       response =~ "Edit Rotation Group"
@@ -124,7 +120,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       redirect =
         conn
-        |> get(Routes.rotation_group_path(conn, :edit, data.id))
+        |> get(DashboardRoutes.rotation_group_path(conn, :edit, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -141,10 +137,10 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.rotation_group_path(conn, :update, data.id), %{rotation_group: update})
+        |> put(DashboardRoutes.rotation_group_path(conn, :update, data.id), %{rotation_group: update})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.rotation_group_path(conn, :index)
+      assert redirect =~ DashboardRoutes.rotation_group_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -153,7 +149,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       redirect =
         conn
-        |> put(Routes.rotation_group_path(conn, :update, data.id), %{rotation_group: update})
+        |> put(DashboardRoutes.rotation_group_path(conn, :update, data.id), %{rotation_group: update})
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -169,10 +165,10 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> delete(Routes.rotation_group_path(conn, :delete, data.id))
+        |> delete(DashboardRoutes.rotation_group_path(conn, :delete, data.id))
         |> redirected_to(302)
 
-      assert redirect =~ Routes.rotation_group_path(conn, :index)
+      assert redirect =~ DashboardRoutes.rotation_group_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -180,7 +176,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       redirect =
         conn
-        |> delete(Routes.rotation_group_path(conn, :delete, data.id))
+        |> delete(DashboardRoutes.rotation_group_path(conn, :delete, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)

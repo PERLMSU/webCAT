@@ -4,6 +4,7 @@ defmodule WebCAT.Rotations.Section do
 
   use Ecto.Schema
   import Ecto.Changeset
+  alias WebCAT.Accounts.User
 
   schema "sections" do
     field(:number, :string)
@@ -14,13 +15,9 @@ defmodule WebCAT.Rotations.Section do
     many_to_many(:users, WebCAT.Accounts.User, join_through: "user_sections")
     many_to_many(:students, WebCAT.Rotations.Student, join_through: "section_students")
 
-
     timestamps()
   end
 
-  def title_for(section) do
-    section.number
-  end
 
   @required ~w(number semester_id)a
   @optional ~w(description)a
@@ -30,6 +27,17 @@ defmodule WebCAT.Rotations.Section do
     |> validate_required(@required)
     |> foreign_key_constraint(:semester_id)
   end
+
+  # Policy behaviour
+
+  def authorize(action, %User{}, _)
+      when action in ~w(list show)a,
+      do: true
+
+  def authorize(action, %User{role: "admin"}, _)
+      when action in ~w(create update delete)a,
+      do: true
+
   @spec authorize(any(), any(), any()) :: false
   def authorize(_, _, _), do: false
 end

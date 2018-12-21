@@ -23,6 +23,7 @@ defmodule WebCATWeb do
       import Plug.Conn
       import WebCATWeb.Gettext
       alias WebCATWeb.Router.Helpers, as: Routes
+      alias WebCATWeb.Dashboard.Router.Helpers, as: DashboardRoutes
       alias WebCATWeb.Auth.Guardian.Plug, as: Auth
     end
   end
@@ -39,6 +40,8 @@ defmodule WebCATWeb do
       use Phoenix.HTML
 
       alias WebCATWeb.Router.Helpers, as: Routes
+      alias WebCATWeb.Dashboard.Router.Helpers, as: DashboardRoutes
+      
       import WebCATWeb.ViewHelpers
     end
   end

@@ -12,6 +12,8 @@ defmodule WebCAT.Accounts.ConfirmationsTest do
     refute confirmation.verified
     assert confirmation.id == inserted.id
     assert confirmation.user_id == inserted.user_id
+
+    {:error, :not_found} = Confirmations.get("asdf")
   end
 
   test "confirm/1 behaves as expected" do
@@ -21,5 +23,7 @@ defmodule WebCAT.Accounts.ConfirmationsTest do
     assert confirmation.verified
     assert confirmation.id == inserted.id
     assert confirmation.user_id == inserted.user_id
+
+    {:error, :not_found} = Confirmations.confirm("asdf")
   end
 end

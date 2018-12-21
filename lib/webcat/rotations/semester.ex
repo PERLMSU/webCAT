@@ -31,30 +31,6 @@ defmodule WebCAT.Rotations.Semester do
     |> foreign_key_constraint(:classroom_id)
   end
 
-  def title_for(semester), do: semester.title
-
-  def table_fields(), do: ~w(title start_date end_date)a
-
-  def display(semester) do
-    semester
-    |> Map.from_struct()
-    |> Map.take(~w(title start_date end_date)a)
-    |> Map.update!(:start_date, fn value ->
-      if Timex.is_valid?(value) do
-        "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
-          Timex.format!(value, "{relative}", :relative)
-        })"
-      end
-    end)
-    |> Map.update!(:end_date, fn value ->
-      if Timex.is_valid?(value) do
-        "#{Timex.format!(value, "{Mfull} {D}, {YYYY}")} (#{
-          Timex.format!(value, "{relative}", :relative)
-        })"
-      end
-    end)
-  end
-
   # Policy behavior
 
   def authorize(action, %User{}, _)

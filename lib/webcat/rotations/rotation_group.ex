@@ -32,16 +32,6 @@ defmodule WebCAT.Rotations.RotationGroup do
     |> foreign_key_constraint(:rotation_id)
   end
 
-  def title_for(rotation_group), do: "Group #{rotation_group.number}"
-
-  def table_fields(), do: ~w(number description)a
-
-  def display(rotation_group) do
-    rotation_group
-    |> Map.from_struct()
-    |> Map.take(~w(description number)a)
-  end
-
   # Policy behavior
 
   def authorize(action, %User{}, _)

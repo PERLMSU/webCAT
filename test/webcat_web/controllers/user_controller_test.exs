@@ -1,8 +1,6 @@
 defmodule WebCATWeb.UserControllerTest do
   use WebCATWeb.ConnCase
 
-  alias WebCAT.Accounts.User
-
   describe "index/2" do
     setup ~w(login_user)a
 
@@ -10,7 +8,7 @@ defmodule WebCATWeb.UserControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.user_path(conn, :index))
+        |> get(DashboardRoutes.user_path(conn, :index))
         |> html_response(200)
 
       assert response =~ "Users"
@@ -19,7 +17,7 @@ defmodule WebCATWeb.UserControllerTest do
     test "redirects user when not logged in", %{conn: conn} do
       redirect =
         conn
-        |> get(Routes.user_path(conn, :index))
+        |> get(DashboardRoutes.user_path(conn, :index))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -32,13 +30,10 @@ defmodule WebCATWeb.UserControllerTest do
     test "displays user", %{conn: conn, user: user} do
       data = Factory.insert(:user)
 
-      response =
-        conn
-        |> Auth.sign_in(user)
-        |> get(Routes.user_path(conn, :show, data.id))
-        |> html_response(200)
-
-      response =~ User.title_for(data)
+      conn
+      |> Auth.sign_in(user)
+      |> get(DashboardRoutes.user_path(conn, :show, data.id))
+      |> html_response(200)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -46,7 +41,7 @@ defmodule WebCATWeb.UserControllerTest do
 
       redirect =
         conn
-        |> get(Routes.user_path(conn, :show, data.id))
+        |> get(DashboardRoutes.user_path(conn, :show, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -60,17 +55,16 @@ defmodule WebCATWeb.UserControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.user_path(conn, :new))
+        |> get(DashboardRoutes.user_path(conn, :new))
         |> html_response(200)
 
-
-      response =~ "Create New Category"
+      response =~ "Create New User"
     end
 
     test "redirects user when not logged in", %{conn: conn} do
       redirect =
         conn
-        |> get(Routes.user_path(conn, :new))
+        |> get(DashboardRoutes.user_path(conn, :new))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -86,10 +80,10 @@ defmodule WebCATWeb.UserControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.user_path(conn, :create), %{user: data})
+        |> post(DashboardRoutes.user_path(conn, :create), %{user: data})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.user_path(conn, :index)
+      assert redirect =~ DashboardRoutes.user_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -97,7 +91,7 @@ defmodule WebCATWeb.UserControllerTest do
 
       redirect =
         conn
-        |> post(Routes.user_path(conn, :create), %{user: data})
+        |> post(DashboardRoutes.user_path(conn, :create), %{user: data})
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -113,10 +107,10 @@ defmodule WebCATWeb.UserControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.user_path(conn, :edit, data.id))
+        |> get(DashboardRoutes.user_path(conn, :edit, data.id))
         |> html_response(200)
 
-      response =~ "Edit Rotation Group"
+      response =~ "Edit User"
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -124,7 +118,7 @@ defmodule WebCATWeb.UserControllerTest do
 
       redirect =
         conn
-        |> get(Routes.user_path(conn, :edit, data.id))
+        |> get(DashboardRoutes.user_path(conn, :edit, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -141,10 +135,10 @@ defmodule WebCATWeb.UserControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.user_path(conn, :update, data.id), %{user: update})
+        |> put(DashboardRoutes.user_path(conn, :update, data.id), %{user: update})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.user_path(conn, :index)
+      assert redirect =~ DashboardRoutes.user_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -153,7 +147,7 @@ defmodule WebCATWeb.UserControllerTest do
 
       redirect =
         conn
-        |> put(Routes.user_path(conn, :update, data.id), %{user: update})
+        |> put(DashboardRoutes.user_path(conn, :update, data.id), %{user: update})
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)
@@ -169,10 +163,10 @@ defmodule WebCATWeb.UserControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> delete(Routes.user_path(conn, :delete, data.id))
+        |> delete(DashboardRoutes.user_path(conn, :delete, data.id))
         |> redirected_to(302)
 
-      assert redirect =~ Routes.user_path(conn, :index)
+      assert redirect =~ DashboardRoutes.user_path(conn, :index)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -180,7 +174,7 @@ defmodule WebCATWeb.UserControllerTest do
 
       redirect =
         conn
-        |> delete(Routes.user_path(conn, :delete, data.id))
+        |> delete(DashboardRoutes.user_path(conn, :delete, data.id))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)

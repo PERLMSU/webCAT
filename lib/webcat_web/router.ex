@@ -45,16 +45,11 @@ defmodule WebCATWeb.Router do
   scope "/", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
-    resources("/categories", CategoryController)
-    resources("/classrooms", ClassroomController)
-    resources("/rotations", RotationController)
-    resources("/rotation_groups", RotationGroupController)
-    resources("/semesters", SemesterController)
-    resources("/students", StudentController)
-    resources("/users", UserController)
-
     get("/", IndexController, :index)
 
     get("/logout", LoginController, :logout)
+
+    forward("/", Dashboard.Router)
   end
+
 end

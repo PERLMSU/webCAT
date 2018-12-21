@@ -7,7 +7,7 @@ defmodule WebCAT.Accounts.Notification do
 
   schema "notifications" do
     field(:content, :string)
-    field(:seen, :boolean)
+    field(:seen, :boolean, default: false)
 
     belongs_to(:draft, WebCAT.Feedback.Draft)
     belongs_to(:user, WebCAT.Accounts.User)
@@ -19,10 +19,10 @@ defmodule WebCAT.Accounts.Notification do
   @optional ~w(seen)a
 
   @doc """
-  Create a changeset for a grade
+  Create a changeset for a notification
   """
-  def changeset(grade, attrs \\ %{}) do
-    grade
+  def changeset(notification, attrs \\ %{}) do
+    notification
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
     |> foreign_key_constraint(:draft_id)

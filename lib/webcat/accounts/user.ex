@@ -1,5 +1,4 @@
 defmodule WebCAT.Accounts.User do
-  @behaviour WebCAT.Dashboardable
   @behaviour Bodyguard.Policy
 
   @moduledoc """
@@ -27,7 +26,10 @@ defmodule WebCAT.Accounts.User do
     field(:active, :boolean)
     field(:role, :string)
 
-    many_to_many(:rotation_groups, WebCAT.Rotations.RotationGroup, join_through: "rotation_group_users")
+    many_to_many(:rotation_groups, WebCAT.Rotations.RotationGroup,
+      join_through: "rotation_group_users"
+    )
+
     many_to_many(:classrooms, WebCAT.Rotations.Classroom, join_through: "user_classrooms")
     many_to_many(:sections, WebCAT.Rotations.Section, join_through: "user_sections")
     has_many(:notifications, WebCAT.Accounts.Notification)
@@ -70,17 +72,6 @@ defmodule WebCAT.Accounts.User do
   end
 
   defp put_pass_hash(changeset), do: changeset
-
-  def title_for(user), do: "#{user.first_name} #{user.last_name}"
-
-  def table_fields(), do: ~w(last_name first_name username email role)a
-
-  def display(user) do
-    user
-    |> Map.from_struct()
-    |> Map.take(@required ++ @optional)
-    |> Map.drop(~w(password)a)
-  end
 
   # Policy behavior
 
