@@ -21,10 +21,13 @@ defmodule WebCAT.CRUDTest do
   end
 
   test "create/2 behaves as expected" do
-    params = Factory.params_for(:category)
+    params =
+      Factory.params_for(:category)
+      |> Map.put(:classroom_id, Factory.insert(:classroom).id)
 
     {:ok, category} = CRUD.create(Category, params)
     assert category.name == params.name
+    assert category.description == params.description
   end
 
   test "update/3 behaves as expected" do

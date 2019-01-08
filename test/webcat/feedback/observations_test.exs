@@ -5,7 +5,7 @@ defmodule WebCAT.Feedback.ObservationsTest do
 
   test "notes/2 behaves as expected" do
     inserted = Factory.insert(:observation)
-    Factory.insert_list(5, :observation_note, observation: inserted)
+    Factory.insert_list(5, :note, observation: inserted)
 
     notes = Observations.notes(inserted.id, limit: 2, offset: 1)
     assert Enum.count(notes) == 2

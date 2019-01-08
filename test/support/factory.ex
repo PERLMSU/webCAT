@@ -16,11 +16,6 @@ defmodule WebCAT.Factory do
       password: Comeonin.Pbkdf2.hashpwsalt("password"),
       nickname: sequence(:nickname, ~w(John Jane)),
       bio: Faker.Lorem.Shakespeare.hamlet(),
-      phone: "989-992-9183",
-      city: "East Lansing",
-      state: "MI",
-      country: "USA",
-      birthday: Date.to_iso8601(Timex.to_date(Timex.shift(Timex.now(), years: -18))),
       active: true,
       role: "instructor"
     }
@@ -52,7 +47,8 @@ defmodule WebCAT.Factory do
   def category_factory do
     %Category{
       name: sequence(:name, &"category#{&1}"),
-      description: Faker.Lorem.Shakespeare.hamlet()
+      description: Faker.Lorem.Shakespeare.hamlet(),
+      classroom: Factory.build(:classroom)
     }
   end
 
@@ -83,23 +79,18 @@ defmodule WebCAT.Factory do
     }
   end
 
-  def misc_note_factory do
+  def note_factory do
     %Note{
-      content: Faker.Lorem.Shakespeare.hamlet()
+      content: Faker.Lorem.Shakespeare.hamlet(),
+      observation: Factory.build(:observation)
     }
   end
 
   def student_note_factory do
     %Note{
       content: Faker.Lorem.Shakespeare.hamlet(),
+      observation: Factory.build(:observation),
       student: Factory.build(:student)
-    }
-  end
-
-  def observation_note_factory do
-    %Note{
-      content: Faker.Lorem.Shakespeare.hamlet(),
-      observation: Factory.build(:observation)
     }
   end
 
@@ -114,7 +105,7 @@ defmodule WebCAT.Factory do
 
   def classroom_factory do
     %Classroom{
-      course_code: "PHY183",
+      course_code: "PHY 183",
       title: "Physics for Scientists and Engineers I",
       description: Faker.Lorem.Shakespeare.hamlet()
     }

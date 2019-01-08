@@ -19,7 +19,6 @@ defmodule WebCATWeb.ConnCase do
       use Phoenix.ConnTest
 
       alias WebCATWeb.Router.Helpers, as: Routes
-      alias WebCATWeb.Dashboard.Router.Helpers, as: DashboardRoutes
       alias WebCATWeb.Auth.Guardian.Plug, as: Auth
       alias WebCAT.Accounts.Users
       alias WebCAT.Factory

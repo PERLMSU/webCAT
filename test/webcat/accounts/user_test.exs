@@ -8,14 +8,11 @@ defmodule WebCAT.Accounts.UserTest do
       assert User.changeset(%User{}, Factory.params_for(:user)).valid?
       refute User.changeset(%User{}, Factory.params_for(:user, first_name: nil)).valid?
       refute User.changeset(%User{}, Factory.params_for(:user, email: "email")).valid?
-      refute User.changeset(%User{}, Factory.params_for(:user, phone: "(989) 992-91")).valid?
 
       refute User.changeset(
                %User{},
                Factory.params_for(:user, username: "wayToooooooLonngGGGggGGGGGGG")
              ).valid?
-
-      refute User.changeset(%User{}, Factory.params_for(:user, state: "Michigan")).valid?
 
       refute User.changeset(%User{}, Factory.params_for(:user, username: "invalid_chars_used@!")).valid?
 
