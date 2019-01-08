@@ -53,3 +53,4 @@ cover
 .idea
 .python-version
 webcat.iml
+/assets/yarn-error.log

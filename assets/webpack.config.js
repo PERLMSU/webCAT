@@ -14,6 +14,7 @@ module.exports = (env, options) => ({
     },
     entry: {
         app: './js/app.js',
+        form: './js/form.js',
     },
     output: {
         filename: '[name].js',
@@ -43,6 +44,9 @@ module.exports = (env, options) => ({
     },
     plugins: [
         new MiniCSSExtractPlugin({ filename: '../css/[name].css' }),
-        new CopyWebpackPlugin([{ from: 'static/', to: '../' }])
+        new CopyWebpackPlugin([{ from: 'static/', to: '../' }]),
+        new CopyWebpackPlugin([{ from: 'node_modules/@fortawesome/fontawesome-pro/webfonts/', to: '../webfonts' }]),
+        new CopyWebpackPlugin([{ from: 'node_modules/@fortawesome/fontawesome-pro/css/all.min.css', to: '../css/fa.min.css' }]),
+        new CopyWebpackPlugin([{ from: 'node_modules/selectize/dist/css/selectize.default.css', to: '../css/selectize.min.css' }]),
     ]
 });
