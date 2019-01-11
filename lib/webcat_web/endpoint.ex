@@ -1,5 +1,6 @@
 defmodule WebCATWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :webcat
+  use Sentry.Phoenix.Endpoint
 
   socket("/socket", WebCATWeb.UserSocket, websocket: true)
 
@@ -7,7 +8,7 @@ defmodule WebCATWeb.Endpoint do
     at: "/",
     from: :webcat,
     gzip: false,
-    only: ~w(css js images favicon.ico robots.txt)
+    only: ~w(css js images webfonts favicon.ico robots.txt)
   )
 
   # Code reloading can be explicitly enabled under the

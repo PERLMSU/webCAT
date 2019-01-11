@@ -1,6 +1,7 @@
 defmodule WebCATWeb.Router do
   use WebCATWeb, :router
   use Plug.ErrorHandler
+  use Sentry.Plug
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -42,14 +43,36 @@ defmodule WebCATWeb.Router do
     get("/:rotation_group_id", FeedbackController, :show_rotation_group)
   end
 
-  scope "/", WebCATWeb do
+  scope "/inbox", WebCATWeb do
+    pipe_through(~w(browser authenticated)a)
+
+    resources("/", InboxController)
+  end
+
+  scope "/dashboard", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
     get("/", IndexController, :index)
 
-    get("/logout", LoginController, :logout)
+    importable_resources("/users", UserController)
 
-    forward("/", Dashboard.Router)
+    importable_resources("/students", StudentController)
+
+    importable_resources("/classrooms", ClassroomController)
+    importable_resources("/semesters", SemesterController)
+    importable_resources("/sections", SectionController)
+    importable_resources("/rotations", RotationController)
+    importable_resources("/rotation_groups", RotationGroupController)
+
+    importable_resources("/criteria", CriteriaController)
+
+    importable_resources("/categories", CategoryController)
   end
 
+  scope "/", WebCATWeb do
+    pipe_through(~w(browser authenticated)a)
+
+    get("/", IndexController, :redirect_index)
+    get("/logout", LoginController, :logout)
+  end
 end

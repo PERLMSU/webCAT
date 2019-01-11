@@ -31,6 +31,11 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :sentry,
+  dsn: "https://04d54265f946462f96fb82fd3b1ee728@sentry.io/1369784",
+  included_environments: [:prod],
+  environment_name: Mix.env()
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

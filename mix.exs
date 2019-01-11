@@ -56,7 +56,8 @@ defmodule WebCAT.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:postgrex, ">= 0.0.0"},
       {:proper_case, "~> 1.0.2"},
-      {:timex, "~> 3.4"}
+      {:timex, "~> 3.4"},
+      {:sentry, "~> 7.0"},
     ]
   end
 
