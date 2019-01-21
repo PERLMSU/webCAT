@@ -59,14 +59,14 @@ defmodule WebCATWeb.Router do
     importable_resources("/students", StudentController)
 
     importable_resources("/classrooms", ClassroomController)
-    importable_resources("/semesters", SemesterController)
-    importable_resources("/sections", SectionController)
-    importable_resources("/rotations", RotationController)
-    importable_resources("/rotation_groups", RotationGroupController)
+    importable_resources("/classrooms/:classroom_id/semesters", SemesterController)
+    importable_resources("/semesters/:semester_id/sections", SectionController)
+    importable_resources("/sections/:section_id/rotations", RotationController)
+    importable_resources("/rotations/:rotation_id/rotation_groups", RotationGroupController)
 
-    importable_resources("/criteria", CriteriaController)
+    importable_resources("/classrooms/:classroom_id/criteria", CriteriaController)
 
-    importable_resources("/categories", CategoryController)
+    importable_resources("/classrooms/:classroom_id/categories", CategoryController)
   end
 
   scope "/", WebCATWeb do
