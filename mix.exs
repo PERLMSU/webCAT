@@ -47,7 +47,7 @@ defmodule WebCAT.Mixfile do
       {:ex_machina, "~> 2.2", exclude: :prod},
       {:gettext, "~> 0.16"},
       {:guardian, git: "https://github.com/bbuscarino/guardian"},
-      {:jason, "~> 1.0.0"},
+      {:jason, "~> 1.1"},
       {:pbkdf2_elixir, "~> 0.12"},
       {:phoenix, "~> 1.4.0", override: true},
       {:phoenix_pubsub, "~> 1.0"},
@@ -58,6 +58,7 @@ defmodule WebCAT.Mixfile do
       {:proper_case, "~> 1.0.2"},
       {:timex, "~> 3.4"},
       {:sentry, "~> 7.0"},
+      {:csv, "~> 2.0.0"}
     ]
   end
 
