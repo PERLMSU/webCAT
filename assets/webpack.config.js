@@ -15,6 +15,7 @@ module.exports = (env, options) => ({
     entry: {
         app: './js/app.js',
         form: './js/form.js',
+        messages: './js/messages.js',
     },
     output: {
         filename: '[name].js',
