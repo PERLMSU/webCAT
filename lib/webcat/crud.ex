@@ -13,10 +13,11 @@ defmodule WebCAT.CRUD do
   """
   def list(schema, options \\ []) do
     schema
+    |> where(^Keyword.get(options, :where, []))
     |> limit(^Keyword.get(options, :limit, 25))
     |> offset(^Keyword.get(options, :offset, 0))
     |> preload(^Keyword.get(options, :preload, []))
-    |> order_by(~w(inserted_at updated_at))
+    |> order_by(~w(updated_at inserted_at))
     |> Repo.all()
   end
 
@@ -46,9 +47,14 @@ defmodule WebCAT.CRUD do
   @doc """
   Update
   """
+  def update(schema, struct, update) when is_map(struct) do
+    schema.changeset(struct, update)
+    |> Repo.update()
+  end
+
   def update(schema, id, update) do
     with {:ok, it} <- get(schema, id) do
-      apply(schema, :changeset, [it, update])
+      schema.changeset(it, update)
       |> Repo.update()
     end
   end

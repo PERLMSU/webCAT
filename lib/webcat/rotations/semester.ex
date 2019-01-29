@@ -1,5 +1,5 @@
 defmodule WebCAT.Rotations.Semester do
-  @behaviour WebCAT.Dashboardable
+  @behaviour Bodyguard.Policy
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -7,9 +7,9 @@ defmodule WebCAT.Rotations.Semester do
   alias WebCAT.Accounts.User
 
   schema "semesters" do
+    field(:title, :string)
     field(:start_date, :date)
     field(:end_date, :date)
-    field(:title, :string)
 
     belongs_to(:classroom, WebCAT.Rotations.Classroom)
     has_many(:sections, WebCAT.Rotations.Section)

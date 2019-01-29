@@ -3,7 +3,10 @@ defmodule WebCAT.Feedback.Draft do
 
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
   alias WebCAT.Accounts.User
+  alias WebCAT.Feedback.Observation
+  alias WebCAT.Repo
 
   schema "drafts" do
     field(:content, :string)
@@ -30,11 +33,18 @@ defmodule WebCAT.Feedback.Draft do
     |> validate_inclusion(:status, ~w(unreviewed reviewing needs_revision approved emailed))
     |> foreign_key_constraint(:student_id)
     |> foreign_key_constraint(:rotation_group_id)
+    |> put_observations(Map.get(attrs, "observations"))
   end
 
-  def title_for(draft) do
-    String.slice(draft.content, 0..15) <> "..."
+  defp put_observations(%{valid?: true} = changeset, observations) when is_list(observations) do
+    put_assoc(
+      changeset,
+      :observations,
+      Repo.all(from(o in Observation, where: o.id in ^observations))
+    )
   end
+
+  defp put_observations(changeset, _), do: changeset
 
   # Policy behavior
 

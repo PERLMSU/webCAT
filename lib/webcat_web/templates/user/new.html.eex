@@ -1,0 +1,14 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li>
+            <%= link("Users", to: Routes.user_path(@conn, :index)) %>
+        </li>
+        <li class="is-active">
+            <%= link("New", to: Routes.user_path(@conn, :new)) %>
+        </li>
+    </ul>
+</nav>
+<h1 class="title">New User</h1>
+<hr>
+<%= form(@conn, @changeset) %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

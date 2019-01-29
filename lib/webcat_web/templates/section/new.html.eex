@@ -1,0 +1,14 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
+        <li><%= link(@semester.classroom.title, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %></li>
+        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @semester.classroom_id)) %></li>
+        <li><%= link(@semester.title, to: Routes.semester_path(@conn, :show, @semester.id)) %></li>
+        <li><%= link("Sections", to: Routes.section_path(@conn, :index, semester_id: @semester.id))%></li>
+        <li class="is-active"><%= link("New", to: Routes.semester_path(@conn, :new, semester_id: @semester.id)) %></li>
+    </ul>
+</nav>
+<h1 class="title">New Section</h1>
+<hr>
+<%= form(@conn, @changeset) %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

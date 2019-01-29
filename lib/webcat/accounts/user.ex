@@ -8,6 +8,9 @@ defmodule WebCAT.Accounts.User do
   alias Comeonin.Pbkdf2
   import Ecto.Changeset
   alias WebCAT.Accounts.User
+  alias WebCAT.Rotations.{Classroom, RotationGroup, Section}
+  alias WebCAT.Repo
+  import Ecto.Query
 
   schema "users" do
     field(:first_name, :string)
@@ -18,27 +21,19 @@ defmodule WebCAT.Accounts.User do
     field(:password, :string)
     field(:nickname, :string)
     field(:bio, :string)
-    field(:phone, :string)
-    field(:city, :string)
-    field(:state, :string)
-    field(:country, :string)
-    field(:birthday, :date)
-    field(:active, :boolean)
-    field(:role, :string)
+    field(:active, :boolean, default: true)
+    field(:role, :string, default: "assistant")
 
-    many_to_many(:rotation_groups, WebCAT.Rotations.RotationGroup,
-      join_through: "rotation_group_users"
-    )
-
-    many_to_many(:classrooms, WebCAT.Rotations.Classroom, join_through: "user_classrooms")
-    many_to_many(:sections, WebCAT.Rotations.Section, join_through: "user_sections")
+    many_to_many(:classrooms, Classroom, join_through: "user_classrooms")
+    many_to_many(:sections, Section, join_through: "user_sections")
+    many_to_many(:rotation_groups, RotationGroup, join_through: "rotation_group_users")
     has_many(:notifications, WebCAT.Accounts.Notification)
 
     timestamps()
   end
 
   @required ~w(first_name last_name email username password role)a
-  @optional ~w(middle_name nickname bio phone city state country birthday active)a
+  @optional ~w(middle_name nickname bio active)a
 
   @doc """
   Build a changeset for a user
@@ -48,15 +43,14 @@ defmodule WebCAT.Accounts.User do
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
     |> validate_format(:email, ~r/(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)/)
-    # 999-999-9999 format numbers for simplicity
-    |> validate_format(:phone, ~r/^\d{3}-\d{3}-\d{4}$/)
-    # MI, AZ, AK, etc.
-    |> validate_format(:state, ~r/^[A-Z]{2}$/)
     # letters and numbers up to 24 characters
     |> validate_format(:username, ~r/^[\w\d]{1,24}$/)
-    |> validate_inclusion(:role, ~w(instructor admin))
+    |> validate_inclusion(:role, ~w(assistant instructor admin))
     |> unique_constraint(:email)
     |> unique_constraint(:username)
+    |> put_classrooms(Map.get(attrs, "classrooms"))
+    |> put_sections(Map.get(attrs, "sections"))
+    |> put_rotation_groups(Map.get(attrs, "rotation_groups"))
   end
 
   @doc """
@@ -72,6 +66,29 @@ defmodule WebCAT.Accounts.User do
   end
 
   defp put_pass_hash(changeset), do: changeset
+
+  defp put_classrooms(%{valid?: true} = changeset, classrooms) when is_list(classrooms) do
+    put_assoc(changeset, :classrooms, Repo.all(from(c in Classroom, where: c.id in ^classrooms)))
+  end
+
+  defp put_classrooms(changeset, _), do: changeset
+
+  defp put_sections(%{valid?: true} = changeset, sections) when is_list(sections) do
+    put_assoc(changeset, :sections, Repo.all(from(s in Section, where: s.id in ^sections)))
+  end
+
+  defp put_sections(changeset, _), do: changeset
+
+  defp put_rotation_groups(%{valid?: true} = changeset, rotation_groups)
+       when is_list(rotation_groups) do
+    put_assoc(
+      changeset,
+      :rotation_groups,
+      Repo.all(from(r in RotationGroup, where: r.id in ^rotation_groups))
+    )
+  end
+
+  defp put_rotation_groups(changeset, _), do: changeset
 
   # Policy behavior
 

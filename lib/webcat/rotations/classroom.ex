@@ -1,10 +1,11 @@
 defmodule WebCAT.Rotations.Classroom do
-  @behaviour WebCAT.Dashboardable
   @behaviour Bodyguard.Policy
 
   use Ecto.Schema
   import Ecto.Changeset
   alias WebCAT.Accounts.User
+  alias WebCAT.Repo
+  import Ecto.Query
 
   schema "classrooms" do
     field(:course_code, :string)
@@ -12,7 +13,7 @@ defmodule WebCAT.Rotations.Classroom do
     field(:description, :string)
 
     has_many(:semesters, WebCAT.Rotations.Semester)
-    many_to_many(:users, WebCAT.Accounts.User, join_through: "user_classrooms")
+    many_to_many(:users, User, join_through: "user_classrooms")
 
     timestamps()
   end
@@ -27,7 +28,14 @@ defmodule WebCAT.Rotations.Classroom do
     classroom
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
+    |> put_users(Map.get(attrs, "users"))
   end
+
+  defp put_users(%{valid?: true} = changeset, users) when is_list(users) do
+    put_assoc(changeset, :users, Repo.all(from(u in User, where: u.id in ^users)))
+  end
+
+  defp put_users(changeset, _), do: changeset
 
   # Policy behavior
 
@@ -36,7 +44,7 @@ defmodule WebCAT.Rotations.Classroom do
       do: true
 
   def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create update delete)a,
+      when action in ~w(create update delete import)a,
       do: true
 
   def authorize(_, _, _), do: false

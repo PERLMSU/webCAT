@@ -23,7 +23,6 @@ defmodule WebCATWeb do
       import Plug.Conn
       import WebCATWeb.Gettext
       alias WebCATWeb.Router.Helpers, as: Routes
-      alias WebCATWeb.Dashboard.Router.Helpers, as: DashboardRoutes
       alias WebCATWeb.Auth.Guardian.Plug, as: Auth
     end
   end
@@ -32,16 +31,11 @@ defmodule WebCATWeb do
     quote do
       use Phoenix.View, root: "lib/webcat_web/templates",
                         namespace: WebCATWeb
-
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
-
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
-
       alias WebCATWeb.Router.Helpers, as: Routes
-      alias WebCATWeb.Dashboard.Router.Helpers, as: DashboardRoutes
-      
       import WebCATWeb.ViewHelpers
     end
   end
@@ -51,6 +45,7 @@ defmodule WebCATWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import WebCATWeb.RouterHelpers
     end
   end
 

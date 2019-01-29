@@ -95,5 +95,6 @@ defmodule WebCAT.Repo.Migrations.Feedback do
     end
 
     create(unique_index(:categories, ~w(name)a))
+    create(unique_index(:criteria, ~w(title)a))
   end
 end

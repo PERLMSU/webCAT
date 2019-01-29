@@ -40,7 +40,7 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     get("/", FeedbackController, :index)
-    get("/:rotation_group_id", FeedbackController, :show_rotation_group)
+    get("/:rotation_group_id", FeedbackController, :show)
   end
 
   scope "/inbox", WebCATWeb do

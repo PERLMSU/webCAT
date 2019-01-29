@@ -4,32 +4,74 @@ defmodule WebCATWeb.ViewHelpers do
   """
   use Phoenix.HTML
 
-  alias WebCAT.CRUD
-  alias WebCATWeb.Router.Helpers, as: Routes
-
   @doc """
   Generates tag for inlined form input errors.
   """
   def error_tag(form, field) do
-    if error = form.errors[field] do
-      {message, _} = error
-      content_tag(:p, message, class: "help is-danger")
-    else
-      ""
-    end
+    Enum.map(Keyword.get_values(form.errors, field), fn {error, _} ->
+      content_tag(:p, error, class: "help is-danger")
+    end)
   end
 
   def icon_button(text, icon, opts \\ []) do
     to = Keyword.get(opts, :to, "")
     class = Keyword.get(opts, :class, "")
 
-    content_tag(:a, href: to, class: "button #{class}") do
+    icon_class =
+      case Keyword.get(opts, :style, :regular) do
+        :regular -> "far"
+        :solid -> "fas"
+        :light -> "fal"
+        :brand -> "fab"
+        _ -> "far"
+      end
+
+    on_click = Keyword.get(opts, :onclick, "")
+
+    content_tag(:a, href: to, class: "button #{class}", onclick: on_click) do
       [
         content_tag(:span, class: "icon") do
-          content_tag(:i, "", class: "fas fa-#{icon}")
+          content_tag(:i, "", class: "#{icon_class} fa-#{icon}")
         end,
         content_tag(:span, text)
       ]
+    end
+  end
+
+  defmacro form_field(label, field, type \\ :text) do
+    block =
+      case type do
+        :textarea ->
+          quote do
+            textarea(var!(f), unquote(field), class: "input")
+          end
+
+        :text ->
+          quote do
+            text_input(var!(f), unquote(field), class: "input")
+          end
+
+        :phone ->
+          quote do
+            telephone_input(var!(f), unquote(field), class: "input")
+          end
+
+        :date ->
+          quote do
+            date_input(var!(f), unquote(field), class: "input")
+          end
+      end
+
+    quote do
+      content_tag(:div, class: "field") do
+        [
+          label(var!(f), unquote(field), unquote(label)),
+          content_tag(:div, class: "control") do
+            unquote(block)
+          end,
+          error_tag(var!(f), unquote(field))
+        ]
+      end
     end
   end
 

@@ -1,5 +1,4 @@
 defmodule WebCAT.Feedback.Category do
-  @behaviour WebCAT.Dashboardable
   @behaviour Bodyguard.Policy
 
   use Ecto.Schema
@@ -18,7 +17,7 @@ defmodule WebCAT.Feedback.Category do
     timestamps()
   end
 
-  @required ~w(name)a
+  @required ~w(name classroom_id)a
   @optional ~w(description parent_category_id)a
 
   @doc """
@@ -26,23 +25,13 @@ defmodule WebCAT.Feedback.Category do
   """
   def changeset(category, attrs \\ %{}) do
     category
-    |> cast(attrs, ~w(name description parent_category_id)a)
-    |> validate_required(~w(name)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> foreign_key_constraint(:parent_category_id)
     |> unique_constraint(:name)
   end
 
-  def title_for(category), do: category.name
-
-  def table_fields(), do: ~w(name description)a
-
-  def display(category) do
-    category
-    |> Map.from_struct()
-    |> Map.take(~w(name description)a)
-  end
-
-  # Policy behavior
+  # Policy behaviour
 
   def authorize(action, %User{}, _)
       when action in ~w(list show)a,

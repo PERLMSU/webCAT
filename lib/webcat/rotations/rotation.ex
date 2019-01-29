@@ -1,5 +1,4 @@
 defmodule WebCAT.Rotations.Rotation do
-  @behaviour WebCAT.Dashboardable
   @behaviour Bodyguard.Policy
 
   use Ecto.Schema

@@ -14,13 +14,16 @@ defmodule WebCAT.Feedback.Email do
     timestamps()
   end
 
+  @required ~w(status draft_id)a
+  @optional ~w(status_message)a
+
   @doc """
   Create a changeset for an email
   """
   def changeset(email, attrs \\ %{}) do
     email
-    |> cast(attrs, ~w(status status_message draft_id)a)
-    |> validate_required(~w(status draft_id)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> foreign_key_constraint(:draft_id)
   end
 

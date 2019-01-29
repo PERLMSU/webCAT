@@ -9,7 +9,9 @@ defmodule WebCATWeb.PasswordResetController do
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    conn
+    |> put_layout({WebCATWeb.LayoutView, "public.html"})
+    |> render("index.html")
   end
 
   def create(conn, %{"email" => email}) do
@@ -28,7 +30,9 @@ defmodule WebCATWeb.PasswordResetController do
         |> redirect(to: Routes.login_path(conn, :index))
 
       _ ->
-        render(conn, "reset.html", conn: conn, token: token)
+        conn
+        |> put_layout({WebCATWeb.LayoutView, "public.html"})
+        |> render("reset.html", conn: conn, token: token)
     end
   end
 

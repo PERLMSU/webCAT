@@ -1,14 +1,16 @@
 defmodule WebCAT.Rotations.RotationGroup do
-  @behaviour WebCAT.Dashboardable
   @behaviour Bodyguard.Policy
 
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
   alias WebCAT.Accounts.User
+  alias WebCAT.Rotations.Student
+  alias WebCAT.Repo
 
   schema "rotation_groups" do
-    field(:description, :string)
     field(:number, :integer)
+    field(:description, :string)
 
     belongs_to(:rotation, WebCAT.Rotations.Rotation)
 
@@ -30,7 +32,22 @@ defmodule WebCAT.Rotations.RotationGroup do
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
     |> foreign_key_constraint(:rotation_id)
+    |> put_users(Map.get(attrs, "users"))
+    |> put_students(Map.get(attrs, "students"))
   end
+
+  defp put_users(%{valid?: true} = changeset, users) when is_list(users) do
+    put_assoc(changeset, :users, Repo.all(from(u in User, where: u.id in ^users)))
+  end
+
+  defp put_users(changeset, _), do: changeset
+
+  defp put_students(%{valid?: true} = changeset, students) when is_list(students) do
+    put_assoc(changeset, :students, Repo.all(from(s in Student, where: s.id in ^students)))
+  end
+
+  defp put_students(changeset, _), do: changeset
+
 
   # Policy behavior
 

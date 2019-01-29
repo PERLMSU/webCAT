@@ -1,0 +1,22 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li>
+            <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
+        </li>
+        <li>
+            <%= link(@changeset.data.classroom.title, to: Routes.classroom_path(@conn, :show, @changeset.data.classroom_id)) %>
+        </li>
+        <li>
+            <%= link("Semesters", to: Routes.semester_path(@conn, :index, @changeset.data.classroom_id)) %>
+        </li>
+        <li class="is-active">
+            <%= link("Edit", to: Routes.semester_path(@conn, :edit, @changeset.data.classroom_id, @changeset.data.id)) %>
+        </li>
+    </ul>
+</nav>
+<h1 class="title">Edit Semester:
+    <%= @changeset.data.title %>
+</h1>
+<hr>
+<%= form(@conn, @changeset) %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

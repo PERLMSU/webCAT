@@ -6,9 +6,8 @@ defmodule WebCAT.Accounts.Users do
 
   alias WebCAT.Repo
   alias WebCAT.Accounts.{User, Confirmation, Notification}
-  alias WebCAT.Rotations.{Classroom, RotationGroup}
+  alias WebCAT.Rotations.{Classroom, RotationGroup, Section}
   alias Comeonin.Pbkdf2
-  alias WebCAT.CRUD
   alias Ecto.Changeset
   alias Ecto.Multi
   import Ecto.Query
@@ -74,10 +73,53 @@ defmodule WebCAT.Accounts.Users do
 
   @doc """
   Get all associated rotation groups for a user
+  assistants only get rotation groups they're assigned to
   """
-  @spec rotation_groups(integer, Keyword.t()) :: [RotationGroup.t()]
-  def rotation_groups(user_id, options \\ []) do
+  @spec rotation_groups(integer) :: [RotationGroup.t()]
+  def rotation_groups(user) do
+    case user.role do
+      "assistant" ->
+        RotationGroup
+        |> join(:inner, [rg], u in assoc(rg, :users))
+        |> join(:inner, [rg], r in assoc(rg, :rotation))
+        |> where([_rg, u], u.id == ^user.id)
+        |> group_by([rg], rg.rotation_id)
+        |> preload([_rg, _u, r], rotation: r)
+        |> order_by([_rg, _u, r], desc: r.start_date)
+        |> select([rg], rg)
+        |> Repo.all()
 
+      "instructor" ->
+        Section
+        |> join(:inner, [s], u in assoc(s, :users))
+        |> join(:inner, [s], r in assoc(s, :rotations))
+        |> join(:inner, [_s, _u, r], r in assoc(r, :rotation_groups))
+        |> where([_s, u], u.id == ^user.id)
+        |> group_by([_s, _u, _r, rg], rg.rotation_id)
+        |> order_by([_s, _u, r], desc: r.start_date)
+        |> select([_s, _u, _r, rg], rg)
+        |> Repo.all()
+
+      "admin" ->
+        RotationGroup
+        |> join(:inner, [rg], c in assoc(rg, :classrooms))
+        |> join(:inner, [_rg, c], u in assoc(c, :users))
+        |> join(:inner, [_rg, c, _u], s in assoc(c, :sections))
+        |> join(:inner, [_rg, _c, _u, s], r in assoc(s, :rotations))
+        |> join(:inner, [_rg, _c, _u, _s, r], r in assoc(r, :rotation_groups))
+        |> where([_s, u], u.id == ^user.id)
+        |> Repo.all()
+    end
+
+    RotationGroup
+    |> join(:inner, [rg], u in assoc(rg, :users))
+    |> join(:inner, [rg], s in assoc(rg, :students))
+    |> join(:inner, [rg], o in assoc(rg, :observations))
+    |> join(:inner, [rg], r in assoc(rg, :rotation))
+    |> where([_, u], u.id == ^user.id)
+    |> order_by([_, _, _, _, r], desc: r.number)
+    |> preload([_, _, s, o, r], students: s, observations: o, rotation: r)
+    |> Repo.all()
   end
 
   @doc """

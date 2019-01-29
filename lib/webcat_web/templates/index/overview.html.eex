@@ -1,0 +1,37 @@
+<div class="box">
+    <h1 class="title has-text-centered">Stats</h1>
+    <nav class="level">
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="heading">Students</p>
+                <p class="title">
+                    <%= @counts.students %>
+                </p>
+            </div>
+        </div>
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="heading">Observations</p>
+                <p class="title">
+                    <%= @counts.observations %>
+                </p>
+            </div>
+        </div>
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="heading">Feedback Emails Sent</p>
+                <p class="title">
+                    <%= @counts.emails %>
+                </p>
+            </div>
+        </div>
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="heading">Users</p>
+                <p class="title">
+                    <%= @counts.users %>
+                </p>
+            </div>
+        </div>
+    </nav>
+</div>

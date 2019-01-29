@@ -7,10 +7,7 @@ defmodule WebCATWeb.IndexController do
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, _params) do
-
-
-    user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
-    
+    user = Auth.current_resource(conn)
 
     # Grab simple statistics
     counts = %{
@@ -20,6 +17,10 @@ defmodule WebCATWeb.IndexController do
       users: Repo.aggregate(from(u in "users"), :count, :id)
     }
 
-    render(conn, "stats.html", user: user, counts: counts)
+    render(conn, "overview.html", user: user, counts: counts, selected: "overview")
+  end
+
+  def redirect_index(conn, _params) do
+    redirect(conn, to: Routes.index_path(conn, :index))
   end
 end

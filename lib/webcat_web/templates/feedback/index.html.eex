@@ -1,2 +1,3 @@
-<%= @current_rotation_group == nil %>
-<%= @rotation_groups == [] %>
+<%= for rotation_group <- @rotation_groups do %>
+    <%= rotation_group.number %>
+<% end %>

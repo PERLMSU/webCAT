@@ -10,9 +10,11 @@ defmodule WebCATWeb.LoginController do
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, params) do
-    render(conn, "login.html",
-      redirect: Map.get(params, "redirect", Routes.index_path(conn, :index))
-    )
+    redirect = Map.get(params, "redirect", Routes.index_path(conn, :index))
+
+    conn
+    |> put_layout({WebCATWeb.LayoutView, "public.html"})
+    |> render("login.html", redirect: redirect)
   end
 
   def login(conn, params) do

@@ -13,13 +13,16 @@ defmodule WebCAT.Feedback.Explanation do
     timestamps()
   end
 
+  @required ~w(content observation_id)a
+  @optional ~w()a
+
   @doc """
   Create a changeset for an explanation
   """
   def changeset(explanation, attrs \\ %{}) do
     explanation
-    |> cast(attrs, ~w(content observation_id)a)
-    |> validate_required(~w(content observation_id)a)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
     |> foreign_key_constraint(:observation_id)
   end
 

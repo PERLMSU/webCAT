@@ -673,6 +673,11 @@
   resolved "https://npm.fontawesome.com/@fortawesome/fontawesome-pro/-/fontawesome-pro-5.4.1.tgz#b27d3cdf7c00112d7b0513e3330b19655d7653fe"
   integrity sha512-HxTvToks1scW+IvXkawmSuYE2cNJCxspEnmko0uFqq4WUEXraYVbFXM3EzvFb+wdHQBrsc2Fk6TBo7Fg95W9/A==
 
+"@vizuaalog/bulmajs@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@vizuaalog/bulmajs/-/bulmajs-0.7.0.tgz#0fcb9b8529453e82d865a80bdb729fca01fef8e3"
+  integrity sha512-VnQL2M5KHPRxCGXsKGpwP8oOorfZCJ/WVPVii7fUAvJNTclR0DWVLc7hVUilQy6FMp+dCOM8iIGaAmFiHGBTXQ==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -3311,11 +3316,6 @@ jquery@3.3.1:
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
   integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
 
-jquery@^1.7.0:
-  version "1.12.4"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-1.12.4.tgz#01e1dfba290fe73deba77ceeacb0f9ba2fec9e0c"
-  integrity sha1-AeHfuikP5z3rp3zurLD5ui/sngw=
-
 js-base64@^2.1.8:
   version "2.4.9"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.4.9.tgz#748911fb04f48a60c4771b375cac45a80df11c03"
@@ -5248,16 +5248,7 @@ scss-tokenizer@^0.2.3:
     js-base64 "^2.1.8"
     source-map "^0.4.2"
 
-selectize.js@0.12.12:
-  version "0.12.12"
-  resolved "https://registry.yarnpkg.com/selectize.js/-/selectize.js-0.12.12.tgz#67321487881a81506abe388b2995d3af3ad6edcd"
-  integrity sha1-ZzIUh4gagVBqvjiLKZXTrzrW7c0=
-  dependencies:
-    jquery "^1.7.0"
-    microplugin "0.0.3"
-    sifter "^0.5.1"
-
-selectize@^0.12.6:
+selectize@0.12.6:
   version "0.12.6"
   resolved "https://registry.yarnpkg.com/selectize/-/selectize-0.12.6.tgz#c2cf08cbaa4cb06c5e99bb452919d71b080690d6"
   integrity sha512-bWO5A7G+I8+QXyjLfQUgh31VI4WKYagUZQxAXlDyUmDDNrFxrASV0W9hxCOl0XJ/XQ1dZEu3G9HjXV4Wj0yb6w==
