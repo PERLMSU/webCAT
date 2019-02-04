@@ -117,12 +117,12 @@ defmodule WebCATWeb.RotationController do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Rotation deleted successfully")
-          |> redirect(to: Routes.rotation_path(conn, :index, section_id: rotation.section_id))
+          |> redirect(to: Routes.rotation_path(conn, :index, rotation.section_id))
 
         {:error, _} ->
           conn
           |> put_flash(:error, "Rotation deletion failed")
-          |> redirect(to: Routes.rotation_path(conn, :index, section_id: rotation.section_id))
+          |> redirect(to: Routes.rotation_path(conn, :index, rotation.section_id))
       end
     end
   end

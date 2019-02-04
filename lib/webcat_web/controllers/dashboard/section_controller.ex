@@ -115,12 +115,12 @@ defmodule WebCATWeb.SectionController do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Section deleted successfully")
-          |> redirect(to: Routes.section_path(conn, :index, semester_id: section.semester_id))
+          |> redirect(to: Routes.section_path(conn, :index, section.semester_id))
 
         {:error, _} ->
           conn
           |> put_flash(:error, "Section deletion failed")
-          |> redirect(to: Routes.section_path(conn, :index, semester_id: section.semester_id))
+          |> redirect(to: Routes.section_path(conn, :index, section.semester_id))
       end
     end
   end

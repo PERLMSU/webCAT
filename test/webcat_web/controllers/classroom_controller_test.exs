@@ -91,7 +91,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> post(Routes.classroom_path(conn, :create), %{classroom: data})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.classroom_path(conn, :index) <> "\/\d+"
+      assert Regex.match?(~r/#{Routes.classroom_path(conn, :index)}\/\d+/, redirect)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -189,7 +189,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
     end
   end
 
-  
+
 
   defp login_user(_) do
     {:ok, user} = Users.login("wcat_admin@msu.edu", "password")

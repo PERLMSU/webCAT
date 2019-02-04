@@ -92,7 +92,7 @@ defmodule WebCATWeb.UserControllerTest do
         |> post(Routes.user_path(conn, :create), %{user: data})
         |> redirected_to(302)
 
-      assert redirect =~ Routes.user_path(conn, :index) <> "\/\d+"
+      assert Regex.match?(~r/#{Routes.user_path(conn, :index)}\/\d+/, redirect)
     end
 
     test "redirects user when not logged in", %{conn: conn} do
@@ -184,29 +184,6 @@ defmodule WebCATWeb.UserControllerTest do
       redirect =
         conn
         |> get(Routes.user_path(conn, :delete, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
-  end
-
-  describe "import/2" do
-    setup ~w(login_user)a
-
-    test "shows user import dialog", %{conn: conn, user: user} do
-      response =
-        conn
-        |> Auth.sign_in(user)
-        |> get(Routes.user_path(conn, :import))
-        |> html_response(200)
-
-      assert response =~ "Import Users"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      redirect =
-        conn
-        |> get(Routes.classroom_path(conn, :import))
         |> redirected_to(302)
 
       assert redirect =~ Routes.login_path(conn, :login)

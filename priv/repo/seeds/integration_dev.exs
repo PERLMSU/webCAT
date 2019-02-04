@@ -3,6 +3,7 @@ alias Ecto.Changeset
 alias WebCAT.Repo
 alias WebCAT.Accounts.User
 alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup, Student}
+alias WebCAT.Feedback.{Category, Observation, Explanation}
 
 admin_changeset =
   User.create_changeset(%User{}, %{
@@ -17,21 +18,6 @@ admin_changeset =
     country: "USA",
     active: true,
     role: "admin"
-  })
-
-instructor_changeset =
-  User.create_changeset(%User{}, %{
-    first_name: "Instructor",
-    last_name: "Account",
-    email: "wcat_instructor@msu.edu",
-    username: "instructor",
-    password: "password",
-    bio: "The default instructor account, here for example purposes and can be deleted.",
-    city: "East Lansing",
-    state: "MI",
-    country: "USA",
-    active: true,
-    role: "instructor"
   })
 
 assistant_changeset =
@@ -59,7 +45,6 @@ classroom_changeset =
 transaction =
   Multi.new()
   |> Multi.insert(:admin, admin_changeset)
-  |> Multi.insert(:instructor, instructor_changeset)
   |> Multi.insert(:assistant, assistant_changeset)
   |> Multi.run(:classroom, fn _repo, %{admin: admin} ->
     classroom_changeset
@@ -89,7 +74,6 @@ transaction =
   |> Multi.run(:fall_section_1, fn _repo,
                                    %{
                                      fall_semester: semester,
-                                     instructor: instructor,
                                      assistant: assistant
                                    } ->
     %Section{}
@@ -98,13 +82,11 @@ transaction =
       description: "Example section 001 for Fall Semester #{semester.start_date.year}",
       semester_id: semester.id
     })
-    |> Changeset.put_assoc(:users, [instructor, assistant])
     |> Repo.insert()
   end)
   |> Multi.run(:fall_section_2, fn _repo,
                                    %{
                                      fall_semester: semester,
-                                     instructor: instructor,
                                      assistant: assistant
                                    } ->
     %Section{}
@@ -113,7 +95,6 @@ transaction =
       description: "Example section 002 for Fall Semester #{semester.start_date.year}",
       semester_id: semester.id
     })
-    |> Changeset.put_assoc(:users, [instructor, assistant])
     |> Repo.insert()
   end)
   |> Multi.run(:fall_rotation_1, fn _repo, %{fall_section_1: section, fall_semester: semester} ->
@@ -181,6 +162,68 @@ transaction =
     |> Changeset.put_assoc(:users, [transaction.assistant])
     |> Repo.insert()
   end)
-
+  |> Multi.run(:category_1, fn _repo, transaction ->
+    %Category{}
+    |> Category.changeset(%{
+      name: "Example Category",
+      description: "Example Category for Example Classroom",
+      classroom_id: transaction.classroom.id
+    })
+    |> Repo.insert()
+  end)
+  |> Multi.run(:observation_positive, fn _repo, transaction ->
+    %Observation{}
+    |> Observation.changeset(%{
+      content: "Example positive observation",
+      category_id: transaction.category_1.id,
+      rotation_group_id: transaction.rotation_group_1.id,
+      type: "positive"
+    })
+    |> Repo.insert()
+  end)
+  |> Multi.run(:observation_neutral, fn _repo, transaction ->
+    %Observation{}
+    |> Observation.changeset(%{
+      content: "Example neutral observation",
+      category_id: transaction.category_1.id,
+      rotation_group_id: transaction.rotation_group_1.id,
+      type: "neutral"
+    })
+    |> Repo.insert()
+  end)
+  |> Multi.run(:observation_negative, fn _repo, transaction ->
+    %Observation{}
+    |> Observation.changeset(%{
+      content: "Example negative observation",
+      category_id: transaction.category_1.id,
+      rotation_group_id: transaction.rotation_group_1.id,
+      type: "negative"
+    })
+    |> Repo.insert()
+  end)
+  |> Multi.run(:explanation_1, fn _repo, transaction ->
+    %Explanation{}
+    |> Explanation.changeset(%{
+      content: "Example explanation 1",
+      observation_id: transaction.observation_positive.id
+    })
+    |> Repo.insert()
+  end)
+  |> Multi.run(:explanation_2, fn _repo, transaction ->
+    %Explanation{}
+    |> Explanation.changeset(%{
+      content: "Example explanation 2",
+      observation_id: transaction.observation_positive.id
+    })
+    |> Repo.insert()
+  end)
+  |> Multi.run(:explanation_3, fn _repo, transaction ->
+    %Explanation{}
+    |> Explanation.changeset(%{
+      content: "Example explanation 3",
+      observation_id: transaction.observation_neutral.id
+    })
+    |> Repo.insert()
+  end)
 
 {:ok, _} = Repo.transaction(transaction)

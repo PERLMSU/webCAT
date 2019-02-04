@@ -9,8 +9,8 @@ defmodule WebCAT.Repo.Migrations.Feedback do
     create table(:categories) do
       add_req(:name, :text)
       add(:description, :text)
-      add(:parent_category_id, references(:categories))
-      add(:classroom_id, references(:classrooms))
+      add(:parent_category_id, references(:categories, on_delete: :delete_all))
+      add(:classroom_id, references(:classrooms, on_delete: :delete_all))
 
       timestamps()
     end
@@ -18,23 +18,23 @@ defmodule WebCAT.Repo.Migrations.Feedback do
     create table(:observations) do
       add_req(:content, :text)
       add_req(:type, :observation_type)
-      add(:category_id, references(:categories))
-      add(:rotation_group_id, references(:rotation_groups))
+      add(:category_id, references(:categories, on_delete: :nilify_all))
+      add(:rotation_group_id, references(:rotation_groups, on_delete: :delete_all))
 
       timestamps()
     end
 
     create table(:explanations) do
       add_req(:content, :text)
-      add_req(:observation_id, references(:observations))
+      add_req(:observation_id, references(:observations, on_delete: :delete_all))
 
       timestamps()
     end
 
     create table(:notes) do
       add_req(:content, :text)
-      add(:student_id, references(:students))
-      add(:observation_id, references(:observations))
+      add(:student_id, references(:students, on_delete: :delete_all))
+      add(:observation_id, references(:observations, on_delete: :delete_all))
 
       timestamps()
     end
@@ -56,14 +56,14 @@ defmodule WebCAT.Repo.Migrations.Feedback do
     """)
 
     create table(:draft_observations, primary_key: false) do
-      add_req(:draft_id, references(:drafts), primary_key: true)
-      add_req(:observation_id, references(:observations), primary_key: true)
+      add_req(:draft_id, references(:drafts, on_delete: :delete_all), primary_key: true)
+      add_req(:observation_id, references(:observations, on_delete: :delete_all), primary_key: true)
     end
 
     create table(:emails) do
       add_req(:status, :text)
       add(:status_message, :text)
-      add_req(:draft_id, references(:drafts))
+      add_req(:draft_id, references(:drafts, on_delete: :delete_all))
 
       timestamps()
     end
@@ -71,8 +71,8 @@ defmodule WebCAT.Repo.Migrations.Feedback do
     create table(:notifications) do
       add_req(:content, :text)
       add_req(:seen, :boolean, default: false)
-      add_req(:draft_id, references(:drafts))
-      add_req(:user_id, references(:users))
+      add_req(:draft_id, references(:drafts, on_delete: :delete_all))
+      add_req(:user_id, references(:users, on_delete: :delete_all))
 
       timestamps()
     end
@@ -88,8 +88,8 @@ defmodule WebCAT.Repo.Migrations.Feedback do
 
     create table(:grades) do
       add_req(:score, :integer)
-      add_req(:criteria_id, references(:criteria))
-      add_req(:draft_id, references(:drafts))
+      add_req(:criteria_id, references(:criteria, on_delete: :delete_all))
+      add_req(:draft_id, references(:drafts, on_delete: :delete_all))
 
       timestamps()
     end

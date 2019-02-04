@@ -60,12 +60,30 @@
             <div class="level-item">
                 <p class="buttons">
                     <%= icon_button("Create", "plus", class: "is-primary", to: Routes.semester_path(@conn, :new, @data.id)) %>
-                    <%= icon_button("Import", "file-import", class: "is-primary", to: Routes.semester_path(@conn, :import, @data.id)) %>
                 </p>
             </div>
         </div>
     </div>
     <%= WebCATWeb.SemesterView.table(@conn, @data.semesters) %>
+</div>
+<div class="box">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <h2 class="subtitle">
+                    Categories
+                </h2>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <p class="buttons">
+                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.category_path(@conn, :new, @data.id)) %>
+                </p>
+            </div>
+        </div>
+    </div>
+    <%= WebCATWeb.CategoryView.table(@conn, @data.categories) %>
 </div>
 <div class="box">
     <h2 class="subtitle">

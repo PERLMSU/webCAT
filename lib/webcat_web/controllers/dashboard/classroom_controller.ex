@@ -3,7 +3,7 @@ defmodule WebCATWeb.ClassroomController do
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Classroom
 
-  @preload [:users, semesters: ~w(sections)a]
+  @preload [:users, categories: ~w(sub_categories)a, semesters: ~w(sections)a]
 
   def index(conn, _params) do
     user = Auth.current_resource(conn)

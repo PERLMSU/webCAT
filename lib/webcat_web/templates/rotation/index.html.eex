@@ -19,7 +19,6 @@
         <div class="level-item">
             <p class="buttons">
                 <%= icon_button("Create", "plus", class: "is-primary", to: Routes.rotation_path(@conn, :new, @section.id)) %>
-                <%= icon_button("Import", "file-import", class: "is-primary", to: Routes.rotation_path(@conn, :import, @section.id)) %>
             </p>
         </div>
     </div>

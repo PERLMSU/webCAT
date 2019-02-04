@@ -1,0 +1,27 @@
+<div class="columns">
+    <%= if not Enum.empty?(@groups) do %>
+    <%= for group <- @groups do %>
+    <div class="column is-one-third">
+        <div class="card">
+            <header class="card-header">
+                <p class="card-header-title">
+                    <%= link("Group #{group.number}", to: Routes.feedback_path(@conn, :observations, group.id)) %>
+                </p>
+            </header>
+            <div class="card-content">
+                <ul>
+                    <%= for student <- group.students do %>
+                    <li>
+                        <%= student.first_name %>
+                        <%= student.last_name %>
+                    </li>
+                    <% end %>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <% end %>
+    <% else %>
+        <h1>No groups</h1>
+    <% end %>
+</div>

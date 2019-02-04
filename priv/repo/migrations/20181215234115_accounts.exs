@@ -4,7 +4,7 @@ defmodule WebCAT.Repo.Migrations.Accounts do
 
   def change do
     extension("pgcrypto")
-    enum("user_role", ~w(assistant instructor admin))
+    enum("user_role", ~w(assistant admin))
 
     create table(:users) do
       add_req(:first_name, :text)

@@ -21,7 +21,6 @@
         <div class="level-item">
             <p class="buttons">
                 <%= icon_button("Create", "plus", class: "is-primary", to: Routes.semester_path(@conn, :new, @classroom.id)) %>
-                <%= icon_button("Import", "file-import", class: "is-primary", to: Routes.semester_path(@conn, :import, @classroom.id)) %>
             </p>
         </div>
     </div>

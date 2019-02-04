@@ -26,7 +26,7 @@ defmodule WebCAT.Mixfile do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ~w(lib test/support)
-  defp elixirc_paths(_), do: ~w(lib)
+  defp elixirc_paths(_), do: ~w(lib priv/repo/migrations)
 
   # Specifies your project dependencies.
   #
@@ -70,9 +70,9 @@ defmodule WebCAT.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      "ecto.seed": ["run priv/repo/seeds.exs"],
-      "ecto.setup": ["ecto.create", "ecto.migrate"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "ecto.seed": ["run priv/repo/seeds/integration_dev.exs"],
+      "ecto.setup": ~w(ecto.create ecto.migrate),
+      "ecto.reset": ~w(ecto.drop ecto.setup ecto.seed),
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end

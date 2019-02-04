@@ -1,0 +1,99 @@
+<h1 class="title">
+    Rotation Group
+    <%= @group.number %>
+</h1>
+<h2 class="title">
+    Students
+</h2>
+<div class="box">
+    <%= if not Enum.empty?(@group.students) do %>
+    <div class="columns">
+        <%= for student <- @group.students do %>
+        <div class="column">
+            <div class="card">
+                <div class="card-content">
+                    <ul>
+                        <li>
+                            <%= student.first_name <> " " <> student.last_name %>
+                        </li>
+                        <li>
+                            <%= student.email %>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <% end %>
+    </div>
+    <% else %>
+    <h2 class="subtitle">No students yet</h2>
+    <% end %>
+</div>
+<div class="level">
+    <div class="level-left">
+        <h1 class="title">Observations</h1>
+    </div>
+    <div class="level-right">
+        <%= icon_button("Create", "comment-plus", class: "is-primary", to: Routes.feedback_path(@conn, :new_observation, @group.id)) %>
+    </div>
+</div>
+<div class="box">
+    <%= if not Enum.empty?(@group.observations) do %>
+    <%= for observation <- @group.observations do %>
+    <% tag_class = case observation.type do
+        "positive" -> "success"
+        "neutral" -> "warning"
+        "negative" -> "danger"
+       end %>
+    <article class="media">
+        <figure class="media-left">
+            <span class="icon is-large has-text-<%= tag_class %>">
+                <i class="fas fa-2x fa-info-circle"></i>
+            </span>
+        </figure>
+        <div class="media-content">
+            <p>
+                <%= observation.content %>
+            </p>
+            <div class="buttons">
+                <%= icon_button("Edit", "edit", class: "is-primary is-small", to: Routes.feedback_path(@conn, :edit_observation, observation.id)) %>
+                <%= icon_button("New Explanation", "plus", class: "is-success is-small", to: Routes.feedback_path(@conn, :new_explanation, observation.id)) %>
+                <%= icon_button("Delete", "times", class: "is-danger is-small", to: Routes.feedback_path(@conn, :delete_observation, observation.id), onclick: "return confirm('Are you sure?');") %>
+            </div>
+
+
+            <%= if not Enum.empty?(observation.explanations) do %>
+            <%= for explanation <- observation.explanations do %>
+            <article class="media">
+                <figure class="media-left">
+
+                </figure>
+                <div class="media-content">
+                    <%= explanation.content %>
+                </div>
+                <figure class="media-right">
+                    <div class="buttons">
+                        <%= icon_button("Edit", "edit", class: "is-primary is-small", to: Routes.feedback_path(@conn, :edit_explanation, explanation.id)) %>
+                        <%= icon_button("Delete", "times", class: "is-danger is-small", to: Routes.feedback_path(@conn, :delete_explanation, explanation.id), onclick: "return confirm('Are you sure?');") %>
+                    </div>
+                </figure>
+            </article>
+            <% end %>
+            <% end %>
+        </div>
+        <figure class="media-right">
+            <div class="tags">
+                <span class="tag is-<%= tag_class %>">
+                    <%= observation.type %>
+                </span>
+                <span class="tag is-primary">
+                    <%= truncate(observation.category.name, 18) %>
+                </span>
+            </div>
+        </figure>
+    </article>
+    <% end %>
+    <% else %>
+    <h2 class="subtitle">No observations yet</h2>
+    <% end %>
+</div>

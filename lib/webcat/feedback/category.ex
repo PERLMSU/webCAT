@@ -12,7 +12,6 @@ defmodule WebCAT.Feedback.Category do
     belongs_to(:parent_category, WebCAT.Feedback.Category)
     belongs_to(:classroom, WebCAT.Rotations.Classroom)
     has_many(:sub_categories, WebCAT.Feedback.Category, foreign_key: :parent_category_id)
-    has_many(:observations, WebCAT.Feedback.Observation)
 
     timestamps()
   end

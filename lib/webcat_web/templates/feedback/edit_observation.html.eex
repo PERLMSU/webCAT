@@ -1,0 +1,21 @@
+<%= form_for(@changeset, Routes.feedback_path(@conn, :update_observation, @changeset.data.id), fn f ->  %>
+<%= form_field("Observation", :content, :textarea) %>
+<%= hidden_input(f, :rotation_group_id, value: @changeset.data.rotation_group_id) %>
+<div class="field">
+    <%= label(f, :category_id, "Category") %>
+    <div class="control">
+        <div class="select">
+            <%= select(f, :category_id, Enum.map(@categories, &{&1.name, &1.id}), selected: @changeset.data.category_id, prompt: "Select a category") %>
+        </div>
+    </div>
+</div>
+<div class="field">
+    <%= label(f, :type, "Type") %>
+    <div class="control">
+        <div class="select">
+            <%= select(f, :type, ["Positive": "positive", "Neutral": "neutral", "Negative": "negative"], selected: @changeset.data.type, prompt: "Select an observation type") %>
+        </div>
+    </div>
+</div>
+<%= submit("Submit", class: "button is-primary")%>
+<% end) %>

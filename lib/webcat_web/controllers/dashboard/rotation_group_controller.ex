@@ -117,12 +117,12 @@ defmodule WebCATWeb.RotationGroupController do
         {:ok, _} ->
           conn
           |> put_flash(:info, "RotationGroup deleted successfully")
-          |> redirect(to: Routes.rotation_group_path(conn, :index, rotation_id: rotation_group.rotation_id))
+          |> redirect(to: Routes.rotation_group_path(conn, :index, rotation_group.rotation_id))
 
         {:error, _} ->
           conn
           |> put_flash(:error, "RotationGroup deletion failed")
-          |> redirect(to: Routes.rotation_group_path(conn, :index, rotation_id: rotation_group.rotation_id))
+          |> redirect(to: Routes.rotation_group_path(conn, :index, rotation_group.rotation_id))
       end
     end
   end

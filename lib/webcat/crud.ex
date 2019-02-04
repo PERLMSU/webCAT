@@ -14,8 +14,6 @@ defmodule WebCAT.CRUD do
   def list(schema, options \\ []) do
     schema
     |> where(^Keyword.get(options, :where, []))
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
     |> preload(^Keyword.get(options, :preload, []))
     |> order_by(~w(updated_at inserted_at))
     |> Repo.all()

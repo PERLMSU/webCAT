@@ -80,6 +80,19 @@ defmodule WebCATWeb.ViewHelpers do
     |> safe_to_string()
   end
 
+  def truncate(string, length \\ 25) do
+    cond do
+      string == nil ->
+        ""
+
+      String.length(string) > length ->
+        String.slice(string, 0..length-3) <> "..."
+
+      true ->
+        string
+    end
+  end
+
   @doc """
   Title cases a string where words are separated by underscores
 

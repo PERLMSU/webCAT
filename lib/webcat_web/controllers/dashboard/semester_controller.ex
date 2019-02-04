@@ -115,12 +115,12 @@ defmodule WebCATWeb.SemesterController do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Semester deleted successfully")
-          |> redirect(to: Routes.semester_path(conn, :index, classroom_id: semester.classroom_id))
+          |> redirect(to: Routes.semester_path(conn, :index, semester.classroom_id))
 
         {:error, _} ->
           conn
           |> put_flash(:error, "Semester deletion failed")
-          |> redirect(to: Routes.semester_path(conn, :index, classroom_id: semester.classroom_id))
+          |> redirect(to: Routes.semester_path(conn, :index, semester.classroom_id))
       end
     end
   end

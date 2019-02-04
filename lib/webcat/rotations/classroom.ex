@@ -13,6 +13,7 @@ defmodule WebCAT.Rotations.Classroom do
     field(:description, :string)
 
     has_many(:semesters, WebCAT.Rotations.Semester)
+    has_many(:categories, WebCAT.Feedback.Category)
     many_to_many(:users, User, join_through: "user_classrooms")
 
     timestamps()
