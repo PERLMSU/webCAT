@@ -1,7 +1,18 @@
-<h1 class="title">
-    Rotation Group
-    <%= @group.number %>
-</h1>
+<nav class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">
+                Rotation Group
+                <%= @group.number %>
+            </h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <%= icon_button("New Draft", "file-alt", class: "is-primary", to: Routes.inbox_path(@conn, :new, group_id: @group.id))%>
+        </div>
+    </div>
+</nav>
 <h2 class="title">
     Students
 </h2>

@@ -79,8 +79,9 @@ defmodule WebCATWeb.CategoryView do
         id -> Routes.category_path(conn, :update, classroom_id, id)
       end
 
-    categories = CRUD.list(Category, where: [classroom_id: classroom_id])
-    |> Enum.map(&{&1.name, &1.id})
+    categories =
+      CRUD.list(Category, where: [classroom_id: classroom_id])
+      |> Enum.map(&{&1.name, &1.id})
 
     form_for(changeset, path, fn f ->
       [
@@ -91,13 +92,15 @@ defmodule WebCATWeb.CategoryView do
           [
             label(f, :parent_category_id, "Parent Category"),
             content_tag(:div, class: "control") do
-              select(f, :parent_category_id, categories,
-                selected:
-                  if(changeset.data.parent_category_id != nil) do
-                    Integer.to_string(changeset.data.parent_category_id)
-                  end,
-                prompt: "None"
-              )
+              content_tag(:div, class: "select") do
+                select(f, :parent_category_id, categories,
+                  selected:
+                    if(changeset.data.parent_category_id != nil) do
+                      Integer.to_string(changeset.data.parent_category_id)
+                    end,
+                  prompt: "None"
+                )
+              end
             end
           ]
         end,

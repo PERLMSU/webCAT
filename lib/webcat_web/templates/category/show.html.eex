@@ -1,7 +1,7 @@
 <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
         <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@category.classroom.title, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) %></li>
+        <li><%= link(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) %></li>
         <li><%= link("Categories", to: Routes.category_path(@conn, :index, @category.classroom_id)) %></li>
         <li class="is-active"><%= link("Categories", to: Routes.category_path(@conn, :show, @category.classroom_id, @category.id)) %></li>
     </ul>
@@ -41,7 +41,7 @@
         <% end %>
         <li>
             <h2 class="subtitle">Classroom:
-                <%= link(@category.classroom.title, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) %>
+                <%= link(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) %>
             </h2>
         </li>
     </ul>

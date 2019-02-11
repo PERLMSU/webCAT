@@ -4,31 +4,32 @@ defmodule WebCAT.Accounts.UsersTest do
   use WebCAT.DataCase, async: true
   use Bamboo.Test
 
-  alias WebCAT.Accounts.{Users, Confirmation}
+  alias WebCAT.Accounts.{Users, TokenCredential}
   alias WebCAT.Repo
 
   test "login/2 behaves as expected" do
-    inserted = Factory.insert(:user)
+    credential = Factory.insert(:password_credential)
 
-    {:ok, user} = Users.login(inserted.email, "password")
+    {:ok, user} = Users.login(credential.email, "password")
 
-    assert inserted.email == user.email
+    assert user.first_name == credential.user.first_name
 
-    {:error, :unauthorized} = Users.login(inserted.email, "password1")
+    {:error, :unauthorized} = Users.login(credential.email, "password1")
     {:error, :unauthorized} = Users.login("email@email.edm", "password")
   end
 
   test "create/2 behaves as expected" do
-    params = Factory.params_for(:user, password: "password")
+    params = Factory.params_for(:user)
 
     {:ok, user} = Users.create(params)
-    {:ok, logged_in} = Users.login(user.email, "password")
+    credential = Factory.insert(:password_credential, user: user)
+    {:ok, logged_in} = Users.login(credential.email, "password")
 
     assert user.id == logged_in.id
     assert user.email == logged_in.email
 
     email =
-      WebCAT.Email.confirmation(user.email, Repo.get_by(Confirmation, user_id: user.id).token)
+      WebCAT.Email.confirmation(credential.email, Repo.get_by(TokenCredential, user_id: user.id).token)
 
     assert_delivered_email(email)
   end
@@ -39,13 +40,5 @@ defmodule WebCAT.Accounts.UsersTest do
 
     notifications = Users.notifications(user.id)
     assert Enum.count(notifications) == 4
-  end
-
-  test "classrooms/1 behaves as expected" do
-    Factory.insert_list(5, :classroom)
-    user = Factory.insert(:user, classrooms: Factory.insert_list(4, :classroom))
-
-    classrooms = Users.classrooms(user.id)
-    assert Enum.count(classrooms) == 4
   end
 end

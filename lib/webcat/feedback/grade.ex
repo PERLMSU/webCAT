@@ -10,12 +10,12 @@ defmodule WebCAT.Feedback.Grade do
     field(:note, :string)
 
     belongs_to(:draft, WebCAT.Feedback.Draft)
-    belongs_to(:criteria, WebCAT.Feedback.Criteria)
+    belongs_to(:category, WebCAT.Feedback.Category)
 
     timestamps()
   end
 
-  @required ~w(score draft_id criteria_id)a
+  @required ~w(score draft_id category_id)a
   @optional ~w(note)a
 
   @doc """

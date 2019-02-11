@@ -3,7 +3,9 @@ defmodule WebCATWeb.StudentController do
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Student
 
-  @preload [:notes, :sections, rotation_groups: ~w(students)a]
+  @preload [:user, sections: ~w(rotations students)a, rotation_groups: ~w(students)a]
+
+  action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, _params) do
     user = Auth.current_resource(conn)
@@ -19,6 +21,9 @@ defmodule WebCATWeb.StudentController do
 
     with {:ok, student} <- CRUD.get(Student, id, preload: @preload),
          :ok <- Bodyguard.permit(Student, :show, user, student) do
+
+      IO.inspect(student.sections)
+
       render(conn, "show.html", user: user, selected: "students", data: student)
     end
   end

@@ -4,7 +4,7 @@
             <%= link("Users", to: Routes.user_path(@conn, :index)) %>
         </li>
         <li>
-            <%= link(@changeset.data.username, to: Routes.user_path(@conn, :show, @changeset.data.id)) %>
+            <%= link("#{@changeset.data.first_name} #{@changeset.data.last_name}", to: Routes.user_path(@conn, :show, @changeset.data.id)) %>
         </li>
         <li class="is-active">
             <%= link("Edit", to: Routes.user_path(@conn, :edit, @changeset.data.id)) %>

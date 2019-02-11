@@ -2,7 +2,12 @@ defmodule WebCATWeb.CategoryController do
   use WebCATWeb, :controller
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Classroom
-  alias WebCAT.Feedback.Category
+  alias WebCAT.Feedback.{Category, Categories}
+
+  import Ecto.Query
+  alias WebCAT.Repo
+
+  action_fallback(WebCATWeb.FallbackController)
 
   @list_preload ~w(sub_categories)a
   @preload ~w(classroom parent_category)a ++ @list_preload
@@ -12,8 +17,7 @@ defmodule WebCATWeb.CategoryController do
 
     with :ok <- Bodyguard.permit(Category, :list, user),
          {:ok, classroom} <- CRUD.get(Classroom, classroom_id),
-         categories <-
-           CRUD.list(Category, preload: @list_preload, where: [classroom_id: classroom_id]) do
+         categories <- Categories.list(classroom_id) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
@@ -26,7 +30,7 @@ defmodule WebCATWeb.CategoryController do
   def show(conn, %{"id" => id}) do
     user = Auth.current_resource(conn)
 
-    with {:ok, category} <- CRUD.get(Category, id, preload: @preload),
+    with {:ok, category} <- Categories.get(id),
          :ok <- Bodyguard.permit(Category, :show, user, category) do
       render(conn, "show.html",
         user: user,

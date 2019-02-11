@@ -4,7 +4,7 @@
             <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
         </li>
         <li>
-            <%= link(@changeset.data.title, to: Routes.classroom_path(@conn, :show, @changeset.data.id)) %>
+            <%= link(@changeset.data.name, to: Routes.classroom_path(@conn, :show, @changeset.data.id)) %>
         </li>
         <li class="is-active">
             <%= link("Edit", to: Routes.classroom_path(@conn, :edit, @changeset.data.id)) %>
@@ -12,7 +12,7 @@
     </ul>
 </nav>
 <h1 class="title">Edit Classroom:
-    <%= @changeset.data.title %>
+    <%= @changeset.data.name %>
 </h1>
 <hr>
 <%= form(@conn, @changeset) %>

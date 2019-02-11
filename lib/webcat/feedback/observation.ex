@@ -3,34 +3,30 @@ defmodule WebCAT.Feedback.Observation do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias WebCAT.Accounts.User
+  alias WebCAT.Accounts.{User, Groups}
 
   schema "observations" do
     field(:content, :string)
     field(:type, :string)
 
     belongs_to(:category, WebCAT.Feedback.Category)
-    belongs_to(:rotation_group, WebCAT.Rotations.RotationGroup)
 
-    has_many(:notes, WebCAT.Feedback.Note)
-    has_many(:explanations, WebCAT.Feedback.Explanation)
+    has_many(:feedback, WebCAT.Feedback.Feedback)
 
     timestamps()
   end
 
-  @required ~w(content type category_id rotation_group_id)a
-  @optional ~w()a
+  @required ~w(content type category_id)a
 
   @doc """
   Create a changeset for an observation
   """
   def changeset(observation, attrs \\ %{}) do
     observation
-    |> cast(attrs, @required ++ @optional)
+    |> cast(attrs, @required)
     |> validate_required(@required)
     |> validate_inclusion(:type, ~w(positive neutral negative))
     |> foreign_key_constraint(:category_id)
-    |> foreign_key_constraint(:rotation_group_id)
   end
 
   # Policy behavior
@@ -39,9 +35,9 @@ defmodule WebCAT.Feedback.Observation do
       when action in ~w(list show)a,
       do: true
 
-  def authorize(action, %User{}, _)
-      when action in ~w(create update delete)a,
-      do: true
+  def authorize(action, %User{groups: groups}, _)
+      when action in ~w(create update delete)a and is_list(groups),
+      do: Groups.has_group?(groups, "admin")
 
   def authorize(_, _, _), do: false
 end

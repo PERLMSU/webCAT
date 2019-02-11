@@ -7,6 +7,9 @@ defmodule WebCATWeb.RotationController do
   @preload [section: [semester: [:classroom]]] ++ @list_preload
   @section_preload [semester: [:classroom]]
 
+  action_fallback(WebCATWeb.FallbackController)
+
+
   def index(conn, %{"section_id" => section_id}) do
     user = Auth.current_resource(conn)
 

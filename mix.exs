@@ -25,7 +25,7 @@ defmodule WebCAT.Mixfile do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ~w(lib test/support)
+  defp elixirc_paths(:test), do: ~w(lib test/support priv/repo/migrations)
   defp elixirc_paths(_), do: ~w(lib priv/repo/migrations)
 
   # Specifies your project dependencies.
@@ -58,7 +58,7 @@ defmodule WebCAT.Mixfile do
       {:proper_case, "~> 1.0.2"},
       {:timex, "~> 3.4"},
       {:sentry, "~> 7.0"},
-      {:csv, "~> 2.0.0"}
+      {:xlsxir, github: "jsonkenl/xlsxir"}
     ]
   end
 

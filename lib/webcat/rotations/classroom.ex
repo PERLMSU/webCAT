@@ -3,13 +3,13 @@ defmodule WebCAT.Rotations.Classroom do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias WebCAT.Accounts.User
+  alias WebCAT.Accounts.{User, Groups}
   alias WebCAT.Repo
   import Ecto.Query
 
   schema "classrooms" do
     field(:course_code, :string)
-    field(:title, :string)
+    field(:name, :string)
     field(:description, :string)
 
     has_many(:semesters, WebCAT.Rotations.Semester)
@@ -19,7 +19,7 @@ defmodule WebCAT.Rotations.Classroom do
     timestamps()
   end
 
-  @required ~w(course_code title)a
+  @required ~w(course_code name)a
   @optional ~w(description)a
 
   @doc """
@@ -44,9 +44,9 @@ defmodule WebCAT.Rotations.Classroom do
       when action in ~w(list show)a,
       do: true
 
-  def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create update delete import)a,
-      do: true
+  def authorize(action, %User{groups: groups}, _)
+      when action in ~w(create update delete)a and is_list(groups),
+      do: Groups.has_group?(groups, "admin")
 
   def authorize(_, _, _), do: false
 end

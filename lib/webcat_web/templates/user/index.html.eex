@@ -12,5 +12,4 @@
 </div>
 <div class="box">
     <%= table(@conn, @data) %>
-
 </div>

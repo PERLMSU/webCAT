@@ -4,13 +4,13 @@
             <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
         </li>
         <li>
-            <%= link(@semester.classroom.title, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %>
+            <%= link(@semester.classroom.name, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %>
         </li>
         <li>
             <%= link("Semesters", to: Routes.semester_path(@conn, :index, @semester.classroom_id)) %>
         </li>
         <li class="is-active">
-            <%= link(@semester.title, to: Routes.semester_path(@conn, :show, @semester.classroom_id, @semester.id)) %>
+            <%= link(@semester.name, to: Routes.semester_path(@conn, :show, @semester.classroom_id, @semester.id)) %>
         </li>
     </ul>
 </nav>
@@ -18,7 +18,7 @@
     <div class="level-left">
         <div class="level-item">
             <h1 class="title">Semester:
-                <%= @semester.title %>
+                <%= @semester.name %>
             </h1>
         </div>
     </div>
@@ -38,8 +38,8 @@
     </h2>
     <ul>
         <li>
-            <h2 class="subtitle">Title</h2>
-            <%= @semester.title %>
+            <h2 class="subtitle">Name</h2>
+            <%= @semester.name %>
         </li>
         <li>
             <h2 class="subtitle">Start Date</h2>
@@ -51,7 +51,7 @@
         </li>
         <li>
             <h2 class="subtitle">Classroom:
-                <%= link(@semester.classroom.title, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %>
+                <%= link(@semester.classroom.name, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %>
             </h2>
 
         </li>

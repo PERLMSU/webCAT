@@ -9,7 +9,7 @@ defmodule WebCATWeb.SemesterView do
       [
         content_tag(:thead) do
           [
-            content_tag(:th, "Title"),
+            content_tag(:th, "Name"),
             content_tag(:th, "Start Date"),
             content_tag(:th, "End Date"),
             content_tag(:th, "Sections"),
@@ -21,7 +21,7 @@ defmodule WebCATWeb.SemesterView do
             Enum.map(semesters, fn semester ->
               content_tag(:tr) do
                 [
-                  content_tag(:td, semester.title),
+                  content_tag(:td, semester.name),
                   content_tag(:td, Timex.format!(semester.start_date, "{M}-{D}-{YYYY}")),
                   content_tag(:td, Timex.format!(semester.end_date, "{M}-{D}-{YYYY}")),
                   content_tag(:td, Enum.count(semester.sections)),
@@ -71,7 +71,7 @@ defmodule WebCATWeb.SemesterView do
 
     form_for(changeset, path, fn f ->
       [
-        form_field("Title", :title),
+        form_field("Name", :name),
         form_field("Start Date", :start_date, :date),
         form_field("End Date", :start_date, :date),
         content_tag(:div, class: "field") do

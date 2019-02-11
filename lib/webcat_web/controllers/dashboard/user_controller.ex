@@ -4,6 +4,10 @@ defmodule WebCATWeb.UserController do
   alias WebCAT.CRUD
   alias WebCAT.Accounts.{User, Users}
 
+  action_fallback(WebCATWeb.FallbackController)
+
+  @preload [rotation_groups: ~w(students)a, classrooms: ~w(semesters users)a]
+
   def index(conn, _params) do
     user = Auth.current_resource(conn)
 
@@ -15,7 +19,7 @@ defmodule WebCATWeb.UserController do
 
   def show(conn, %{"id" => id}) do
     auth_user = Auth.current_resource(conn)
-    with {:ok, user} <- CRUD.get(User, id, preload: [:rotation_groups, :sections, classrooms: ~w(semesters users)a]),
+    with {:ok, user} <- CRUD.get(User, id, preload: @preload),
          :ok <- Bodyguard.permit(User, :show, auth_user, user) do
       render(conn, "show.html", user: auth_user, selected: "users", data: user)
     end
@@ -58,7 +62,7 @@ defmodule WebCATWeb.UserController do
   def edit(conn, %{"id" => id}) do
     auth_user = Auth.current_resource(conn)
 
-    with {:ok, user} <- CRUD.get(User, id, preload: ~w(rotation_groups classrooms sections)a),
+    with {:ok, user} <- CRUD.get(User, id, preload: @preload),
          :ok <- Bodyguard.permit(User, :update, auth_user, user) do
       render(conn, "edit.html",
         user: auth_user,
@@ -71,7 +75,7 @@ defmodule WebCATWeb.UserController do
   def update(conn, %{"id" => id, "user" => update}) do
     auth_user = Auth.current_resource(conn)
 
-    with {:ok, user} <- CRUD.get(User, id, preload: ~w(rotation_groups classrooms sections)a),
+    with {:ok, user} <- CRUD.get(User, id, preload: @preload),
          :ok <- Bodyguard.permit(User, :update, auth_user, user) do
       case CRUD.update(User, user, update) do
         {:ok, _} ->

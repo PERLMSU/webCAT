@@ -12,13 +12,12 @@ defmodule WebCATWeb.SectionView do
             content_tag(:th, "Number"),
             content_tag(:th, "Description"),
             content_tag(:th, "Rotations"),
-            content_tag(:th, "Users"),
             content_tag(:th, "Students"),
             content_tag(:th, "")
           ]
         end,
         content_tag(:tbody) do
-          if Enum.count(sections) > 0 do
+          if not Enum.empty?(sections) do
             Enum.map(sections, fn section ->
               content_tag(:tr) do
                 [
@@ -36,7 +35,6 @@ defmodule WebCATWeb.SectionView do
                     end
                   end,
                   content_tag(:td, Enum.count(section.rotations)),
-                  content_tag(:td, Enum.count(section.users)),
                   content_tag(:td, Enum.count(section.students)),
                   content_tag(:td) do
                     content_tag(:div, class: "field has-addons") do

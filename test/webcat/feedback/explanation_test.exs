@@ -1,9 +1,9 @@
-defmodule WebCAT.Feedback.ExplanationTest do
+defmodule WebCAT.Feedback.FeedbackTest do
   use WebCAT.DataCase, async: true
 
-  alias WebCAT.Feedback.Explanation
+  alias WebCAT.Feedback.Feedback
 
   test "changeset/2 behaves as expected" do
-    assert Explanation.changeset(%Explanation{}, Factory.params_with_assocs(:explanation)).valid?
+    assert Feedback.changeset(%Feedback{}, Factory.params_with_assocs(:feedback)).valid?
   end
 end

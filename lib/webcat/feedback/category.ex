@@ -3,7 +3,7 @@ defmodule WebCAT.Feedback.Category do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias WebCAT.Accounts.User
+  alias WebCAT.Accounts.{User, Groups}
 
   schema "categories" do
     field(:name, :string)
@@ -12,6 +12,7 @@ defmodule WebCAT.Feedback.Category do
     belongs_to(:parent_category, WebCAT.Feedback.Category)
     belongs_to(:classroom, WebCAT.Rotations.Classroom)
     has_many(:sub_categories, WebCAT.Feedback.Category, foreign_key: :parent_category_id)
+    has_many(:observations, WebCAT.Feedback.Observation, foreign_key: :category_id)
 
     timestamps()
   end
@@ -36,9 +37,9 @@ defmodule WebCAT.Feedback.Category do
       when action in ~w(list show)a,
       do: true
 
-  def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create update delete)a,
-      do: true
+  def authorize(action, %User{groups: groups}, _)
+      when action in ~w(create update delete)a and is_list(groups),
+      do: Groups.has_group?(groups, "admin")
 
   def authorize(_, _, _), do: false
 end

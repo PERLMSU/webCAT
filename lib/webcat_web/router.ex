@@ -60,12 +60,15 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     resources("/", InboxController)
+    resources("/draft_id/comments", InboxController, except: ~w(index show)a, name: "comments")
   end
 
   scope "/dashboard", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
     get("/", IndexController, :index)
+    get("/import", IndexController, :import)
+    post("/import", IndexController, :do_import)
 
     importable_resources("/users", UserController)
 
@@ -80,6 +83,12 @@ defmodule WebCATWeb.Router do
     importable_resources("/classrooms/:classroom_id/criteria", CriteriaController)
 
     importable_resources("/classrooms/:classroom_id/categories", CategoryController)
+  end
+
+  scope "/profile", WebCATWeb do
+    pipe_through(~w(browser authenticated)a)
+
+    resources("/", ProfileController, only: ~w(show edit update)a, singleton: true)
   end
 
   scope "/", WebCATWeb do

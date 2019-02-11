@@ -4,7 +4,7 @@ defmodule WebCAT.Rotations.Rotation do
   use Ecto.Schema
   import Ecto.Changeset
   import WebCAT.Validators
-  alias WebCAT.Accounts.User
+  alias WebCAT.Accounts.{User, Groups}
 
   schema "rotations" do
     field(:number, :integer)
@@ -38,9 +38,9 @@ defmodule WebCAT.Rotations.Rotation do
       when action in ~w(list show)a,
       do: true
 
-  def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create update delete)a,
-      do: true
+  def authorize(action, %User{groups: groups}, _)
+      when action in ~w(create update delete)a and is_list(groups),
+      do: Groups.has_group?(groups, "admin")
 
   def authorize(_, _, _), do: false
 end

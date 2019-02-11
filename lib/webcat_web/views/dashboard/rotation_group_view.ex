@@ -16,44 +16,54 @@ defmodule WebCATWeb.RotationGroupView do
           ]
         end,
         content_tag(:tbody) do
-          Enum.map(groups, fn group ->
+          if not Enum.empty?(groups) do
+            Enum.map(groups, fn group ->
+              content_tag(:tr) do
+                [
+                  content_tag(:td, group.number),
+                  content_tag(:td) do
+                    cond do
+                      group.description == nil ->
+                        ""
+
+                      String.length(group.description) > 25 ->
+                        String.slice(group.description, 0..25) <> "..."
+
+                      true ->
+                        group.description
+                    end
+                  end,
+                  content_tag(:td, Enum.count(group.students)),
+                  content_tag(:td) do
+                    content_tag(:div, class: "field has-addons") do
+                      [
+                        content_tag(:p, class: "control") do
+                          icon_button("View", "eye",
+                            class: "is-primary",
+                            to:
+                              Routes.rotation_group_path(conn, :show, group.rotation_id, group.id)
+                          )
+                        end,
+                        content_tag(:p, class: "control") do
+                          icon_button("Edit", "wrench",
+                            class: "is-primary",
+                            to:
+                              Routes.rotation_group_path(conn, :edit, group.rotation_id, group.id)
+                          )
+                        end
+                      ]
+                    end
+                  end
+                ]
+              end
+            end)
+          else
             content_tag(:tr) do
-              [
-                content_tag(:td, group.number),
-                content_tag(:td) do
-                  cond do
-                    group.description == nil ->
-                      ""
-
-                    String.length(group.description) > 25 ->
-                      String.slice(group.description, 0..25) <> "..."
-
-                    true ->
-                      group.description
-                  end
-                end,
-                content_tag(:td, Enum.count(group.students)),
-                content_tag(:td) do
-                  content_tag(:div, class: "field has-addons") do
-                    [
-                      content_tag(:p, class: "control") do
-                        icon_button("View", "eye",
-                          class: "is-primary",
-                          to: Routes.rotation_group_path(conn, :show, group.rotation_id, group.id)
-                        )
-                      end,
-                      content_tag(:p, class: "control") do
-                        icon_button("Edit", "wrench",
-                          class: "is-primary",
-                          to: Routes.rotation_group_path(conn, :edit, group.rotation_id, group.id)
-                        )
-                      end
-                    ]
-                  end
-                end
-              ]
+              content_tag(:td) do
+                "No rotation groups yet"
+              end
             end
-          end)
+          end
         end
       ]
     end

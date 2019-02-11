@@ -1,9 +1,9 @@
 <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
         <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@rotation_group.rotation.section.semester.classroom.title, to: Routes.classroom_path(@conn, :show, @rotation_group.rotation.section.semester.classroom_id)) %></li>
+        <li><%= link(@rotation_group.rotation.section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @rotation_group.rotation.section.semester.classroom_id)) %></li>
         <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, @rotation_group.rotation.section.semester.classroom_id)) %></li>
-        <li><%= link(@rotation_group.rotation.section.semester.title, to: Routes.semester_path(@conn, :show, @rotation_group.rotation.section.semester.classroom_id, @rotation_group.rotation.section.semester.id)) %></li>
+        <li><%= link(@rotation_group.rotation.section.semester.name, to: Routes.semester_path(@conn, :show, @rotation_group.rotation.section.semester.classroom_id, @rotation_group.rotation.section.semester.id)) %></li>
         <li><%= link("Sections", to: Routes.section_path(@conn, :index, @rotation_group.rotation.section.semester_id))%></li>
         <li><%= link(@rotation_group.rotation.section.number, to: Routes.section_path(@conn, :show, @rotation_group.rotation.section.semester_id, @rotation_group.rotation.section_id)) %></li>
         <li><%= link("Rotations", to: Routes.rotation_path(@conn, :index, @rotation_group.rotation.section_id)) %></li>

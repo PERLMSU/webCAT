@@ -2,51 +2,45 @@ defmodule WebCAT.Accounts.Users do
   @moduledoc """
   Helper methods for the user collection
   """
-  use Anaphora
-
   alias WebCAT.Repo
-  alias WebCAT.Accounts.{User, Confirmation, Notification}
-  alias WebCAT.Rotations.{Classroom, RotationGroup, Section}
+  alias WebCAT.Accounts.{User, TokenCredential, PasswordCredential}
   alias Comeonin.Pbkdf2
   alias Ecto.Changeset
   alias Ecto.Multi
   import Ecto.Query
 
-  def list(options \\ []) do
-    User
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by(desc: :email)
-    |> Repo.all()
-  end
-
   @doc """
-  Get a user by their email
+  Get a user by their email if they have one associated
   """
-  @spec by_email(String.t()) :: {:ok, User.t()} | {:error, any}
+  @spec by_email(String.t()) :: {:ok, User.t()} | {:error, String.t()}
   def by_email(email) do
-    case Repo.get_by(User, email: email) do
+    PasswordCredential
+    |> where([c], c.email == ^email)
+    |> join(:left, [c], u in assoc(c, :user))
+    |> select([_, u], u)
+    |> Repo.one()
+    |> case do
       %User{} = user -> {:ok, user}
-      nil -> {:error, :not_found}
+      nil -> {:error, "Email not found"}
     end
   end
 
   @doc """
-  Use supplied attributes to sign up a new user
+  Use supplied attributes to sign up a new user and send them a token to login via a supplied email address
   """
-  @spec create(map()) :: {:ok, User.t()} | {:error, Changeset.t()}
-  def create(attrs) do
+  @spec create(map(), String.t()) :: {:ok, User.t()} | {:error, Changeset.t()}
+  def create(attrs, email) do
     Multi.new()
-    |> Multi.insert(:user, User.create_changeset(%User{}, attrs))
-    |> Multi.run(:confirmation, fn _repo, %{user: user} ->
-      %Confirmation{}
-      |> Confirmation.changeset(%{user_id: user.id, token: Confirmation.gen_token()})
+    |> Multi.insert(:user, User.changeset(%User{}, attrs))
+    |> Multi.run(:credential, fn _repo, %{user: user} ->
+      %TokenCredential{}
+      |> TokenCredential.changeset(%{user_id: user.id, expire: Timex.shift(Timex.now(), days: 1)})
       |> Repo.insert()
     end)
     |> Repo.transaction()
     |> case do
       {:ok, result} ->
-        WebCAT.Email.confirmation(result.user.email, result.confirmation.token)
+        WebCAT.Email.confirmation(email, result.credential.token)
         |> WebCAT.Mailer.deliver_later()
 
         {:ok, result.user}
@@ -57,71 +51,52 @@ defmodule WebCAT.Accounts.Users do
   end
 
   @doc """
-  Login a user, returning the user if the authentication is successful
+  Login a user using a token credential
   """
-  @spec login(String.t(), String.t()) :: {:ok, User.t()} | {:error, :unauthorized}
-  def login(email, password) do
-    User
-    |> where([u], u.email == ^email)
+  @spec login(String.t()) :: {:ok, User.t()} | {:error}
+  def login(token) do
+    TokenCredential
+    |> where([c], c.token == ^token)
+    |> join(:left, [c], u in assoc(c, :user))
+    |> preload([_, u], user: u)
     |> Repo.one()
-    |> check_password(password)
-    |> acase do
-      {:ok, _} -> it
-      {:error, _} -> {:error, :unauthorized}
+    |> case do
+      %TokenCredential{} = credential ->
+        if Timex.after?(Timex.now(), credential.expire) do
+          Repo.delete(credential)
+          {:error, "Token not found or expired"}
+        else
+          {:ok, credential.user}
+        end
+
+      nil ->
+        {:error, "Token not found or expired"}
     end
   end
 
   @doc """
-  Get all associated rotation groups for a user
-  assistants only get rotation groups they're assigned to
+  Login a user using an email-password credential
   """
-  @spec rotation_groups(integer) :: [RotationGroup.t()]
-  def rotation_groups(user) do
-    RotationGroup
-    |> join(:inner, [rg], u in assoc(rg, :users))
-    |> join(:inner, [rg], s in assoc(rg, :students))
-    |> join(:inner, [rg], o in assoc(rg, :observations))
-    |> join(:inner, [rg], r in assoc(rg, :rotation))
-    |> where([_, u], u.id == ^user.id)
-    |> order_by([_, _, _, _, r], desc: r.number)
-    |> preload([_, _, s, o, r], students: s, observations: o, rotation: r)
-    |> Repo.all()
+  @spec login(String.t(), String.t()) :: {:ok, User.t()} | {:error, String.t()}
+  def login(email, password) do
+    PasswordCredential
+    |> where([c], c.email == ^email)
+    |> join(:left, [c], u in assoc(c, :user))
+    |> preload([_, u], user: u)
+    |> Repo.one()
+    |> check_password(password)
+    |> case do
+      {:ok, credential} -> {:ok, credential.user}
+      {:error, _} = it -> it
+    end
   end
 
-  @doc """
-  Get all associated notifications for a user
-  """
-  @spec notifications(integer, Keyword.t()) :: [Notification.t()]
-  def notifications(user_id, options \\ []) do
-    Notification
-    |> where([n], n.user_id == ^user_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
-  end
+  defp check_password(nil, _), do: {:error, "Incorrect email or password"}
 
-  @doc """
-  Get all of the classrooms a user belongs to
-  """
-  @spec classrooms(integer) :: [Classroom.t()]
-  def classrooms(user_id, options \\ []) do
-    Classroom
-    |> join(:inner, [c], uc in "user_classrooms", on: uc.classroom_id == c.id)
-    |> where([_, uc], uc.user_id == ^user_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by([c, _], desc: c.inserted_at)
-    |> select([c, _], c)
-    |> Repo.all()
-  end
-
-  defp check_password(nil, _), do: {:error, "Incorrect username or password"}
-
-  defp check_password(%User{} = user, password) do
-    case Pbkdf2.checkpw(password, user.password) do
-      true -> {:ok, user}
-      false -> {:error, "Incorrect username or password"}
+  defp check_password(%PasswordCredential{password: hashed_password} = credential, password) do
+    case Pbkdf2.checkpw(password, hashed_password) do
+      true -> {:ok, credential}
+      false -> {:error, "Incorrect email or password"}
     end
   end
 end

@@ -1,7 +1,7 @@
 <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
         <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@classroom.title, to: Routes.classroom_path(@conn, :show, @classroom.id)) %></li>
+        <li><%= link(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)) %></li>
         <li class="is-active"><%= link("Categories", to: Routes.category_path(@conn, :index, @classroom.id)) %></li>
     </ul>
 </nav>

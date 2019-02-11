@@ -4,7 +4,7 @@
             <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
         </li>
         <li>
-            <%= link(@classroom.title, to: Routes.classroom_path(@conn, :show, @classroom.id)) %>
+            <%= link(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)) %>
         </li>
         <li>
             <%= link("Semesters", to: Routes.semester_path(@conn, :index, @classroom.id)) %>

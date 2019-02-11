@@ -3,9 +3,11 @@ defmodule WebCATWeb.RotationGroupController do
   alias WebCAT.CRUD
   alias WebCAT.Rotations.{Rotation, RotationGroup}
 
-  @list_preload ~w(students users)a
+  @list_preload [students: ~w(user)a] ++ ~w(users)a
   @preload [rotation: [section: [semester: [:classroom]]]] ++ @list_preload
   @rotation_preload [section: [semester: [:classroom]]]
+
+  action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, %{"rotation_id" => rotation_id}) do
     user = Auth.current_resource(conn)

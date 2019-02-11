@@ -4,7 +4,7 @@
             <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
         </li>
         <li>
-            <%= link(@changeset.data.classroom.title, to: Routes.classroom_path(@conn, :show, @changeset.data.classroom_id)) %>
+            <%= link(@changeset.data.classroom.name, to: Routes.classroom_path(@conn, :show, @changeset.data.classroom_id)) %>
         </li>
         <li>
             <%= link("Categories", to: Routes.category_path(@conn, :index, @changeset.data.classroom_id)) %>

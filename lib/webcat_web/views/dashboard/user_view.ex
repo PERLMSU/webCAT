@@ -9,11 +9,9 @@ defmodule WebCATWeb.UserView do
       [
         content_tag(:thead) do
           [
-            content_tag(:th, "Username"),
-            content_tag(:th, "First Name"),
             content_tag(:th, "Last Name"),
-            content_tag(:th, "Email"),
-            content_tag(:th, "Role"),
+            content_tag(:th, "First Name"),
+            content_tag(:th, "Groups"),
             content_tag(:th, "")
           ]
         end,
@@ -21,11 +19,16 @@ defmodule WebCATWeb.UserView do
           Enum.map(users, fn user ->
             content_tag(:tr) do
               [
-                content_tag(:td, user.username),
-                content_tag(:td, user.first_name),
                 content_tag(:td, user.last_name),
-                content_tag(:td, user.email),
-                content_tag(:td, user.role),
+                content_tag(:td, user.first_name),
+                content_tag(:td) do
+                  if is_list(user.groups) and not Enum.empty?(user.groups) do
+                    Enum.map(user.groups, &(&1.name))
+                    |> Enum.join(",")
+                  else
+                    "None"
+                  end
+                end,
                 content_tag(:td) do
                   content_tag(:div, class: "field has-addons") do
                     [
@@ -55,7 +58,7 @@ defmodule WebCATWeb.UserView do
   def form(conn, changeset) do
     classrooms =
       CRUD.list(Classroom)
-      |> Enum.map(&{&1.title, &1.id})
+      |> Enum.map(&{&1.name, &1.id})
 
     path =
       case changeset.data.id do
@@ -68,10 +71,6 @@ defmodule WebCATWeb.UserView do
         form_field("First Name", :first_name),
         form_field("Middle Name", :middle_name),
         form_field("Last Name", :last_name),
-        form_field("Email", :email),
-        form_field("Username", :username),
-        form_field("Nickname", :nickname),
-        form_field("Bio", :bio, :textarea),
         content_tag(:div, class: "field") do
           [
             label(f, :classrooms, "Classrooms"),

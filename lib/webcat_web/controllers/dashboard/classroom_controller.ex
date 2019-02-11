@@ -2,8 +2,12 @@ defmodule WebCATWeb.ClassroomController do
   use WebCATWeb, :controller
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Classroom
+  alias WebCAT.Feedback.Categories
 
-  @preload [:users, categories: ~w(sub_categories)a, semesters: ~w(sections)a]
+  action_fallback(WebCATWeb.FallbackController)
+
+
+  @preload [users: ~w(groups)a, semesters: ~w(sections)a]
 
   def index(conn, _params) do
     user = Auth.current_resource(conn)
@@ -19,7 +23,7 @@ defmodule WebCATWeb.ClassroomController do
 
     with {:ok, classroom} <- CRUD.get(Classroom, id, preload: @preload),
          :ok <- Bodyguard.permit(Classroom, :show, user, classroom) do
-      render(conn, "show.html", user: user, selected: "classroom", data: classroom)
+      render(conn, "show.html", user: user, selected: "classroom", data: Map.replace!(classroom, :categories, Categories.list(id)))
     end
   end
 

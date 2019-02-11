@@ -1,9 +1,9 @@
 <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
         <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@section.semester.classroom.title, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)) %></li>
+        <li><%= link(@section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)) %></li>
         <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, @section.semester.classroom_id)) %></li>
-        <li><%= link(@section.semester.title, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester.id)) %></li>
+        <li><%= link(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester.id)) %></li>
         <li><%= link("Sections", to: Routes.section_path(@conn, :index, @section.semester.id))%></li>
         <li><%= link(@section.number, to: Routes.section_path(@conn, :show, @section.semester.id, @section.id)) %></li>
         <li class="is-active"><%= link("Rotations", to: Routes.rotation_path(@conn, :index, @section.id)) %></li>

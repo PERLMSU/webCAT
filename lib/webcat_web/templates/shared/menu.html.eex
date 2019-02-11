@@ -4,10 +4,11 @@
         <%= menu_entry("Overview", "tachometer", Routes.index_path(@conn, :index), @selected == "overview") %>
         <%= menu_entry("Classroom", "university", Routes.classroom_path(@conn, :index), @selected == "classroom") %>
         <%= menu_entry("Users", "users", Routes.user_path(@conn, :index), @selected == "users") %>
+        <%= menu_entry("Import", "file-import", Routes.index_path(@conn, :import), @selected == "import") %>
     </ul>
     <p class="menu-label">Feedback</p>
     <ul class="menu-list">
-        <%= menu_entry("Feedback Editor", "pen", Routes.feedback_path(@conn, :index), @selected == "feedback") %>
+        <%= menu_entry("Feedback", "pen", Routes.feedback_path(@conn, :index), @selected == "feedback") %>
         <%= menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
     </ul>
 </aside>

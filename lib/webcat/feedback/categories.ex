@@ -1,23 +1,30 @@
 defmodule WebCAT.Feedback.Categories do
-  @moduledoc """
-  Helper functions for working with categories
-  """
-
-  alias WebCAT.Repo
-  alias WebCAT.Feedback.Observation
-
   import Ecto.Query
+  alias WebCAT.Feedback.Category
+  alias WebCAT.Repo
 
-  @doc """
-  Get all observations for a category
-  """
-  @spec observations(integer, Keyword.t) :: [Observation.t]
-  def observations(category_id, options \\ []) do
-    Observation
-    |> where([o], o.category_id == ^category_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
+  def list(classroom_id) when is_binary(classroom_id) or is_integer(classroom_id) do
+      Category
+      |> where([c], c.classroom_id == ^classroom_id)
+      |> where([c], is_nil(c.parent_category_id))
+      |> join(:left, [c], s in assoc(c, :sub_categories))
+      |> preload([_, s], sub_categories: s)
+      |> Repo.all()
+  end
+
+  def get(id) when is_binary(id) or is_integer(id) do
+      Category
+      |> where([c], c.id == ^id)
+      |> join(:left, [c], s in assoc(c, :sub_categories))
+      |> join(:left, [_, s], s_s in assoc(s, :sub_categories))
+      |> join(:left, [c], cl in assoc(c, :classroom))
+      |> preload([_, s, s_s, c], sub_categories: {s, sub_categories: s_s}, classroom: c)
+      |> Repo.one()
+      |> case do
+        nil -> {:error, :not_found}
+        category ->
+          IO.inspect(category)
+          {:ok, category}
+      end
   end
 end

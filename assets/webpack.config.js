@@ -17,6 +17,7 @@ module.exports = (env, options) => ({
         form: './js/form.js',
         messages: './js/messages.js',
         file: './js/file.js',
+        feedback: './js/feedback.js',
     },
     output: {
         filename: '[name].js',
@@ -40,7 +41,16 @@ module.exports = (env, options) => ({
                     'sass-loader'
                 ]
             },
-
+            {
+                test: /\.elm$/,
+                exclude: [/elm-stuff/, /node_modules/],
+                use: {
+                  loader: 'elm-webpack-loader',
+                  options: {
+                    debug: options.mode === "development"
+                  }
+                }
+            },
             {test: /\.css$/, use: [MiniCSSExtractPlugin.loader, 'css-loader']},
         ]
     },

@@ -7,7 +7,7 @@ defmodule WebCATWeb.ClassroomView do
         content_tag(:thead) do
           [
             content_tag(:th, "Course Code"),
-            content_tag(:th, "Title"),
+            content_tag(:th, "Name"),
             content_tag(:th, "Description"),
             content_tag(:th, "Semesters"),
             content_tag(:th, "Users"),
@@ -15,12 +15,12 @@ defmodule WebCATWeb.ClassroomView do
           ]
         end,
         content_tag(:tbody) do
-          if Enum.count(classrooms) > 0 do
+          if not Enum.empty?(classrooms) do
             Enum.map(classrooms, fn classroom ->
               content_tag(:tr) do
                 [
                   content_tag(:td, classroom.course_code),
-                  content_tag(:td, classroom.title),
+                  content_tag(:td, classroom.name),
                   content_tag(:td) do
                     cond do
                       classroom.description == nil ->
@@ -78,7 +78,7 @@ defmodule WebCATWeb.ClassroomView do
     form_for(changeset, path, fn f ->
       [
         form_field("Course Code", :course_code),
-        form_field("Title", :title),
+        form_field("Name", :name),
         form_field("Description", :description, :textarea),
         content_tag(:div, class: "field") do
           content_tag(:div, class: "control") do

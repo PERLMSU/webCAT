@@ -1,40 +1,14 @@
 defmodule WebCAT.Rotations.Students do
-  @moduledoc """
-  Helper functions for working with students
-  """
-
-  alias WebCAT.Repo
-  alias WebCAT.Feedback.{Note, Draft}
-  alias WebCAT.Rotations.RotationGroup
-
   import Ecto.Query
+  alias WebCAT.Rotation.Student
+  alias WebCAT.Repo
 
-  def drafts(student_id, options \\ []) do
-    Draft
-    |> where([d], d.student_id == ^student_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
-  end
-
-  def notes(student_id, options \\ []) do
-    Note
-    |> where([n], n.student_id == ^student_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by(desc: :inserted_at)
-    |> Repo.all()
-  end
-
-  def rotation_groups(student_id, options \\ []) do
-    RotationGroup
-    |> join(:inner, [rg], sg in "student_groups", on: sg.rotation_group_id == rg.id)
-    |> where([_, sg], sg.student_id == ^student_id)
-    |> limit(^Keyword.get(options, :limit, 25))
-    |> offset(^Keyword.get(options, :offset, 0))
-    |> order_by([rg, _], desc: rg.inserted_at)
-    |> select([rg, _], rg)
+  def list(section_id) when is_binary(section_id) or is_integer(section_id) do
+    Student
+    |> join(:left, [s], sec in assoc(s, :sections))
+    |> where([_, s], s.id == ^section_id)
+    |> join(:left, [s], u in assoc(s, :user))
+    |> preload([_, _, u], user: u)
     |> Repo.all()
   end
 end

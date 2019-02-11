@@ -10,7 +10,7 @@ defmodule WebCAT.Accounts.Notification do
     field(:seen, :boolean, default: false)
 
     belongs_to(:draft, WebCAT.Feedback.Draft)
-    belongs_to(:user, WebCAT.Accounts.User)
+    belongs_to(:user, User)
 
     timestamps()
   end
@@ -29,14 +29,14 @@ defmodule WebCAT.Accounts.Notification do
     |> foreign_key_constraint(:user_id)
   end
 
-  def title_for(notification) do
-    String.slice(notification.content, 0..15) <> "..."
-  end
-
   # Policy behavior
 
+  def authorize(action, %User{}, _)
+      when action in ~w(list)a,
+      do: true
+
   def authorize(action, %User{id: id}, %__MODULE__{user_id: id})
-      when action in ~w(list show)a,
+      when action in ~w(show)a,
       do: true
 
   def authorize(_, _, _), do: false

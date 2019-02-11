@@ -9,10 +9,9 @@ defmodule WebCATWeb.StudentView do
       [
         content_tag(:thead) do
           [
+            content_tag(:th, "Email"),
             content_tag(:th, "First Name"),
             content_tag(:th, "Last Name"),
-            content_tag(:th, "Email"),
-            content_tag(:th, "Description"),
             content_tag(:th, "")
           ]
         end,
@@ -21,19 +20,19 @@ defmodule WebCATWeb.StudentView do
             Enum.map(students, fn student ->
               content_tag(:tr) do
                 [
-                  content_tag(:td, student.first_name),
-                  content_tag(:td, student.last_name),
                   content_tag(:td, student.email),
                   content_tag(:td) do
-                    cond do
-                      student.description == nil ->
-                        ""
-
-                      String.length(student.description) > 25 ->
-                        String.slice(student.description, 0..25) <> "..."
-
-                      true ->
-                        student.description
+                    if student.user != nil do
+                      student.user.first_name
+                    else
+                      ""
+                    end
+                  end,
+                  content_tag(:td) do
+                    if student.user != nil do
+                      student.user.last_name
+                    else
+                      ""
                     end
                   end,
                   content_tag(:td) do

@@ -4,13 +4,13 @@
             <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
         </li>
         <li>
-            <%= link(@section.semester.classroom.title, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)) %>
+            <%= link(@section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)) %>
         </li>
         <li>
             <%= link("Semesters", to: Routes.semester_path(@conn, :index, @section.semester.classroom_id)) %>
         </li>
         <li>
-            <%= link(@section.semester.title, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester_id)) %>
+            <%= link(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester_id)) %>
         </li>
         <li>
             <%= link("Sections", to: Routes.section_path(@conn, :index, @section.semester.id))%>
@@ -55,7 +55,7 @@
         <% end %>
         <li>
             <h2 class="subtitle">Semester:
-                <%= link(@section.semester.title, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester_id)) %>
+                <%= link(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester_id)) %>
             </h2>
 
         </li>

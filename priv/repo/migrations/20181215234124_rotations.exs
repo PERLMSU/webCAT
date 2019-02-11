@@ -5,14 +5,14 @@ defmodule WebCAT.Repo.Migrations.Rotations do
   def change do
     create table(:classrooms) do
       add_req(:course_code, :text)
-      add_req(:title, :text)
+      add_req(:name, :text)
       add(:description, :text)
 
       timestamps()
     end
 
     create table(:semesters) do
-      add_req(:title, :text)
+      add_req(:name, :text)
       add_req(:start_date, :date)
       add_req(:end_date, :date)
       add_req(:classroom_id, references(:classrooms, on_delete: :delete_all))
@@ -47,11 +47,8 @@ defmodule WebCAT.Repo.Migrations.Rotations do
     end
 
     create table(:students) do
-      add_req(:first_name, :text)
-      add_req(:last_name, :text)
-      add(:middle_name, :text)
-      add(:description, :text)
       add(:email, :text)
+      add_req(:user_id, references(:users, on_delete: :delete_all))
 
       timestamps()
     end

@@ -4,7 +4,7 @@ defmodule WebCAT.Rotations.RotationGroup do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query
-  alias WebCAT.Accounts.User
+  alias WebCAT.Accounts.{User, Groups}
   alias WebCAT.Rotations.Student
   alias WebCAT.Repo
 
@@ -16,7 +16,6 @@ defmodule WebCAT.Rotations.RotationGroup do
 
     many_to_many(:students, WebCAT.Rotations.Student, join_through: "student_groups")
     many_to_many(:users, WebCAT.Accounts.User, join_through: "rotation_group_users")
-    has_many(:observations, WebCAT.Feedback.Observation)
 
     timestamps()
   end
@@ -48,16 +47,15 @@ defmodule WebCAT.Rotations.RotationGroup do
 
   defp put_students(changeset, _), do: changeset
 
-
   # Policy behavior
 
   def authorize(action, %User{}, _)
       when action in ~w(list show)a,
       do: true
 
-  def authorize(action, %User{role: "admin"}, _)
-      when action in ~w(create update delete)a,
-      do: true
+  def authorize(action, %User{groups: groups}, _)
+      when action in ~w(create update delete)a and is_list(groups),
+      do: Groups.has_group?(groups, "admin")
 
   def authorize(_, _, _), do: false
 end

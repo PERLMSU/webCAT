@@ -4,7 +4,7 @@
             <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
         </li>
         <li class="is-active">
-            <%= link(@data.title, to: Routes.classroom_path(@conn, :show, @data.id)) %>
+            <%= link(@data.name, to: Routes.classroom_path(@conn, :show, @data.id)) %>
         </li>
     </ul>
 </nav>
@@ -12,7 +12,7 @@
     <div class="level-left">
         <div class="level-item">
             <h1 class="title">Classroom:
-                <%= @data.title %>
+                <%= @data.name %>
             </h1>
         </div>
     </div>
@@ -36,8 +36,8 @@
             <%= @data.course_code %>
         </li>
         <li>
-            <h2 class="subtitle">Title</h2>
-            <%= @data.title %>
+            <h2 class="subtitle">Name</h2>
+            <%= @data.name %>
         </li>
         <%= if @data.description != nil do %>
         <li>

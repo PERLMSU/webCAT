@@ -18,26 +18,34 @@ defmodule WebCAT.Repo.Migrations.Feedback do
     create table(:observations) do
       add_req(:content, :text)
       add_req(:type, :observation_type)
-      add(:category_id, references(:categories, on_delete: :nilify_all))
-      add(:rotation_group_id, references(:rotation_groups, on_delete: :delete_all))
+      add(:category_id, references(:categories, on_delete: :delete_all))
 
       timestamps()
     end
 
-    create table(:explanations) do
+    create table(:feedback) do
       add_req(:content, :text)
       add_req(:observation_id, references(:observations, on_delete: :delete_all))
 
       timestamps()
     end
 
-    create table(:notes) do
-      add_req(:content, :text)
-      add(:student_id, references(:students, on_delete: :delete_all))
-      add(:observation_id, references(:observations, on_delete: :delete_all))
+    create table(:student_feedback, primary_key: false) do
+      add_req(:feedback_id, references(:feedback, on_delete: :delete_all), primary_key: true)
+      add_req(:rotation_group_id, :integer, primary_key: true)
+      add_req(:student_id, :integer, primary_key: true)
 
       timestamps()
     end
+
+    execute(
+      """
+      ALTER TABLE student_feedback ADD CONSTRAINT fk_feedback_student_group FOREIGN KEY (student_id, rotation_group_id) REFERENCES student_groups (student_id, rotation_group_id) ON DELETE CASCADE;
+      """,
+      """
+      ALTER TABLE student_feedback DROP CONSTRAINT fk_feedback_student_group;
+      """
+    )
 
     create table(:drafts) do
       add_req(:content, :text)
@@ -48,21 +56,25 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       timestamps()
     end
 
-    execute("""
-    ALTER TABLE drafts ADD CONSTRAINT fk_draft_student_group FOREIGN KEY (student_id, rotation_group_id) REFERENCES student_groups (student_id, rotation_group_id);
-    """,
-    """
-    ALTER TABLE drafts DROP CONSTRAINT fk_draft_student_group;
-    """)
+    execute(
+      """
+      ALTER TABLE drafts ADD CONSTRAINT fk_draft_student_group FOREIGN KEY (student_id, rotation_group_id) REFERENCES student_groups (student_id, rotation_group_id) ON DELETE CASCADE;
+      """,
+      """
+      ALTER TABLE drafts DROP CONSTRAINT fk_draft_student_group;
+      """
+    )
 
-    create table(:draft_observations, primary_key: false) do
-      add_req(:draft_id, references(:drafts, on_delete: :delete_all), primary_key: true)
-      add_req(:observation_id, references(:observations, on_delete: :delete_all), primary_key: true)
+    create table(:comments) do
+      add_req(:content, :text)
+      add(:draft_id, references(:drafts, on_delete: :delete_all))
+      add(:user_id, references(:users, on_delete: :delete_all))
+
+      timestamps()
     end
 
     create table(:emails) do
       add_req(:status, :text)
-      add(:status_message, :text)
       add_req(:draft_id, references(:drafts, on_delete: :delete_all))
 
       timestamps()
@@ -77,24 +89,15 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       timestamps()
     end
 
-    create table(:criteria) do
-      add_req(:min, :integer)
-      add_req(:max, :integer)
-      add_req(:title, :text)
-      add_req(:description, :text)
-
-      timestamps()
-    end
-
     create table(:grades) do
       add_req(:score, :integer)
-      add_req(:criteria_id, references(:criteria, on_delete: :delete_all))
+      add(:note, :text)
+      add_req(:category_id, references(:categories, on_delete: :delete_all))
       add_req(:draft_id, references(:drafts, on_delete: :delete_all))
 
       timestamps()
     end
 
     create(unique_index(:categories, ~w(name)a))
-    create(unique_index(:criteria, ~w(title)a))
   end
 end

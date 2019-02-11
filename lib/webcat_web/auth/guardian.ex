@@ -13,7 +13,7 @@ defmodule WebCATWeb.Auth.Guardian do
   end
 
   def resource_from_claims(%{"sub" => user_id}) do
-    CRUD.get(User, user_id)
+    CRUD.get(User, user_id, preload: ~w(groups)a)
   end
 
   def resource_from_claims(_claims) do

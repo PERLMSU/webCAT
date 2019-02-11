@@ -2,6 +2,7 @@ defmodule WebCATWeb.IndexController do
   use WebCATWeb, :controller
 
   alias WebCAT.Repo
+  alias WebCATWeb.Import
   import Ecto.Query
 
   action_fallback(WebCATWeb.FallbackController)
@@ -23,4 +24,35 @@ defmodule WebCATWeb.IndexController do
   def redirect_index(conn, _params) do
     redirect(conn, to: Routes.index_path(conn, :index))
   end
+
+  def import(conn, _params) do
+    user = Auth.current_resource(conn)
+
+    render(conn, "import.html", user: user, selected: "import")
+  end
+
+  def do_import(conn, assigns) do
+    Auth.current_resource(conn)
+
+    case assigns do
+      %{"import" => %{"file" => %{path: path}}} ->
+        case Import.from_path(path) do
+          :ok ->
+            conn
+            |> put_flash(:info, "Import successful")
+            |> redirect(to: Routes.index_path(conn, :import))
+
+          {:error, message} ->
+            conn
+            |> put_flash(:error, "Import failed: #{message}")
+            |> redirect(to: Routes.index_path(conn, :import))
+        end
+
+      _ ->
+        conn
+        |> put_flash(:error, "Import failed: please select a file")
+        |> redirect(to: Routes.index_path(conn, :import))
+    end
+  end
+
 end
