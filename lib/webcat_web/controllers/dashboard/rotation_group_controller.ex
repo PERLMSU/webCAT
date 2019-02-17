@@ -1,20 +1,23 @@
 defmodule WebCATWeb.RotationGroupController do
-  use WebCATWeb, :controller
+  use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
   alias WebCAT.Rotations.{Rotation, RotationGroup}
 
-  @list_preload [students: ~w(user)a] ++ ~w(users)a
+  @list_preload ~w(users)a
   @preload [rotation: [section: [semester: [:classroom]]]] ++ @list_preload
   @rotation_preload [section: [semester: [:classroom]]]
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, %{"rotation_id" => rotation_id}) do
-    user = Auth.current_resource(conn)
+  def index(conn, user, %{"rotation_id" => rotation_id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(RotationGroup, :list, user),
+    with :ok <- is_authorized?(),
          {:ok, rotation} <- CRUD.get(Rotation, rotation_id, preload: @rotation_preload),
-         rotation_groups <- CRUD.list(RotationGroup, preload: @list_preload, where: [rotation_id: rotation_id]) do
+         rotation_groups <-
+           CRUD.list(RotationGroup, preload: @list_preload, where: [rotation_id: rotation_id]) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
@@ -24,11 +27,13 @@ defmodule WebCATWeb.RotationGroupController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def show(conn, user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, rotation_group} <- CRUD.get(RotationGroup, id, preload: @preload),
-         :ok <- Bodyguard.permit(RotationGroup, :show, user, rotation_group) do
+    with :ok <- is_authorized?(),
+         {:ok, rotation_group} <- CRUD.get(RotationGroup, id, preload: @preload) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -37,10 +42,12 @@ defmodule WebCATWeb.RotationGroupController do
     end
   end
 
-  def new(conn, %{"rotation_id" => rotation_id}) do
-    user = Auth.current_resource(conn)
+  def new(conn, user, %{"rotation_id" => rotation_id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(RotationGroup, :create, user),
+    with :ok <- is_authorized?(),
          {:ok, rotation} <- CRUD.get(Rotation, rotation_id, preload: @rotation_preload) do
       conn
       |> render("new.html",
@@ -52,15 +59,17 @@ defmodule WebCATWeb.RotationGroupController do
     end
   end
 
-  def create(conn, %{"rotation_group" => params}) do
-    user = Auth.current_resource(conn)
+  def create(conn, user, %{"rotation_group" => params}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(RotationGroup, :create, user) do
+    with :ok <- is_authorized?() do
       case CRUD.create(RotationGroup, params) do
         {:ok, rotation_group} ->
           conn
           |> put_flash(:info, "RotationGroup created!")
-          |> redirect(to: Routes.rotation_group_path(conn, :show, rotation_group.id))
+          |> redirect(to: Routes.rotation_group_path(conn, :show, rotation_group.rotation_id, rotation_group.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           {:ok, rotation} = CRUD.get(Rotation, params["rotation_id"], preload: @rotation_preload)
@@ -76,11 +85,13 @@ defmodule WebCATWeb.RotationGroupController do
     end
   end
 
-  def edit(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def edit(conn, user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, rotation_group} <- CRUD.get(RotationGroup, id, preload: @preload),
-         :ok <- Bodyguard.permit(RotationGroup, :update, user, rotation_group) do
+    with :ok <- is_authorized?(),
+         {:ok, rotation_group} <- CRUD.get(RotationGroup, id, preload: @preload) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -89,16 +100,18 @@ defmodule WebCATWeb.RotationGroupController do
     end
   end
 
-  def update(conn, %{"id" => id, "rotation_group" => update}) do
-    user = Auth.current_resource(conn)
+  def update(conn, user, %{"id" => id, "rotation_group" => update}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, rotation_group} <- CRUD.get(RotationGroup, id, preload: @preload),
-         :ok <- Bodyguard.permit(RotationGroup, :update, user, rotation_group) do
+    with :ok <- is_authorized?(),
+         {:ok, rotation_group} <- CRUD.get(RotationGroup, id, preload: @preload) do
       case CRUD.update(RotationGroup, rotation_group, update) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "RotationGroup updated!")
-          |> redirect(to: Routes.rotation_group_path(conn, :show, id))
+          |> redirect(to: Routes.rotation_group_path(conn, :show, rotation_group.rotation_id, id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -110,11 +123,13 @@ defmodule WebCATWeb.RotationGroupController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def delete(conn, _user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, rotation_group} <- CRUD.get(RotationGroup, id),
-         :ok <- Bodyguard.permit(RotationGroup, :delete, user, rotation_group) do
+    with :ok <- is_authorized?(),
+         {:ok, rotation_group} <- CRUD.get(RotationGroup, id) do
       case CRUD.delete(RotationGroup, id) do
         {:ok, _} ->
           conn
