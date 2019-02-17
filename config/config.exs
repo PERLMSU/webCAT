@@ -9,6 +9,8 @@ use Mix.Config
 config :webcat,
   ecto_repos: [WebCAT.Repo]
 
+config :terminator, repo: WebCAT.Repo
+
 config :ecto, json_library: Jason
 
 # Configures the endpoint

@@ -1,6 +1,4 @@
 defmodule WebCAT.Feedback.Grade do
-  @behaviour Bodyguard.Policy
-
   use Ecto.Schema
   import Ecto.Changeset
   alias WebCAT.Accounts.User
@@ -28,15 +26,4 @@ defmodule WebCAT.Feedback.Grade do
     |> foreign_key_constraint(:draft_id)
     |> foreign_key_constraint(:criteria_id)
   end
-
-  # Policy behaviour
-  def authorize(action, %User{}, _)
-      when action in ~w(list show)a,
-      do: true
-
-  def authorize(action, %User{}, _)
-      when action in ~w(create update delete)a,
-      do: true
-
-  def authorize(_, _, _), do: false
 end

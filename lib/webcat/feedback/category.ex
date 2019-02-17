@@ -1,9 +1,6 @@
 defmodule WebCAT.Feedback.Category do
-  @behaviour Bodyguard.Policy
-
   use Ecto.Schema
   import Ecto.Changeset
-  alias WebCAT.Accounts.{User, Groups}
 
   schema "categories" do
     field(:name, :string)
@@ -30,16 +27,4 @@ defmodule WebCAT.Feedback.Category do
     |> foreign_key_constraint(:parent_category_id)
     |> unique_constraint(:name)
   end
-
-  # Policy behaviour
-
-  def authorize(action, %User{}, _)
-      when action in ~w(list show)a,
-      do: true
-
-  def authorize(action, %User{groups: groups}, _)
-      when action in ~w(create update delete)a and is_list(groups),
-      do: Groups.has_group?(groups, "admin")
-
-  def authorize(_, _, _), do: false
 end

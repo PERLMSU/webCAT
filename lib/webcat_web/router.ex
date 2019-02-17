@@ -41,19 +41,9 @@ defmodule WebCATWeb.Router do
 
     get("/", FeedbackController, :index)
     get("/rotations/:rotation_id", FeedbackController, :groups)
-    get("/groups/:group_id", FeedbackController, :observations)
+    get("/groups/:group_id", FeedbackController, :students)
+    get("/groups/:group_id/students/:student_id/categories", FeedbackController, :categories)
 
-    get("/groups/:group_id/observations/new", FeedbackController, :new_observation)
-    post("/observations/", FeedbackController, :create_observation)
-    get("/observations/:id/edit", FeedbackController, :edit_observation)
-    put("/observations/:id/", FeedbackController, :update_observation)
-    get("/observations/:id/delete", FeedbackController, :delete_observation)
-
-    get("/observations/:observation_id/explanations/new", FeedbackController, :new_explanation)
-    post("/explanations/", FeedbackController, :create_explanation)
-    get("/explanations/:id/edit", FeedbackController, :edit_explanation)
-    put("/explanations/:id/", FeedbackController, :update_explanation)
-    get("/explanations/:id/delete", FeedbackController, :delete_explanation)
   end
 
   scope "/inbox", WebCATWeb do

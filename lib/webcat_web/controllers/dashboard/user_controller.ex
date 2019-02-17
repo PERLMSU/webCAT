@@ -1,47 +1,56 @@
 defmodule WebCATWeb.UserController do
-  use WebCATWeb, :controller
+  use WebCATWeb, :authenticated_controller
 
   alias WebCAT.CRUD
   alias WebCAT.Accounts.{User, Users}
 
   action_fallback(WebCATWeb.FallbackController)
 
-  @preload [rotation_groups: ~w(students)a, classrooms: ~w(semesters users)a]
+  @preload [rotation_groups: ~w(students)a, classrooms: ~w(semesters users)a, performer: ~w(roles)a]
 
-  def index(conn, _params) do
-    user = Auth.current_resource(conn)
+  def index(conn, user, _params) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(User, :list, user),
-         users <- CRUD.list(User) do
+    with :ok <- is_authorized?(),
+         users <- CRUD.list(User, preload: @preload) do
       render(conn, "index.html", user: user, selected: "users", data: users)
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    auth_user = Auth.current_resource(conn)
-    with {:ok, user} <- CRUD.get(User, id, preload: @preload),
-         :ok <- Bodyguard.permit(User, :show, auth_user, user) do
+  def show(conn, auth_user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
+
+    with :ok <- is_authorized?(),
+         {:ok, user} <- CRUD.get(User, id, preload: @preload) do
       render(conn, "show.html", user: auth_user, selected: "users", data: user)
     end
   end
 
-  def new(conn, _params) do
-    auth_user = Auth.current_resource(conn)
+  def new(conn, auth_user, _params) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(User, :create, auth_user) do
+    with :ok <- is_authorized?() do
       conn
       |> render("new.html",
         user: auth_user,
-        changeset: User.create_changeset(%User{}),
+        changeset: User.changeset(%User{}),
         selected: "users"
       )
     end
   end
 
-  def create(conn, %{"user" => params}) do
-    auth_user = Auth.current_resource(conn)
+  def create(conn, auth_user, %{"user" => params}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(User, :create, auth_user) do
+    with :ok <- is_authorized?() do
       case(Users.create(params)) do
         {:ok, created} ->
           conn
@@ -59,11 +68,13 @@ defmodule WebCATWeb.UserController do
     end
   end
 
-  def edit(conn, %{"id" => id}) do
-    auth_user = Auth.current_resource(conn)
+  def edit(conn, auth_user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
     with {:ok, user} <- CRUD.get(User, id, preload: @preload),
-         :ok <- Bodyguard.permit(User, :update, auth_user, user) do
+         :ok <- is_authorized?() do
       render(conn, "edit.html",
         user: auth_user,
         selected: "users",
@@ -72,11 +83,13 @@ defmodule WebCATWeb.UserController do
     end
   end
 
-  def update(conn, %{"id" => id, "user" => update}) do
-    auth_user = Auth.current_resource(conn)
+  def update(conn, auth_user, %{"id" => id, "user" => update}) do
+    permissions do
+      has_role(:admin)
+    end
 
     with {:ok, user} <- CRUD.get(User, id, preload: @preload),
-         :ok <- Bodyguard.permit(User, :update, auth_user, user) do
+         :ok <- is_authorized?() do
       case CRUD.update(User, user, update) do
         {:ok, _} ->
           conn
@@ -85,7 +98,7 @@ defmodule WebCATWeb.UserController do
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
-            user: user,
+            user: auth_user,
             selected: "users",
             changeset: changeset
           )
@@ -93,11 +106,13 @@ defmodule WebCATWeb.UserController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    auth_user = Auth.current_resource(conn)
+  def delete(conn, _user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, user} <- CRUD.get(User, id),
-         :ok <- Bodyguard.permit(User, :delete, auth_user, user) do
+    with {:ok, _} <- CRUD.get(User, id),
+         :ok <- is_authorized?() do
       case CRUD.delete(User, id) do
         {:ok, _} ->
           conn

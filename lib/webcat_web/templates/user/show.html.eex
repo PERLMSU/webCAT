@@ -32,6 +32,10 @@
     </h2>
     <ul>
         <li>
+            <h2 class="subtitle">Email</h2>
+            <%= @data.email %>
+        </li>
+        <li>
             <h2 class="subtitle">First Name</h2>
             <%= @data.first_name %>
         </li>
@@ -46,15 +50,15 @@
             <%= @data.last_name %>
         </li>
         <li>
-            <h2 class="subtitle">Groups</h2>
-            <%= if is_list(@data.groups) and not Enum.empty?(@data.groups) do %>
+            <h2 class="subtitle">Roles</h2>
+            <%= if is_list(@data.performer.roles) and not Enum.empty?(@data.performer.roles) do %>
             <ul>
-                <%= for group <- @data.groups do %>
-                <li><%= group.name %></li>
+                <%= for role <- @data.performer.roles do %>
+                <li><%= role.name %></li>
                 <% end %>
             </ul>
             <% else %>
-            <p>No Groups Assigned</p>
+            <p>No Roles Assigned</p>
             <% end %>
         </li>
     </ul>

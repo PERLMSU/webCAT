@@ -8,11 +8,11 @@ defmodule WebCATWeb.Accounts.PasswordResetsTest do
 
   test "start_reset/1 behaves as expected" do
     credential = Factory.insert(:password_credential)
-    {:ok, reset} = PasswordResets.start_reset(credential.email)
+    {:ok, reset} = PasswordResets.start_reset(credential.user.email)
 
     assert reset.user_id == credential.user_id
 
-    email = WebCAT.Email.password_reset(credential.email, reset.token)
+    email = WebCAT.Email.password_reset(credential.user.email, reset.token)
     assert_delivered_email(email)
   end
 
@@ -20,20 +20,20 @@ defmodule WebCATWeb.Accounts.PasswordResetsTest do
     reset = Factory.insert(:password_reset)
 
     {:ok, found} = PasswordResets.get(reset.token)
-    assert found.id == reset.id
+    assert found.user_id == reset.user_id
   end
 
   test "finish_reset/2 behaves as expected" do
     credential = Factory.insert(:password_credential)
     reset = Factory.insert(:password_reset, user: credential.user)
 
-    {:ok, _} = Users.login(credential.email, "password")
+    {:ok, _} = Users.login(credential.user.email, "password")
     {:ok, user} = PasswordResets.finish_reset(reset.token, "password1")
     assert user.id == credential.user_id
 
     # Ensure the password has been changed
-    {:ok, _} = Users.login(credential.email, "password1")
-    {:error, _} = Users.login(credential.email, "password")
+    {:ok, _} = Users.login(credential.user.email, "password1")
+    {:error, _} = Users.login(credential.user.email, "password")
 
     # Ensure it can't be changed twice with the same token
     {:error, _} = PasswordResets.finish_reset(reset.token, "password")

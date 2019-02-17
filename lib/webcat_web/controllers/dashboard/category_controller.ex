@@ -4,8 +4,6 @@ defmodule WebCATWeb.CategoryController do
   alias WebCAT.Rotations.Classroom
   alias WebCAT.Feedback.{Category, Categories}
 
-  import Ecto.Query
-  alias WebCAT.Repo
 
   action_fallback(WebCATWeb.FallbackController)
 

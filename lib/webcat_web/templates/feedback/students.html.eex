@@ -1,0 +1,43 @@
+<nav class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">
+                Rotation Group
+                <%= @group.number %>
+            </h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <%= icon_button("New Draft", "file-alt", class: "is-primary", to: Routes.inbox_path(@conn, :new, group_id: @group.id))%>
+        </div>
+    </div>
+</nav>
+<h2 class="title">
+    Students
+</h2>
+<div class="box">
+    <%= if not Enum.empty?(@group.students) do %>
+    <%= for student <- @group.students do %>
+    <article class="media">
+        <figure class="media-left">
+            <span class="icon">
+                <i class="fas fa-user"></i>
+            </span>
+        </figure>
+        <div class="media-content">
+            <ul>
+                <%= if student.user != nil do %>
+                <li><strong><%= "#{student.user.first_name} #{student.user.last_name}" %></strong></li>
+                <% end %>
+                <li><%= student.email %></li>
+            </ul>
+            <!-- Observations by category -->
+        </div>
+    </article>
+    <% end %>
+    <% else %>
+    <h2 class="subtitle">No students yet</h2>
+    <% end %>
+</div>
+</div>

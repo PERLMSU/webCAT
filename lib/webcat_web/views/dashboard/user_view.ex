@@ -9,9 +9,10 @@ defmodule WebCATWeb.UserView do
       [
         content_tag(:thead) do
           [
+            content_tag(:th, "Email"),
             content_tag(:th, "Last Name"),
             content_tag(:th, "First Name"),
-            content_tag(:th, "Groups"),
+            content_tag(:th, "Roles"),
             content_tag(:th, "")
           ]
         end,
@@ -19,11 +20,12 @@ defmodule WebCATWeb.UserView do
           Enum.map(users, fn user ->
             content_tag(:tr) do
               [
+                content_tag(:td, user.email),
                 content_tag(:td, user.last_name),
                 content_tag(:td, user.first_name),
                 content_tag(:td) do
-                  if is_list(user.groups) and not Enum.empty?(user.groups) do
-                    Enum.map(user.groups, &(&1.name))
+                  if is_list(user.performer.roles) and not Enum.empty?(user.performer.roles) do
+                    Enum.map(user.performer.roles, &(&1.name))
                     |> Enum.join(",")
                   else
                     "None"
@@ -68,6 +70,7 @@ defmodule WebCATWeb.UserView do
 
     form_for(changeset, path, fn f ->
       [
+        form_field("Email", :email),
         form_field("First Name", :first_name),
         form_field("Middle Name", :middle_name),
         form_field("Last Name", :last_name),

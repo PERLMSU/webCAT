@@ -37,7 +37,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> html_response(200)
 
       assert response =~ data.course_code
-      assert response =~ data.title
+      assert response =~ data.name
       assert response =~ data.description
 
       assert response =~ "Semesters"

@@ -1,5 +1,0 @@
-<%= form_for(@changeset, Routes.feedback_path(@conn, :create_explanation), fn f ->  %>
-<%= form_field("Explanation", :content, :textarea) %>
-<%= hidden_input(f, :observation_id, value: @changeset.data.observation_id) %>
-<%= submit("Submit", class: "button is-primary")%>
-<% end) %>

@@ -1,8 +1,7 @@
 defmodule WebCATWeb.Import do
   alias Ecto.Multi
-  import Ecto.Query
   alias WebCAT.Repo
-  alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup, Student}
+  alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
   alias WebCAT.Feedback.{Category, Observation, Feedback}
   alias WebCAT.Accounts.User
 
@@ -94,13 +93,9 @@ defmodule WebCATWeb.Import do
         students =
           Enum.reduce(Map.get(table_map, "students", []), rotation_groups, fn student, multi ->
             Multi.run(multi, {:student, student["id"]}, fn _repo, _transaction ->
-              {:ok, user} =
-                %User{}
-                |> User.changeset(student)
-                |> Repo.insert()
-
-              %Student{}
-              |> Student.changeset(Map.put(student, "user_id", user.id))
+              # TODO: Add to student group on creation
+              %User{}
+              |> User.changeset(student)
               |> Repo.insert()
             end)
           end)
@@ -157,11 +152,10 @@ defmodule WebCATWeb.Import do
             end)
           end)
 
-        IO.inspect(Multi.to_list(import_transaction))
-
-        {:ok, _} = Repo.transaction(import_transaction)
-
-        :ok
+        case Repo.transaction(import_transaction) do
+          {:ok, _} -> :ok
+          {:error, _} -> :error
+        end
     end
   end
 
@@ -172,10 +166,14 @@ defmodule WebCATWeb.Import do
 
     Enum.map(rows, fn row ->
       Enum.reduce(Enum.with_index(row), %{}, fn {elem, index}, map ->
-        Map.put(map, Enum.at(header, index), case elem do
-          {_, _, _} -> Date.from_erl!(elem)
-          _ -> to_string(elem)
-        end)
+        Map.put(
+          map,
+          Enum.at(header, index),
+          case elem do
+            {_, _, _} -> Date.from_erl!(elem)
+            _ -> to_string(elem)
+          end
+        )
       end)
     end)
   end

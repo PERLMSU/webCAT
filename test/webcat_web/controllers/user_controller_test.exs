@@ -39,8 +39,6 @@ defmodule WebCATWeb.UserControllerTest do
       assert response =~ data.first_name
       assert response =~ data.last_name
       assert response =~ data.email
-      assert response =~ data.role
-      assert response =~ data.bio
 
       assert response =~ "Classrooms"
     end
@@ -191,7 +189,7 @@ defmodule WebCATWeb.UserControllerTest do
   end
 
   defp login_user(_) do
-    {:ok, user} = Users.login("wcat_admin@msu.edu", "password")
+    user = Factory.insert(:admin)
     {:ok, user: user}
   end
 end

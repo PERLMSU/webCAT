@@ -5,15 +5,18 @@
         <div class="card">
             <header class="card-header">
                 <p class="card-header-title">
-                    <%= link("Group #{group.number}", to: Routes.feedback_path(@conn, :observations, group.id)) %>
+                    <%= link("Group #{group.number}", to: Routes.feedback_path(@conn, :students, group.id)) %>
                 </p>
             </header>
             <div class="card-content">
                 <ul>
                     <%= for student <- group.students do %>
                     <li>
-                        <%= student.first_name %>
-                        <%= student.last_name %>
+                        <%= if student.user != nil do %>
+                        <%= student.user.first_name %> <%= student.user.last_name %>
+                        <% else %>
+                        <%= student.email %>
+                        <% end %>
                     </li>
                     <% end %>
                 </ul>
@@ -22,6 +25,6 @@
     </div>
     <% end %>
     <% else %>
-        <h1>No groups</h1>
+    <h1>No groups</h1>
     <% end %>
 </div>

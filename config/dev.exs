@@ -57,3 +57,10 @@ config :webcat, WebCAT.Repo,
   database: "webcat_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :terminator, Terminator.Repo,
+  username: "webcat",
+  password: "webcat",
+  database: "webcat_dev",
+  hostname: "localhost",
+  pool_size: 10

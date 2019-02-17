@@ -5,8 +5,7 @@ defmodule WebCAT.Accounts.PasswordResets do
 
   use Anaphora
   alias WebCAT.Repo
-  alias WebCAT.CRUD
-  alias WebCAT.Accounts.{PasswordReset, User, Users}
+  alias WebCAT.Accounts.{PasswordReset, User, Users, PasswordCredential}
   alias Comeonin.Pbkdf2
   alias Ecto.Multi
 
@@ -21,7 +20,7 @@ defmodule WebCAT.Accounts.PasswordResets do
 
       inserted =
         %PasswordReset{}
-        |> PasswordReset.changeset(%{user_id: user.id, token: PasswordReset.gen_token()})
+        |> PasswordReset.changeset(%{user_id: user.id, expire: Timex.shift(Timex.now(), days: 1)})
         |> Repo.insert()
 
       case inserted do
@@ -42,7 +41,7 @@ defmodule WebCAT.Accounts.PasswordResets do
     case Repo.get_by(PasswordReset, token: token) do
       %PasswordReset{} = reset ->
         # Delete if reset older than 24 hours
-        if Timex.before?(reset.inserted_at, Timex.shift(Timex.now(), days: -1)) do
+        if Timex.after?(Timex.now(), reset.expire) do
           Repo.delete(reset)
           {:error, :not_found}
         else
@@ -62,17 +61,21 @@ defmodule WebCAT.Accounts.PasswordResets do
   def finish_reset(token, new_password) when is_binary(token) and is_binary(new_password) do
     case Repo.get_by(PasswordReset, token: token) do
       %PasswordReset{} = reset ->
-        with {:ok, user} <- CRUD.get(User, reset.user_id) do
-          user_changeset = User.changeset(user, %{password: Pbkdf2.hashpwsalt(new_password)})
+        case Repo.get_by(PasswordCredential, user_id: reset.user_id) do
+          nil ->
+            nil
 
-          Multi.new()
-          |> Multi.update(:user, user_changeset)
-          |> Multi.delete(:reset, reset)
-          |> Repo.transaction()
-          |> case do
-            {:ok, result} -> {:ok, result.user}
-            {:error, _, changeset, %{}} -> {:error, changeset}
-          end
+          credential ->
+            changeset = PasswordCredential.changeset(credential, %{password: new_password})
+
+            Multi.new()
+            |> Multi.update(:credential, changeset)
+            |> Multi.delete(:reset, reset)
+            |> Repo.transaction()
+            |> case do
+              {:ok, result} -> {:ok, Repo.get(User, result.credential.user_id)}
+              {:error, _, changeset, %{}} -> {:error, changeset}
+            end
         end
 
       nil ->

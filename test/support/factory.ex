@@ -1,28 +1,16 @@
 defmodule WebCAT.Factory do
   use ExMachina.Ecto, repo: WebCAT.Repo
 
-
-
-  alias WebCAT.Accounts.{Group, Notification, PasswordCredential, PasswordReset, TokenCredential, User}
+  alias WebCAT.Accounts.{Notification, PasswordCredential, PasswordReset, TokenCredential, User}
   alias WebCAT.Feedback.{Category, Comment, Draft, Email, Feedback, Grade, Observation}
-  alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Student, Section}
+  alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Section}
   alias WebCAT.Factory
-
-  def admin_group_factory do
-    %Group{
-      name: "admin"
-    }
-  end
-
-  def admin_group_factory do
-    %Group{
-      name: "assistant"
-    }
-  end
+  alias WebCAT.Repo
+  alias Terminator.{Performer, Role}
 
   def notification_factory do
     %Notification{
-      content: Faker.Lorem.sentences(2..3),
+      content: Enum.join(Faker.Lorem.sentences(2..3), "\n"),
       seen: false,
       draft: Factory.build(:draft),
       user: Factory.build(:user)
@@ -31,7 +19,6 @@ defmodule WebCAT.Factory do
 
   def password_credential_factory do
     %PasswordCredential{
-      email: sequence(:email, &"email-#{&1}@msu.edu"),
       password: Comeonin.Pbkdf2.hashpwsalt("password"),
       user: Factory.build(:user)
     }
@@ -40,43 +27,74 @@ defmodule WebCAT.Factory do
   def token_credential_factory do
     %TokenCredential{
       token: Base.encode32(:crypto.strong_rand_bytes(32)),
-      expire: Timex.add(Timex.now()),
-      user: Factory.build(:user),
+      expire: Timex.shift(Timex.now(), days: 1),
+      user: Factory.build(:user)
     }
   end
 
   def password_reset_factory do
     %PasswordReset{
       token: Base.encode32(:crypto.strong_rand_bytes(32)),
-      expire: Timex.add(Timex.now()),
-      user: Factory.build(:user),
+      expire: Timex.shift(Timex.now(), days: 1),
+      user: Factory.build(:user)
     }
   end
 
   def user_factory do
+    performer = Factory.insert(:performer)
+
     %User{
+      email: sequence(:email, &"email-#{&1}@msu.edu"),
       first_name: sequence(:first_name, ~w(John Jane)),
       last_name: "Doe",
       middle_name: sequence(:middle_name, ~w(James Renee)),
       nickname: sequence(:nickname, ~w(John Jane)),
+      performer: performer,
+      performer_id: performer.id,
       active: true
     }
   end
 
+  def admin_factory do
+    user = build(:user)
+    role = Repo.get_by(Role, identifier: "admin")
+    Performer.grant(user, role)
+    user
+  end
+
+  def student_factory do
+    user = build(:user)
+    role = Repo.get_by(Role, identifier: "student")
+    Performer.grant(user, role)
+    user
+  end
+
+  def assistant_factory do
+    user = build(:user)
+    role = Repo.get_by(Role, identifier: "assistant")
+    Performer.grant(user, role)
+    user
+  end
+
+  def performer_factory do
+    %Performer{}
+  end
+
   def category_factory do
-    classroom_id =  Factory.insert(:classroom).id
+    classroom = Factory.build(:classroom)
+
     %Category{
       name: sequence(:name, &"category#{&1}"),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
-      classroom_id: classroom_id,
-      sub_categories: Factory.build_list(3, :sub_category, classroom_id: classroom_id)
+      classroom: classroom,
+      sub_categories: Factory.build_list(3, :sub_category, classroom: classroom)
     }
   end
 
   def sub_category_factory do
     %Category{
       name: sequence(:name, &"sub_category#{&1}"),
-      description: Enum.join(Faker.Lorem.sentences(), "\n"),
+      description: Enum.join(Faker.Lorem.sentences(), "\n")
     }
   end
 
@@ -90,12 +108,12 @@ defmodule WebCAT.Factory do
 
   def draft_factory do
     student = Factory.insert(:student)
-    rotation_group = Factory.insert(:rotation_group, students: [student])
+    rotation_group = Factory.insert(:rotation_group, users: [student])
 
     %Draft{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
       status: sequence(:status, ~w(unreviewed reviewing needs_revision approved emailed)),
-      student: student,
+      user: student,
       rotation_group: rotation_group
     }
   end
@@ -119,7 +137,7 @@ defmodule WebCAT.Factory do
       score: Enum.random(0..100),
       note: Enum.join(Faker.Lorem.sentences(), "\n"),
       draft: Factory.build(:draft),
-      category: Factory.build(:category),
+      category: Factory.build(:category)
     }
   end
 
@@ -127,7 +145,7 @@ defmodule WebCAT.Factory do
     %Observation{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
       type: sequence(:type, ~w(positive neutral negative)),
-      category: Enum.random(Factory.insert(:category).sub_categories),
+      category: Enum.random(Factory.insert(:category).sub_categories)
     }
   end
 
@@ -162,7 +180,7 @@ defmodule WebCAT.Factory do
       start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: -3)),
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 9)),
       classroom: Factory.build(:classroom),
-      name: sequence(:name, ~w(Fall Spring)a)
+      name: sequence(:name, ~w(Fall Spring))
     }
   end
 
@@ -171,13 +189,6 @@ defmodule WebCAT.Factory do
       number: sequence(:number, &Integer.to_string/1),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       semester: Factory.build(:semester)
-    }
-  end
-
-  def student_factory do
-    %Student{
-      email: sequence(:email, &"email-#{&1}@msu.edu"),
-      user: Factory.build(:user)
     }
   end
 end

@@ -4,10 +4,10 @@
         <%= section.number %>
     </h1>
     <h2 class="subtitle">Classroom:
-        <%= section.semester.classroom.title %>
+        <%= section.semester.classroom.name %>
     </h2>
     <h2 class="subtitle">Semester:
-        <%= section.semester.title %>
+        <%= section.semester.name %>
     </h2>
     <p>Students: <%= Enum.count(section.students) %></p>
     <div class="columns">

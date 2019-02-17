@@ -8,15 +8,14 @@ defmodule WebCAT.Accounts.PasswordCredential do
 
   @primary_key false
   schema "password_credentials" do
-    field(:email, :string)
     field(:password, :string)
 
-    belongs_to(:user, WebCAT.Accounts.User)
+    belongs_to(:user, WebCAT.Accounts.User, primary_key: true)
 
     timestamps()
   end
 
-  @required ~w(email password user_id)a
+  @required ~w(password user_id)a
 
   @doc """
   Build a changeset for a credential

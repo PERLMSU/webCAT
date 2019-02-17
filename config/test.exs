@@ -18,6 +18,13 @@ config :webcat, WebCAT.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
+config :terminator, Terminator.Repo,
+  username: "webcat",
+  password: "webcat",
+  database: "webcat_test",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox
+
 config :webcat, WebCAT.Mailer, adapter: Bamboo.TestAdapter
 
 config :pbkdf2_elixir, rounds: 1

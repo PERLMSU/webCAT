@@ -1,10 +1,10 @@
 defmodule WebCAT.Rotations.Semester do
-  @behaviour Bodyguard.Policy
-
   use Ecto.Schema
   import Ecto.Changeset
   import WebCAT.Validators
-  alias WebCAT.Accounts.{User, Groups}
+  import Ecto.Query
+  alias WebCAT.Accounts.User
+  alias WebCAT.Repo
 
   schema "semesters" do
     field(:name, :string)
@@ -13,6 +13,7 @@ defmodule WebCAT.Rotations.Semester do
 
     belongs_to(:classroom, WebCAT.Rotations.Classroom)
     has_many(:sections, WebCAT.Rotations.Section)
+    many_to_many(:users, User, join_through: "semester_users")
 
     timestamps()
   end
@@ -28,17 +29,12 @@ defmodule WebCAT.Rotations.Semester do
     |> validate_required(@required)
     |> validate_dates_after(:start_date, :end_date)
     |> foreign_key_constraint(:classroom_id)
+    |> put_users(Map.get(attrs, "users"))
   end
 
-  # Policy behavior
+  defp put_users(%{valid?: true} = changeset, users) when is_list(users) do
+    put_assoc(changeset, :users, Repo.all(from(u in User, where: u.id in ^users)))
+  end
 
-  def authorize(action, %User{}, _)
-      when action in ~w(list show)a,
-      do: true
-
-  def authorize(action, %User{groups: groups}, _)
-      when action in ~w(create update delete)a and is_list(groups),
-      do: Groups.has_group?(groups, "admin")
-
-  def authorize(_, _, _), do: false
+  defp put_users(changeset, _), do: changeset
 end

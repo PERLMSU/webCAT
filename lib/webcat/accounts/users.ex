@@ -14,10 +14,8 @@ defmodule WebCAT.Accounts.Users do
   """
   @spec by_email(String.t()) :: {:ok, User.t()} | {:error, String.t()}
   def by_email(email) do
-    PasswordCredential
-    |> where([c], c.email == ^email)
-    |> join(:left, [c], u in assoc(c, :user))
-    |> select([_, u], u)
+    User
+    |> where([u], u.email == ^email)
     |> Repo.one()
     |> case do
       %User{} = user -> {:ok, user}
@@ -28,8 +26,8 @@ defmodule WebCAT.Accounts.Users do
   @doc """
   Use supplied attributes to sign up a new user and send them a token to login via a supplied email address
   """
-  @spec create(map(), String.t()) :: {:ok, User.t()} | {:error, Changeset.t()}
-  def create(attrs, email) do
+  @spec create(map()) :: {:ok, User.t()} | {:error, Changeset.t()}
+  def create(attrs) do
     Multi.new()
     |> Multi.insert(:user, User.changeset(%User{}, attrs))
     |> Multi.run(:credential, fn _repo, %{user: user} ->
@@ -40,7 +38,7 @@ defmodule WebCAT.Accounts.Users do
     |> Repo.transaction()
     |> case do
       {:ok, result} ->
-        WebCAT.Email.confirmation(email, result.credential.token)
+        WebCAT.Email.confirmation(result.user.email, result.credential.token)
         |> WebCAT.Mailer.deliver_later()
 
         {:ok, result.user}
@@ -80,15 +78,28 @@ defmodule WebCAT.Accounts.Users do
   @spec login(String.t(), String.t()) :: {:ok, User.t()} | {:error, String.t()}
   def login(email, password) do
     PasswordCredential
-    |> where([c], c.email == ^email)
     |> join(:left, [c], u in assoc(c, :user))
+    |> where([_, u], u.email == ^email)
     |> preload([_, u], user: u)
     |> Repo.one()
     |> check_password(password)
     |> case do
-      {:ok, credential} -> {:ok, credential.user}
+      {:ok, credential} ->
+        {:ok, credential.user}
       {:error, _} = it -> it
     end
+  end
+
+  @doc """
+  Get all users with a specific role
+  """
+  def with_role(role) do
+    User
+    |> join(:left, [u], p in assoc(u, :performer))
+    |> join(:left, [_, p], r in assoc(p, :roles))
+    |> where([_, _, role], role.name == ^role)
+    |> preload([_, p, r], performer: {p, roles: r})
+    |> Repo.all()
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect email or password"}

@@ -27,10 +27,27 @@ defmodule WebCATWeb do
     end
   end
 
+  def authenticated_controller do
+    quote do
+      use WebCATWeb, :controller
+      use Terminator
+
+      # Override Phoenix.Controller.action/2 callback
+      def action(conn, _) do
+        user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
+        load_and_authorize_performer(user)
+
+        apply(__MODULE__, action_name(conn), [conn, user, conn.params])
+      end
+    end
+  end
+
   def view do
     quote do
-      use Phoenix.View, root: "lib/webcat_web/templates",
-                        namespace: WebCATWeb
+      use Phoenix.View,
+        root: "lib/webcat_web/templates",
+        namespace: WebCATWeb
+
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
       # Use all HTML functionality (forms, tags, etc)

@@ -4,18 +4,22 @@ defmodule WebCATWeb.IndexController do
   alias WebCAT.Repo
   alias WebCATWeb.Import
   import Ecto.Query
+  alias WebCat
+  alias WebCAT.Accounts.Users
 
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, _params) do
     user = Auth.current_resource(conn)
 
+    student_count = Users.with_role("student") |> Enum.count()
+
     # Grab simple statistics
     counts = %{
-      students: Repo.aggregate(from(s in "students"), :count, :id),
+      students: student_count,
       observations: Repo.aggregate(from(o in "observations"), :count, :id),
       emails: Repo.aggregate(from(d in "drafts"), :count, :id),
-      users: Repo.aggregate(from(u in "users"), :count, :id)
+      users: Repo.aggregate(from(u in "users"), :count, :id) - student_count
     }
 
     render(conn, "overview.html", user: user, counts: counts, selected: "overview")
@@ -54,5 +58,4 @@ defmodule WebCATWeb.IndexController do
         |> redirect(to: Routes.index_path(conn, :import))
     end
   end
-
 end
