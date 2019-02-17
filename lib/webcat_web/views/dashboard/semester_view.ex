@@ -61,7 +61,7 @@ defmodule WebCATWeb.SemesterView do
   def form(%{params: %{"classroom_id" => classroom_id}} = conn, changeset) do
     classrooms =
       CRUD.list(Classroom)
-      |> Enum.map(&{&1.title, &1.id})
+      |> Enum.map(&{&1.name, &1.id})
 
     path =
       case changeset.data.id do

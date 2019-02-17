@@ -189,10 +189,8 @@ defmodule WebCATWeb.ClassroomControllerTest do
     end
   end
 
-
-
   defp login_user(_) do
-    {:ok, user} = Users.login("wcat_admin@msu.edu", "password")
+    user = Factory.insert(:admin)
     {:ok, user: user}
   end
 end

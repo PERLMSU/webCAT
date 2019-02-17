@@ -41,6 +41,12 @@
             <h2 class="subtitle">Name</h2>
             <%= @semester.name %>
         </li>
+        <%= if @semester.description != nil do %>
+        <li>
+            <h2 class="subtitle">Description</h2>
+            <%= @semester.description %>
+        </li>
+        <% end %>
         <li>
             <h2 class="subtitle">Start Date</h2>
             <%= Timex.format!(@semester.start_date, "{M}-{D}-{YYYY}") %>

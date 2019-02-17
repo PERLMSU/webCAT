@@ -8,6 +8,7 @@ defmodule WebCAT.Rotations.Semester do
 
   schema "semesters" do
     field(:name, :string)
+    field(:description, :string)
     field(:start_date, :date)
     field(:end_date, :date)
 
@@ -19,13 +20,14 @@ defmodule WebCAT.Rotations.Semester do
   end
 
   @required ~w(name start_date end_date classroom_id)a
+  @optional ~w(description)a
 
   @doc """
   Build a changeset for a semester
   """
   def changeset(semester, attrs \\ %{}) do
     semester
-    |> cast(attrs, @required)
+    |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
     |> validate_dates_after(:start_date, :end_date)
     |> foreign_key_constraint(:classroom_id)
