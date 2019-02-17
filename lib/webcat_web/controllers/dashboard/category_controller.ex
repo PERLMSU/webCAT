@@ -1,19 +1,21 @@
 defmodule WebCATWeb.CategoryController do
-  use WebCATWeb, :controller
+  use WebCATWeb, :authenticated_controller
+  use Anaphora
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Classroom
   alias WebCAT.Feedback.{Category, Categories}
-
 
   action_fallback(WebCATWeb.FallbackController)
 
   @list_preload ~w(sub_categories)a
   @preload ~w(classroom parent_category)a ++ @list_preload
 
-  def index(conn, %{"classroom_id" => classroom_id}) do
-    user = Auth.current_resource(conn)
+  def index(conn, user, %{"classroom_id" => classroom_id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(Category, :list, user),
+    with :ok <- is_authorized?(),
          {:ok, classroom} <- CRUD.get(Classroom, classroom_id),
          categories <- Categories.list(classroom_id) do
       render(conn, "index.html",
@@ -25,11 +27,13 @@ defmodule WebCATWeb.CategoryController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def show(conn, user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, category} <- Categories.get(id),
-         :ok <- Bodyguard.permit(Category, :show, user, category) do
+    with :ok <- is_authorized?(),
+    {:ok, category} <- Categories.get(id) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -38,20 +42,17 @@ defmodule WebCATWeb.CategoryController do
     end
   end
 
-  def new(conn, %{"classroom_id" => classroom_id} = params) do
-    user = Auth.current_resource(conn)
+  def new(conn, user, %{"classroom_id" => classroom_id} = params) do
+    permissions do
+      has_role(:admin)
+    end
 
     parent_category_id =
-      case Map.get(params, "parent_category_id") do
-        nil ->
-          nil
+      aif(Map.get(params, "parent_category_id"),
+        do: Integer.parse(it) |> Tuple.to_list() |> Enum.at(0)
+      )
 
-        id ->
-          {num, _} = Integer.parse(id)
-          num
-      end
-
-    with :ok <- Bodyguard.permit(Category, :create, user),
+    with :ok <- is_authorized?(),
          {:ok, classroom} <- CRUD.get(Classroom, classroom_id) do
       conn
       |> render("new.html",
@@ -67,10 +68,12 @@ defmodule WebCATWeb.CategoryController do
     end
   end
 
-  def create(conn, %{"category" => params}) do
-    user = Auth.current_resource(conn)
+  def create(conn, user, %{"category" => params}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(Category, :create, user) do
+    with :ok <- is_authorized?() do
       case CRUD.create(Category, params) do
         {:ok, category} ->
           conn
@@ -91,11 +94,13 @@ defmodule WebCATWeb.CategoryController do
     end
   end
 
-  def edit(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def edit(conn, user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, category} <- CRUD.get(Category, id, preload: @preload),
-         :ok <- Bodyguard.permit(Category, :update, user, category) do
+    with :ok <- is_authorized?(),
+    {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -104,11 +109,13 @@ defmodule WebCATWeb.CategoryController do
     end
   end
 
-  def update(conn, %{"id" => id, "category" => update}) do
-    user = Auth.current_resource(conn)
+  def update(conn, user, %{"id" => id, "category" => update}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, category} <- CRUD.get(Category, id, preload: @preload),
-         :ok <- Bodyguard.permit(Category, :update, user, category) do
+    with :ok <- is_authorized?(),
+    {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
       case CRUD.update(Category, category, update) do
         {:ok, _} ->
           conn
@@ -125,11 +132,13 @@ defmodule WebCATWeb.CategoryController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def delete(conn, _user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, category} <- CRUD.get(Category, id),
-         :ok <- Bodyguard.permit(Category, :delete, user, category) do
+    with :ok <- is_authorized?(),
+    {:ok, category} <- CRUD.get(Category, id) do
       case CRUD.delete(Category, id) do
         {:ok, _} ->
           conn
