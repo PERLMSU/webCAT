@@ -2,10 +2,10 @@
     <ul>
         <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
         <li><%= link(@semester.classroom.name, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %></li>
-        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @semester.classroom_id)) %></li>
-        <li><%= link(@semester.name, to: Routes.semester_path(@conn, :show, @semester.id)) %></li>
-        <li><%= link("Sections", to: Routes.section_path(@conn, :index, semester_id: @semester.id))%></li>
-        <li class="is-active"><%= link("New", to: Routes.semester_path(@conn, :new, semester_id: @semester.id)) %></li>
+        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, @semester.classroom_id)) %></li>
+        <li><%= link(@semester.name, to: Routes.semester_path(@conn, :show, @semester.classroom_id, @semester.id)) %></li>
+        <li><%= link("Sections", to: Routes.section_path(@conn, :index, @semester.id))%></li>
+        <li class="is-active"><%= link("New", to: Routes.semester_path(@conn, :new, @semester.id)) %></li>
     </ul>
 </nav>
 <h1 class="title">New Section</h1>

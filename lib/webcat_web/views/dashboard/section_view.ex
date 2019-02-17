@@ -12,7 +12,7 @@ defmodule WebCATWeb.SectionView do
             content_tag(:th, "Number"),
             content_tag(:th, "Description"),
             content_tag(:th, "Rotations"),
-            content_tag(:th, "Students"),
+            content_tag(:th, "Users"),
             content_tag(:th, "")
           ]
         end,
@@ -35,7 +35,7 @@ defmodule WebCATWeb.SectionView do
                     end
                   end,
                   content_tag(:td, Enum.count(section.rotations)),
-                  content_tag(:td, Enum.count(section.students)),
+                  content_tag(:td, Enum.count(section.users)),
                   content_tag(:td) do
                     content_tag(:div, class: "field has-addons") do
                       [
@@ -72,7 +72,7 @@ defmodule WebCATWeb.SectionView do
   def form(%{params: %{"semester_id" => semester_id}} = conn, changeset) do
     semesters =
       CRUD.list(Semester)
-      |> Enum.map(&{&1.title, &1.id})
+      |> Enum.map(&{&1.name, &1.id})
 
     path =
       case changeset.data.id do

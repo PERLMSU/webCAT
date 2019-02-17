@@ -85,17 +85,17 @@
         <div class="level-left">
             <div class="level-item">
                 <h2 class="subtitle">
-                    Students
+                    Users
                 </h2>
             </div>
         </div>
         <div class="level-right">
             <div class="level-item">
                 <p class="buttons">
-                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.student_path(@conn, :new)) %>
+                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.user_path(@conn, :new)) %>
                 </p>
             </div>
         </div>
     </div>
-    <%= WebCATWeb.StudentView.table(@conn, @section.students) %>
+    <%= WebCATWeb.UserView.table(@conn, @section.users) %>
 </div>

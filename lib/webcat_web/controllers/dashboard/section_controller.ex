@@ -1,17 +1,19 @@
 defmodule WebCATWeb.SectionController do
-  use WebCATWeb, :controller
+  use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
   alias WebCAT.Rotations.{Semester, Section}
 
-  @list_preload [rotations: [:rotation_groups], students: ~w(user)a]
+  @list_preload [:users, rotations: [:rotation_groups]]
   @preload [semester: [:classroom]] ++ @list_preload
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, %{"semester_id" => semester_id}) do
-    user = Auth.current_resource(conn)
+  def index(conn, user, %{"semester_id" => semester_id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(Section, :list, user),
+    with :ok <- is_authorized?(),
          {:ok, semester} <- CRUD.get(Semester, semester_id, preload: ~w(classroom)a),
          sections <-
            CRUD.list(Section, preload: @list_preload, where: [semester_id: semester_id]) do
@@ -24,11 +26,13 @@ defmodule WebCATWeb.SectionController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def show(conn, user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, section} <- CRUD.get(Section, id, preload: @preload),
-         :ok <- Bodyguard.permit(Section, :show, user, section) do
+    with :ok <- is_authorized?(),
+         {:ok, section} <- CRUD.get(Section, id, preload: @preload) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -37,12 +41,13 @@ defmodule WebCATWeb.SectionController do
     end
   end
 
-  def new(conn, %{"semester_id" => semester_id}) do
-    user = Auth.current_resource(conn)
+  def new(conn, user, %{"semester_id" => semester_id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(Section, :create, user),
+    with :ok <- is_authorized?(),
          {:ok, semester} <- CRUD.get(Semester, semester_id, preload: ~w(classroom)a) do
-
       conn
       |> render("new.html",
         user: user,
@@ -53,15 +58,17 @@ defmodule WebCATWeb.SectionController do
     end
   end
 
-  def create(conn, %{"section" => params}) do
-    user = Auth.current_resource(conn)
+  def create(conn, user, %{"section" => params}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with :ok <- Bodyguard.permit(Section, :create, user) do
+    with :ok <- is_authorized?() do
       case CRUD.create(Section, params) do
         {:ok, section} ->
           conn
           |> put_flash(:info, "Section created!")
-          |> redirect(to: Routes.section_path(conn, :show, section.id))
+          |> redirect(to: Routes.section_path(conn, :show, section.semester_id, section.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           conn
@@ -74,11 +81,13 @@ defmodule WebCATWeb.SectionController do
     end
   end
 
-  def edit(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def edit(conn, user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, section} <- CRUD.get(Section, id, preload: @preload),
-         :ok <- Bodyguard.permit(Section, :update, user, section) do
+    with :ok <- is_authorized?(),
+         {:ok, section} <- CRUD.get(Section, id, preload: @preload) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -87,16 +96,18 @@ defmodule WebCATWeb.SectionController do
     end
   end
 
-  def update(conn, %{"id" => id, "section" => update}) do
-    user = Auth.current_resource(conn)
+  def update(conn, user, %{"id" => id, "section" => update}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, section} <- CRUD.get(Section, id, preload: @preload),
-         :ok <- Bodyguard.permit(Section, :update, user, section) do
+    with :ok <- is_authorized?(),
+         {:ok, section} <- CRUD.get(Section, id, preload: @preload) do
       case CRUD.update(Section, section, update) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Section updated!")
-          |> redirect(to: Routes.section_path(conn, :show, id))
+          |> redirect(to: Routes.section_path(conn, :show, section.semester_id, id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -108,11 +119,13 @@ defmodule WebCATWeb.SectionController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def delete(conn, _user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
 
-    with {:ok, section} <- CRUD.get(Section, id),
-         :ok <- Bodyguard.permit(Section, :delete, user, section) do
+    with :ok <- is_authorized?(),
+         {:ok, section} <- CRUD.get(Section, id) do
       case CRUD.delete(Section, id) do
         {:ok, _} ->
           conn
