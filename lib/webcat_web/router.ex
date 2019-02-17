@@ -28,12 +28,12 @@ defmodule WebCATWeb.Router do
     get("/", LoginController, :index)
     post("/", LoginController, :login)
 
+    get("/credential", LoginController, :credential_login)
+
     get("/reset", PasswordResetController, :index)
     post("/reset", PasswordResetController, :create)
     get("/reset/:token", PasswordResetController, :reset)
     post("/reset/:token", PasswordResetController, :finish_reset)
-
-    get("/confirm/:token", EmailConfirmationController, :confirm)
   end
 
   scope "/feedback", WebCATWeb do
@@ -43,7 +43,6 @@ defmodule WebCATWeb.Router do
     get("/rotations/:rotation_id", FeedbackController, :groups)
     get("/groups/:group_id", FeedbackController, :students)
     get("/groups/:group_id/students/:student_id/categories", FeedbackController, :categories)
-
   end
 
   scope "/inbox", WebCATWeb do
@@ -69,7 +68,6 @@ defmodule WebCATWeb.Router do
     importable_resources("/semesters/:semester_id/sections", SectionController)
     importable_resources("/sections/:section_id/rotations", RotationController)
     importable_resources("/rotations/:rotation_id/rotation_groups", RotationGroupController)
-
 
     importable_resources("/classrooms/:classroom_id/categories", CategoryController)
     importable_resources("/categories/:category_id/observations", ObservationController)

@@ -23,8 +23,8 @@ defmodule WebCAT.Email do
     new_email()
     |> to(email)
     |> from("no-reply@webcat.io")
-    |> subject("Password Reset")
-    |> html_body(~s(<a href="#{email_confirmation_url(WebCATWeb.Endpoint, :confirm, token)}">))
+    |> subject("Confirm Login")
+    |> html_body(~s(<a href="#{login_url(WebCATWeb.Endpoint, :credential_login, token: token)}">))
     |> text_body("Token: #{token}")
   end
 end

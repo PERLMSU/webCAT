@@ -42,6 +42,8 @@ defmodule WebCATWeb.SemesterControllerTest do
 
       assert response =~ data.name
       assert response =~ data.description
+      assert response =~ Timex.format!(data.start_date, "{M}-{D}-{YYYY}")
+      assert response =~ Timex.format!(data.end_date, "{M}-{D}-{YYYY}")
 
       assert response =~ "Semesters"
       assert response =~ "Users"
