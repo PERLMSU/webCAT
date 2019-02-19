@@ -13,15 +13,6 @@ defmodule WebCATWeb.UserControllerTest do
 
       assert response =~ "Users"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      redirect =
-        conn
-        |> get(Routes.user_path(conn, :index))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "show/2" do
@@ -42,17 +33,6 @@ defmodule WebCATWeb.UserControllerTest do
 
       assert response =~ "Classrooms"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:user)
-
-      redirect =
-        conn
-        |> get(Routes.user_path(conn, :show, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "new/2" do
@@ -66,15 +46,6 @@ defmodule WebCATWeb.UserControllerTest do
         |> html_response(200)
 
       assert response =~ "New User"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      redirect =
-        conn
-        |> get(Routes.user_path(conn, :new))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -92,17 +63,6 @@ defmodule WebCATWeb.UserControllerTest do
 
       assert Regex.match?(~r/#{Routes.user_path(conn, :index)}\/\d+/, redirect)
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.params_with_assocs(:user)
-
-      redirect =
-        conn
-        |> post(Routes.user_path(conn, :create), %{user: data})
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "edit/2" do
@@ -118,17 +78,6 @@ defmodule WebCATWeb.UserControllerTest do
         |> html_response(200)
 
       assert response =~ "Edit User"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:user)
-
-      redirect =
-        conn
-        |> get(Routes.user_path(conn, :edit, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -147,18 +96,6 @@ defmodule WebCATWeb.UserControllerTest do
 
       assert redirect =~ Routes.user_path(conn, :index)
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:user)
-      update = Factory.params_with_assocs(:user)
-
-      redirect =
-        conn
-        |> put(Routes.user_path(conn, :update, data.id), %{user: update})
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "delete/2" do
@@ -174,17 +111,6 @@ defmodule WebCATWeb.UserControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.user_path(conn, :index)
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:user)
-
-      redirect =
-        conn
-        |> get(Routes.user_path(conn, :delete, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 

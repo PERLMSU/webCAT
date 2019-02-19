@@ -15,17 +15,6 @@ defmodule WebCATWeb.SectionControllerTest do
 
       assert response =~ "Sections"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      semester = Factory.insert(:semester)
-
-      redirect =
-        conn
-        |> get(Routes.section_path(conn, :index, semester.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "show/2" do
@@ -46,17 +35,6 @@ defmodule WebCATWeb.SectionControllerTest do
       assert response =~ "Rotations"
       assert response =~ "Users"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:section)
-
-      redirect =
-        conn
-        |> get(Routes.section_path(conn, :show, data.semester_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "new/2" do
@@ -72,17 +50,6 @@ defmodule WebCATWeb.SectionControllerTest do
         |> html_response(200)
 
       assert response =~ "New Section"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      semester = Factory.insert(:semester)
-
-      redirect =
-        conn
-        |> get(Routes.section_path(conn, :new, semester.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -103,17 +70,6 @@ defmodule WebCATWeb.SectionControllerTest do
                redirect
              )
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.params_with_assocs(:section)
-
-      redirect =
-        conn
-        |> post(Routes.section_path(conn, :create, data.semester_id), %{section: data})
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "edit/2" do
@@ -129,17 +85,6 @@ defmodule WebCATWeb.SectionControllerTest do
         |> html_response(200)
 
       assert response =~ "Edit Section"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:section)
-
-      redirect =
-        conn
-        |> get(Routes.section_path(conn, :edit, data.semester_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -160,20 +105,6 @@ defmodule WebCATWeb.SectionControllerTest do
 
       assert redirect =~ Routes.section_path(conn, :show, data.semester_id, data.id)
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:section)
-      update = Factory.params_with_assocs(:section)
-
-      redirect =
-        conn
-        |> put(Routes.section_path(conn, :update, data.semester_id, data.id), %{
-          section: update
-        })
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "delete/2" do
@@ -189,17 +120,6 @@ defmodule WebCATWeb.SectionControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.section_path(conn, :index, data.semester_id)
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:section)
-
-      redirect =
-        conn
-        |> get(Routes.section_path(conn, :delete, data.semester_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 

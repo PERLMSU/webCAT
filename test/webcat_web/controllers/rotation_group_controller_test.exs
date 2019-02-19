@@ -15,17 +15,6 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       assert response =~ "Rotations"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      rotation = Factory.insert(:rotation)
-
-      redirect =
-        conn
-        |> get(Routes.rotation_group_path(conn, :index, rotation.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "show/2" do
@@ -45,17 +34,6 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       assert response =~ "Rotation Groups"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:rotation_group)
-
-      redirect =
-        conn
-        |> get(Routes.rotation_group_path(conn, :show, data.rotation_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "new/2" do
@@ -71,17 +49,6 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> html_response(200)
 
       assert response =~ "New Rotation"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      rotation = Factory.insert(:rotation)
-
-      redirect =
-        conn
-        |> get(Routes.rotation_group_path(conn, :new, rotation.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -102,17 +69,6 @@ defmodule WebCATWeb.RotationGroupControllerTest do
                redirect
              )
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.params_with_assocs(:rotation_group)
-
-      redirect =
-        conn
-        |> post(Routes.rotation_group_path(conn, :create, data.rotation_id), %{rotation_group: data})
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "edit/2" do
@@ -128,17 +84,6 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> html_response(200)
 
       assert response =~ "Edit Rotation"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:rotation_group)
-
-      redirect =
-        conn
-        |> get(Routes.rotation_group_path(conn, :edit, data.rotation_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -159,20 +104,6 @@ defmodule WebCATWeb.RotationGroupControllerTest do
 
       assert redirect =~ Routes.rotation_group_path(conn, :show, data.rotation_id, data.id)
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:rotation_group)
-      update = Factory.params_with_assocs(:rotation_group)
-
-      redirect =
-        conn
-        |> put(Routes.rotation_group_path(conn, :update, data.rotation_id, data.id), %{
-          rotation_group: update
-        })
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "delete/2" do
@@ -188,17 +119,6 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.rotation_group_path(conn, :index, data.rotation_id)
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:rotation_group)
-
-      redirect =
-        conn
-        |> get(Routes.rotation_group_path(conn, :delete, data.rotation_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 

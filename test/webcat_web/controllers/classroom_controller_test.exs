@@ -13,15 +13,6 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       assert response =~ "Classrooms"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      redirect =
-        conn
-        |> get(Routes.classroom_path(conn, :index))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "show/2" do
@@ -43,17 +34,6 @@ defmodule WebCATWeb.ClassroomControllerTest do
       assert response =~ "Semesters"
       assert response =~ "Users"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:classroom)
-
-      redirect =
-        conn
-        |> get(Routes.classroom_path(conn, :show, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "new/2" do
@@ -67,15 +47,6 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> html_response(200)
 
       assert response =~ "New Classroom"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      redirect =
-        conn
-        |> get(Routes.classroom_path(conn, :new))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -93,17 +64,6 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       assert Regex.match?(~r/#{Routes.classroom_path(conn, :index)}\/\d+/, redirect)
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.params_with_assocs(:classroom)
-
-      redirect =
-        conn
-        |> post(Routes.classroom_path(conn, :create), %{user: data})
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "edit/2" do
@@ -119,17 +79,6 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> html_response(200)
 
       assert response =~ "Edit Classroom"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:classroom)
-
-      redirect =
-        conn
-        |> get(Routes.classroom_path(conn, :edit, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -148,18 +97,6 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       assert redirect =~ Routes.classroom_path(conn, :show, data.id)
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:classroom)
-      update = Factory.params_with_assocs(:classroom)
-
-      redirect =
-        conn
-        |> put(Routes.classroom_path(conn, :update, data.id), %{classroom: update})
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "delete/2" do
@@ -175,17 +112,6 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.classroom_path(conn, :index)
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:classroom)
-
-      redirect =
-        conn
-        |> get(Routes.classroom_path(conn, :delete, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 

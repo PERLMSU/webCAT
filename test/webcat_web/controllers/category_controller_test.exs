@@ -4,7 +4,7 @@ defmodule WebCATWeb.CategoryControllerTest do
   describe "index/2" do
     setup ~w(login_user)a
 
-    test "responds with a table of categorys", %{conn: conn, user: user} do
+    test "responds with a table of categories", %{conn: conn, user: user} do
       classroom = Factory.insert(:classroom)
 
       response =
@@ -14,17 +14,6 @@ defmodule WebCATWeb.CategoryControllerTest do
         |> html_response(200)
 
       assert response =~ "Categories"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      classroom = Factory.insert(:classroom)
-
-      redirect =
-        conn
-        |> get(Routes.category_path(conn, :index, classroom.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -45,17 +34,6 @@ defmodule WebCATWeb.CategoryControllerTest do
 
       assert response =~ "Sub Categories"
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:category)
-
-      redirect =
-        conn
-        |> get(Routes.category_path(conn, :show, data.classroom_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "new/2" do
@@ -71,17 +49,6 @@ defmodule WebCATWeb.CategoryControllerTest do
         |> html_response(200)
 
       assert response =~ "New Category"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      classroom = Factory.insert(:classroom)
-
-      redirect =
-        conn
-        |> get(Routes.category_path(conn, :new, classroom.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -102,17 +69,6 @@ defmodule WebCATWeb.CategoryControllerTest do
                redirect
              )
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.params_with_assocs(:category)
-
-      redirect =
-        conn
-        |> post(Routes.category_path(conn, :create, data.classroom_id), %{category: data})
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "edit/2" do
@@ -128,17 +84,6 @@ defmodule WebCATWeb.CategoryControllerTest do
         |> html_response(200)
 
       assert response =~ "Edit Category"
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:category)
-
-      redirect =
-        conn
-        |> get(Routes.category_path(conn, :edit, data.classroom_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
@@ -159,20 +104,6 @@ defmodule WebCATWeb.CategoryControllerTest do
 
       assert redirect =~ Routes.category_path(conn, :show, data.classroom_id, data.id)
     end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:category)
-      update = Factory.params_with_assocs(:category)
-
-      redirect =
-        conn
-        |> put(Routes.category_path(conn, :update, data.classroom_id, data.id), %{
-          category: update
-        })
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
-    end
   end
 
   describe "delete/2" do
@@ -188,17 +119,6 @@ defmodule WebCATWeb.CategoryControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.category_path(conn, :index, data.classroom_id)
-    end
-
-    test "redirects user when not logged in", %{conn: conn} do
-      data = Factory.insert(:category)
-
-      redirect =
-        conn
-        |> get(Routes.category_path(conn, :delete, data.classroom_id, data.id))
-        |> redirected_to(302)
-
-      assert redirect =~ Routes.login_path(conn, :login)
     end
   end
 
