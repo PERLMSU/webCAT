@@ -39,10 +39,10 @@ defmodule WebCATWeb.Router do
   scope "/feedback", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
-    get("/", FeedbackController, :index)
-    get("/rotations/:rotation_id", FeedbackController, :groups)
-    get("/groups/:group_id", FeedbackController, :students)
-    get("/groups/:group_id/students/:student_id/categories", FeedbackController, :categories)
+    get("/", StudentFeedbackController, :index)
+    get("/rotations/:rotation_id", StudentFeedbackController, :groups)
+    get("/groups/:group_id", StudentFeedbackController, :students)
+    get("/groups/:group_id/students/:student_id/categories", StudentFeedbackController, :categories)
   end
 
   scope "/inbox", WebCATWeb do

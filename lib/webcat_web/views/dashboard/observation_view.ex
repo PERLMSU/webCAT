@@ -1,28 +1,36 @@
-defmodule WebCATWeb.CategoryView do
+defmodule WebCATWeb.ObservationView do
   use WebCATWeb, :view
 
-  alias WebCAT.CRUD
-  alias WebCAT.Feedback.Category
-
-  def table(conn, categories) do
+  def table(conn, observations) do
     content_tag(:table, class: "table") do
       [
         content_tag(:thead) do
           [
-            content_tag(:th, "Name"),
-            content_tag(:th, "Description"),
-            content_tag(:th, "Sub Categories"),
+            content_tag(:th, "Type"),
+            content_tag(:th, "Content"),
+            content_tag(:th, "Category"),
             content_tag(:th, "")
           ]
         end,
         content_tag(:tbody) do
-          if Enum.count(categories) > 0 do
-            Enum.map(categories, fn category ->
+          if Enum.count(observations) > 0 do
+            Enum.map(observations, fn observation ->
               content_tag(:tr) do
                 [
-                  content_tag(:td, category.name),
-                  content_tag(:td, truncate(category.description)),
-                  content_tag(:td, Enum.count(category.sub_categories)),
+                  content_tag(:td, String.capitalize(observation.type)),
+                  content_tag(:td, truncate(observation.content)),
+                  content_tag(
+                    :td,
+                    link(observation.category.name,
+                      to:
+                        Routes.category_path(
+                          conn,
+                          :show,
+                          observation.category.classroom_id,
+                          observation.category_id
+                        )
+                    )
+                  ),
                   content_tag(:td) do
                     content_tag(:div, class: "field has-addons") do
                       [
@@ -30,11 +38,11 @@ defmodule WebCATWeb.CategoryView do
                           icon_button("View", "eye",
                             class: "is-primary",
                             to:
-                              Routes.category_path(
+                              Routes.observation_path(
                                 conn,
                                 :show,
-                                category.classroom_id,
-                                category.id
+                                observation.category_id,
+                                observation.id
                               )
                           )
                         end,
@@ -42,11 +50,11 @@ defmodule WebCATWeb.CategoryView do
                           icon_button("Edit", "wrench",
                             class: "is-primary",
                             to:
-                              Routes.category_path(
+                              Routes.observation_path(
                                 conn,
                                 :edit,
-                                category.classroom_id,
-                                category.id
+                                observation.category_id,
+                                observation.id
                               )
                           )
                         end
@@ -59,7 +67,7 @@ defmodule WebCATWeb.CategoryView do
           else
             content_tag(:tr) do
               content_tag(:td) do
-                "No categories yet"
+                "No observations yet"
               end
             end
           end
@@ -68,37 +76,22 @@ defmodule WebCATWeb.CategoryView do
     end
   end
 
-  def form(conn, changeset) do
-    classroom_id = changeset.data.classroom_id
-
+  def form(%{params: %{"category_id" => category_id}} = conn, changeset) do
     path =
       case changeset.data.id do
-        nil -> Routes.category_path(conn, :create, classroom_id)
-        id -> Routes.category_path(conn, :update, classroom_id, id)
+        nil -> Routes.observation_path(conn, :create, category_id)
+        id -> Routes.observation_path(conn, :update, category_id, id)
       end
-
-    categories =
-      CRUD.list(Category, where: [classroom_id: classroom_id])
-      |> Enum.map(&{&1.name, &1.id})
 
     form_for(changeset, path, fn f ->
       [
-        form_field("Name", :name),
-        form_field("Description", :description, :textarea),
-        hidden_input(f, :classroom_id, value: classroom_id),
+        form_field("Content", :content, :textarea),
+        hidden_input(f, :category_id, value: category_id),
         content_tag(:div, class: "field") do
           [
-            label(f, :parent_category_id, "Parent Category"),
+            label(f, :type, "Type"),
             content_tag(:div, class: "control") do
-              content_tag(:div, class: "select") do
-                select(f, :parent_category_id, categories,
-                  selected:
-                    if(changeset.data.parent_category_id != nil) do
-                      Integer.to_string(changeset.data.parent_category_id)
-                    end,
-                  prompt: "None"
-                )
-              end
+              select(f, :type, Positive: "positive", Neutral: "neutral", Negative: "negative")
             end
           ]
         end,

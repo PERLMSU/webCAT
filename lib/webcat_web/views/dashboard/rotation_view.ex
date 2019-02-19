@@ -25,18 +25,7 @@ defmodule WebCATWeb.RotationView do
                   content_tag(:td, rotation.number),
                   content_tag(:td, Timex.format!(rotation.start_date, "{M}-{D}-{YYYY}")),
                   content_tag(:td, Timex.format!(rotation.end_date, "{M}-{D}-{YYYY}")),
-                  content_tag(:td) do
-                    cond do
-                      rotation.description == nil ->
-                        ""
-
-                      String.length(rotation.description) > 25 ->
-                        String.slice(rotation.description, 0..25) <> "..."
-
-                      true ->
-                        rotation.description
-                    end
-                  end,
+                  content_tag(:td, truncate(rotation.description)),
                   content_tag(:td, Enum.count(rotation.rotation_groups)),
                   content_tag(:td) do
                     content_tag(:div, class: "field has-addons") do

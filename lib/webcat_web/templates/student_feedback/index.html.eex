@@ -1,0 +1,33 @@
+<%= for section <- @sections do %>
+<div class="box">
+    <h1 class="title">Section:
+        <%= section.number %>
+    </h1>
+    <h2 class="subtitle">Classroom:
+        <%= section.semester.classroom.name %>
+    </h2>
+    <h2 class="subtitle">Semester:
+        <%= section.semester.name %>
+    </h2>
+    <p>Students: <%= Enum.count(section.students) %></p>
+    <div class="columns">
+        <%= for rotation <- section.rotations do %>
+        <div class="column is-one-third">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <%= link("Rotation #{rotation.number}", to: Routes.feedback_path(@conn, :groups, rotation.id)) %>
+                    </p>
+                </header>
+                <div class="card-content">
+                    <ul>
+                        <li><%= rotation.description %></li>
+                        <li><%= Timex.format!(rotation.start_date, "{M}/{D}/{YYYY}") %> - <%= Timex.format!(rotation.start_date, "{M}/{D}/{YYYY}") %></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <% end %>
+    </div>
+</div>
+<% end %>

@@ -21,18 +21,7 @@ defmodule WebCATWeb.RotationGroupView do
               content_tag(:tr) do
                 [
                   content_tag(:td, group.number),
-                  content_tag(:td) do
-                    cond do
-                      group.description == nil ->
-                        ""
-
-                      String.length(group.description) > 25 ->
-                        String.slice(group.description, 0..25) <> "..."
-
-                      true ->
-                        group.description
-                    end
-                  end,
+                  content_tag(:td, truncate(group.description)),
                   content_tag(:td, Enum.count(group.students)),
                   content_tag(:td) do
                     content_tag(:div, class: "field has-addons") do

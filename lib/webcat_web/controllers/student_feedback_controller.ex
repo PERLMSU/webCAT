@@ -1,4 +1,4 @@
-defmodule WebCATWeb.FeedbackController do
+defmodule WebCATWeb.StudentFeedbackController do
   @moduledoc """
   Logic for working with the feedback writer
   """
