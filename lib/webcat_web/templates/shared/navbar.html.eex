@@ -22,7 +22,7 @@
                         <%= @user.first_name <> " " <> @user.last_name %>
                     </a>
                     <div class="navbar-dropdown">
-                        <%= link("Profile", to: Routes.profile_path(@conn, :edit), class: "navbar-item") %>
+                        <%= link("Profile", to: Routes.profile_path(@conn, :show), class: "navbar-item") %>
                         <hr class="navbar-divider">
                         
                         <a href="<%= Routes.login_path(@conn, :logout) %>" class="navbar-item">

@@ -21,6 +21,7 @@ defmodule WebCAT.Accounts.User do
     many_to_many(:sections, Section, join_through: "section_users")
     many_to_many(:rotations, Rotation, join_through: "rotation_users")
     many_to_many(:rotation_groups, RotationGroup, join_through: "rotation_group_users")
+
     has_many(:notifications, WebCAT.Accounts.Notification)
 
     timestamps()
@@ -40,8 +41,11 @@ defmodule WebCAT.Accounts.User do
     |> put_performer()
   end
 
-  defp put_performer(%{valid?: true, data: %{performer_id: nil}, changes: %{performer_id: nil}} = changeset) do
-    put_assoc(changeset, :performer, %Terminator.Performer{})
+  defp put_performer(%{valid?: true} = changeset) do
+    case get_field(changeset, :performer_id) do
+      :error -> put_assoc(changeset, :performer, %Terminator.Performer{})
+      _ -> changeset
+    end
   end
 
   defp put_performer(changeset), do: changeset

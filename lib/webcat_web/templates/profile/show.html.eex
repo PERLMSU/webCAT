@@ -1,26 +1,19 @@
 <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
-        <li>
-            <%= link("Users", to: Routes.user_path(@conn, :index)) %>
-        </li>
-        <li class="is-active">
-            <%= link("#{@data.first_name} #{@data.last_name}", to: Routes.user_path(@conn, :show, @data.id)) %>
-        </li>
+        <li class="is-active"><%= link("Profile", to: Routes.profile_path(@conn, :show)) %></li>
     </ul>
 </nav>
 <div class="level">
     <div class="level-left">
         <div class="level-item">
-            <h1 class="title">User:
-                <%= "#{@data.first_name} #{@data.last_name}" %>
-            </h1>
+            <h1 class="title">Profile</h1>
         </div>
     </div>
     <div class="level-right">
         <div class="level-item">
             <p class="buttons">
-                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.user_path(@conn, :edit, @data.id)) %>
-                <%= icon_button("Delete", "times", class: "is-danger", to: Routes.user_path(@conn, :delete, @data.id), onclick: "return confirm('Are you sure?');") %>
+                <%= icon_button("Change Password", "lock", class: "is-info", to: Routes.profile_path(@conn, :edit_password)) %>
+                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.profile_path(@conn, :edit)) %>
             </p>
         </div>
     </div>
@@ -33,27 +26,27 @@
     <ul>
         <li>
             <h2 class="subtitle">Email</h2>
-            <%= @data.email %>
+            <%= @user.email %>
         </li>
         <li>
             <h2 class="subtitle">First Name</h2>
-            <%= @data.first_name %>
+            <%= @user.first_name %>
         </li>
-        <%= if @data.middle_name != nil do %>
+        <%= if @user.middle_name != nil do %>
         <li>
             <h2 class="subtitle">Middle Name</h2>
-            <%= @data.middle_name %>
+            <%= @user.middle_name %>
         </li>
         <% end %>
         <li>
             <h2 class="subtitle">Last Name</h2>
-            <%= @data.last_name %>
+            <%= @user.last_name %>
         </li>
         <li>
             <h2 class="subtitle">Roles</h2>
-            <%= if is_list(@data.performer.roles) and not Enum.empty?(@data.performer.roles) do %>
+            <%= if is_list(@user.performer.roles) and not Enum.empty?(@user.performer.roles) do %>
             <ul>
-                <%= for role <- @data.performer.roles do %>
+                <%= for role <- @user.performer.roles do %>
                 <li><%= role.name %></li>
                 <% end %>
             </ul>
@@ -67,17 +60,17 @@
     <h2 class="subtitle">
         Classrooms
     </h2>
-    <%= WebCATWeb.ClassroomView.table(@conn, @data.classrooms) %>
+    <%= WebCATWeb.ClassroomView.table(@conn, @user.classrooms) %>
 </div>
 <div class="box">
     <h2 class="subtitle">
         Sections
     </h2>
-    <%= WebCATWeb.SectionView.table(@conn, @data.sections) %>
+    <%= WebCATWeb.SectionView.table(@conn, @user.sections) %>
 </div>
 <div class="box">
     <h2 class="subtitle">
         Rotation Groups
     </h2>
-    <%= WebCATWeb.RotationGroupView.table(@conn, @data.rotation_groups) %>
+    <%= WebCATWeb.RotationGroupView.table(@conn, @user.rotation_groups) %>
 </div>

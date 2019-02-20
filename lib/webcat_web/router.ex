@@ -78,6 +78,9 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     resources("/", ProfileController, only: ~w(show edit update)a, singleton: true)
+    get("/change_password", ProfileController, :edit_password)
+    put("/change_password", ProfileController, :update_password)
+    patch("/change_password", ProfileController, :update_password)
   end
 
   scope "/", WebCATWeb do

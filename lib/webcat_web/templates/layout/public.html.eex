@@ -10,14 +10,27 @@
 
   <title>WebCAT</title>
 
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>"/>
-  
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
+
 
 </head>
 
 <body>
+  <%= with "" <> message <- get_flash(@conn, :info) do %>
+  <div class="notification is-info">
+    <button class="delete"></button>
+    <%= message %>
+  </div>
+  <% end %>
+  <%= with "" <> message <- get_flash(@conn, :error) do %>
+  <div class="notification is-danger">
+    <button class="delete"></button>
+    <%= message %>
+  </div>
+  <% end %>
   <%= render @view_module, @view_template, assigns %>
+  <script src='<%= Routes.static_path(@conn, "/js/messages.js") %>'></script>
 </body>
 
 </html>

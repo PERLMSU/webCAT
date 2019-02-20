@@ -6,7 +6,12 @@ defmodule WebCATWeb.UserController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  @preload [rotation_groups: ~w(students)a, classrooms: ~w(semesters users)a, performer: ~w(roles)a]
+  @preload [
+    rotation_groups: ~w(students)a,
+    sections: [:users, rotations: [:rotation_groups]],
+    classrooms: ~w(semesters users)a,
+    performer: ~w(roles)a
+  ]
 
   def index(conn, user, _params) do
     permissions do
