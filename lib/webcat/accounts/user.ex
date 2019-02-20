@@ -43,7 +43,7 @@ defmodule WebCAT.Accounts.User do
 
   defp put_performer(%{valid?: true} = changeset) do
     case get_field(changeset, :performer_id) do
-      :error -> put_assoc(changeset, :performer, %Terminator.Performer{})
+      nil -> put_assoc(changeset, :performer, %Terminator.Performer{})
       _ -> changeset
     end
   end

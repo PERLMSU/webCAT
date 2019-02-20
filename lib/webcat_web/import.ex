@@ -4,6 +4,7 @@ defmodule WebCATWeb.Import do
   alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
   alias WebCAT.Feedback.{Category, Observation, Feedback}
   alias WebCAT.Accounts.User
+  alias Terminator.{Performer, Role}
 
   def from_path(path) do
     case Xlsxir.multi_extract(path) do
@@ -93,10 +94,16 @@ defmodule WebCATWeb.Import do
         students =
           Enum.reduce(Map.get(table_map, "students", []), rotation_groups, fn student, multi ->
             Multi.run(multi, {:student, student["id"]}, fn _repo, _transaction ->
-              # TODO: Add to student group on creation
-              %User{}
-              |> User.changeset(student)
-              |> Repo.insert()
+              {:ok, user} =
+                %User{}
+                |> User.changeset(student)
+                |> Repo.insert()
+
+              # Add to student group on creation
+              role = Repo.get_by!(Role, identifier: "student")
+              Performer.grant(user, role)
+
+              {:ok, user}
             end)
           end)
 
@@ -153,7 +160,7 @@ defmodule WebCATWeb.Import do
           end)
 
         case Repo.transaction(import_transaction) do
-          {:ok, _} -> :ok
+          {:ok, data} -> {:ok, data}
           {:error, _} -> :error
         end
     end

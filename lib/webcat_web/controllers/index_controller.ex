@@ -41,7 +41,7 @@ defmodule WebCATWeb.IndexController do
     case assigns do
       %{"import" => %{"file" => %{path: path}}} ->
         case Import.from_path(path) do
-          :ok ->
+          {:ok, _} ->
             conn
             |> put_flash(:info, "Import successful")
             |> redirect(to: Routes.index_path(conn, :import))
