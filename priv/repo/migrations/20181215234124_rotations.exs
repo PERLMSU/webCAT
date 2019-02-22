@@ -74,9 +74,13 @@ defmodule WebCAT.Repo.Migrations.Rotations do
     end
 
     create table(:rotation_group_users, primary_key: false) do
-      add_req(:rotation_group_id, references(:rotation_groups, on_delete: :delete_all), primary_key: true)
+      add_req(:rotation_group_id, references(:rotation_groups, on_delete: :delete_all),
+        primary_key: true
+      )
+
       add_req(:user_id, references(:users, on_delete: :delete_all), primary_key: true)
     end
 
+    create(unique_index(:classrooms, ~w(course_code)a))
   end
 end

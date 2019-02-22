@@ -74,7 +74,7 @@ defmodule WebCAT.Mixfile do
       "ecto.seed.integration": ["run priv/repo/seeds/integration.exs"],
       "ecto.seed.test": ["run priv/repo/seeds/base_test.exs"],
       "ecto.seed": ["run priv/repo/seeds/base.exs"],
-      "ecto.setup": ~w(ecto.create terminator.setup ecto.migrate),
+      "ecto.setup": ~w(ecto.create terminator.setup ecto.migrate) ++ ["run priv/repo/migrations/auth.exs"],
       "ecto.reset": ~w(ecto.drop ecto.setup),
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
