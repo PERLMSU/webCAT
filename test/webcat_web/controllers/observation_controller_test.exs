@@ -68,6 +68,18 @@ defmodule WebCATWeb.ObservationControllerTest do
                redirect
              )
     end
+
+    test "renders form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:observation) |> Map.drop(~w(content)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.observation_path(conn, :create, data.category_id), %{observation: data})
+        |> html_response(200)
+
+      assert response =~ "New Observation"
+    end
   end
 
   describe "edit/2" do
@@ -102,6 +114,21 @@ defmodule WebCATWeb.ObservationControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.observation_path(conn, :show, data.category_id, data.id)
+    end
+
+    test "shows form if update fails", %{conn: conn, user: user} do
+      data = Factory.insert(:observation)
+      update = Factory.params_with_assocs(:observation) |> Map.put(:content, nil)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.observation_path(conn, :update, data.category_id, data.id), %{
+          observation: update
+        })
+        |> html_response(200)
+
+      assert response =~ "Edit Observation"
     end
   end
 

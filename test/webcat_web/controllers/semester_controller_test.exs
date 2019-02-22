@@ -72,6 +72,18 @@ defmodule WebCATWeb.SemesterControllerTest do
                redirect
              )
     end
+
+    test "displays form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:semester) |> Map.drop(~w(name)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.semester_path(conn, :create, data.classroom_id), %{semester: data})
+        |> html_response(200)
+
+      assert response =~ "New Semester"
+    end
   end
 
   describe "edit/2" do
@@ -106,6 +118,21 @@ defmodule WebCATWeb.SemesterControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.semester_path(conn, :show, data.classroom_id, data.id)
+    end
+
+    test "displays form errors if update fails", %{conn: conn, user: user} do
+      data = Factory.insert(:semester)
+      update = Factory.params_with_assocs(:semester) |> Map.put(:name, nil)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.semester_path(conn, :update, data.classroom_id, data.id), %{
+          semester: update
+        })
+        |> html_response(200)
+
+      assert response =~ "Edit Semester"
     end
   end
 

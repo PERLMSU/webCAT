@@ -66,6 +66,18 @@ defmodule WebCATWeb.FeedbackControllerTest do
                redirect
              )
     end
+
+    test "renders form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:feedback) |> Map.drop(~w(content)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.feedback_path(conn, :create, data.observation_id), %{feedback: data})
+        |> html_response(200)
+
+      assert response =~ "New Feedback"
+    end
   end
 
   describe "edit/2" do
@@ -100,6 +112,21 @@ defmodule WebCATWeb.FeedbackControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.feedback_path(conn, :show, data.observation_id, data.id)
+    end
+
+    test "shows form if update fails", %{conn: conn, user: user} do
+      data = Factory.insert(:feedback)
+      update = Factory.params_with_assocs(:feedback) |> Map.put(:content, nil)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.feedback_path(conn, :update, data.observation_id, data.id), %{
+          feedback: update
+        })
+        |> html_response(200)
+
+      assert response =~ "Edit Feedback"
     end
   end
 

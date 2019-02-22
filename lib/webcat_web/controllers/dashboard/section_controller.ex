@@ -71,12 +71,15 @@ defmodule WebCATWeb.SectionController do
           |> redirect(to: Routes.section_path(conn, :show, section.semester_id, section.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          conn
-          |> render("new.html",
-            user: user,
-            changeset: changeset,
-            selected: "classroom"
-          )
+          with {:ok, semester} <- CRUD.get(Semester, Map.get(params, "semester_id"), preload: ~w(classroom)a) do
+            conn
+            |> render("new.html",
+              user: user,
+              changeset: changeset,
+              selected: "classroom",
+              semester: semester
+            )
+          end
       end
     end
   end

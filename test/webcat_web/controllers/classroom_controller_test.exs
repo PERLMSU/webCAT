@@ -64,6 +64,18 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       assert Regex.match?(~r/#{Routes.classroom_path(conn, :index)}\/\d+/, redirect)
     end
+
+    test "renders form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:classroom) |> Map.drop(~w(name)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.classroom_path(conn, :create), %{classroom: data})
+        |> html_response(200)
+
+      assert response =~ "New Classroom"
+    end
   end
 
   describe "edit/2" do
@@ -96,6 +108,20 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.classroom_path(conn, :show, data.id)
+    end
+
+    test "renders form errors if update fails", %{conn: conn, user: user} do
+      inserted = Factory.insert(:classroom)
+      data = Factory.insert(:classroom)
+      update = Factory.params_with_assocs(:classroom, course_code: inserted.course_code)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.classroom_path(conn, :update, data.id), %{classroom: update})
+        |> html_response(200)
+
+      assert response =~ "Edit Classroom"
     end
   end
 

@@ -61,13 +61,29 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       redirect =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.rotation_group_path(conn, :create, data.rotation_id), %{rotation_group: data})
+        |> post(Routes.rotation_group_path(conn, :create, data.rotation_id), %{
+          rotation_group: data
+        })
         |> redirected_to(302)
 
       assert Regex.match?(
                ~r/#{Routes.rotation_group_path(conn, :index, data.rotation_id)}\/\d+/,
                redirect
              )
+    end
+
+    test "displays form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:rotation_group) |> Map.drop(~w(number)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.rotation_group_path(conn, :create, data.rotation_id), %{
+          rotation_group: data
+        })
+        |> html_response(200)
+
+      assert response =~ "New Rotation"
     end
   end
 
@@ -103,6 +119,21 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.rotation_group_path(conn, :show, data.rotation_id, data.id)
+    end
+
+    test "displays form errors if update fails", %{conn: conn, user: user} do
+      data = Factory.insert(:rotation_group)
+      update = Factory.params_with_assocs(:rotation_group) |> Map.put(:number, nil)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.rotation_group_path(conn, :update, data.rotation_id, data.id), %{
+          rotation_group: update
+        })
+        |> html_response(200)
+
+      assert response =~ "Edit Rotation"
     end
   end
 

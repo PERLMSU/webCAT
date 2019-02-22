@@ -70,6 +70,18 @@ defmodule WebCATWeb.SectionControllerTest do
                redirect
              )
     end
+
+    test "shows form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:section) |> Map.drop(~w(number)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.section_path(conn, :create, data.semester_id), %{section: data})
+        |> html_response(200)
+
+      assert response =~ "New Section"
+    end
   end
 
   describe "edit/2" do
@@ -104,6 +116,21 @@ defmodule WebCATWeb.SectionControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.section_path(conn, :show, data.semester_id, data.id)
+    end
+
+    test "displays form errors if update fails", %{conn: conn, user: user} do
+      data = Factory.insert(:section)
+      update = Factory.params_with_assocs(:section) |> Map.put(:number, nil)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.section_path(conn, :update, data.semester_id, data.id), %{
+          section: update
+        })
+        |> html_response(200)
+
+      assert response =~ "Edit Section"
     end
   end
 

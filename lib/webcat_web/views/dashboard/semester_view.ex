@@ -65,8 +65,8 @@ defmodule WebCATWeb.SemesterView do
 
     path =
       case changeset.data.id do
-        nil -> Routes.section_path(conn, :create, classroom_id)
-        id -> Routes.section_path(conn, :update, classroom_id, id)
+        nil -> Routes.semester_path(conn, :create, classroom_id)
+        id -> Routes.semester_path(conn, :update, classroom_id, id)
       end
 
     form_for(changeset, path, fn f ->

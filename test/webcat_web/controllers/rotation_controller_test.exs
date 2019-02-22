@@ -69,6 +69,18 @@ defmodule WebCATWeb.RotationControllerTest do
                redirect
              )
     end
+
+    test "displays form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:rotation) |> Map.drop(~w(number)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.rotation_path(conn, :create, data.section_id), %{rotation: data})
+        |> html_response(200)
+
+      assert response =~ "New Rotation"
+    end
   end
 
   describe "edit/2" do
@@ -103,6 +115,21 @@ defmodule WebCATWeb.RotationControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.rotation_path(conn, :show, data.section_id, data.id)
+    end
+
+    test "displays form errors if update fails", %{conn: conn, user: user} do
+      data = Factory.insert(:rotation)
+      update = Factory.params_with_assocs(:rotation) |> Map.put(:number, nil)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.rotation_path(conn, :update, data.section_id, data.id), %{
+          rotation: update
+        })
+        |> html_response(200)
+
+      assert response =~ "Edit Rotation"
     end
   end
 

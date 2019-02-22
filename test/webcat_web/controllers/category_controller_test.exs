@@ -69,6 +69,19 @@ defmodule WebCATWeb.CategoryControllerTest do
                redirect
              )
     end
+
+    test "renders form errors if create fails", %{conn: conn, user: user} do
+      inserted = Factory.insert(:category)
+      data = Factory.params_with_assocs(:category, name: inserted.name)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.category_path(conn, :create, data.classroom_id), %{category: data})
+        |> html_response(200)
+
+      assert response =~ "New Category"
+    end
   end
 
   describe "edit/2" do
@@ -103,6 +116,20 @@ defmodule WebCATWeb.CategoryControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.category_path(conn, :show, data.classroom_id, data.id)
+    end
+
+    test "renders form errors if create fails", %{conn: conn, user: user} do
+      inserted = Factory.insert(:category)
+      data = Factory.insert(:category)
+      update = Factory.params_with_assocs(:category, name: inserted.name)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.category_path(conn, :update, data.classroom_id, data.id), %{category: update})
+        |> html_response(200)
+
+      assert response =~ "Edit Category"
     end
   end
 

@@ -63,6 +63,18 @@ defmodule WebCATWeb.UserControllerTest do
 
       assert Regex.match?(~r/#{Routes.user_path(conn, :index)}\/\d+/, redirect)
     end
+
+    test "displays form errors if create fails", %{conn: conn, user: user} do
+      data = Factory.params_with_assocs(:user) |> Map.drop(~w(first_name)a)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.user_path(conn, :create), %{user: data})
+        |> html_response(200)
+
+      assert response =~ "New User"
+    end
   end
 
   describe "edit/2" do
@@ -95,6 +107,19 @@ defmodule WebCATWeb.UserControllerTest do
         |> redirected_to(302)
 
       assert redirect =~ Routes.user_path(conn, :index)
+    end
+
+    test "displays form errors if update fails", %{conn: conn, user: user} do
+      data = Factory.insert(:user)
+      update = Factory.params_with_assocs(:user) |> Map.put(:first_name, nil)
+
+      response =
+        conn
+        |> Auth.sign_in(user)
+        |> put(Routes.user_path(conn, :update, data.id), %{user: update})
+        |> html_response(200)
+
+      assert response =~ "Edit User"
     end
   end
 

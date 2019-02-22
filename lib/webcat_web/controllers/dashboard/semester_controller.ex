@@ -71,12 +71,15 @@ defmodule WebCATWeb.SemesterController do
           |> redirect(to: Routes.semester_path(conn, :show, semester.classroom_id, semester.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          conn
-          |> render("new.html",
-            user: user,
-            changeset: changeset,
-            selected: "classroom"
-          )
+          with {:ok, classroom} <- CRUD.get(Classroom, Map.get(params, "classroom_id")) do
+            conn
+            |> render("new.html",
+              user: user,
+              changeset: changeset,
+              selected: "classroom",
+              classroom: classroom
+              )
+          end
       end
     end
   end

@@ -4,6 +4,8 @@ defmodule WebCATWeb.CategoryView do
   alias WebCAT.CRUD
   alias WebCAT.Feedback.Category
 
+  import Ecto.Changeset
+
   def table(conn, categories) do
     content_tag(:table, class: "table") do
       [
@@ -69,10 +71,10 @@ defmodule WebCATWeb.CategoryView do
   end
 
   def form(conn, changeset) do
-    classroom_id = changeset.data.classroom_id
+    classroom_id = get_field(changeset, :classroom_id)
 
     path =
-      case changeset.data.id do
+      case get_field(changeset, :id) do
         nil -> Routes.category_path(conn, :create, classroom_id)
         id -> Routes.category_path(conn, :update, classroom_id, id)
       end
