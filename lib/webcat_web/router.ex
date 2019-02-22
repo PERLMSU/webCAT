@@ -36,13 +36,16 @@ defmodule WebCATWeb.Router do
     post("/reset/:token", PasswordResetController, :finish_reset)
   end
 
-  scope "/feedback", WebCATWeb do
+  scope "/student_feedback", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
     get("/", StudentFeedbackController, :index)
-    get("/rotations/:rotation_id", StudentFeedbackController, :groups)
+    get("/classrooms/:classroom_id/semesters", StudentFeedbackController, :semesters)
+    get("/sections/:section_id/rotations", StudentFeedbackController, :rotations)
+    get("/rotations/:rotation_id/rotation_groups", StudentFeedbackController, :groups)
     get("/groups/:group_id", StudentFeedbackController, :students)
     get("/groups/:group_id/students/:student_id/categories", StudentFeedbackController, :categories)
+    get("/groups/:group_id/students/:student_id/categories/:category_id/observations", StudentFeedbackController, :observations)
   end
 
   scope "/inbox", WebCATWeb do

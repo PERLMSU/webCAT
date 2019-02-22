@@ -7,7 +7,7 @@ defmodule WebCATWeb.ClassroomController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  @preload [users: ~w(groups)a, semesters: ~w(sections)a]
+  @preload [users: [performer: ~w(roles)a], semesters: ~w(sections)a]
 
   def index(conn, user, _params) do
     permissions do
@@ -90,16 +90,6 @@ defmodule WebCATWeb.ClassroomController do
 
   def update(conn, user, %{"id" => id, "classroom" => update}) do
     permissions do
-
-
-
-
-
-
-
-
-
-
       has_role(:admin)
     end
 

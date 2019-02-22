@@ -11,7 +11,7 @@ defmodule WebCAT.Rotations.Section do
 
     belongs_to(:semester, WebCAT.Rotations.Semester)
     has_many(:rotations, WebCAT.Rotations.Rotation)
-    many_to_many(:users, User, join_through: "section_users")
+    many_to_many(:users, User, join_through: "section_users", on_replace: :delete)
 
     timestamps()
   end
@@ -28,7 +28,23 @@ defmodule WebCAT.Rotations.Section do
   end
 
   defp put_users(%{valid?: true} = changeset, users) when is_list(users) do
-    put_assoc(changeset, :users, Repo.all(from(u in User, where: u.id in ^users)))
+    ids =
+      users
+      |> Enum.map(fn user ->
+        cond do
+          is_map(user) ->
+            Map.get(user, "id")
+
+          is_integer(user) ->
+            user
+
+          true ->
+            nil
+        end
+      end)
+      |> Enum.reject(&is_nil/1)
+
+    put_assoc(changeset, :users, Repo.all(from(u in User, where: u.id in ^ids)))
   end
 
   defp put_users(changeset, _), do: changeset

@@ -3,55 +3,50 @@ defmodule WebCATWeb.StudentFeedbackController do
   Logic for working with the feedback writer
   """
 
-  use WebCATWeb, :controller
+  use WebCATWeb, :authenticated_controller
 
-  alias WebCAT.Accounts.{Users, Groups}
+  alias WebCAT.Accounts.Users
   alias WebCAT.CRUD
-  alias WebCAT.Rotations.{Classroom, RotationGroup, Section, Rotation}
+  alias WebCAT.Rotations.{RotationGroup, Section}
   alias WebCAT.Feedback.{Observation, Category, Explanation}
   alias WebCAT.Repo
   import Ecto.Query
 
+  alias Terminator
+
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, _params) do
-    user = Auth.current_resource(conn)
+  def index(conn, user, _params) do
+    permissions do
+      has_role(:admin)
+      has_role(:assistant)
+    end
 
-    sections =
-      cond do
-        Groups.has_group?(user.groups, "admin") ->
-          Section
-          |> join(:left, [s], r in assoc(s, :rotations))
-          |> join(:left, [s], stu in assoc(s, :students))
-          |> join(:left, [s], sem in assoc(s, :semester))
-          |> join(:left, [_, _, _, s], c in assoc(s, :classroom))
-          |> order_by([_, r], desc: r.end_date)
-          |> preload([_, r, students, semester, classroom],
-            rotations: r,
-            students: students,
-            semester: {semester, classroom: classroom}
-          )
-          |> Repo.all()
+    with :ok <- is_authorized?() do
+      sections =
+        cond do
+          Terminator.has_role?(user.performer, :admin) ->
+            Section
+            |> join(:left, [s], r in assoc(s, :rotations))
+            |> join(:left, [s], u in assoc(s, :users))
+            |> join(:left, [s], sem in assoc(s, :semester))
+            |> join(:left, [_, _, _, s], c in assoc(s, :classroom))
+            |> order_by([_, r], desc: r.end_date)
+            |> preload([_, r, users, semester, classroom],
+              rotations: r,
+              users: users,
+              semester: {semester, classroom: classroom}
+            )
+            |> Repo.all()
 
-        true ->
-          Section
-          |> join(:left, [sections], r in assoc(sections, :rotations))
-          |> join(:left, [_, rotations], rotation_groups in assoc(rotations, :rotation_groups))
-          |> join(:left, [_, _, rotation_groups], users in assoc(rotation_groups, :users))
-          |> join(:left, [sections], students in assoc(sections, :students))
-          |> join(:left, [sections], semesters in assoc(sections, :semester))
-          |> join(:left, [_, _, _, _, _, semesters], classrooms in assoc(semesters, :classroom))
-          |> where([_, _, _, users], users.id == ^user.id)
-          |> order_by([_, rotations], desc: rotations.end_date)
-          |> preload([_, rotations, _, _, students, semesters, classrooms],
-            rotations: rotations,
-            students: students,
-            semester: {semesters, classroom: classrooms}
-          )
-          |> Repo.all()
-      end
+          true ->
+            Section
+            |> join(:left, [sections], r in assoc(sections, :rotations))
+            |> Repo.all()
+        end
 
-    render(conn, "index.html", user: user, selected: "feedback", sections: sections)
+      render(conn, "index.html", user: user, selected: "feedback", sections: sections)
+    end
   end
 
   def groups(conn, %{"rotation_id" => rotation_id}) do
@@ -87,13 +82,12 @@ defmodule WebCATWeb.StudentFeedbackController do
     group =
       RotationGroup
       |> where([g], g.id == ^group_id)
-      |> preload([students: [:user]])
+      |> preload(students: [:user])
       |> Repo.one()
 
     render(conn, "students.html", user: user, selected: "feedback", group: group)
   end
 
   def categories(conn, %{"group_id" => group_id, "student_id" => student_id} = params) do
-
   end
 end

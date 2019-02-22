@@ -81,7 +81,7 @@ defmodule WebCAT.Factory do
   end
 
   def category_factory do
-    classroom = Factory.build(:classroom)
+    classroom = Factory.insert(:classroom)
 
     %Category{
       name: sequence(:name, &"category#{&1}"),
@@ -94,7 +94,8 @@ defmodule WebCAT.Factory do
   def sub_category_factory do
     %Category{
       name: sequence(:name, &"sub_category#{&1}"),
-      description: Enum.join(Faker.Lorem.sentences(), "\n")
+      description: Enum.join(Faker.Lorem.sentences(), "\n"),
+      classroom: Factory.build(:classroom)
     }
   end
 
@@ -108,7 +109,7 @@ defmodule WebCAT.Factory do
 
   def draft_factory do
     student = Factory.insert(:student)
-    rotation_group = Factory.insert(:rotation_group, users: [student])
+    rotation_group = Factory.build(:rotation_group, users: [student])
 
     %Draft{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
@@ -145,15 +146,16 @@ defmodule WebCAT.Factory do
     %Observation{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
       type: sequence(:type, ~w(positive neutral negative)),
-      category: Enum.random(Factory.insert(:category).sub_categories)
+      category: Enum.random(Factory.build(:category).sub_categories)
     }
   end
 
   def classroom_factory do
     %Classroom{
-      course_code: sequence(:course_code, &"PHY #{&1}"),
+      course_code: sequence(:course_code, &"#{&1}"),
       name: sequence(:name, &"Physics for Scientists and Engineers #{&1}"),
-      description: Enum.join(Faker.Lorem.sentences(), "\n")
+      description: Enum.join(Faker.Lorem.sentences(), "\n"),
+      users: [Factory.insert(:admin)] ++ Factory.insert_list(1, :assistant)
     }
   end
 
@@ -161,7 +163,8 @@ defmodule WebCAT.Factory do
     %RotationGroup{
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       number: sequence(:number, & &1),
-      rotation: Factory.build(:rotation)
+      rotation: Factory.build(:rotation),
+      users: [Factory.insert(:assistant)] ++ Factory.insert_list(2, :student)
     }
   end
 
@@ -189,7 +192,8 @@ defmodule WebCAT.Factory do
     %Section{
       number: sequence(:number, &Integer.to_string/1),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
-      semester: Factory.build(:semester)
+      semester: Factory.build(:semester),
+      users: [Factory.insert(:assistant)] ++ Factory.insert_list(2, :student)
     }
   end
 end

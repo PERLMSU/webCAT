@@ -3,7 +3,7 @@ defmodule WebCATWeb.RotationGroupController do
   alias WebCAT.CRUD
   alias WebCAT.Rotations.{Rotation, RotationGroup}
 
-  @list_preload ~w(users)a
+  @list_preload [users: [performer: ~w(roles)a]]
   @preload [rotation: [section: [semester: [:classroom]]]] ++ @list_preload
   @rotation_preload [section: [semester: [:classroom]]]
 

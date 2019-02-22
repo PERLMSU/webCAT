@@ -14,6 +14,12 @@ defmodule WebCATWeb.FallbackController do
     |> render(ErrorView, "error.html", error: "403", message: "Forbidden", user: user_or_nil(conn), selected: nil)
   end
 
+  def call(conn, {:error, message}) when is_binary(message) do
+    conn
+    |> put_status(403)
+    |> render(ErrorView, "error.html", error: "403", message: message, user: user_or_nil(conn), selected: nil)
+  end
+
   defp user_or_nil(conn) do
     try do
       WebCATWeb.Auth.Guardian.Plug.current_resource(conn)

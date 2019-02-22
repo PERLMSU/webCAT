@@ -3,7 +3,7 @@ defmodule WebCATWeb.SectionController do
   alias WebCAT.CRUD
   alias WebCAT.Rotations.{Semester, Section}
 
-  @list_preload [:users, rotations: [:rotation_groups]]
+  @list_preload [users: [performer: ~w(roles)a], rotations: [:rotation_groups]]
   @preload [semester: [:classroom]] ++ @list_preload
 
   action_fallback(WebCATWeb.FallbackController)
