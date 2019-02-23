@@ -36,7 +36,7 @@ defmodule WebCATWeb.FeedbackView do
                           icon_button("View", "eye",
                             class: "is-primary",
                             to:
-                              Routes.item_path(
+                              Routes.feedback_path(
                                 conn,
                                 :show,
                                 item.observation_id,
@@ -48,7 +48,7 @@ defmodule WebCATWeb.FeedbackView do
                           icon_button("Edit", "wrench",
                             class: "is-primary",
                             to:
-                              Routes.item_path(
+                              Routes.feedback_path(
                                 conn,
                                 :edit,
                                 item.observation_id,

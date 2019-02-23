@@ -7,7 +7,7 @@ defmodule WebCATWeb.UserController do
   action_fallback(WebCATWeb.FallbackController)
 
   @preload [
-    rotation_groups: ~w(students)a,
+    rotation_groups: ~w(users)a,
     sections: [:users, rotations: [:rotation_groups]],
     classrooms: ~w(semesters users)a,
     performer: ~w(roles)a

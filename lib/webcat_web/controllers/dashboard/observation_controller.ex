@@ -4,7 +4,7 @@ defmodule WebCATWeb.ObservationController do
   alias WebCAT.Feedback.{Category, Observation}
 
   @list_preload ~w(feedback category)a
-  @preload [:feedback, category: ~w(classroom)a]
+  @preload [feedback: ~w(observation)a, category: ~w(classroom)a]
   @category_preload ~w(classroom)a
 
   action_fallback(WebCATWeb.FallbackController)

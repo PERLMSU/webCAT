@@ -5,7 +5,7 @@ defmodule WebCATWeb.RotationControllerTest do
     setup ~w(login_user)a
 
     test "responds with a table of rotations", %{conn: conn, user: user} do
-      section = Factory.insert(:section)
+      section = Factory.insert(:rotation).section
 
       response =
         conn
@@ -21,7 +21,7 @@ defmodule WebCATWeb.RotationControllerTest do
     setup ~w(login_user)a
 
     test "displays rotation", %{conn: conn, user: user} do
-      data = Factory.insert(:rotation)
+      data = Factory.insert(:rotation_group).rotation
 
       response =
         conn

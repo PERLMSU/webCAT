@@ -5,7 +5,7 @@ defmodule WebCATWeb.SemesterControllerTest do
     setup ~w(login_user)a
 
     test "responds with a table of semesters", %{conn: conn, user: user} do
-      classroom = Factory.insert(:classroom)
+      classroom = Factory.insert(:semester).classroom
 
       response =
         conn
@@ -21,7 +21,7 @@ defmodule WebCATWeb.SemesterControllerTest do
     setup ~w(login_user)a
 
     test "displays semester", %{conn: conn, user: user} do
-      data = Factory.insert(:semester)
+      data = Factory.insert(:section).semester
 
       response =
         conn

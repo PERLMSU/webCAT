@@ -19,7 +19,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
     setup ~w(login_user)a
 
     test "displays classroom", %{conn: conn, user: user} do
-      data = Factory.insert(:classroom)
+      data = Factory.insert(:semester).classroom
 
       response =
         conn

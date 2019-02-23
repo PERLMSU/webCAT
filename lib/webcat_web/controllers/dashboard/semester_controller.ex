@@ -4,7 +4,7 @@ defmodule WebCATWeb.SemesterController do
   alias WebCAT.Rotations.{Classroom, Semester}
 
   @list_preload ~w(sections)a
-  @preload [:classroom, sections: ~w(rotations students)a]
+  @preload [:classroom, sections: ~w(rotations users)a]
 
   action_fallback(WebCATWeb.FallbackController)
 

@@ -5,7 +5,7 @@ defmodule WebCATWeb.FeedbackControllerTest do
     setup ~w(login_user)a
 
     test "responds with a table of feedback", %{conn: conn, user: user} do
-      observation = Factory.insert(:observation)
+      observation = Factory.insert(:feedback).observation
 
       response =
         conn

@@ -5,7 +5,7 @@ defmodule WebCATWeb.ObservationControllerTest do
     setup ~w(login_user)a
 
     test "responds with a table of observations", %{conn: conn, user: user} do
-      category = Factory.insert(:category)
+      category = Factory.insert(:observation).category
 
       response =
         conn
@@ -21,7 +21,7 @@ defmodule WebCATWeb.ObservationControllerTest do
     setup ~w(login_user)a
 
     test "displays observation", %{conn: conn, user: user} do
-      data = Factory.insert(:observation)
+      data = Factory.insert(:feedback).observation
 
       response =
         conn

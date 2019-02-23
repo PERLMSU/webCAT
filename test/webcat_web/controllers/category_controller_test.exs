@@ -5,7 +5,7 @@ defmodule WebCATWeb.CategoryControllerTest do
     setup ~w(login_user)a
 
     test "responds with a table of categories", %{conn: conn, user: user} do
-      classroom = Factory.insert(:classroom)
+      classroom = Factory.insert(:category).classroom
 
       response =
         conn

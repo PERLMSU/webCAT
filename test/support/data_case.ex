@@ -30,7 +30,7 @@ defmodule WebCAT.DataCase do
   setup tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(WebCAT.Repo)
 
-    unless tags[:async] do
+    unless Map.get(tags, :async, true) do
       Ecto.Adapters.SQL.Sandbox.mode(WebCAT.Repo, {:shared, self()})
     end
 
