@@ -1,0 +1,54 @@
+<div class="columns">
+    <%= if not Enum.empty?(@groups) do %>
+    <%= for group <- @groups do %>
+    <div class="column is-one-third">
+        <div class="card">
+            <header class="card-header">
+                <p class="card-header-title">
+                    <%= link("Group #{group.number}", to: Routes.student_feedback_path(@conn, :students, group.id)) %>
+                </p>
+            </header>
+            <div class="card-content">
+                <% by_role = User.by_role(group.users) %>
+                <% students = Map.get(by_role, "student", []) %>
+                <% assistants = Map.get(by_role, "assistant", []) %>
+
+                <h2 class="subtitle">Assistants</h2>
+                <%= if not Enum.empty?(assistants) do %>
+                <ul>
+                    <%= for assistant <- assistants do %>
+                    <li>
+                        <%= assistant.first_name %> <%= assistant.last_name %>
+                    </li>
+                    <li>
+                        <%= assistant.email %>
+                    </li>
+                    <% end %>
+                </ul>
+                <% else %>
+                <p class="has-text-warning">No Assistants</p>
+                <% end %>
+
+                <h2 class="subtitle">Students</h2>
+                <%= if not Enum.empty?(students) do %>
+                <ul>
+                    <%= for student <- students do %>
+                    <li>
+                        <%= student.first_name %> <%= student.last_name %>
+                    </li>
+                    <li>
+                        <%= student.email %>
+                    </li>
+                    <% end %>
+                </ul>
+                <% else %>
+                <p class="has-text-warning">No Students</p>
+                <% end %>
+            </div>
+        </div>
+    </div>
+    <% end %>
+    <% else %>
+    <h1>No groups</h1>
+    <% end %>
+</div>

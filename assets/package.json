@@ -1,0 +1,46 @@
+{
+  "repository": {},
+  "license": "ISC",
+  "sideEffects": false,
+  "scripts": {
+    "build:dev": "webpack --mode development",
+    "build": "webpack --mode production",
+    "start": "yarn run watch",
+    "watch": "webpack --mode development --watch-stdin",
+    "elm": "elm"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-pro": "5.4.1",
+    "@vizuaalog/bulmajs": "^0.7.0",
+    "bootstrap": "4.2.1",
+    "bootswatch": "4.2.1",
+    "bulma": "0.7.2",
+    "bulmaswatch": "0.7.2",
+    "jquery": "3.3.1",
+    "phoenix": "file:../deps/phoenix",
+    "phoenix_html": "file:../deps/phoenix_html",
+    "popper.js": "1.14.6",
+    "selectize": "0.12.6"
+  },
+  "devDependencies": {
+    "@babel/core": "7.1.2",
+    "@babel/plugin-transform-modules-commonjs": "7.1.0",
+    "@babel/preset-env": "7.1.0",
+    "autoprefixer": "9.3.1",
+    "babel-cli": "6.26.0",
+    "babel-loader": "8.0.4",
+    "copy-webpack-plugin": "4.5.4",
+    "css-loader": "1.0.0",
+    "cssnano": "4.1.7",
+    "elm": "0.19.0-bugfix6",
+    "elm-webpack-loader": "5.0.0",
+    "mini-css-extract-plugin": "0.4.4",
+    "node-sass": "4.9.4",
+    "optimize-css-assets-webpack-plugin": "5.0.1",
+    "postcss-loader": "3.0.0",
+    "sass-loader": "7.1.0",
+    "uglifyjs-webpack-plugin": "2.0.1",
+    "webpack": "4.5.0",
+    "webpack-cli": "3.1.2"
+  }
+}

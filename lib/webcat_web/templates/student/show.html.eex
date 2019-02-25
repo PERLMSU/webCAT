@@ -1,0 +1,66 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li>
+            <%= link("Students", to: Routes.student_path(@conn, :index)) %>
+        </li>
+        <li class="is-active">
+            <%= link("#{@data.user.first_name} #{@data.user.last_name}", to: Routes.student_path(@conn, :show, @data.id)) %>
+        </li>
+    </ul>
+</nav>
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">Student:
+                <%= "#{@data.user.first_name} #{@data.user.last_name}" %>
+            </h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <p class="buttons">
+                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.student_path(@conn, :edit, @data.id)) %>
+                <%= icon_button("Delete", "times", class: "is-danger", to: Routes.student_path(@conn, :delete, @data.id), onclick: "return confirm('Are you sure?');") %>
+            </p>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="box">
+    <h2 class="subtitle">
+        Details
+    </h2>
+    <ul>
+        <li>
+            <h2 class="subtitle">First Name</h2>
+            <%= @data.user.first_name %>
+        </li>
+        <%= if @data.user.middle_name != nil do %>
+        <li>
+            <h2 class="subtitle">Middle Name</h2>
+            <%= @data.user.middle_name %>
+        </li>
+        <% end %>
+        <li>
+            <h2 class="subtitle">Last Name</h2>
+            <%= @data.user.last_name %>
+        </li>
+        <li>
+            <h2 class="subtitle">Email</h2>
+            <%= @data.email %>
+        </li>
+    </ul>
+</div>
+<div class="box">
+    <h2 class="subtitle">
+        Rotation Groups
+    </h2>
+    <%= WebCATWeb.RotationGroupView.table(@conn, @data.rotation_groups) %>
+</div>
+<div class="box">
+    <h2 class="subtitle">
+        Sections
+    </h2>
+    <%= WebCATWeb.SectionView.table(@conn, @data.sections) %>
+</div>
+</div>

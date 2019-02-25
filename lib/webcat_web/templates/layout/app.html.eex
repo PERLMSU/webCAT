@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>WebCAT</title>
+
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/selectize.min.css") %>"/>
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>"/>
+</head>
+
+<body>
+  <%= render(WebCATWeb.SharedView, "navbar.html", conn: @conn, user: @user) %>
+  <%= with "" <> message <- get_flash(@conn, :info) do %>
+  <div class="notification is-info">
+    <button class="delete"></button>
+    <%= message %>
+  </div>
+  <% end %>
+  <%= with "" <> message <- get_flash(@conn, :error) do %>
+  <div class="notification is-danger">
+    <button class="delete"></button>
+    <%= message %>
+  </div>
+  <% end %>
+  <section class="section">
+    <div class="columns">
+      <div class="column is-one-fifth">
+        <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: @selected) %>
+      </div>
+      <div class="column">
+        <%= render @view_module, @view_template, assigns %>
+      </div>
+    </div>
+  </section>
+  <script src='<%= Routes.static_path(@conn, "/js/messages.js") %>'></script>
+  <!--<footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <i class="far fa-eye"></i>
+      </p>
+    </div>
+  </footer>-->
+</body>
+</html>

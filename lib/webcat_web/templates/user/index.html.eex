@@ -1,0 +1,15 @@
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">Users</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <%= icon_button("Create", "plus", class: "is-primary", to: Routes.user_path(@conn, :new)) %>
+        </div>
+    </div>
+</div>
+<div class="box">
+    <%= table(@conn, @data) %>
+</div>

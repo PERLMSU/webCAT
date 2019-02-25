@@ -1,23 +1,19 @@
-# webCAT
-## Requirements
-* Python 3.6, [Pipenv](https://github.com/pypa/pipenv#installation), and [Pyenv](https://github.com/pyenv/pyenv#installation)
-* Node 10+, [NVM](https://github.com/creationix/nvm#installation) and [Yarn](https://yarnpkg.com/en/docs/install)
+# WebCAT
 
-If you're on MacOS, you can get all of the requirements with the following commands:
-```bash
-# NVM and Node.js
-$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-$ nvm install 10
+To start your Phoenix app:
 
-# Yarn
-$ brew install yarn --without-node
+  * Install dependencies with `mix deps.get`
+  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
+  * Start Phoenix endpoint with `mix phoenix.server`
 
-# Pyenv and Pipenv
-$ brew install pipenv pyenv
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-# Python 3.6
-$ pyenv install 3.6.5
-```
-## Getting Running
-1. Install dependencies via `pipenv install`
-2. Get a shell with the virtualenv activated via `pipenv shell` 
+Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+
+## Learn more
+
+  * Official website: http://www.phoenixframework.org/
+  * Guides: http://phoenixframework.org/docs/overview
+  * Docs: https://hexdocs.pm/phoenix
+  * Mailing list: http://groups.google.com/group/phoenix-talk
+  * Source: https://github.com/phoenixframework/phoenix
