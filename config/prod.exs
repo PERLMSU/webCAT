@@ -14,7 +14,7 @@ use Mix.Config
 config :webcat, WebCATWeb.Endpoint,
   # Possibly not needed, but doesn't hurt
   http: [port: {:system, "PORT"}],
-  url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 80],
+  url: [host: "flawed-disloyal-invisiblerail.gigalixirapp.com", port: 80],
   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
   server: true
 

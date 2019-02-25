@@ -35,7 +35,7 @@ defmodule WebCAT.Mixfile do
     [
       {:anaphora, "~> 0.1.2"},
       {:bamboo, "~> 1.0"},
-      {:terminator, github: "bbuscarino/terminator", branch: :dev},
+      {:terminator, github: "bbuscarino/terminator", branch: "dev"},
       {:comeonin, "~> 4.0"},
       {:cors_plug, "~> 1.5"},
       {:plug_cowboy, "~> 2.0"},
