@@ -63,7 +63,7 @@ defmodule Release.Tasks do
 
   defp run_seeds_for(repo) do
     # Run the seed script if it exists
-    seed_script = priv_path_for(repo, "seeds.exs")
+    seed_script = priv_path_for(repo, "seeds/base.exs")
 
     if File.exists?(seed_script) do
       IO.puts("Running seed script..")
