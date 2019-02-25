@@ -3,7 +3,7 @@ alias Ecto.Changeset
 alias WebCAT.Repo
 alias WebCAT.Accounts.{User, Notification, PasswordCredential}
 alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
-alias WebCAT.Feedback.{Category, Observation, Feedback, Draft, Comment}
+alias WebCAT.Feedback.{Category, Observation, Feedback, Draft, Comment, StudentFeedback}
 alias Terminator.{Role, Performer}
 
 admin_changeset =
@@ -38,6 +38,11 @@ transaction =
     {:ok, nil}
   end)
   |> Multi.insert(:assistant, assistant_changeset)
+  |> Multi.run(:assistant_role, fn repo, %{assistant: user} ->
+    Performer.grant(user.performer, repo.get_by!(Role, identifier: "assistant"))
+
+    {:ok, nil}
+  end)
   |> Multi.run(:admin_credentials, fn repo, %{admin: user} ->
     %PasswordCredential{}
     |> PasswordCredential.changeset(%{
@@ -189,7 +194,6 @@ transaction =
     |> Observation.changeset(%{
       content: "Example positive observation",
       category_id: transaction.category_1.id,
-      rotation_group_id: transaction.rotation_group_1.id,
       type: "positive"
     })
     |> repo.insert()
@@ -199,7 +203,6 @@ transaction =
     |> Observation.changeset(%{
       content: "Example neutral observation",
       category_id: transaction.category_1.id,
-      rotation_group_id: transaction.rotation_group_1.id,
       type: "neutral"
     })
     |> repo.insert()
@@ -209,34 +212,54 @@ transaction =
     |> Observation.changeset(%{
       content: "Example negative observation",
       category_id: transaction.category_1.id,
-      rotation_group_id: transaction.rotation_group_1.id,
       type: "negative"
     })
     |> repo.insert()
   end)
-  |> Multi.run(:explanation_1, fn repo, transaction ->
+  |> Multi.run(:feedback_1, fn repo, transaction ->
     %Feedback{}
     |> Feedback.changeset(%{
-      content: "Example explanation 1",
+      content: "Example feedback 1",
       observation_id: transaction.observation_positive.id
     })
     |> repo.insert()
   end)
-  |> Multi.run(:explanation_2, fn repo, transaction ->
+  |> Multi.run(:feedback_2, fn repo, transaction ->
     %Feedback{}
     |> Feedback.changeset(%{
-      content: "Example explanation 2",
+      content: "Example feedback 2",
       observation_id: transaction.observation_positive.id
     })
     |> repo.insert()
   end)
-  |> Multi.run(:explanation_3, fn repo, transaction ->
+  |> Multi.run(:feedback_3, fn repo, transaction ->
     %Feedback{}
     |> Feedback.changeset(%{
-      content: "Example explanation 3",
+      content: "Example feedback 3",
       observation_id: transaction.observation_neutral.id
     })
     |> repo.insert()
+  end)
+  |> Multi.run(:student_feedback_1, fn repo, transaction ->
+    StudentFeedback.add(
+      transaction.rotation_group_1.id,
+      transaction.fall_student_1.id,
+      transaction.feedback_1.id
+    )
+  end)
+  |> Multi.run(:student_feedback_2, fn repo, transaction ->
+    StudentFeedback.add(
+      transaction.rotation_group_1.id,
+      transaction.fall_student_1.id,
+      transaction.feedback_2.id
+    )
+  end)
+  |> Multi.run(:student_feedback_3, fn repo, transaction ->
+    StudentFeedback.add(
+      transaction.rotation_group_1.id,
+      transaction.fall_student_1.id,
+      transaction.feedback_3.id
+    )
   end)
   |> Multi.run(:draft_1, fn repo, transaction ->
     %Draft{}

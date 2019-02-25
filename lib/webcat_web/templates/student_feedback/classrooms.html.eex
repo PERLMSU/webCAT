@@ -1,0 +1,27 @@
+<%= for classroom <- @classrooms do %>
+<div class="box">
+    <h1 class="title">Classroom: <%= classroom.name %></h1>
+    <div class="columns">
+        <%= for semester <- classroom.semesters do %>
+        <div class="column is-one-third">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <%= link(semester.name, to: Routes.student_feedback_path(@conn, :sections, semester.id)) %>
+                    </p>
+                </header>
+                <div class="card-content">
+                    <ul>
+                        <%= if semester.description do %>
+                        <li><%= semester.description %></li>
+                        <% end %>
+                        <li><%= Timex.format!(semester.start_date, "{M}/{D}/{YYYY}") %> -
+                            <%= Timex.format!(semester.end_date, "{M}/{D}/{YYYY}") %></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <% end %>
+    </div>
+</div>
+<% end %>

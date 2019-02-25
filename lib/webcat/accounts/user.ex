@@ -5,6 +5,7 @@ defmodule WebCAT.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
+  alias Terminator.{Performer, Role}
 
   schema "users" do
     field(:email, :string)
@@ -23,6 +24,9 @@ defmodule WebCAT.Accounts.User do
     many_to_many(:rotation_groups, RotationGroup, join_through: "rotation_group_users")
 
     has_many(:notifications, WebCAT.Accounts.Notification)
+
+    # For student feedback
+    # field(:feedback, {:array, :map}, virtual: true)
 
     timestamps()
   end
@@ -49,4 +53,21 @@ defmodule WebCAT.Accounts.User do
   end
 
   defp put_performer(changeset), do: changeset
+
+  @doc """
+  Partition a list of users into a map keyed by their role.
+  Keys are strings.
+  """
+  def by_role(users) when is_list(users) do
+    Enum.reduce(users, %{}, fn user, acc ->
+      user.performer.roles
+      |> Enum.map(&Map.get(&1, :identifier))
+      |> Enum.reject(&is_nil/1)
+      |> Enum.reduce(acc, fn role, nested_acc ->
+        Map.update(nested_acc, role, [user], fn value ->
+          [user | value]
+        end)
+      end)
+    end)
+  end
 end

@@ -1,24 +1,49 @@
+<% by_role = User.by_role(@group.users) %>
+<% students = Map.get(by_role, "student", []) %>
+<% assistants = Map.get(by_role, "assistant", []) %>
 <nav class="level">
     <div class="level-left">
         <div class="level-item">
             <h1 class="title">
-                Rotation Group
-                <%= @group.number %>
+                Rotation Group <%= @group.number %>
             </h1>
         </div>
     </div>
     <div class="level-right">
         <div class="level-item">
-            <%= icon_button("New Draft", "file-alt", class: "is-primary", to: Routes.inbox_path(@conn, :new, group_id: @group.id))%>
         </div>
     </div>
 </nav>
 <h2 class="title">
+    Assistants
+</h2>
+<div class="box">
+    <%= if not Enum.empty?(assistants) do %>
+    <%= for assistant <- assistants do %>
+    <article class="media">
+        <figure class="media-left">
+            <span class="icon">
+                <i class="fas fa-user-ninja"></i>
+            </span>
+        </figure>
+        <div class="media-content">
+            <ul>
+                <li><strong><%= assistant.first_name %> <%= assistant.last_name %></strong></li>
+                <li><%= assistant.email %></li>
+            </ul>
+        </div>
+    </article>
+    <% end %>
+    <% else %>
+    <h2 class="subtitle has-text-warning">No Assistants</h2>
+    <% end %>
+</div>
+<h2 class="title">
     Students
 </h2>
 <div class="box">
-    <%= if not Enum.empty?(@group.students) do %>
-    <%= for student <- @group.students do %>
+    <%= if not Enum.empty?(students) do %>
+    <%= for student <- students do %>
     <article class="media">
         <figure class="media-left">
             <span class="icon">
@@ -26,18 +51,54 @@
             </span>
         </figure>
         <div class="media-content">
-            <ul>
-                <%= if student.user != nil do %>
-                <li><strong><%= "#{student.user.first_name} #{student.user.last_name}" %></strong></li>
-                <% end %>
-                <li><%= student.email %></li>
-            </ul>
-            <!-- Observations by category -->
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li><strong><%= student.first_name %> <%= student.last_name %></strong></li>
+                            <li><%= student.email %></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <%= icon_button("Record Feedback", "comment", class: "is-primary", to: Routes.student_feedback_path(@conn, :categories, @group.id, student.id)) %>
+                    </div>
+                    <div class="level-item">
+                            <%= icon_button("New Draft", "file-alt", class: "is-primary", to: Routes.inbox_path(@conn, :new, group_id: @group.id, user_id: student.id))%>
+                    </div>
+                </div>
+            </div>
+            <!-- Observations -->
+            <h1 class="title">Observations</h1>
+            <% observations = StudentFeedback.by_observation(@group.id, student.id) %>
+            <%= if not Enum.empty?(observations) do %>
+            <%= for observation <- observations do %>
+            <article class="media">
+                <figure class="media-left">
+
+                </figure>
+                <div class="media-content">
+                    <ul>
+                        <li>Category: <%= observation.category.name %></li>
+                        <li>Observation: <%= observation.content %></li>
+                    </ul>
+                    <!-- Feedback -->
+                    <%= for item <- observation.feedback do %>
+                    <article class="media">
+                        <%= item.content %>
+                    </article>
+                    <% end %>
+                </div>
+            </article> 
+            <% end %>
+            <% else %>
+            <h2 class="subtitle">No Feedback Recorded</h2>
+            <% end %>
         </div>
     </article>
     <% end %>
     <% else %>
-    <h2 class="subtitle">No students yet</h2>
+    <h2 class="subtitle has-text-warning">No Students</h2>
     <% end %>
-</div>
 </div>

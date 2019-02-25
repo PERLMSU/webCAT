@@ -8,7 +8,7 @@
     </ul>
     <p class="menu-label">Feedback</p>
     <ul class="menu-list">
-        <%= menu_entry("Feedback", "pen", Routes.student_feedback_path(@conn, :index), @selected == "feedback") %>
+        <%= menu_entry("Feedback", "pen", Routes.student_feedback_path(@conn, :classrooms), @selected == "feedback") %>
         <%= menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
     </ul>
 </aside>

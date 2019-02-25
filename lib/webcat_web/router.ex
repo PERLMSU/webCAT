@@ -39,9 +39,8 @@ defmodule WebCATWeb.Router do
   scope "/student_feedback", WebCATWeb do
     pipe_through(~w(browser authenticated)a)
 
-    get("/", StudentFeedbackController, :index)
-    get("/classrooms/:classroom_id/semesters", StudentFeedbackController, :semesters)
-    get("/sections/:section_id/rotations", StudentFeedbackController, :rotations)
+    get("/", StudentFeedbackController, :classrooms)
+    get("/semesters/:semester_id/sections", StudentFeedbackController, :sections)
     get("/rotations/:rotation_id/rotation_groups", StudentFeedbackController, :groups)
     get("/groups/:group_id", StudentFeedbackController, :students)
     get("/groups/:group_id/students/:student_id/categories", StudentFeedbackController, :categories)
@@ -81,9 +80,9 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     resources("/", ProfileController, only: ~w(show edit update)a, singleton: true)
-    get("/change_password", ProfileController, :edit_password)
-    put("/change_password", ProfileController, :update_password)
-    patch("/change_password", ProfileController, :update_password)
+    get("/password/edit", ProfileController, :edit_password)
+    put("/password", ProfileController, :update_password)
+    patch("/password", ProfileController, :update_password)
   end
 
   scope "/", WebCATWeb do

@@ -152,8 +152,8 @@ defmodule WebCAT.Factory do
 
   def classroom_factory do
     %Classroom{
-      course_code: sequence(:course_code, &"#{&1}"),
-      name: sequence(:name, &"Physics for Scientists and Engineers #{&1}"),
+      course_code: sequence("PHY "),
+      name: sequence("Physics for Scientists and Engineers "),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       users: [Factory.insert(:admin)] ++ Factory.insert_list(1, :assistant)
     }

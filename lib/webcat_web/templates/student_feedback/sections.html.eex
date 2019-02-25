@@ -1,0 +1,26 @@
+<%= for section <- @sections do %>
+<div class="box">
+    <h1 class="title">Section: <%= section.number %></h1>
+    <h2 class="subtitle">Rotations</h2>
+    <%= if not Enum.empty?(section.rotations) do %>
+    <%= for rotation <- section.rotations do %>
+    <article class="media">
+        <figure class="media-left">
+
+        </figure>
+        <div class="media-content">
+            <p>
+                <%= link("Rotation #{rotation.number}", to: Routes.student_feedback_path(@conn, :groups, rotation.id)) %>
+            </p><br>
+            <p>
+                Date: <%= Timex.format!(rotation.start_date, "{M}/{D}/{YYYY}") %> -
+                <%= Timex.format!(rotation.end_date, "{M}/{D}/{YYYY}") %>
+            </p>
+        </div>
+    </article>
+    <% end %>
+    <% else %>
+    <h2 class="subtitle has-text-warning">No Rotations</h2>
+    <% end %>
+</div>
+<% end %>
