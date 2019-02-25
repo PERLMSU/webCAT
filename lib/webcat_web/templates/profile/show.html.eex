@@ -1,0 +1,76 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li class="is-active"><%= link("Profile", to: Routes.profile_path(@conn, :show)) %></li>
+    </ul>
+</nav>
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">Profile</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <p class="buttons">
+                <%= icon_button("Change Password", "lock", class: "is-info", to: Routes.profile_path(@conn, :edit_password)) %>
+                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.profile_path(@conn, :edit)) %>
+            </p>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="box">
+    <h2 class="subtitle">
+        Details
+    </h2>
+    <ul>
+        <li>
+            <h2 class="subtitle">Email</h2>
+            <%= @user.email %>
+        </li>
+        <li>
+            <h2 class="subtitle">First Name</h2>
+            <%= @user.first_name %>
+        </li>
+        <%= if @user.middle_name != nil do %>
+        <li>
+            <h2 class="subtitle">Middle Name</h2>
+            <%= @user.middle_name %>
+        </li>
+        <% end %>
+        <li>
+            <h2 class="subtitle">Last Name</h2>
+            <%= @user.last_name %>
+        </li>
+        <li>
+            <h2 class="subtitle">Roles</h2>
+            <%= if is_list(@user.performer.roles) and not Enum.empty?(@user.performer.roles) do %>
+            <ul>
+                <%= for role <- @user.performer.roles do %>
+                <li><%= role.name %></li>
+                <% end %>
+            </ul>
+            <% else %>
+            <p>No Roles Assigned</p>
+            <% end %>
+        </li>
+    </ul>
+</div>
+<div class="box">
+    <h2 class="subtitle">
+        Classrooms
+    </h2>
+    <%= WebCATWeb.ClassroomView.table(@conn, @user.classrooms) %>
+</div>
+<div class="box">
+    <h2 class="subtitle">
+        Sections
+    </h2>
+    <%= WebCATWeb.SectionView.table(@conn, @user.sections) %>
+</div>
+<div class="box">
+    <h2 class="subtitle">
+        Rotation Groups
+    </h2>
+    <%= WebCATWeb.RotationGroupView.table(@conn, @user.rotation_groups) %>
+</div>

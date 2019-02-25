@@ -1,0 +1,27 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
+        <li><%= link(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) %></li>
+        <li><%= link("Categories", to: Routes.category_path(@conn, :index, @category.classroom_id)) %></li>
+        <li><%= link(@category.name, to: Routes.category_path(@conn, :show, @category.classroom_id, @category.id)) %></li>
+        <li class="is-active"><%= link("Observations", to: Routes.observation_path(@conn, :index, @category.id))%></li>
+    </ul>
+</nav>
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">Observations</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <p class="buttons">
+                <%= icon_button("Create", "plus", class: "is-primary", to: Routes.observation_path(@conn, :new, @category.id)) %>
+            </p>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="box">
+    <%= table(@conn, @observations) %>
+</div>

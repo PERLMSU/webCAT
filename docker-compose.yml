@@ -1,24 +1,10 @@
 version: '3'
-
 services:
   db:
-    image: postgres:10.3-alpine
+    image: postgres:11-alpine
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=wcat
-      - POSTGRES_PASSWORD=wcat
-      - POSTGRES_DB=wcat
-  web:
-    build:
-      context: .
-      dockerfile: docker/local/Dockerfile
-    command: /start.sh
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-    volumes:
-      - .:/code
+      POSTGRES_USER: webcat
+      POSTGRES_PASSWORD: webcat
     ports:
-      - "8000:8000"
-    depends_on:
-      - db
+      - 5432:5432

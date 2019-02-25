@@ -1,0 +1,21 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
+        <li><%= link(@changeset.data.rotation.section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @changeset.data.rotation.section.semester.classroom_id)) %></li>
+        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, @changeset.data.rotation.section.semester.classroom_id)) %></li>
+        <li><%= link(@changeset.data.rotation.section.semester.name, to: Routes.semester_path(@conn, :show, @changeset.data.rotation.section.semester.classroom_id, @changeset.data.rotation.section.semester_id)) %></li>
+        <li><%= link("Sections", to: Routes.section_path(@conn, :index, @changeset.data.rotation.section.semester_id))%></li>
+        <li><%= link(@changeset.data.rotation.section.number, to: Routes.section_path(@conn, :show, @changeset.data.rotation.section.semester_id, @changeset.data.rotation.section_id)) %></li>
+        <li><%= link("Rotations", to: Routes.rotation_path(@conn, :index, @changeset.data.rotation.section_id)) %></li>
+        <li><%= link(@changeset.data.rotation.number, to: Routes.rotation_path(@conn, :show, @changeset.data.rotation.section_id, @changeset.data.rotation_id)) %></li>
+        <li><%= link("Rotation Groups", to: Routes.rotation_group_path(@conn, :index, @changeset.data.rotation_id)) %></li>
+        <li><%= link(@changeset.data.number, to: Routes.rotation_group_path(@conn, :show, @changeset.data.rotation_id, @changeset.data.id)) %></li>
+        <li class="is-active"><%= link("Edit", to: Routes.rotation_group_path(@conn, :edit, @changeset.data.rotation_id, @changeset.data.id)) %></li>
+    </ul>
+</nav>
+<h1 class="title">Edit Rotation Group:
+    <%= @changeset.data.number %>
+</h1>
+<hr>
+<%= form(@conn, @changeset) %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

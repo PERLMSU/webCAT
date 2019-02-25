@@ -1,0 +1,32 @@
+<%= if Map.has_key?(@drafts, "unreviewed") do %>
+<div class="box">
+    <h1 class="title">Unreviewed Drafts</h1>
+    <%= for draft <- @drafts["unreviewed"] do  %>
+    <%= render_draft(draft) %>
+    <% end %>
+</div>
+<% end %>
+<%= if Map.has_key?(@drafts, "needs_revision") do %>
+<div class="box">
+    <h1 class="title">Need Revision</h1>
+    <%= for draft <- @drafts["needs_revision"] do  %>
+    <%= render_draft(draft) %>
+    <% end %>
+</div>
+<% end %>
+<%= if Map.has_key?(@drafts, "approved") do %>
+<div class="box">
+    <h1 class="title">Approved Drafts</h1>
+    <%= for draft <- @drafts["approved"] do  %>
+    <%= render_draft(draft) %>
+    <% end %>
+</div>
+<% end %>
+<%= if Map.has_key?(@drafts, "emailed") do %>
+<div class="box">
+    <h1 class="title">Emailed Drafts</h1>
+    <%= for draft <- @drafts["emailed"] do  %>
+    <%= render_draft(draft) %>
+    <% end %>
+</div>
+<% end %>

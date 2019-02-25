@@ -1,0 +1,16 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
+        <li><%= link(@changeset.data.category.classroom.name, to: Routes.classroom_path(@conn, :show, @changeset.data.category.classroom_id)) %></li>
+        <li><%= link("Categories", to: Routes.category_path(@conn, :index, @changeset.data.category.classroom_id)) %></li>
+        <li><%= link(@changeset.data.category.name, to: Routes.category_path(@conn, :show, @changeset.data.category.classroom_id, @changeset.data.category_id)) %></li>
+        <li><%= link("Observations", to: Routes.observation_path(@conn, :index, @changeset.data.category_id))%></li>
+        <li><%= link(truncate(@changeset.data.content, 10), to: Routes.observation_path(@conn, :show, @changeset.data.category_id, @changeset.data.id)) %></li>
+        <li class="is-active"><%= link("Edit", to: Routes.observation_path(@conn, :edit, @changeset.data.category_id, @changeset.data.id)) %></li>
+    </ul>
+</nav>
+<h1 class="title">Edit Observation
+</h1>
+<hr>
+<%= form(@conn, @changeset) %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

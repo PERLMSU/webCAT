@@ -1,0 +1,19 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li>
+            <%= link("Students", to: Routes.student_path(@conn, :index)) %>
+        </li>
+        <li>
+            <%= link("#{@changeset.data.first_name} #{@changeset.data.last_name}", to: Routes.student_path(@conn, :show, @changeset.data.id)) %>
+        </li>
+        <li class="is-active">
+            Edit
+        </li>
+    </ul>
+</nav>
+<h1 class="title">Edit Student:
+    <%= "#{@changeset.data.first_name} #{@changeset.data.last_name}" %>
+</h1>
+<hr>
+<%= form(@conn, @changeset) %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

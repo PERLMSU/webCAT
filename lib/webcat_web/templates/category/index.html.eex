@@ -1,0 +1,25 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
+        <li><%= link(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)) %></li>
+        <li class="is-active"><%= link("Categories", to: Routes.category_path(@conn, :index, @classroom.id)) %></li>
+    </ul>
+</nav>
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">Categories</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <p class="buttons">
+                <%= icon_button("Create", "plus", class: "is-primary", to: Routes.category_path(@conn, :new, @classroom.id)) %>
+            </p>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="box">
+    <%= table(@conn, @categories) %>
+</div>
