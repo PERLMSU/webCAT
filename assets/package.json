@@ -37,7 +37,7 @@
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "postcss-loader": "3.0.0",
     "sass-loader": "7.1.0",
-    "uglifyjs-webpack-plugin": "2.1.1",
+    "uglifyjs-webpack-plugin": "^1.0.0",
     "webpack": "4.29.5",
     "webpack-cli": "3.2.3"
   }
