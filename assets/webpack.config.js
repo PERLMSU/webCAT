@@ -16,7 +16,7 @@ module.exports = (env, options) => ({
         app: './js/app.js',
         form: './js/form.js',
         messages: './js/messages.js',
-        file: './js/file.js',
+        //file: './js/file.js',
         feedback: './js/feedback.js',
     },
     output: {

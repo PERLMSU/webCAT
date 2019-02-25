@@ -17,4 +17,4 @@
     <%= submit("Import", class: "button is-primary")%>
 </div>
 <% end) %>
-<script src='<%= Routes.static_path(@conn, "/js/file.js") %>'></script>
+<!--<script src='<%= Routes.static_path(@conn, "/js/file.js") %>'></script>-->
