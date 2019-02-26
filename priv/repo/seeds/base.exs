@@ -44,7 +44,13 @@ admin_password =
       transaction.admin
       |> repo.preload(performer: ~w(roles)a)
 
-    unless Terminator.has_role?(admin.performer, :admin) do
+    is_admin =
+      admin.performer.roles
+      |> Enum.find(false, fn role ->
+        role.identifier == "admin"
+      end)
+
+    unless is_admin do
       Performer.grant(admin.performer, repo.get_by(Role, identifier: "admin"))
     end
 
