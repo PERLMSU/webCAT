@@ -38,7 +38,7 @@ defmodule Release.Tasks do
 
     # Start the Repo(s) for app
     IO.puts("Starting repos..")
-    Enum.each(@repos, & &1.start_link(pool_size: 2))
+    Enum.each(@repos, & &1.start_link(pool_size: 4))
   end
 
   defp stop_services do
