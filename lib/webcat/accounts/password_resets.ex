@@ -3,7 +3,6 @@ defmodule WebCAT.Accounts.PasswordResets do
   Utility functions for working with password resets
   """
 
-  use Anaphora
   alias WebCAT.Repo
   alias WebCAT.Accounts.{PasswordReset, User, Users, PasswordCredential}
   alias Comeonin.Pbkdf2
@@ -16,7 +15,11 @@ defmodule WebCAT.Accounts.PasswordResets do
   def start_reset(email) when is_binary(email) do
     with {:ok, user} <- Users.by_email(email) do
       # Delete an existing reset if it exists
-      aif(Repo.get_by(PasswordReset, user_id: user.id), do: Repo.delete(it))
+      existing = Repo.get_by(PasswordReset, user_id: user.id)
+
+      unless is_nil(existing) do
+        Repo.delete(existing)
+      end
 
       inserted =
         %PasswordReset{}
