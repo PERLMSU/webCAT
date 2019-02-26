@@ -17,7 +17,7 @@ admin_password =
   |> Base.encode32()
   |> String.downcase()
 
-transaction =
+{:ok, _} =
   Multi.new()
   |> Multi.insert(:admin, admin_changeset)
   |> Multi.run(:admin_credentials, fn _repo, %{admin: user} ->
@@ -28,13 +28,12 @@ transaction =
     })
     |> Repo.insert()
   end)
-  |> Multi.run(with_roles, :granted, fn _repo, transaction ->
+  |> Multi.run(:granted, fn _repo, transaction ->
     Performer.grant(transaction.admin.performer, Map.get(transaction, {:role, "admin"}))
 
     {:ok, nil}
   end)
-
-{:ok, _} = Repo.transaction(transaction)
+  |> Repo.transaction(transaction)
 
 IO.puts("""
 *****************************
