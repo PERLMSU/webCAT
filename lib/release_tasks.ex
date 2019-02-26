@@ -8,7 +8,8 @@ defmodule Release.Tasks do
     :crypto,
     :ssl,
     :postgrex,
-    :ecto
+    :ecto,
+    :ecto_sql
   ]
 
   @repos Application.get_env(:webcat, :ecto_repos, [])
