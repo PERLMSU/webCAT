@@ -2,8 +2,6 @@ defmodule WebCAT.CRUD do
   @moduledoc """
   Helper functions for doing basic CRUD actions
   """
-  use Anaphora
-
   alias WebCAT.Repo
 
   import Ecto.Query
@@ -29,9 +27,9 @@ defmodule WebCAT.CRUD do
     |> where([s], s.id == ^id)
     |> preload(^Keyword.get(options, :preload, []))
     |> Repo.one()
-    |> acase do
+    |> case do
       nil -> {:error, :not_found}
-      _ -> {:ok, it}
+      _ = it -> {:ok, it}
     end
   end
 

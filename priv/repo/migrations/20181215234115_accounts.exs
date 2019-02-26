@@ -1,8 +1,16 @@
 defmodule WebCAT.Repo.Migrations.Accounts do
   use Ecto.Migration
   import WebCAT.Repo.Helpers
+  import Terminator.Migrations
 
   def change do
+    # Terminator
+    performers()
+    roles()
+    performer_roles()
+    abilities()
+    entities()
+
     create table(:users) do
       add_req(:email, :text)
       add_req(:first_name, :text)

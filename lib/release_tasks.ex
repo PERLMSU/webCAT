@@ -8,7 +8,8 @@ defmodule Release.Tasks do
     :crypto,
     :ssl,
     :postgrex,
-    :ecto
+    :ecto,
+    :ecto_sql
   ]
 
   @repos Application.get_env(:webcat, :ecto_repos, [])
@@ -38,7 +39,7 @@ defmodule Release.Tasks do
 
     # Start the Repo(s) for app
     IO.puts("Starting repos..")
-    Enum.each(@repos, & &1.start_link(pool_size: 1))
+    Enum.each(@repos, & &1.start_link(pool_size: 2))
   end
 
   defp stop_services do
@@ -62,8 +63,16 @@ defmodule Release.Tasks do
   end
 
   defp run_seeds_for(repo) do
+    # Run the auth seed script if exists
+    auth_script = priv_path_for(repo, "migrations/auth.exs")
+
+    if File.exists?(auth_script) do
+      IO.puts("Running auth script..")
+      Code.eval_file(auth_script)
+    end
+
     # Run the seed script if it exists
-    seed_script = priv_path_for(repo, "seeds.exs")
+    seed_script = priv_path_for(repo, "seeds/base.exs")
 
     if File.exists?(seed_script) do
       IO.puts("Running seed script..")
