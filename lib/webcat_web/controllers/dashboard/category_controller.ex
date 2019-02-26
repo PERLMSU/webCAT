@@ -1,6 +1,5 @@
 defmodule WebCATWeb.CategoryController do
   use WebCATWeb, :authenticated_controller
-  use Anaphora
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Classroom
   alias WebCAT.Feedback.{Category, Categories}
@@ -33,7 +32,7 @@ defmodule WebCATWeb.CategoryController do
     end
 
     with :ok <- is_authorized?(),
-    {:ok, category} <- Categories.get(id) do
+         {:ok, category} <- Categories.get(id) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -48,9 +47,12 @@ defmodule WebCATWeb.CategoryController do
     end
 
     parent_category_id =
-      aif(Map.get(params, "parent_category_id"),
-        do: Integer.parse(it) |> Tuple.to_list() |> Enum.at(0)
-      )
+      with "" <> param <- Map.get(params, "parent_category_id"),
+           {num, _} <- Integer.parse(param) do
+        num
+      else
+        _ -> nil
+      end
 
     with :ok <- is_authorized?(),
          {:ok, classroom} <- CRUD.get(Classroom, classroom_id) do
@@ -100,7 +102,7 @@ defmodule WebCATWeb.CategoryController do
     end
 
     with :ok <- is_authorized?(),
-    {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
+         {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -115,7 +117,7 @@ defmodule WebCATWeb.CategoryController do
     end
 
     with :ok <- is_authorized?(),
-    {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
+         {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
       case CRUD.update(Category, category, update) do
         {:ok, _} ->
           conn
@@ -138,7 +140,7 @@ defmodule WebCATWeb.CategoryController do
     end
 
     with :ok <- is_authorized?(),
-    {:ok, category} <- CRUD.get(Category, id) do
+         {:ok, category} <- CRUD.get(Category, id) do
       case CRUD.delete(Category, id) do
         {:ok, _} ->
           conn
