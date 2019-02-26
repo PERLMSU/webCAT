@@ -2,7 +2,7 @@ alias Ecto.Multi
 alias WebCAT.Repo
 alias WebCAT.Accounts.{User, PasswordCredential}
 
-alias Terminator.{Ability, Performer, Role}
+alias Terminator.{Performer, Role}
 
 admin_changeset =
   User.changeset(%User{}, %{
@@ -17,27 +17,48 @@ admin_password =
   |> Base.encode32()
   |> String.downcase()
 
-{:ok, _} =
+{:ok, transaction} =
   Multi.new()
-  |> Multi.insert(:admin, admin_changeset)
-  |> Multi.run(:admin_credentials, fn _repo, %{admin: user} ->
-    %PasswordCredential{}
-    |> PasswordCredential.changeset(%{
-      password: admin_password,
-      user_id: user.id
-    })
-    |> Repo.insert()
+  |> Multi.run(:admin, fn repo, _transaction ->
+    case repo.get_by(User, email: admin_changeset.changes.email) do
+      nil -> repo.insert(admin_changeset)
+      admin -> {:ok, admin}
+    end
   end)
-  |> Multi.run(:granted, fn _repo, transaction ->
-    Performer.grant(transaction.admin.performer, Map.get(transaction, {:role, "admin"}))
+  |> Multi.run(:admin_credentials, fn repo, %{admin: user} ->
+    case repo.get_by(PasswordCredential, user_id: user.id) do
+      nil ->
+        %PasswordCredential{}
+        |> PasswordCredential.changeset(%{
+          password: admin_password,
+          user_id: user.id
+        })
+        |> repo.insert()
+
+      _ ->
+        {:ok, nil}
+    end
+  end)
+  |> Multi.run(:granted, fn repo, transaction ->
+    admin =
+      transaction.admin
+      |> repo.preload(performer: ~w(roles)a)
+
+    unless Terminator.has_role?(admin.performer, :admin) do
+      Performer.grant(admin.performer, repo.get_by(Role, identifier: "admin"))
+    end
 
     {:ok, nil}
   end)
-  |> Repo.transaction(transaction)
+  |> Repo.transaction()
 
-IO.puts("""
-*****************************
-* Email: wcat_admin@msu.edu *
-* Password: #{admin_password}        *
-*****************************
-""")
+if transaction.admin_credentials do
+  IO.puts("""
+  *****************************
+  * Email: wcat_admin@msu.edu *
+  * Password: #{admin_password}        *
+  *****************************
+  """)
+else
+  IO.puts("*** Admin credentials already exist, skipping ***")
+end

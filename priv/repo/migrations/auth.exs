@@ -28,33 +28,60 @@ roles = [
 
 with_abilities =
   (crud_abilities ++ other_abilities)
-  |> Enum.reduce(Multi.new(), &Multi.insert(&2, {:ability, &1.changes.identifier}, &1))
+  |> Enum.reduce(Multi.new(), fn ability, multi ->
+    Multi.run(multi, {:ability, ability.changes.identifier}, fn repo, _transaction ->
+      case repo.get_by(Ability, identifier: ability.changes.identifier) do
+        nil ->
+          repo.insert(ability)
 
-with_roles =
-  Enum.reduce(roles, with_abilities, &Multi.insert(&2, {:role, &1.changes.identifier}, &1))
-
-with_granted_roles =
-  Multi.run(with_roles, :granted, fn _repo, transaction ->
-    assistant_role = Map.get(transaction, {:role, "assistant"})
-    student_role = Map.get(transaction, {:role, "student"})
-
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "show_classroom"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "show_semester"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "show_section"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "show_rotation"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "show_rotation_group"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "create_draft"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "show_draft"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "update_draft"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "delete_draft"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "create_comment"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "show_comment"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "update_comment"}))
-    Role.grant(assistant_role, Map.get(transaction, {:ability, "delete_comment"}))
-
-    Role.grant(student_role, Map.get(transaction, {:ability, "view_email"}))
-
-    {:ok, nil}
+        found ->
+          IO.puts("*** Abilities already created, skipping ***")
+          {:ok, nil}
+      end
+    end)
   end)
 
-{:ok, _} = Repo.transaction(with_granted_roles)
+with_roles =
+  roles
+  |> Enum.reduce(with_abilities, fn role, multi ->
+    Multi.run(multi, {:role, role.changes.identifier}, fn repo, _transaction ->
+      case repo.get_by(Role, identifier: role.changes.identifier) do
+        nil ->
+          repo.insert(role)
+
+        found ->
+          IO.puts("*** Roles already created, skipping ***")
+          {:ok, nil}
+      end
+    end)
+  end)
+
+with_granted_abilities =
+  Multi.run(with_roles, :granted, fn _repo, transaction ->
+    with %Role{} = assistant_role <- Map.get(transaction, {:role, "assistant"}),
+         %Role{} = student_role <- Map.get(transaction, {:role, "student"}) do
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "show_classroom"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "show_semester"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "show_section"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "show_rotation"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "show_rotation_group"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "create_draft"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "show_draft"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "update_draft"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "delete_draft"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "create_comment"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "show_comment"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "update_comment"}))
+      Role.grant(assistant_role, Map.get(transaction, {:ability, "delete_comment"}))
+
+      Role.grant(student_role, Map.get(transaction, {:ability, "view_email"}))
+
+      {:ok, nil}
+    else
+      _ ->
+        IO.puts("*** Roles already granted, skipping ***")
+        {:ok, nil}
+    end
+  end)
+
+{:ok, _} = Repo.transaction(with_granted_abilities)
