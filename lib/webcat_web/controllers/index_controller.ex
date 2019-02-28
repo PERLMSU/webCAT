@@ -32,9 +32,7 @@ defmodule WebCATWeb.IndexController do
     render(conn, "changes.html", user: user, selected: nil)
   end
 
-  def import(conn, _params) do
-    user = Auth.current_resource(conn)
-
+  def import(conn, user, _params) do
     render(conn, "import.html", user: user, selected: "import")
   end
 

@@ -5,10 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 **All versions before 1.0 should consider minor version changes breaking, as the API isn't stable yet.**
 ## [Unreleased](#unreleased)
 ## Added
-- Website footer
+- Website footer [#6](https://github.com/PERLMSU/webCAT/issues/6)
     - Version
     - Build date
     - Link to changelog
+- Changelog
+    - Renders the changelog from markdown at compile time
+    - Allows users to keep up with changes to functionality without explicit communication
 ## [0.1.0](#0.1.0) - 2019-02-26
 ### Added
 - Classroom Control Panel
