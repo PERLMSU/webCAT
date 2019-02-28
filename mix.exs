@@ -34,6 +34,7 @@ defmodule WebCAT.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:earmark, "~> 1.3.1"},
       {:bamboo, "~> 1.0"},
       {:terminator, github: "bbuscarino/terminator", branch: "dev"},
       {:comeonin, "~> 4.0"},

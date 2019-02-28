@@ -40,12 +40,6 @@
     </div>
   </section>
   <script src='<%= Routes.static_path(@conn, "/js/messages.js") %>'></script>
-  <!--<footer class="footer">
-    <div class="content has-text-centered">
-      <p>
-        <i class="far fa-eye"></i>
-      </p>
-    </div>
-  </footer>-->
+  <%= render(WebCATWeb.SharedView, "footer.html", conn: @conn)%>
 </body>
 </html>

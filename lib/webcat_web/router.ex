@@ -58,6 +58,7 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     get("/", IndexController, :index)
+    get("/changes", IndexController, :changes)
     get("/import", IndexController, :import)
     post("/import", IndexController, :do_import)
 

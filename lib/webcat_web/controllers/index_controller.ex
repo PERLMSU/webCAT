@@ -1,5 +1,5 @@
 defmodule WebCATWeb.IndexController do
-  use WebCATWeb, :controller
+  use WebCATWeb, :authenticated_controller
 
   alias WebCAT.Repo
   alias WebCATWeb.Import
@@ -9,8 +9,7 @@ defmodule WebCATWeb.IndexController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, _params) do
-    user = Auth.current_resource(conn)
+  def index(conn, user, _params) do
 
     student_count = Users.with_role("student") |> Enum.count()
 
@@ -25,8 +24,12 @@ defmodule WebCATWeb.IndexController do
     render(conn, "overview.html", user: user, counts: counts, selected: "overview")
   end
 
-  def redirect_index(conn, _params) do
+  def redirect_index(conn, _user, _params) do
     redirect(conn, to: Routes.index_path(conn, :index))
+  end
+
+  def changes(conn, user, _params) do
+    render(conn, "changes.html", user: user, selected: nil)
   end
 
   def import(conn, _params) do
@@ -35,10 +38,9 @@ defmodule WebCATWeb.IndexController do
     render(conn, "import.html", user: user, selected: "import")
   end
 
-  def do_import(conn, assigns) do
-    Auth.current_resource(conn)
+  def do_import(conn, _user, params) do
 
-    case assigns do
+    case params do
       %{"import" => %{"file" => %{path: path}}} ->
         case Import.from_path(path) do
           {:ok, _} ->

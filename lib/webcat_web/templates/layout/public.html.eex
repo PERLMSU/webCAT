@@ -31,6 +31,6 @@
   <% end %>
   <%= render @view_module, @view_template, assigns %>
   <script src='<%= Routes.static_path(@conn, "/js/messages.js") %>'></script>
+  <%= render(WebCATWeb.SharedView, "footer.html", conn: @conn)%>
 </body>
-
 </html>
