@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
     - Version
     - Build date
     - Link to changelog
+- Feedback Editor [#7](https://github.com/PERLMSU/webCAT/issues/7)
+    - Browse by categories
+    - Add feedback from a single observation at a time
 - Changelog
     - Renders the changelog from markdown at compile time
     - Allows users to keep up with changes to functionality without explicit communication
