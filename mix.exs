@@ -4,7 +4,7 @@ defmodule WebCAT.Mixfile do
   def project do
     [
       app: :webcat,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -34,6 +34,7 @@ defmodule WebCAT.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:earmark, "~> 1.3.1"},
       {:bamboo, "~> 1.0"},
       {:terminator, github: "bbuscarino/terminator", branch: "dev"},
       {:comeonin, "~> 4.0"},

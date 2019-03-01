@@ -43,8 +43,10 @@ defmodule WebCATWeb.Router do
     get("/semesters/:semester_id/sections", StudentFeedbackController, :sections)
     get("/rotations/:rotation_id/rotation_groups", StudentFeedbackController, :groups)
     get("/groups/:group_id", StudentFeedbackController, :students)
-    get("/groups/:group_id/students/:student_id/categories", StudentFeedbackController, :categories)
-    get("/groups/:group_id/students/:student_id/categories/:category_id/observations", StudentFeedbackController, :observations)
+    get("/groups/:group_id/students/:user_id/categories", StudentFeedbackController, :categories)
+    get("/groups/:group_id/students/:user_id/categories/:category_id/observations", StudentFeedbackController, :observations)
+
+    post("/groups/:group_id/students/:user_id/feedback", StudentFeedbackController, :feedback)
   end
 
   scope "/inbox", WebCATWeb do
@@ -58,6 +60,7 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     get("/", IndexController, :index)
+    get("/changes", IndexController, :changes)
     get("/import", IndexController, :import)
     post("/import", IndexController, :do_import)
 

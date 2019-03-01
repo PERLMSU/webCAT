@@ -6,7 +6,7 @@ defmodule WebCATWeb.StudentFeedbackController do
   use WebCATWeb, :authenticated_controller
 
   alias WebCAT.Rotations.{Classroom, RotationGroup, Section}
-  alias WebCAT.Feedback.{Observation, Category}
+  alias WebCAT.Feedback.{Category, StudentFeedback}
   alias WebCAT.Repo
   import Ecto.Query
 
@@ -142,36 +142,66 @@ defmodule WebCATWeb.StudentFeedbackController do
     with :ok <- is_authorized?() do
       parent_category_id = Map.get(params, "category_id")
 
-      categories = if parent_category_id do
-        Category
-        |> where([c], c.parent_category_id == ^parent_category_id)
-        |> join(:left, [c], o in assoc(c, :observations))
-        |> join(:left, [_, o], f in assoc(o, :feedback))
-        |> preload([_, o, f], observations: {o, feedback: f})
-        |> Repo.all()
-      else
-        Category
-        |> join(:left, [c], o in assoc(c, :observations))
-        |> join(:left, [_, o], f in assoc(o, :feedback))
-        |> preload([_, o, f], observations: {o, feedback: f})
-        |> Repo.all()
-      end
+      categories =
+        if parent_category_id do
+          Category
+          |> where([c], c.parent_category_id == ^parent_category_id)
+          |> join(:left, [c], o in assoc(c, :observations))
+          |> join(:left, [_, o], f in assoc(o, :feedback))
+          |> join(:left, [c], s in assoc(c, :sub_categories))
+          |> preload([_, o, f, s], sub_categories: s, observations: {o, feedback: f})
+          |> Repo.all()
+        else
+          Category
+          |> join(:left, [c], o in assoc(c, :observations))
+          |> join(:left, [_, o], f in assoc(o, :feedback))
+          |> join(:left, [c], s in assoc(c, :sub_categories))
+          |> preload([_, o, f, s], sub_categories: s, observations: {o, feedback: f})
+          |> Repo.all()
+        end
 
-      render(conn, "categories.html", user: user, selected: "feedback", categories: categories, params: params)
+      selected_feedback =
+        StudentFeedback
+        |> where([sf], sf.user_id == ^params["user_id"])
+        |> where([sf], sf.rotation_group_id == ^params["group_id"])
+        |> select([sf], sf.feedback_id)
+        |> Repo.all()
+
+      render(conn, "categories.html",
+        user: user,
+        selected: "feedback",
+        categories: categories,
+        params: params,
+        selected_feedback: selected_feedback
+      )
     end
   end
 
-  def observations(conn, user, %{
+  def feedback(conn, _user, %{
+        "student_feedback" => feedback,
         "group_id" => group_id,
-        "student_id" => student_id,
-        "category_id" => category_id
+        "user_id" => user_id
       }) do
-    permissions do
-      has_role(:admin)
-      has_role(:assistant)
-    end
+    feedback
+    |> Enum.filter(fn {_, value} -> value == "true" end)
+    |> Enum.map(fn {key, _} ->
+      StudentFeedback.add(group_id, user_id, key)
+    end)
 
-    with :ok <- is_authorized?() do
-    end
+    removed =
+      feedback
+      |> Enum.filter(fn {_, value} -> value == "false" end)
+      |> Enum.map(fn {key, _} -> key end)
+
+    # Remove deleted feedback
+    StudentFeedback
+    |> where([sf], sf.rotation_group_id == ^group_id)
+    |> where([sf], sf.user_id == ^user_id)
+    |> where([sf], sf.feedback_id in ^removed)
+    |> Repo.delete_all()
+
+    conn
+    |> put_flash(:info, "Added feedback successfully!")
+    |> redirect(to: Routes.student_feedback_path(conn, :students, group_id))
   end
 end
