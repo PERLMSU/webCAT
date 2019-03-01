@@ -37,7 +37,7 @@
     <%= if not Enum.empty?(category.sub_categories) do %>
     <li>
     <% for sub_category <- category.sub_categories do %>
-        <ul><%= link(sub_category.name, to: Routes.student_feedback_path(@conn, :categories, @params["group_id"], @params["user_id"], category_id: sub_category.id)) %></ul>
+        <ul><%= link(sub_category.name, to: Routes.student_feedback_path(@conn, :categories, @params["group_id"], @params["user_id"], category_id: category.id)) %></ul>
     <% end %>
     </li>
     <% else %>
