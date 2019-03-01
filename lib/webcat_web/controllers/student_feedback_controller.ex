@@ -182,12 +182,11 @@ defmodule WebCATWeb.StudentFeedbackController do
         "group_id" => group_id,
         "user_id" => user_id
       }) do
-    added =
-      feedback
-      |> Enum.filter(fn {_, value} -> value == "true" end)
-      |> Enum.map(fn {key, _} ->
-        StudentFeedback.add(group_id, user_id, key)
-      end)
+    feedback
+    |> Enum.filter(fn {_, value} -> value == "true" end)
+    |> Enum.map(fn {key, _} ->
+      StudentFeedback.add(group_id, user_id, key)
+    end)
 
     removed =
       feedback
@@ -200,8 +199,6 @@ defmodule WebCATWeb.StudentFeedbackController do
     |> where([sf], sf.user_id == ^user_id)
     |> where([sf], sf.feedback_id in ^removed)
     |> Repo.delete_all()
-
-    IO.inspect(added)
 
     conn
     |> put_flash(:info, "Added feedback successfully!")

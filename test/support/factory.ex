@@ -2,7 +2,7 @@ defmodule WebCAT.Factory do
   use ExMachina.Ecto, repo: WebCAT.Repo
 
   alias WebCAT.Accounts.{Notification, PasswordCredential, PasswordReset, TokenCredential, User}
-  alias WebCAT.Feedback.{Category, Comment, Draft, Email, Feedback, Grade, Observation}
+  alias WebCAT.Feedback.{Category, Comment, Draft, Email, Feedback, Grade, Observation, StudentFeedback}
   alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Section}
   alias WebCAT.Factory
   alias WebCAT.Repo
@@ -147,6 +147,20 @@ defmodule WebCAT.Factory do
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
       type: sequence(:type, ~w(positive neutral negative)),
       category: Enum.random(Factory.build(:category).sub_categories)
+    }
+  end
+
+  def student_feedback_factory do
+    student = Factory.insert(:student)
+    rotation_group = Factory.build(:rotation_group)
+    |> Map.update!(:users, fn users ->
+      [student | users]
+    end)
+
+    %StudentFeedback{
+      feedback: Factory.build(:feedback),
+      rotation_group: rotation_group,
+      user: student
     }
   end
 
