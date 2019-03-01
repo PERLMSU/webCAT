@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changelog
     - Renders the changelog from markdown at compile time
     - Allows users to keep up with changes to functionality without explicit communication
+## Security
+- HTTPS/SSL is now forced in production environment
 ## [0.1.0](#0.1.0) - 2019-02-26
 ### Added
 - Classroom Control Panel

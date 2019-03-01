@@ -16,6 +16,7 @@ config :webcat, WebCATWeb.Endpoint,
   http: [port: {:system, "PORT"}],
   url: [host: "flawed-disloyal-invisiblerail.gigalixirapp.com", port: 80],
   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   server: true
 
 config :webcat, WebCAT.Repo,
