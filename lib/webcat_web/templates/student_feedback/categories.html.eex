@@ -6,12 +6,42 @@
     <%= for observation <- category.observations do %>
     <article class="media">
         <div class="media-content">
-            
+            <%= observation.content %>
+            <h3 class="subtitle">
+                Feedback
+            </h3>
+            <%= if not Enum.empty?(observation.feedback) do %>
+            <%= form_for(@conn, Routes.student_feedback_path(@conn, :feedback, @params["group_id"], @params["user_id"]), [as: :student_feedback], fn f -> %>
+            <%= for item <- observation.feedback do %>
+            <article class="media">
+                <div class="media-content">
+                    <label class="checkbox">
+                        <%= checkbox(f, :"#{item.id}", value: item.id in @selected_feedback) %>
+                        <%= item.content %>
+                    </label>
+                </div>
+            </article>
+            <% end %>
+            <%= submit("Submit feedback for observation", class: "button") %>
+            <% end) %>
+            <% else %>
+            <h2 class="subtitle has-text-warning">No Feedback for Observation</h2>
+            <% end %>
         </div>
     </article>
     <% end %>
     <% else %>
     <h2 class="subtitle has-text-warning">No Observations for Category</h2>
+    <% end %>
+    <h2 class="subtitle">Sub Categories</h2>
+    <%= if not Enum.empty?(category.sub_categories) do %>
+    <li>
+    <% for sub_category <- category.sub_categories do %>
+        <ul><%= link(sub_category.name, to: Routes.student_feedback_path(@conn, :categories, @params["group_id"], @params["user_id"], category_id: sub_category.id)) %></ul>
+    <% end %>
+    </li>
+    <% else %>
+    <h2 class="subtitle has-text-warning">No Sub Categories</h2>
     <% end %>
 </div>
 <% end %>

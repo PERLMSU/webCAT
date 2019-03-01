@@ -52,17 +52,6 @@ defmodule WebCAT.Feedback.StudentFeedback do
       user_id: user_id,
       feedback_id: feedback_id
     })
-    |> Repo.insert()
-  end
-
-  @doc """
-  Remove a feedback item from a student in a rotation group
-  """
-  def delete(rotation_group_id, user_id, feedback_id) do
-    StudentFeedback
-    |> where([sf], sf.user_id == ^user_id)
-    |> where([sf], sf.rotation_group_id == ^rotation_group_id)
-    |> where([sf], sf.feedback_id == ^feedback_id)
-    |> Repo.delete_all()
+    |> Repo.insert(on_conflict: :nothing)
   end
 end
