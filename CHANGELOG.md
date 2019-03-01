@@ -3,6 +3,15 @@ All notable changes to WebCAT will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as much as possible.
 **All versions before 1.0 should consider minor version changes breaking, as the API isn't stable yet.**
+## [Unreleased](#0.3.0)
+## Added
+-
+## Changed
+-
+## Fixed
+-
+## Security
+-
 ## [0.2.0](#0.2.0)
 ## Added
 - Website footer [#6](https://github.com/PERLMSU/webCAT/issues/6)
