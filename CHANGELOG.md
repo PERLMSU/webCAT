@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 -
 ## Fixed
 - User classroom select width is now set and readable.
+- The build info macro now watches the lib directory for changes so that it can recompile.
 ## Security
 -
 ## [0.2.0](#0.2.0)
