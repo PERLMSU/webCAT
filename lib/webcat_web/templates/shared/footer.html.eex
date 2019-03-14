@@ -3,7 +3,7 @@
     <div class="has-text-centered has-text-grey-light">
         Version <%= version %> - Built on <%= build_date %> -
         <%= link("Changelog", to: Routes.index_path(@conn, :changes))%>
-        <br>
+        <!--<br>
         <a href="https://github.com/bbuscarino" target="_blank">
             <span class="icon">
                 <i class="fab fa-github"></i>
@@ -13,6 +13,6 @@
             <span class="icon">
                 <i class="fal fa-atom"></i>
             </span>
-        </a>
+        </a>-->
     </div>
 </footer>
