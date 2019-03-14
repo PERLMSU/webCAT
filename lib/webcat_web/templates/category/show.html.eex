@@ -65,3 +65,22 @@
     </div>
     <%= WebCATWeb.CategoryView.table(@conn, @category.sub_categories) %>
 </div>
+<div class="box">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <h2 class="subtitle">
+                    Observations
+                </h2>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <p class="buttons">
+                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.observation_path(@conn, :new, @category.id)) %>
+                </p>
+            </div>
+        </div>
+    </div>
+    <%= WebCATWeb.ObservationView.table(@conn, @category.observations) %>
+</div>

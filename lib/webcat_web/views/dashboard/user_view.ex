@@ -78,7 +78,7 @@ defmodule WebCATWeb.UserView do
           [
             label(f, :classrooms, "Classrooms"),
             content_tag(:p, class: "control") do
-              content_tag(:span, class: "select is-multiple") do
+              content_tag(:div, class: "select is-multiple", style: "width:100%;") do
                 multiple_select(f, :classrooms, classrooms,
                   selected:
                     if(is_list(changeset.data.classrooms),
