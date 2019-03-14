@@ -7,7 +7,7 @@ defmodule WebCATWeb.CategoryController do
   action_fallback(WebCATWeb.FallbackController)
 
   @list_preload ~w(sub_categories)a
-  @preload ~w(classroom parent_category)a ++ @list_preload
+  @preload ~w(classroom parent_category observations)a ++ @list_preload
 
   def index(conn, user, %{"classroom_id" => classroom_id}) do
     permissions do
