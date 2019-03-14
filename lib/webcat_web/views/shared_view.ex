@@ -14,6 +14,8 @@ defmodule WebCATWeb.SharedView do
     end
   end
 
+
+  @external_resource Path.join(File.cwd!(), "./lib")
   defmacro build_info do
     # Timex has to be started at compile time for tzdata
     {:ok, _} = Application.ensure_all_started(:timex)
