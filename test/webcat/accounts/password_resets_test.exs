@@ -12,7 +12,7 @@ defmodule WebCATWeb.Accounts.PasswordResetsTest do
 
     assert reset.user_id == credential.user_id
 
-    email = WebCAT.Email.password_reset(credential.user.email, reset.token)
+    email = WebCATWeb.Email.password_reset(credential.user.email, reset.token)
     assert_delivered_email(email)
   end
 

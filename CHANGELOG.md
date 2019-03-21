@@ -6,9 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased](#0.3.0)
 ### Added
--
+- Better looking emails that actually get delivered.
 ### Fixed
 - Profile editing fields are now actually correct
+- Password reset bug fixed.
 
 ## [0.2.1](#0.2.1)
 ### Fixed

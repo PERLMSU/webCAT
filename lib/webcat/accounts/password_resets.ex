@@ -28,7 +28,7 @@ defmodule WebCAT.Accounts.PasswordResets do
 
       case inserted do
         {:ok, reset} ->
-          WebCAT.Email.password_reset(user.email, reset.token)
+          WebCATWeb.Email.password_reset(user.email, reset.token)
           |> WebCAT.Mailer.deliver_later()
 
           {:ok, reset}
