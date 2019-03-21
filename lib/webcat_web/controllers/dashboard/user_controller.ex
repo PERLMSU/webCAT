@@ -131,4 +131,18 @@ defmodule WebCATWeb.UserController do
       end
     end
   end
+
+  def send_confirmation(conn, _user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+    end
+
+    with {:ok, subject} <- CRUD.get(User, id),
+         :ok <- is_authorized?(),
+         :ok <- Users.send_confirmation(subject) do
+      conn
+      |> put_flash(:info, "User email confirmation sent")
+      |> redirect(to: Routes.user_path(conn, :show, id))
+    end
+  end
 end

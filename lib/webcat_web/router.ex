@@ -65,6 +65,7 @@ defmodule WebCATWeb.Router do
     post("/import", IndexController, :do_import)
 
     importable_resources("/users", UserController)
+    get("/users/:id/confirmation", UserController, :send_confirmation)
 
     importable_resources("/students", StudentController)
 

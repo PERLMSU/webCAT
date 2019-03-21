@@ -19,6 +19,7 @@
     <div class="level-right">
         <div class="level-item">
             <p class="buttons">
+                <%= icon_button("Send Confirmation Email", "envelope", class: "is-primary", to: Routes.user_path(@conn, :send_confirmation, @data.id)) %>
                 <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.user_path(@conn, :edit, @data.id)) %>
                 <%= icon_button("Delete", "times", class: "is-danger", to: Routes.user_path(@conn, :delete, @data.id), onclick: "return confirm('Are you sure?');") %>
             </p>

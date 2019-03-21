@@ -2,19 +2,25 @@
 All notable changes to WebCAT will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as much as possible.
-**All versions before 1.0 should consider minor version changes breaking, as the API isn't stable yet.**
+
+**All versions before 1.0 should consider minor version changes breaking, as the nothing is really stable yet.**
+
 ## [Unreleased](#0.3.0)
-## Added
--
-## Changed
--
-## Fixed
+### Added
+- Better looking emails that actually get delivered.
+### Fixed
+- Profile editing fields are now actually correct.
+- Password reset bug fixed.
 - User classroom select width is now set and readable.
 - The build info macro now watches the lib directory for changes so that it can recompile.
-## Security
--
+## [0.2.1](#0.2.1)
+### Fixed
+- Observation and feedback editing is now accessible in the dashboard...
+- User classroom select width is now set and readable.
+- The build info macro now watches the lib directory for changes so that it can recompile.
+
 ## [0.2.0](#0.2.0)
-## Added
+### Added
 - Website footer [#6](https://github.com/PERLMSU/webCAT/issues/6)
     - Version
     - Build date and time
@@ -25,8 +31,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changelog
     - Renders the changelog from markdown at compile time
     - Allows users to keep up with changes to functionality without explicit communication
-## Security
+### Security
 - HTTPS/SSL is now forced in production environment
+
 ## [0.1.0](#0.1.0) - 2019-02-26
 ### Added
 - Classroom Control Panel

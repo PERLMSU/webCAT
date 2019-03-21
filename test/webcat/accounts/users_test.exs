@@ -31,7 +31,7 @@ defmodule WebCAT.Accounts.UsersTest do
     assert user.email == logged_in.email
 
     email =
-      WebCAT.Email.confirmation(credential.user.email, Repo.get_by(TokenCredential, user_id: user.id).token)
+      WebCATWeb.Email.confirmation(credential.user.email, Repo.get_by(TokenCredential, user_id: user.id).token)
 
     assert_delivered_email(email)
   end

@@ -26,7 +26,10 @@ config :webcat, WebCATWeb.Auth.Guardian,
 
 config :phoenix, :json_library, Jason
 
-config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
+config :webcat, WebCAT.Mailer,
+  adapter: Bamboo.MailgunAdapter,
+  domain: "sandbox17aeaeb906ad4816bd4ba04ccc6ee113.mailgun.org",
+  api_key: "493778cca90233e14c73ddb2855904cf-de7062c6-d819699b"
 
 # Configures Elixir's Logger
 config :logger, :console,
