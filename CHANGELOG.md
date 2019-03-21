@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Password reset bug fixed.
 - User classroom select width is now set and readable.
 - The build info macro now watches the lib directory for changes so that it can recompile.
+- You can now edit user roles.
+### Security
+- Random security issue of not handling credentials suddenly disappearing fixed.
 ## [0.2.1](#0.2.1)
 ### Fixed
 - Observation and feedback editing is now accessible in the dashboard...
