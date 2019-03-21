@@ -38,12 +38,28 @@ defmodule WebCAT.Accounts.Users do
     |> Repo.transaction()
     |> case do
       {:ok, result} ->
-        WebCAT.Email.confirmation(result.user.email, result.credential.token)
+        WebCATWeb.Email.confirmation(result.user.email, result.credential.token)
         |> WebCAT.Mailer.deliver_later()
 
         {:ok, result.user}
 
       {:error, _, changeset, %{}} ->
+        {:error, changeset}
+    end
+  end
+
+  def send_confirmation(user) do
+    %TokenCredential{}
+    |> TokenCredential.changeset(%{user_id: user.id, expire: Timex.shift(Timex.now(), days: 1)})
+    |> Repo.insert()
+    |> case do
+      {:ok, credential} ->
+        WebCATWeb.Email.confirmation(user.email, credential.token)
+        |> WebCAT.Mailer.deliver_later()
+
+        :ok
+
+      {:error, changeset} ->
         {:error, changeset}
     end
   end
@@ -86,7 +102,9 @@ defmodule WebCAT.Accounts.Users do
     |> case do
       {:ok, credential} ->
         {:ok, credential.user}
-      {:error, _} = it -> it
+
+      {:error, _} = it ->
+        it
     end
   end
 

@@ -51,7 +51,7 @@ defmodule WebCATWeb.PasswordResetController do
 
       {:ok, user} ->
         conn
-        |> put_flash(:info, "Password for user #{user.username} reset successfully")
+        |> put_flash(:info, "Password for user #{user.email} reset successfully")
         |> redirect(to: Routes.login_path(conn, :index))
     end
   end

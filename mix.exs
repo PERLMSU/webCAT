@@ -4,7 +4,7 @@ defmodule WebCAT.Mixfile do
   def project do
     [
       app: :webcat,
-      version: "0.2.1",
+      version: "0.3.0-dev",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),

@@ -1,0 +1,18 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+
+        <mj-image width="100px" src="https://raw.githubusercontent.com/PERLMSU/webCAT/3cd1faf191cd0959e1cf9717f61903ba8a7df247/app/static/images/physics.png"></mj-image>
+
+        <mj-divider border-color="#345193"></mj-divider>
+
+        <mj-text font-size="20px" color="#395FB8" font-family="helvetica">Welcome to WebCAT!</mj-text>
+        <mj-text font-size="20px" color="#395FB8" font-family="helvetica">Please click here to confirm your email address.</mj-text>
+        <mj-button href="" font-family="Helvetica" background-color="#345193" color="white">
+          Confirm your email address
+        </mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
