@@ -49,6 +49,7 @@ defmodule WebCAT.Accounts.User do
     |> unique_constraint(:email)
     |> put_performer()
     |> put_roles(Map.get(attrs, "roles"))
+    |> put_classrooms(Map.get(attrs, "classrooms"))
   end
 
   defp put_performer(%{valid?: true} = changeset) do
@@ -77,6 +78,12 @@ defmodule WebCAT.Accounts.User do
   end
 
   defp put_roles(changeset, _), do: changeset
+
+  defp put_classrooms(%{valid?: true} = changeset, classrooms) when is_list(classrooms) do
+    put_assoc(changeset, :classrooms, Repo.all(from(c in Classroom, where: c.id in ^classrooms)))
+  end
+
+  defp put_classrooms(changeset, _), do: changeset
 
   @doc """
   Partition a list of users into a map keyed by their role.
