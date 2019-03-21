@@ -2,6 +2,7 @@
 All notable changes to WebCAT will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as much as possible.
+
 **All versions before 1.0 should consider minor version changes breaking, as the nothing is really stable yet.**
 
 ## [Unreleased](#0.3.0)
@@ -10,7 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - Profile editing fields are now actually correct.
 - Password reset bug fixed.
-
+- User classroom select width is now set and readable.
+- The build info macro now watches the lib directory for changes so that it can recompile.
 ## [0.2.1](#0.2.1)
 ### Fixed
 - Observation and feedback editing is now accessible in the dashboard...

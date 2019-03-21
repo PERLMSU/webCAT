@@ -5,7 +5,6 @@ defmodule WebCATWeb.IndexControllerTest do
     setup ~w(login_user)a
 
     test "responds with the dashboard", %{conn: conn, user: user} do
-
       response =
         conn
         |> Auth.sign_in(user)
@@ -19,11 +18,11 @@ defmodule WebCATWeb.IndexControllerTest do
       assert response =~ "Users"
     end
   end
+
   describe "changes/2" do
     setup ~w(login_user)a
 
     test "responds with the changelog", %{conn: conn, user: user} do
-
       response =
         conn
         |> Auth.sign_in(user)
@@ -35,11 +34,11 @@ defmodule WebCATWeb.IndexControllerTest do
       assert response =~ "Keep a Changelog"
     end
   end
+
   describe "import/2" do
     setup ~w(login_user)a
 
     test "responds with the import prompt", %{conn: conn, user: user} do
-
       response =
         conn
         |> Auth.sign_in(user)
