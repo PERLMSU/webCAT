@@ -25,8 +25,8 @@ transaction =
     })
     |> Repo.insert()
   end)
-  |> Multi.run(with_roles, :granted, fn _repo, transaction ->
-    Performer.grant(transaction.admin.performer, Map.get(transaction, {:role, "admin"}))
+  |> Multi.run(:granted, fn repo, transaction ->
+    Performer.grant(transaction.admin.performer, repo.get_by(Role, identifier: "admin"))
 
     {:ok, nil}
   end)

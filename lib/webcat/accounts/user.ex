@@ -3,9 +3,11 @@ defmodule WebCAT.Accounts.User do
   Schema for user accounts
   """
   use Ecto.Schema
+  import Ecto.Query
   import Ecto.Changeset
   alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
   alias Terminator.{Performer, Role}
+  alias WebCAT.Repo
 
   schema "users" do
     field(:email, :string)
@@ -28,6 +30,9 @@ defmodule WebCAT.Accounts.User do
     # For student feedback
     # field(:feedback, {:array, :map}, virtual: true)
 
+    # For role assignment TODO: Needs better solution
+    has_many(:roles, through: ~w(performer roles)a)
+
     timestamps()
   end
 
@@ -43,16 +48,35 @@ defmodule WebCAT.Accounts.User do
     |> validate_required(@required)
     |> unique_constraint(:email)
     |> put_performer()
+    |> put_roles(Map.get(attrs, "roles"))
   end
 
   defp put_performer(%{valid?: true} = changeset) do
     case get_field(changeset, :performer_id) do
-      nil -> put_assoc(changeset, :performer, %Terminator.Performer{})
+      nil -> put_assoc(changeset, :performer, Repo.insert!(%Terminator.Performer{}))
       _ -> changeset
     end
   end
 
   defp put_performer(changeset), do: changeset
+
+  defp put_roles(%{valid?: true} = changeset, roles) when is_list(roles) do
+    case get_field(changeset, :performer) do
+      nil ->
+        changeset
+
+      performer ->
+        performer
+        |> Repo.preload(~w(roles)a)
+        |> Performer.changeset()
+        |> put_assoc(:roles, Repo.all(from(r in Role, where: r.id in ^roles)))
+        |> Repo.update()
+
+        changeset
+    end
+  end
+
+  defp put_roles(changeset, _), do: changeset
 
   @doc """
   Partition a list of users into a map keyed by their role.

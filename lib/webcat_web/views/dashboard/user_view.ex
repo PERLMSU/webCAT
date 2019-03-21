@@ -3,6 +3,7 @@ defmodule WebCATWeb.UserView do
 
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Classroom
+  alias Terminator.Role
 
   def table(conn, users) do
     content_tag(:table, class: "table") do
@@ -62,6 +63,10 @@ defmodule WebCATWeb.UserView do
       CRUD.list(Classroom)
       |> Enum.map(&{&1.name, &1.id})
 
+    roles =
+      CRUD.list(Role)
+      |> Enum.map(&{&1.identifier, &1.id})
+
     path =
       case changeset.data.id do
         nil -> Routes.user_path(conn, :create)
@@ -86,6 +91,23 @@ defmodule WebCATWeb.UserView do
                       else: []
                     ),
                   size: Enum.count(classrooms)
+                )
+              end
+            end
+          ]
+        end,
+        content_tag(:div, class: "field") do
+          [
+            label(f, :roles, "Roles"),
+            content_tag(:p, class: "control") do
+              content_tag(:div, class: "select is-multiple", style: "width:100%;") do
+                multiple_select(f, :roles, roles,
+                  selected:
+                    if(is_list(changeset.data.roles),
+                      do: Enum.map(changeset.data.roles, & &1.id),
+                      else: []
+                    ),
+                  size: Enum.count(roles)
                 )
               end
             end
