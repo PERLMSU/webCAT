@@ -1,7 +1,7 @@
 defmodule WebCATWeb.InboxView do
   use WebCATWeb, :view
 
-  def render_draft(draft) do
+  def render_draft(draft, assigns) do
     tag_class =
       case draft.status do
         "unreviewed" -> "is-primary"
@@ -16,7 +16,7 @@ defmodule WebCATWeb.InboxView do
             <div class="level-item">
               <div class="card-header-title">
                 <ul>
-                  <li><%= draft.student.first_name %> <%= draft.student.last_name %></li>
+                  <li><%= draft.user.first_name %> <%= draft.user.last_name %></li>
                   <li>Rotation <%= draft.rotation_group.rotation.number %> - Rotation group <%= draft.rotation_group.number %></li>
                 </ul>
               </div>
@@ -28,6 +28,12 @@ defmodule WebCATWeb.InboxView do
                 <span class="tag <%= tag_class %>">
                   <%= humanize(draft.status) %>
                 </span>
+              </div>
+            </div>
+            <div class="level-item">
+              <div class="buttons">
+                <%= icon_button("View", "eye", to: Routes.inbox_path(@conn, :show, draft.id)) %>
+                <%= icon_button("Edit", "edit", to: Routes.inbox_path(@conn, :edit, draft.id)) %>
               </div>
             </div>
           </div>
