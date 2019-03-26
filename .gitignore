@@ -58,3 +58,6 @@ webcat.iml
 
 # pyenv Python version
 .python-version
+
+# Semantic UI
+/assets/semantic/dist

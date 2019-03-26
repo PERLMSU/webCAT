@@ -16,8 +16,6 @@ module.exports = (env, options) => ({
         app: './js/app.js',
         form: './js/form.js',
         messages: './js/messages.js',
-        file: './js/file.js',
-        feedback: './js/feedback.js',
     },
     output: {
         filename: '[name].js',
@@ -31,34 +29,17 @@ module.exports = (env, options) => ({
                 use: {
                     loader: 'babel-loader'
                 }
-            },
-            {
-                test: /\.scss$/,
-                use: [
-                    MiniCSSExtractPlugin.loader,
-                    {loader: 'css-loader', options: {importLoaders: 1}},
-                    'postcss-loader',
-                    'sass-loader'
-                ]
-            },
-            {
-                test: /\.elm$/,
-                exclude: [/elm-stuff/, /node_modules/],
-                use: {
-                  loader: 'elm-webpack-loader',
-                  options: {
-                    debug: options.mode === "development"
-                  }
-                }
-            },
-            {test: /\.css$/, use: [MiniCSSExtractPlugin.loader, 'css-loader']},
+            }
         ]
     },
     plugins: [
-        new MiniCSSExtractPlugin({ filename: '../css/[name].css' }),
         new CopyWebpackPlugin([{ from: 'static/', to: '../' }]),
+        new CopyWebpackPlugin([{ from: 'semantic/dist/semantic.min.css', to: '../css/semantic.min.css' }]),
+        new CopyWebpackPlugin([{ from: 'semantic/dist/semantic.min.js', to: '../js/semantic.min.js' }]),
+        new CopyWebpackPlugin([{ from: 'semantic/dist/themes/default/assets/fonts', to: '../webfonts' }]),
+        new CopyWebpackPlugin([{ from: 'semantic/dist/themes/default/assets/images', to: '../images' }]),
+        new CopyWebpackPlugin([{ from: 'node_modules/selectize/dist/css/selectize.default.css', to: '../css/selectize.min.css' }]),
         new CopyWebpackPlugin([{ from: 'node_modules/@fortawesome/fontawesome-pro/webfonts/', to: '../webfonts' }]),
         new CopyWebpackPlugin([{ from: 'node_modules/@fortawesome/fontawesome-pro/css/all.min.css', to: '../css/fa.min.css' }]),
-        new CopyWebpackPlugin([{ from: 'node_modules/selectize/dist/css/selectize.default.css', to: '../css/selectize.min.css' }]),
     ]
-});
+});        
