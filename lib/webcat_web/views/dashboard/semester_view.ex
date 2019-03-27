@@ -73,7 +73,7 @@ defmodule WebCATWeb.SemesterView do
       [
         form_field("Name", :name),
         form_field("Start Date", :start_date, :date),
-        form_field("End Date", :start_date, :date),
+        form_field("End Date", :end_date, :date),
         content_tag(:div, class: "field") do
           [
             label(f, :classroom_id, "Classroom"),
