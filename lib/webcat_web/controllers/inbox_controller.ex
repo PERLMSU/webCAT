@@ -1,72 +1,79 @@
 defmodule WebCATWeb.InboxController do
-  use WebCATWeb, :controller
+  use WebCATWeb, :authenticated_controller
 
   alias WebCAT.Repo
   import Ecto.Query
 
-  alias WebCAT.Feedback.{Draft, Criteria, Grade, Observation}
-  alias WebCAT.Rotations.{Student}
+  alias WebCAT.Feedback.{Draft, Criteria, Grade, Observation, StudentFeedback}
+  alias WebCAT.Accounts.User
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, _params) do
-    user = Auth.current_resource(conn)
+  def index(conn, user, _params) do
+    permissions do
+      has_role(:admin)
+      has_role(:assistant)
+    end
 
-    with :ok <- Bodyguard.permit(Draft, :list, user) do
+    with :ok <- is_authorized?() do
       drafts_query =
         Draft
         |> join(:left, [d], c in assoc(d, :comments))
         |> join(:left, [d], rg in assoc(d, :rotation_group))
-        |> join(:left, [d], s in assoc(d, :student))
-        |> join(:left, [_d, _c, rg, _s], u in assoc(rg, :users))
-        |> join(:left, [_d, _c, rg, _s, _u], r in assoc(rg, :rotation))
+        |> join(:left, [d], u in assoc(d, :user))
+        |> join(:left, [_d, _c, rg, _u], u in assoc(rg, :users))
+        |> join(:left, [_d, _c, rg, _u, _users], r in assoc(rg, :rotation))
         |> order_by([d], d.updated_at)
-        |> preload([_, c, rg, s, u, r],
+        |> preload([_, c, rg, u, users, r],
           comments: c,
-          student: s,
-          rotation_group: {rg, users: u, rotation: r}
+          user: u,
+          rotation_group: {rg, users: users, rotation: r}
         )
 
       drafts =
-        case user.role do
-          "assistant" ->
-            drafts_query
-            |> where([_, _, _, _, u], ^user.id in u.id)
-            |> Repo.all()
-            |> Enum.group_by(& &1.status)
-
-          "admin" ->
-            drafts_query
-            |> Repo.all()
-            |> Enum.group_by(& &1.status)
+        if Terminator.has_role?(user.performer, :admin) do
+          drafts_query
+          |> Repo.all()
+          |> Enum.group_by(& &1.status)
+        else
+          drafts_query
+          |> where([_, _, _, _, u], ^user.id in u.id)
+          |> Repo.all()
+          |> Enum.group_by(& &1.status)
         end
 
       render(conn, "index.html", user: user, selected: "inbox", drafts: drafts)
     end
   end
 
-  def new(conn, %{"group_id" => group_id}) do
-    user = Auth.current_resource(conn)
+  def show(conn, user, %{"draft_id" => draft_id}) do
+    permissions do
+      has_role(:admin)
+      has_role(:assistant)
+    end
 
-    with :ok <- Bodyguard.permit(Draft, :create, user) do
-      students =
-        Student
-        |> join(:left, [s], rg in assoc(s, :rotation_groups))
-        |> where([_, rg], rg.id == ^group_id)
-        |> Repo.all()
+    with :ok <- is_authorized?() do
+    end
+  end
 
+  def new(conn, user, %{"group_id" => group_id, "user_id" => user_id}) do
+    permissions do
+      has_role(:admin)
+      has_role(:assistant)
+    end
+
+    with :ok <- is_authorized?(),
+         {:ok, student} <- CRUD.get(User, user_id) do
       observations =
-        Observation
-        |> where([o], o.rotation_group_id == ^group_id)
-        |> Repo.all()
+        StudentFeedback.by_observation(group_id, user_id)
 
       render(conn, "new.html",
         user: user,
         selected: "inbox",
-        students: students,
+        student: student,
         observations: observations,
-        changeset: Draft.changeset(%Draft{rotation_group_id: group_id})
+        changeset: Draft.changeset(%Draft{rotation_group_id: group_id, user_id: user_id})
       )
     end
   end

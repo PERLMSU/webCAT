@@ -2,7 +2,7 @@
 <div class="box">
     <h1 class="title">Unreviewed Drafts</h1>
     <%= for draft <- @drafts["unreviewed"] do  %>
-    <%= render_draft(draft) %>
+    <%= render_draft(draft, assigns) %>
     <% end %>
 </div>
 <% end %>
@@ -10,7 +10,7 @@
 <div class="box">
     <h1 class="title">Need Revision</h1>
     <%= for draft <- @drafts["needs_revision"] do  %>
-    <%= render_draft(draft) %>
+    <%= render_draft(draft, assigns) %>
     <% end %>
 </div>
 <% end %>
@@ -18,7 +18,7 @@
 <div class="box">
     <h1 class="title">Approved Drafts</h1>
     <%= for draft <- @drafts["approved"] do  %>
-    <%= render_draft(draft) %>
+    <%= render_draft(draft, assigns) %>
     <% end %>
 </div>
 <% end %>
@@ -26,7 +26,7 @@
 <div class="box">
     <h1 class="title">Emailed Drafts</h1>
     <%= for draft <- @drafts["emailed"] do  %>
-    <%= render_draft(draft) %>
+    <%= render_draft(draft, assigns) %>
     <% end %>
 </div>
 <% end %>

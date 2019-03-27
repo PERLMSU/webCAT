@@ -1,31 +1,9 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <%= form_for(@changeset, Routes.inbox_path(@conn, :create), fn f ->  %>
 <%= hidden_input(f, :rotation_group_id, value: @changeset.data.rotation_group_id) %>
-<%= form_field("Content", :content, :textarea) %>
-<div class="field">
-    <%= label(f, :observations, "Observations") %>
-    <div class="control">
-        <div class="select is-multiple">
-            <%= multiple_select(f, :observations, Enum.map(@observations, &{&1.content, &1.id}),
-            selected:
-              if(is_list(@changeset.data.observations),
-                do: Enum.map(@changeset.data.observations, & &1.id),
-                else: []
-              ),
-            size: Enum.count(@observations)
-          ) %>
-        </div>
-    </div>
-</div>
-<div class="field">
-    <%= label(f, :student_id, "Student") %>
-    <div class="control">
-        <div class="select">
-            <%= select(f, :student_id, Enum.map(@students, &{&1.first_name <> " " <> &1.last_name, &1.id}), selected: if(@changeset.data.student_id != nil) do
-                Integer.to_string(@changeset.data.student_id)
-              end) %>
-        </div>
-    </div>
-</div>
-<%= submit("Submit", class: "button is-primary")%>
+<%= hidden_input(f, :user_id, value: @changeset.data.user_id) %>
+<%= textarea(f, :content, id: "md-editor") %>
+<%= submit("Submit", class: "button is-primary") %>
 <% end) %>
+<script src='<%= Routes.static_path(@conn, "/js/draft.js") %>'></script>
 <script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

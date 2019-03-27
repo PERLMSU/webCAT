@@ -109,15 +109,15 @@ defmodule WebCAT.Accounts.Users do
   end
 
   @doc """
-  Get all users with a specific role
+  Filter users by role
   """
-  def with_role(role) do
-    User
-    |> join(:left, [u], p in assoc(u, :performer))
-    |> join(:left, [_, p], r in assoc(p, :roles))
-    |> where([_, _, role], role.name == ^role)
-    |> preload([_, p, r], performer: {p, roles: r})
-    |> Repo.all()
+  def by_role(query, role) do
+    from(u in query,
+      left_join: p in assoc(u, :performer),
+      left_join: r in assoc(p, :roles),
+      where: r.name == ^role,
+      preload: [performer: {p, roles: r}]
+    )
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect email or password"}

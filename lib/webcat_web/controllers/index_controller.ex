@@ -10,8 +10,7 @@ defmodule WebCATWeb.IndexController do
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, user, _params) do
-
-    student_count = Users.with_role("student") |> Enum.count()
+    student_count = from(u in Users.by_role(User, "student"), group_by: u.id, select: count(u.id))
 
     # Grab simple statistics
     counts = %{
@@ -37,7 +36,6 @@ defmodule WebCATWeb.IndexController do
   end
 
   def do_import(conn, _user, params) do
-
     case params do
       %{"import" => %{"file" => %{path: path}}} ->
         case Import.from_path(path) do
