@@ -1,20 +1,25 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li>
-            <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
-        </li>
-        <li>
-            <%= link(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)) %>
-        </li>
-        <li>
-            <%= link("Semesters", to: Routes.semester_path(@conn, :index, @classroom.id)) %>
-        </li>
-        <li class="is-active">
-            <%= link("New", to: Routes.semester_path(@conn, :new, @classroom.id)) %>
-        </li>
-    </ul>
-</nav>
-<h1 class="title">New Semester</h1>
-<hr>
-<%= form(@conn, @changeset) %>
-<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+                <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)),
+                    breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @classroom.id)),
+                    breadcrumb("New")
+                ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="header">New Semester</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <%= render("form.html", assigns) %>
+            </div>
+        </div>
+    </div>
+</div>

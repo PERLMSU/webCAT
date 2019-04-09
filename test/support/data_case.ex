@@ -23,7 +23,6 @@ defmodule WebCAT.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import WebCAT.DataCase
-
     end
   end
 

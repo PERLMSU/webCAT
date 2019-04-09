@@ -1,0 +1,21 @@
+<%
+    semesters =
+      CRUD.list(Semester)
+      |> Enum.map(&{&1.name, &1.id})
+
+    path =
+      case @changeset.data.id do
+        nil -> Routes.section_path(@conn, :create)
+        id -> Routes.section_path(@conn, :update, id)
+      end
+ %>
+
+ <%= form_for @changeset, path, [class: "ui form"], fn f -> %>
+   <div class="two fields">
+    <%= form_field(f, "Number", :number, :text, required: true) %>
+    <%= select_field(f, "Semester", :semester_id, semesters, required: true, search: true) %>
+   </div>
+  <%= form_field(f, "Description", :description, :text, required: true) %>
+   <%= submit("Submit", class: "ui green button") %>
+ <% end %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

@@ -1,31 +1,25 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li>
-            <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
-        </li>
-        <li>
-            <%= link(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)) %>
-        </li>
-        <li class="is-active">
-            <%= link("Semesters", to: Routes.semester_path(@conn, :index, @classroom.id)) %>
-        </li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Semesters</h1>
+<div class="ui grid container">
+    <div class="row">
+        <div class="twelve wide column">
+          <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)),
+                    breadcrumb("Semesters")
+                ]) %>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Create", "plus", class: "is-primary", to: Routes.semester_path(@conn, :new, @classroom.id)) %>
-            </p>
+    <div class="row">
+        <div class="fourteen wide column">
+            <h1 class="ui header">Semesters</h1>
+        </div>
+        <div class="two wide right aligned column">
+            <%= icon_button("Create", "plus", class: "green", to: Routes.semester_path(@conn, :new, classroom_id: @classroom.id)) %>
         </div>
     </div>
-</div>
-<hr>
-<div class="box">
-    <%= table(@conn, @semesters) %>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="sixteen wide column">
+            <%= render("table.html", assigns) %>
+        </div>
+    </div>
 </div>

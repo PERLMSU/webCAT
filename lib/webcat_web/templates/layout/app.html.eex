@@ -8,38 +8,28 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>WebCAT</title>
+  <title><%= Map.get(assigns, :title, "WebCAT") %></title>
 
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/selectize.min.css") %>"/>
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>"/>
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/semantic.min.css") %>" />
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/selectize.min.css") %>" />
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
+  <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src='<%= Routes.static_path(@conn, "/js/semantic.min.js") %>'></script>
+
 </head>
 
 <body>
-  <%= render(WebCATWeb.SharedView, "navbar.html", conn: @conn, user: @user) %>
-  <%= with "" <> message <- get_flash(@conn, :info) do %>
-  <div class="notification is-info">
-    <button class="delete"></button>
-    <%= message %>
+  <%= render(WebCATWeb.SharedView, "notifications.html", assigns)%>
+  <%= render(WebCATWeb.SharedView, "menu.html", assigns) %>
+  <div class="pusher">
+    <%= render(WebCATWeb.SharedView, "navbar.html", assigns) %>
+
+    <%= render @view_module, @view_template, assigns %>
   </div>
-  <% end %>
-  <%= with "" <> message <- get_flash(@conn, :error) do %>
-  <div class="notification is-danger">
-    <button class="delete"></button>
-    <%= message %>
-  </div>
-  <% end %>
-  <section class="section">
-    <div class="columns">
-      <div class="column is-one-fifth">
-        <%= render(WebCATWeb.SharedView, "menu.html", conn: @conn, selected: @selected) %>
-      </div>
-      <div class="column">
-        <%= render @view_module, @view_template, assigns %>
-      </div>
-    </div>
-  </section>
+  <%= render(WebCATWeb.SharedView, "footer.html", assigns)%>
   <script src='<%= Routes.static_path(@conn, "/js/messages.js") %>'></script>
-  <%= render(WebCATWeb.SharedView, "footer.html", conn: @conn)%>
+  <script src='<%= Routes.static_path(@conn, "/js/app.js") %>'></script>
 </body>
+
 </html>

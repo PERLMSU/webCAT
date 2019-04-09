@@ -5,7 +5,10 @@ defmodule WebCAT.Accounts.PasswordResetTest do
 
   describe "changeset/2" do
     test "behaves as expected" do
-      assert PasswordReset.changeset(%PasswordReset{}, Factory.params_with_assocs(:password_reset)).valid?
+      assert PasswordReset.changeset(
+               %PasswordReset{},
+               Factory.params_with_assocs(:password_reset)
+             ).valid?
     end
   end
 end

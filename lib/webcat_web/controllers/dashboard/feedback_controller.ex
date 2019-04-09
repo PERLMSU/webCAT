@@ -1,11 +1,7 @@
 defmodule WebCATWeb.FeedbackController do
   use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
-  alias WebCAT.Feedback.{Observation, Feedback}
-
-  @observation_preload [:feedback, category: ~w(classroom)a]
-  @list_preload [observation: @observation_preload]
-  @preload @list_preload
+  alias WebCAT.Feedback.Feedback
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -15,12 +11,10 @@ defmodule WebCATWeb.FeedbackController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, observation} <- CRUD.get(Observation, observation_id, preload: @observation_preload),
-         feedback <- CRUD.list(Feedback, preload: @list_preload, where: [observation_id: observation_id]) do
+         feedback <- Feedback.list(observation_id) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
-        observation: observation,
         feedback: feedback
       )
     end
@@ -32,7 +26,7 @@ defmodule WebCATWeb.FeedbackController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, feedback} <- CRUD.get(Feedback, id, preload: @preload) do
+         {:ok, feedback} <- Feedback.get(id) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -46,13 +40,11 @@ defmodule WebCATWeb.FeedbackController do
       has_role(:admin)
     end
 
-    with :ok <- is_authorized?(),
-         {:ok, observation} <- CRUD.get(Observation, observation_id, preload: @observation_preload) do
+    with :ok <- is_authorized?() do
       conn
       |> render("new.html",
         user: user,
-        changeset: Feedback.changeset(%Feedback{}, %{}),
-        observation: observation,
+        changeset: Feedback.changeset(%Feedback{observation_id: observation_id}),
         selected: "classroom"
       )
     end
@@ -68,17 +60,14 @@ defmodule WebCATWeb.FeedbackController do
         {:ok, feedback} ->
           conn
           |> put_flash(:info, "Feedback created!")
-          |> redirect(to: Routes.feedback_path(conn, :show, feedback.observation_id, feedback.id))
+          |> redirect(to: Routes.feedback_path(conn, :show, feedback.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          {:ok, observation} = CRUD.get(Observation, params["observation_id"], preload: @observation_preload)
-
           conn
           |> render("new.html",
             user: user,
             changeset: changeset,
-            selected: "classroom",
-            observation: observation
+            selected: "classroom"
           )
       end
     end
@@ -90,8 +79,7 @@ defmodule WebCATWeb.FeedbackController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, feedback} <- CRUD.get(Feedback, id, preload: @preload) do
-
+         {:ok, feedback} <- Feedback.get(id) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -106,12 +94,12 @@ defmodule WebCATWeb.FeedbackController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, feedback} <- CRUD.get(Feedback, id, preload: @preload) do
+         {:ok, feedback} <- Feedback.get(id) do
       case CRUD.update(Feedback, feedback, update) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Feedback updated!")
-          |> redirect(to: Routes.feedback_path(conn, :show, feedback.observation_id, id))
+          |> redirect(to: Routes.feedback_path(conn, :show, id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -128,18 +116,19 @@ defmodule WebCATWeb.FeedbackController do
       has_role(:admin)
     end
 
-    with :ok <- is_authorized?(),
-         {:ok, feedback} <- CRUD.get(Feedback, id) do
+    with :ok <- is_authorized?() do
       case CRUD.delete(Feedback, id) do
-        {:ok, _} ->
+        {:ok, feedback} ->
           conn
           |> put_flash(:info, "Feedback deleted successfully")
-          |> redirect(to: Routes.feedback_path(conn, :index, feedback.observation_id))
+          |> redirect(
+            to: Routes.feedback_path(conn, :index, observation_id: feedback.observation_id)
+          )
 
-        {:error, _} ->
+        {:error, %Ecto.Changeset{}} ->
           conn
           |> put_flash(:error, "Feedback deletion failed")
-          |> redirect(to: Routes.feedback_path(conn, :index, feedback.observation_id))
+          |> redirect(to: Routes.feedback_path(conn, :index))
       end
     end
   end

@@ -1,67 +1,58 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@observation.category.classroom.name, to: Routes.classroom_path(@conn, :show, @observation.category.classroom_id)) %></li>
-        <li><%= link("Categories", to: Routes.category_path(@conn, :index, @observation.category.classroom_id)) %></li>
-        <li><%= link(@observation.category.name, to: Routes.category_path(@conn, :show, @observation.category.classroom_id, @observation.category_id)) %></li>
-        <li><%= link("Observations", to: Routes.observation_path(@conn, :index, @observation.category_id))%></li>
-        <li class="is-active"><%= link(truncate(@observation.content, 10), to: Routes.observation_path(@conn, :show, @observation.category_id, @observation.id)) %></li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Observation:
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                breadcrumb(@observation.category.classroom.name, to: Routes.classroom_path(@conn, :show, @observation.category.classroom_id)),
+                breadcrumb("Categories", to: Routes.category_path(@conn, :index, classroom_id: @observation.category.classroom_id)),
+                breadcrumb(@observation.category.name, to: Routes.category_path(@conn, :show, @observation.category_id))
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Observation:
                 <%= truncate(@observation.content, 10) %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.observation_path(@conn, :edit, @observation.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.observation_path(@conn, :delete, @observation.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
             </h1>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.observation_path(@conn, :edit, @observation.category_id, @observation.id)) %>
-                <%= icon_button("Delete", "times", class: "is-danger", to: Routes.observation_path(@conn, :delete, @observation.category_id, @observation.id), onclick: "return confirm('Are you sure?');") %>
-            </p>
-        </div>
-    </div>
-</div>
-<hr>
-<div class="box">
-    <h2 class="subtitle">
-        Details
-    </h2>
-    <ul>
-        <li>
-            <h2 class="subtitle">Content</h2>
-            <%= @observation.content %>
-        </li>
-        <li>
-            <h2 class="subtitle">Type</h2>
-            <%= String.capitalize(@observation.type) %>
-        </li>
-        <li>
-            <h2 class="subtitle">Category:
-                <%= link(@observation.category.name, to: Routes.category_path(@conn, :show, @observation.category.classroom_id, @observation.category_id)) %>
-            </h2>
-        </li>
-    </ul>
-</div>
-<div class="box">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <h2 class="subtitle">
-                    Feedback
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
                 </h2>
-            </div>
-        </div>
-        <div class="level-right">
-            <div class="level-item">
-                <p class="buttons">
-                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.feedback_path(@conn, :new, @observation.id)) %>
-                </p>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Content</strong></td>
+                        <td><%= @observation.content %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Type</strong></td>
+                        <td><%= @observation.type %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Category</strong></td>
+                        <td><%= link(@observation.category.name, to: Routes.category_path(@conn, :show, @observation.category_id)) %></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
-    <%= WebCATWeb.FeedbackView.table(@conn, @observation.feedback) %>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Feedback
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.feedback_path(@conn, :new, observation_id: @observation.id)) %>
+                </h2>
+                <%= render(WebCATWeb.FeedbackView, "table.html", conn: @conn, feedback: @observation.feedback) %>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,25 +1,31 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@classroom.name, to: Routes.classroom_path(@conn, :show, @classroom.id)) %></li>
-        <li class="is-active"><%= link("Categories", to: Routes.category_path(@conn, :index, @classroom.id)) %></li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Categories</h1>
+<div class="ui grid container">
+    <div class="row">
+        <div class="twelve wide column">
+        <% classroom = Map.get(assigns, :classroom, %{}) %>
+        <% classroom_id = Map.get(classroom, :id) %>
+        <%= if classroom_id != nil do %>
+          <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(classroom.name, to: Routes.classroom_path(@conn, :show, classroom_id)),
+                    breadcrumb("Categories")
+                ]) %>
+        <% else %>
+          <%= breadcrumbs([breadcrumb("Categories")]) %>
+        <% end %>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Create", "plus", class: "is-primary", to: Routes.category_path(@conn, :new, @classroom.id)) %>
-            </p>
+    <div class="row">
+        <div class="fourteen wide column">
+            <h1 class="ui header">Categories</h1>
+        </div>
+        <div class="two wide right aligned column">
+            <%= icon_button("Create", "plus", class: "green", to: Routes.category_path(@conn, :new, classroom_id: classroom_id)) %>
         </div>
     </div>
-</div>
-<hr>
-<div class="box">
-    <%= table(@conn, @categories) %>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="sixteen wide column">
+            <%= render("table.html", assigns) %>
+        </div>
+    </div>
 </div>

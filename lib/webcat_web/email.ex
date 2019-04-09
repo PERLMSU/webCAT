@@ -23,6 +23,8 @@ defmodule WebCATWeb.Email do
     |> to(email)
     |> from("no-reply@webcat.io")
     |> subject("Confirm Email")
-    |> render("confirmation.html", link: login_url(WebCATWeb.Endpoint, :credential_login, token: token))
+    |> render("confirmation.html",
+      link: login_url(WebCATWeb.Endpoint, :credential_login, token: token)
+    )
   end
 end

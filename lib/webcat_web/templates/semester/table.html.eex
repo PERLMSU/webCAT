@@ -1,0 +1,36 @@
+<%= if not Enum.empty?(@semesters) do %>
+<table class="ui very basic selectable fixed single line striped table">
+    <thead>
+        <th>Name</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th></th>
+    </thead>
+    <tbody>
+        <%= for semester <- @semesters do %>
+        <tr>
+            <td><%= link(semester.name, to: Routes.semester_path(@conn, :show, semester.id)) %></td>
+            <td><%= Timex.format!(semester.start_date, "{M}-{D}-{YYYY}") %></td>
+            <td><%= Timex.format!(semester.end_date, "{M}-{D}-{YYYY}") %></td>
+            <td>
+                <div class="ui small icon buttons">
+                    <%= link(class: "ui blue basic button", data: [content: "Edit", variation: "tiny inverted"], to: Routes.semester_path(@conn, :edit, semester.id)) do %>
+                        <i class="edit icon"></i>
+                    <% end %>
+                    <%= link(class: "ui red basic button", data: [content: "Delete", variation: "tiny inverted", confirm: "Are you sure?"], method: :delete, to: Routes.semester_path(@conn, :delete, semester.id)) do %>
+                        <i class="trash icon"></i>
+                    <% end %>
+                </div>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>    
+<% else %>
+<div class="ui placeholder segment">
+    <div class="ui icon header">
+        <i class="tags outline icon"></i>
+        No Semesters Yet
+    </div>
+</div>
+<% end %>

@@ -1,27 +1,28 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@semester.classroom.name, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %></li>
-        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, @semester.classroom_id)) %></li>
-        <li><%= link(@semester.name, to: Routes.semester_path(@conn, :show, @semester.classroom_id, @semester.id)) %></li>
-        <li class="is-active"><%= link("Sections", to: Routes.section_path(@conn, :index, @semester.id))%></li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Sections</h1>
+<div class="ui grid container">
+    <div class="row">
+        <div class="twelve wide column">
+           <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(@semester.classroom.name, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)),
+                    breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @semester.classroom_id)),
+                    breadcrumb(@semester.name, to: Routes.semester_path(@conn, :show, @semester.id)),
+                    breadcrumb("Sections"),
+                ]) %>
+                   
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Create", "plus", class: "is-primary", to: Routes.section_path(@conn, :new, @semester.id)) %>
-            </p>
+    <div class="row">
+        <div class="fourteen wide column">
+            <h1 class="ui header">Sections</h1>
+        </div>
+        <div class="two wide right aligned column">
+            <%= icon_button("Create", "plus", class: "green", to: Routes.section_path(@conn, :new, semester_id: @semester.id)) %>
         </div>
     </div>
-</div>
-<hr>
-<div class="box">
-    <%= table(@conn, @sections) %>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="sixteen wide column">
+            <%= render(WebCATWeb.SectionView, "table.html", assigns) %>
+        </div>
+    </div>
 </div>

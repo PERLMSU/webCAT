@@ -1,79 +1,73 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@rotation.section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @rotation.section.semester.classroom_id)) %></li>
-        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, @rotation.section.semester.classroom_id)) %></li>
-        <li><%= link(@rotation.section.semester.name, to: Routes.semester_path(@conn, :show, @rotation.section.semester.classroom_id, @rotation.section.semester.id)) %></li>
-        <li><%= link("Sections", to: Routes.section_path(@conn, :index, @rotation.section.semester_id))%></li>
-        <li><%= link(@rotation.section.number, to: Routes.section_path(@conn, :show, @rotation.section.semester_id, @rotation.section.id)) %></li>
-        <li><%= link("Rotations", to: Routes.rotation_path(@conn, :index, @rotation.section_id)) %></li>
-        <li class="is-active"><%= link(@rotation.number, to: Routes.rotation_path(@conn, :show, @rotation.section_id, @rotation.id)) %></li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Rotation:
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(@rotation.section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @rotation.section.semester.classroom_id)),
+                    breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @rotation.section.semester.classroom_id)),
+                    breadcrumb(@rotation.section.semester.name, to: Routes.semester_path(@conn , :show, @rotation.section.semester_id)),
+                    breadcrumb("Sections", to: Routes.section_path(@conn, :index, semester_id: @rotation.section.semester_id)),
+                    breadcrumb(@rotation.section.number, to: Routes.section_path(@conn, :show, @rotation.section_id)),
+                    breadcrumb("Rotations", to: Routes.rotation_path(@conn, :index, section_id: @rotation.section_id)),
+                    breadcrumb(@rotation.number)
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Rotation:
                 <%= @rotation.number %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.rotation_path(@conn, :edit, @rotation.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.rotation_path(@conn, :delete, @rotation.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
             </h1>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.rotation_path(@conn, :edit, @rotation.section_id, @rotation.id)) %>
-                <%= icon_button("Delete", "times", class: "is-danger", to: Routes.rotation_path(@conn, :delete, @rotation.section_id, @rotation.id), onclick: "return confirm('Are you sure?');") %>
-            </p>
-        </div>
-    </div>
-</div>
-<hr>
-<div class="box">
-    <h2 class="subtitle">
-        Details
-    </h2>
-    <ul>
-        <li>
-            <h2 class="subtitle">Number</h2>
-            <%= @rotation.number %>
-        </li>
-        <%= if @rotation.description != nil do %>
-        <li>
-            <h2 class="subtitle">Description</h2>
-            <%= @rotation.description %>
-        </li>
-        <% end %>
-        <li>
-            <h2 class="subtitle">Start Date</h2>
-            <%= Timex.format!(@rotation.start_date, "{M}-{D}-{YYYY}") %>
-        </li>
-        <li>
-            <h2 class="subtitle">End Date</h2>
-            <%= Timex.format!(@rotation.end_date, "{M}-{D}-{YYYY}") %>
-        </li>
-        <li>
-            <h2 class="subtitle">Section:
-                <%= link(@rotation.section.number, to: Routes.section_path(@conn, :show, @rotation.section.semester_id, @rotation.section_id)) %>
-            </h2>
-        </li>
-    </ul>
-</div>
-<div class="box">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <h2 class="subtitle">
-                    Rotation Groups
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
                 </h2>
-            </div>
-        </div>
-        <div class="level-right">
-            <div class="level-item">
-                <p class="buttons">
-                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.rotation_group_path(@conn, :new, @rotation.id)) %>
-                </p>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Number</strong></td>
+                        <td><%= @rotation.number %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Section</strong></td>
+                        <td><%= link(@rotation.section.number, to: Routes.section_path(@conn, :show, @rotation.section_id)) %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Start Date</strong></td>
+                        <td><%= Timex.format!(@rotation.start_date, "{M}-{D}-{YYYY}") %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>End Date</strong></td>
+                        <td><%= Timex.format!(@rotation.end_date, "{M}-{D}-{YYYY}") %></td>
+                    </tr>
+                    <%= if @rotation.description != nil do %>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td><%= @rotation.description %></td>
+                    </tr>
+                    <% end %>
+                </table>
             </div>
         </div>
     </div>
-    <%= WebCATWeb.RotationGroupView.table(@conn, @rotation.rotation_groups) %>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Rotation Groups
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.rotation_group_path(@conn, :new, rotation_id: @rotation.id)) %>
+                </h2>
+                <%= render(WebCATWeb.RotationGroupView, "table.html", conn: @conn, rotation_groups: @rotation.rotation_groups) %>
+            </div>
+        </div>
+    </div>
 </div>

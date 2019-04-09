@@ -1,32 +1,44 @@
-<section class="hero is-primary is-fullheight">
-    <div class="hero-body">
-        <div class="container has-text-centered">
-            <div class="columns is-centered">
-                <div class="column is-half">
-                    <div class="box">
-                        <h1 class="title has-text-dark">Reset Password</h1>
-                        <%= form_for @conn, Routes.password_reset_path(@conn, :create), fn _f ->%>
-                        <div class="field has-addons">
-                            <div class="control is-expanded has-icons-left">
-                                <input name="email" class="input" type="email" placeholder="Email Address">
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-envelope"></i>
-                                </span>
-                            </div>
-                            <div class="control">
-                                <%= submit "Reset Password", class: "button is-primary" %>
-                            </div>
-                        </div>
-                        <% end %>
-                        <p class="help is-primary">
-                            <%= get_flash(@conn, :info) %>
-                        </p>
-                        <p class="help is-danger">
-                            <%= get_flash(@conn, :error) %>
-                        </p>
-                    </div>
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <h2 class="ui blue header">
+            <div class="content">
+                Reset Password
+            </div>
+        </h2>
+        <%= form_for @conn, Routes.password_reset_path(@conn, :create), [class: "ui large form"], fn f -> %>
+        <div class="ui stacked segment">
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="user icon"></i>
+                    <input type="text" name="email" placeholder="E-mail address" autocomplete="off"
+                        style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
                 </div>
             </div>
+            <div class="ui fluid large blue submit button">Submit Reset</div>
         </div>
+        <%= if info = get_flash(@conn, :info) do %>
+        <div class="ui info message"><%= info %></div>
+        <% end %>
+        <%= if error = get_flash(@conn, :error) do %>
+        <div class="ui error message"><%= error %></div>
+        <% end %>
+        <% end %>
     </div>
-</section>
+</div>
+<style type="text/css">
+    body {
+        background-color: #DADADA;
+    }
+
+    body>.grid {
+        height: 100%;
+    }
+
+    .image {
+        margin-top: -100px;
+    }
+
+    .column {
+        max-width: 450px;
+    }
+</style>

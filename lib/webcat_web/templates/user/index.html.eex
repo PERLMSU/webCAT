@@ -1,15 +1,21 @@
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Users</h1>
+<div class="ui grid container">
+    <div class="row">
+        <div class="twelve wide column">
+        <%= breadcrumbs([breadcrumb("Users")]) %>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <%= icon_button("Create", "plus", class: "is-primary", to: Routes.user_path(@conn, :new)) %>
+    <div class="row">
+        <div class="fourteen wide column">
+            <h1 class="ui header">Users</h1>
+        </div>
+        <div class="two wide right aligned column">
+            <%= icon_button("Create", "plus", class: "green", to: Routes.user_path(@conn, :new)) %>
         </div>
     </div>
-</div>
-<div class="box">
-    <%= table(@conn, @data) %>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="sixteen wide column">
+            <%= render("table.html", assigns) %>
+        </div>
+    </div>
 </div>

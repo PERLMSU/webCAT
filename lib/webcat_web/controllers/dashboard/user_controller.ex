@@ -6,22 +6,14 @@ defmodule WebCATWeb.UserController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  @preload [
-    :roles,
-    rotation_groups: ~w(users)a,
-    sections: [:users, rotations: [:rotation_groups]],
-    classrooms: ~w(semesters users)a,
-    performer: ~w(roles)a
-  ]
-
   def index(conn, user, _params) do
     permissions do
       has_role(:admin)
     end
 
     with :ok <- is_authorized?(),
-         users <- CRUD.list(User, preload: @preload) do
-      render(conn, "index.html", user: user, selected: "users", data: users)
+         users <- Users.list() do
+      render(conn, "index.html", user: user, selected: "users", users: users)
     end
   end
 
@@ -31,7 +23,7 @@ defmodule WebCATWeb.UserController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, user} <- CRUD.get(User, id, preload: @preload) do
+         {:ok, user} <- Users.get(id) do
       render(conn, "show.html", user: auth_user, selected: "users", data: user)
     end
   end
@@ -57,11 +49,11 @@ defmodule WebCATWeb.UserController do
     end
 
     with :ok <- is_authorized?() do
-      case(Users.create(params)) do
-        {:ok, created} ->
+      case Users.create(params) do
+        {:ok, user} ->
           conn
           |> put_flash(:info, "User created!")
-          |> redirect(to: Routes.user_path(conn, :show, created.id))
+          |> redirect(to: Routes.user_path(conn, :show, user.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           conn
@@ -79,8 +71,8 @@ defmodule WebCATWeb.UserController do
       has_role(:admin)
     end
 
-    with {:ok, user} <- CRUD.get(User, id, preload: @preload),
-         :ok <- is_authorized?() do
+    with :ok <- is_authorized?(),
+         {:ok, user} <- Users.get(id) do
       render(conn, "edit.html",
         user: auth_user,
         selected: "users",
@@ -94,8 +86,8 @@ defmodule WebCATWeb.UserController do
       has_role(:admin)
     end
 
-    with {:ok, user} <- CRUD.get(User, id, preload: @preload),
-         :ok <- is_authorized?() do
+    with :ok <- is_authorized?(),
+         {:ok, user} <- Users.get(id) do
       case CRUD.update(User, user, update) do
         {:ok, _} ->
           conn
@@ -117,8 +109,7 @@ defmodule WebCATWeb.UserController do
       has_role(:admin)
     end
 
-    with {:ok, _} <- CRUD.get(User, id),
-         :ok <- is_authorized?() do
+    with :ok <- is_authorized?() do
       case CRUD.delete(User, id) do
         {:ok, _} ->
           conn
@@ -138,8 +129,8 @@ defmodule WebCATWeb.UserController do
       has_role(:admin)
     end
 
-    with {:ok, subject} <- CRUD.get(User, id),
-         :ok <- is_authorized?(),
+    with :ok <- is_authorized?(),
+         {:ok, subject} <- CRUD.get(User, id),
          :ok <- Users.send_confirmation(subject) do
       conn
       |> put_flash(:info, "User email confirmation sent")

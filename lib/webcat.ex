@@ -11,7 +11,7 @@ defmodule WebCAT do
       # Start the Ecto repository
       supervisor(WebCAT.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(WebCATWeb.Endpoint, []),
+      supervisor(WebCATWeb.Endpoint, [])
       # Start your own worker by calling: WebCAT.Worker.start_link(arg1, arg2, arg3)
       # worker(WebCAT.Worker, [arg1, arg2, arg3]),
     ]

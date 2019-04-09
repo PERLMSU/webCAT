@@ -1,29 +1,30 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)) %></li>
-        <li><%= link("Semesters", to: Routes.semester_path(@conn, :index, @section.semester.classroom_id)) %></li>
-        <li><%= link(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester.id)) %></li>
-        <li><%= link("Sections", to: Routes.section_path(@conn, :index, @section.semester.id))%></li>
-        <li><%= link(@section.number, to: Routes.section_path(@conn, :show, @section.semester.id, @section.id)) %></li>
-        <li class="is-active"><%= link("Rotations", to: Routes.rotation_path(@conn, :index, @section.id)) %></li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Rotations</h1>
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="sixteen wide column">
+          <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)) ,
+                breadcrumb(@section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)) ,
+                breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @section.semester.classroom_id)) ,
+                breadcrumb(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester_id)),
+                breadcrumb("Sections", to: Routes.section_path(@conn, :index, semester_id: @section.semester_id)),
+                breadcrumb(@section.number, to: Routes.section_path(@conn, :show, @section.id)),
+                breadcrumb("Rotations"),
+            ]) %>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Create", "plus", class: "is-primary", to: Routes.rotation_path(@conn, :new, @section.id)) %>
-            </p>
+    <div class="row">
+        <div class="fourteen wide column">
+            <h1 class="ui header">Rotations</h1>
+        </div>
+        <div class="two wide right aligned column">
+            <%= icon_button("Create", "plus", class: "green", to: Routes.rotation_path(@conn, :new, section_id: @section.id)) %>
         </div>
     </div>
-</div>
-<hr>
-<div class="box">
-    <%= table(@conn, @rotations) %>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="sixteen wide column">
+            <%= render "table.html", assigns %>
+        </div>
+    </div>
 </div>

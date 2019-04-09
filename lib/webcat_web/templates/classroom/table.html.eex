@@ -1,0 +1,36 @@
+<%= if not Enum.empty?(@classrooms) do %>
+<table class="ui very basic selectable fixed single line striped table">
+    <thead>
+        <th>Course Code</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th></th>
+    </thead>
+    <tbody>
+        <%= for classroom <- @classrooms do %>
+        <tr>
+            <td><%= link(classroom.course_code, to: Routes.classroom_path(@conn, :show, classroom.id)) %></td>
+            <td><%= classroom.name %></td>
+            <td><%= classroom.description %></td>
+            <td>
+                <div class="ui small icon buttons">
+                    <%= link(class: "ui blue basic button", data: [content: "Edit", variation: "tiny inverted"], to: Routes.classroom_path(@conn, :edit, classroom.id)) do %>
+                        <i class="edit icon"></i>
+                    <% end %>
+                    <%= link(class: "ui red basic button", data: [content: "Delete", variation: "tiny inverted", confirm: "Are you sure?"], method: :delete, to: Routes.classroom_path(@conn, :delete, classroom.id)) do %>
+                        <i class="trash icon"></i>
+                    <% end %>
+                </div>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>    
+<% else %>
+<div class="ui placeholder segment">
+    <div class="ui icon header">
+        <i class="users class outline icon"></i>
+        No Classrooms Yet
+    </div>
+</div>
+<% end %>

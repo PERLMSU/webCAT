@@ -7,7 +7,7 @@ defmodule WebCAT.Accounts.TokenCredential do
 
   @primary_key false
   schema "token_credentials" do
-    field(:token, :string,  primary_key: true)
+    field(:token, :string, primary_key: true)
     field(:expire, :utc_datetime)
 
     belongs_to(:user, WebCAT.Accounts.User)

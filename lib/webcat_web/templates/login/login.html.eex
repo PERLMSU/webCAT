@@ -1,47 +1,52 @@
-<section class="hero is-primary is-fullheight">
-    <div class="hero-body">
-        <div class="container has-text-centered">
-            <div class="columns is-centered">
-                <div class="column is-half">
-                    <div class="box">
-                        <figure class="avatar">
-                            <img src="https://raw.githubusercontent.com/PERLMSU/webCAT/3cd1faf191cd0959e1cf9717f61903ba8a7df247/app/static/images/physics.png" />
-                        </figure>
-                        <h1 class="title">WebCAT</h1>
-                        <h2 class="subtitle">Please Log In</h2>
-                        <%= form_for @conn, Routes.login_path(@conn, :login), fn f -> %>
-                        <%= hidden_input(f, :redirect, value: @redirect) %>
-                        <div class="field">
-                            <div class="control has-icons-left">
-                                <input name="email" class="input" type="email" placeholder="Email Address">
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-envelope"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <p class="control has-icons-left">
-                                <input name="password" class="input" type="password" placeholder="Password">
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-lock"></i>
-                                </span>
-                            </p>
-                        </div>
-                        <p class="help is-danger">
-                            <%= get_flash(@conn, :error) %>
-                        </p>
-                        <div class="field is-grouped">
-                            <p class="control">
-                                <%= submit "Login", class: "button is-primary" %>
-                            </p>
-                            <p class="control">
-                                <%= link("Reset Password", to: Routes.password_reset_path(@conn, :index), class: "button is-link") %>
-                            </p>
-                        </div>
-                        <% end %>
-                    </div>
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <h2 class="ui blue header">
+            <div class="content">
+                Log-in to WebCAT
+            </div>
+        </h2>
+        <%= form_for @conn, Routes.login_path(@conn, :login), [class: "ui large form"], fn f -> %>
+        <%= hidden_input(f, :redirect, value: @redirect) %>
+        <div class="ui stacked segment">
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="user icon"></i>
+                    <input type="text" name="email" placeholder="E-mail address" autocomplete="off"
+                        style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
                 </div>
             </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="lock icon"></i>
+                    <input type="password" name="password" placeholder="Password" autocomplete="off"
+                        style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: auto;">
+                </div>
+            </div>
+            <%= submit "Login", class: "ui fluid large blue submit button" %>
+        </div>
+        <%= if error = get_flash(@conn, :error) do %>
+        <div class="ui error message"><%= error %></div>
+        <% end %>
+        <% end %>
+        <div class="ui message">
+            Forgot your Password? <%= link("Reset Password", to: Routes.password_reset_path(@conn, :index)) %>
         </div>
     </div>
-</section>
+</div>
+<style type="text/css">
+    body {
+        background-color: #DADADA;
+    }
+
+    body>.grid {
+        height: 100%;
+    }
+
+    .image {
+        margin-top: -100px;
+    }
+
+    .column {
+        max-width: 450px;
+    }
+</style>

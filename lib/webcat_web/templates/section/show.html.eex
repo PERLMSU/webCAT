@@ -1,101 +1,73 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li>
-            <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
-        </li>
-        <li>
-            <%= link(@section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)) %>
-        </li>
-        <li>
-            <%= link("Semesters", to: Routes.semester_path(@conn, :index, @section.semester.classroom_id)) %>
-        </li>
-        <li>
-            <%= link(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester_id)) %>
-        </li>
-        <li>
-            <%= link("Sections", to: Routes.section_path(@conn, :index, @section.semester.id))%>
-        </li>
-        <li class="is-active">
-            <%= link(@section.number, to: Routes.section_path(@conn, :show, @section.semester.id, @section.id)) %>
-        </li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Section:
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(@section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @section.semester.classroom_id)),
+                    breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @section.semester.classroom_id)),
+                    breadcrumb(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester_id)),
+                    breadcrumb("Sections", to: Routes.section_path(@conn, :index, semester_id: @section.semester_id)),
+                    breadcrumb(@section.number)
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Section:
                 <%= @section.number %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.section_path(@conn, :edit, @section.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.section_path(@conn, :delete, @section.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
             </h1>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.section_path(@conn, :edit, @section.semester.id, @section.id)) %>
-                <%= icon_button("Delete", "times", class: "is-danger", to: Routes.section_path(@conn, :delete, @section.semester.id, @section.id), onclick: "return confirm('Are you sure?');") %>
-            </p>
-        </div>
-    </div>
-</div>
-<hr>
-<div class="box">
-    <h2 class="subtitle">
-        Details
-    </h2>
-    <ul>
-        <li>
-            <h2 class="subtitle">Number</h2>
-            <%= @section.number %>
-        </li>
-        <%= if @section.description != nil do %>
-        <li>
-            <h2 class="subtitle">Description</h2>
-            <%= @section.description %>
-        </li>
-        <% end %>
-        <li>
-            <h2 class="subtitle">Semester:
-                <%= link(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester.classroom_id, @section.semester_id)) %>
-            </h2>
-
-        </li>
-    </ul>
-</div>
-<div class="box">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <h2 class="subtitle">
-                    Rotations
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
                 </h2>
-            </div>
-        </div>
-        <div class="level-right">
-            <div class="level-item">
-                <p class="buttons">
-                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.rotation_path(@conn, :new, @section.id)) %>
-                </p>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Number</strong></td>
+                        <td><%= @section.number %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Semester</strong></td>
+                        <td><%= link(@section.semester.name, to: Routes.semester_path(@conn, :show, @section.semester_id)) %>
+                        </td>
+                    </tr>
+                    <%= if @section.description != nil do %>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td><%= @section.description %></td>
+                    </tr>
+                    <% end %>
+                </table>
             </div>
         </div>
     </div>
-    <%= WebCATWeb.RotationView.table(@conn, @section.rotations) %>
-</div>
-<div class="box">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <h2 class="subtitle">
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Rotations
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.rotation_path(@conn, :new, section_id: @section.id)) %>
+                </h2>
+                <%= render(WebCATWeb.RotationView, "table.html", conn: @conn, rotations: @section.rotations) %>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
                     Users
                 </h2>
-            </div>
-        </div>
-        <div class="level-right">
-            <div class="level-item">
-                <p class="buttons">
-                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.user_path(@conn, :new)) %>
-                </p>
+                <%= render(WebCATWeb.UserView, "table.html", conn: @conn, users: @section.users) %>
             </div>
         </div>
     </div>
-    <%= WebCATWeb.UserView.table(@conn, @section.users) %>
 </div>

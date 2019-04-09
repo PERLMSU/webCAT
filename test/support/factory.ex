@@ -2,7 +2,18 @@ defmodule WebCAT.Factory do
   use ExMachina.Ecto, repo: WebCAT.Repo
 
   alias WebCAT.Accounts.{Notification, PasswordCredential, PasswordReset, TokenCredential, User}
-  alias WebCAT.Feedback.{Category, Comment, Draft, Email, Feedback, Grade, Observation, StudentFeedback}
+
+  alias WebCAT.Feedback.{
+    Category,
+    Comment,
+    Draft,
+    Email,
+    Feedback,
+    Grade,
+    Observation,
+    StudentFeedback
+  }
+
   alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Section}
   alias WebCAT.Factory
   alias WebCAT.Repo
@@ -152,10 +163,12 @@ defmodule WebCAT.Factory do
 
   def student_feedback_factory do
     student = Factory.insert(:student)
-    rotation_group = Factory.build(:rotation_group)
-    |> Map.update!(:users, fn users ->
-      [student | users]
-    end)
+
+    rotation_group =
+      Factory.build(:rotation_group)
+      |> Map.update!(:users, fn users ->
+        [student | users]
+      end)
 
     %StudentFeedback{
       feedback: Factory.build(:feedback),

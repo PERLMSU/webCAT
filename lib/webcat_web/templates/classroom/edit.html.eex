@@ -1,19 +1,26 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li>
-            <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
-        </li>
-        <li>
-            <%= link(@changeset.data.name, to: Routes.classroom_path(@conn, :show, @changeset.data.id)) %>
-        </li>
-        <li class="is-active">
-            <%= link("Edit", to: Routes.classroom_path(@conn, :edit, @changeset.data.id)) %>
-        </li>
-    </ul>
-</nav>
-<h1 class="title">Edit Classroom:
-    <%= @changeset.data.name %>
-</h1>
-<hr>
-<%= form(@conn, @changeset) %>
-<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                breadcrumb(@changeset.data.name, to: Routes.classroom_path(@conn, :show, @changeset.data.id)),
+                breadcrumb("Edit")
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="header">Edit Classroom:
+                <%= @changeset.data.name %>
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <%= render("form.html", assigns) %>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,12 +2,9 @@ defmodule WebCATWeb.ClassroomController do
   use WebCATWeb, :authenticated_controller
 
   alias WebCAT.CRUD
-  alias WebCAT.Rotations.Classroom
-  alias WebCAT.Feedback.Categories
+  alias WebCAT.Rotations.{Classroom, Classrooms}
 
   action_fallback(WebCATWeb.FallbackController)
-
-  @preload [users: [performer: ~w(roles)a], semesters: ~w(sections)a]
 
   def index(conn, user, _params) do
     permissions do
@@ -15,8 +12,8 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with :ok <- is_authorized?(),
-         classrooms <- CRUD.list(Classroom, preload: @preload) do
-      render(conn, "index.html", user: user, selected: "classroom", data: classrooms)
+         classrooms <- Classrooms.list() do
+      render(conn, "index.html", user: user, selected: "classroom", classrooms: classrooms)
     end
   end
 
@@ -26,11 +23,11 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, classroom} <- CRUD.get(Classroom, id, preload: @preload) do
+         {:ok, classroom} <- Classrooms.get(id) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
-        data: Map.replace!(classroom, :categories, Categories.list(id))
+        classroom: classroom
       )
     end
   end
@@ -79,7 +76,7 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, classroom} <- CRUD.get(Classroom, id, preload: @preload) do
+         {:ok, classroom} <- Classrooms.get(id) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -94,7 +91,7 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, classroom} <- CRUD.get(Classroom, id, preload: @preload) do
+         {:ok, classroom} <- Classrooms.get(id) do
       case CRUD.update(Classroom, classroom, update) do
         {:ok, _} ->
           conn
@@ -116,15 +113,14 @@ defmodule WebCATWeb.ClassroomController do
       has_role(:admin)
     end
 
-    with :ok <- is_authorized?(),
-         {:ok, _} <- CRUD.get(Classroom, id) do
+    with :ok <- is_authorized?() do
       case CRUD.delete(Classroom, id) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Classroom deleted successfully")
           |> redirect(to: Routes.classroom_path(conn, :index))
 
-        {:error, _} ->
+        {:error, %Ecto.Changeset{}} ->
           conn
           |> put_flash(:error, "Classroom deletion failed")
           |> redirect(to: Routes.classroom_path(conn, :index))

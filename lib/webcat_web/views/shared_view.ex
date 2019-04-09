@@ -2,18 +2,13 @@ defmodule WebCATWeb.SharedView do
   use WebCATWeb, :view
 
   def menu_entry(entry, icon, to, selected) do
-    content_tag(:li) do
-      content_tag(:a, class: if(selected == true, do: "is-active", else: ""), href: to) do
-        [
-          content_tag(:span, class: "icon") do
-            content_tag(:i, "", class: "far fa-#{icon}")
-          end,
-          content_tag(:span, entry)
-        ]
-      end
+    content_tag(:a, class: if(selected == true, do: "active item", else: "item"), href: to) do
+      [
+        entry,
+        content_tag(:i, "", class: "icon far fa-#{icon}")
+      ]
     end
   end
-
 
   @external_resource Path.join(File.cwd!(), "./lib")
   defmacro build_info do

@@ -1,86 +1,74 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %></li>
-        <li><%= link(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) %></li>
-        <li><%= link("Categories", to: Routes.category_path(@conn, :index, @category.classroom_id)) %></li>
-        <li class="is-active"><%= link("Categories", to: Routes.category_path(@conn, :show, @category.classroom_id, @category.id)) %></li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Category:
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                breadcrumb(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)),
+                breadcrumb("Categories", to: Routes.category_path(@conn, :index, classroom_id: @category.classroom_id)),
+                breadcrumb(@category.name)
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Category:
                 <%= @category.name %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.category_path(@conn, :edit, @category.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.category_path(@conn, :delete, @category.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
             </h1>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.category_path(@conn, :edit, @category.classroom_id, @category.id)) %>
-                <%= icon_button("Delete", "times", class: "is-danger", to: Routes.category_path(@conn, :delete, @category.classroom_id, @category.id), onclick: "return confirm('Are you sure?');") %>
-            </p>
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
+                </h2>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td><%= @category.name %></td>
+                    </tr>
+                    <%= if @category.parent_category_id != nil do %>
+                    <tr>
+                        <td><strong>Parent Category</strong></td>
+                        <td><%= link(@category.parent_category.name, to: Routes.category_path(@conn, :show, @category.parent_category_id)) %>
+                        </td>
+                    </tr>
+                    <% end %>
+                    <%= if @category.description != nil do %>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td><%= @category.description %></td>
+                    </tr>
+                    <% end %>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-<hr>
-<div class="box">
-    <h2 class="subtitle">
-        Details
-    </h2>
-    <ul>
-        <li>
-            <h2 class="subtitle">Name</h2>
-            <%= @category.name %>
-        </li>
-        <%= if @category.description != nil do %>
-        <li>
-            <h2 class="subtitle">Description</h2>
-            <%= @category.description %>
-        </li>
-        <% end %>
-        <li>
-            <h2 class="subtitle">Classroom:
-                <%= link(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) %>
-            </h2>
-        </li>
-    </ul>
-</div>
-<div class="box">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <h2 class="subtitle">
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
                     Sub-Categories
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.category_path(@conn, :new, classroom_id: @category.classroom_id, parent_category_id: @category.id)) %>
                 </h2>
-            </div>
-        </div>
-        <div class="level-right">
-            <div class="level-item">
-                <p class="buttons">
-                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.category_path(@conn, :new, @category.classroom_id, parent_category_id: @category.id)) %>
-                </p>
+                <%= render("table.html", conn: @conn, categories: @category.sub_categories) %>
             </div>
         </div>
     </div>
-    <%= WebCATWeb.CategoryView.table(@conn, @category.sub_categories) %>
-</div>
-<div class="box">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <h2 class="subtitle">
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
                     Observations
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.observation_path(@conn, :new, category_id: @category.id)) %>
                 </h2>
-            </div>
-        </div>
-        <div class="level-right">
-            <div class="level-item">
-                <p class="buttons">
-                    <%= icon_button("Create", "plus", class: "is-primary", to: Routes.observation_path(@conn, :new, @category.id)) %>
-                </p>
+                <%= render(WebCATWeb.ObservationView, "table.html", conn: @conn, observations: @category.observations) %>
             </div>
         </div>
     </div>
-    <%= WebCATWeb.ObservationView.table(@conn, @category.observations) %>
 </div>

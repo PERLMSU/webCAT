@@ -1,84 +1,96 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li>
-            <%= link("Users", to: Routes.user_path(@conn, :index)) %>
-        </li>
-        <li class="is-active">
-            <%= link("#{@data.first_name} #{@data.last_name}", to: Routes.user_path(@conn, :show, @data.id)) %>
-        </li>
-    </ul>
-</nav>
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">User:
-                <%= "#{@data.first_name} #{@data.last_name}" %>
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Users", to: Routes.user_path(@conn, :index)),
+                breadcrumb(@data.email)
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">User:
+                <%= @data.first_name %> <%= @data.last_name %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Send Confirmation Email", "envelope", class: "green", to: Routes.user_path(@conn, :send_confirmation, @data.id)) %>                    
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.user_path(@conn, :edit, @data.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.user_path(@conn, :delete, @data.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
             </h1>
         </div>
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            <p class="buttons">
-                <%= icon_button("Send Confirmation Email", "envelope", class: "is-primary", to: Routes.user_path(@conn, :send_confirmation, @data.id)) %>
-                <%= icon_button("Edit", "wrench", class: "is-primary", to: Routes.user_path(@conn, :edit, @data.id)) %>
-                <%= icon_button("Delete", "times", class: "is-danger", to: Routes.user_path(@conn, :delete, @data.id), onclick: "return confirm('Are you sure?');") %>
-            </p>
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
+                </h2>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Email</strong></td>
+                        <td><%= @data.email %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>First Name</strong></td>
+                        <td><%= @data.first_name %></td>
+                    </tr>
+                    <%= if @data.middle_name != nil do %>
+                    <tr>
+                        <td><strong>Middle Name</strong></td>
+                        <td><%= @data.middle_name %></td>
+                    </tr>
+                    <% end %>
+                    <tr>
+                        <td><strong>Last Name</strong></td>
+                        <td><%= @data.last_name %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Roles</strong></td>
+                        <td>
+                        <%= if is_list(@data.performer.roles) and not Enum.empty?(@data.performer.roles) do %>
+                            <ul>
+                                <%= for role <- @data.performer.roles do %>
+                                <li><%= role.name %></li>
+                                <% end %>
+                            </ul>
+                        <% else %>
+                            <p>No Roles Assigned</p>
+                        <% end %>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-<hr>
-<div class="box">
-    <h2 class="subtitle">
-        Details
-    </h2>
-    <ul>
-        <li>
-            <h2 class="subtitle">Email</h2>
-            <%= @data.email %>
-        </li>
-        <li>
-            <h2 class="subtitle">First Name</h2>
-            <%= @data.first_name %>
-        </li>
-        <%= if @data.middle_name != nil do %>
-        <li>
-            <h2 class="subtitle">Middle Name</h2>
-            <%= @data.middle_name %>
-        </li>
-        <% end %>
-        <li>
-            <h2 class="subtitle">Last Name</h2>
-            <%= @data.last_name %>
-        </li>
-        <li>
-            <h2 class="subtitle">Roles</h2>
-            <%= if is_list(@data.performer.roles) and not Enum.empty?(@data.performer.roles) do %>
-            <ul>
-                <%= for role <- @data.performer.roles do %>
-                <li><%= role.name %></li>
-                <% end %>
-            </ul>
-            <% else %>
-            <p>No Roles Assigned</p>
-            <% end %>
-        </li>
-    </ul>
-</div>
-<div class="box">
-    <h2 class="subtitle">
-        Classrooms
-    </h2>
-    <%= WebCATWeb.ClassroomView.table(@conn, @data.classrooms) %>
-</div>
-<div class="box">
-    <h2 class="subtitle">
-        Sections
-    </h2>
-    <%= WebCATWeb.SectionView.table(@conn, @data.sections) %>
-</div>
-<div class="box">
-    <h2 class="subtitle">
-        Rotation Groups
-    </h2>
-    <%= WebCATWeb.RotationGroupView.table(@conn, @data.rotation_groups) %>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Classrooms
+                </h2>
+                <%= render(WebCATWeb.ClassroomView, "table.html", conn: @conn, classrooms: @data.classrooms) %>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Sections
+                </h2>
+                <%= render(WebCATWeb.SectionView, "table.html", conn: @conn, sections: @data.sections) %>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Rotation Groups
+                </h2>
+                <%= render(WebCATWeb.RotationGroupView, "table.html", conn: @conn, sections: @data.rotation_groups) %>
+            </div>
+        </div>
+    </div>
 </div>

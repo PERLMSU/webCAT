@@ -1,14 +1,23 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li>
-            <%= link("Classrooms", to: Routes.classroom_path(@conn, :index)) %>
-        </li>
-        <li class="is-active">
-            <%= link("New", to: Routes.classroom_path(@conn, :new)) %>
-        </li>
-    </ul>
-</nav>
-<h1 class="title">New Classroom</h1>
-<hr>
-<%= form(@conn, @changeset) %>
-<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                breadcrumb("New")
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="header">New Classroom</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <%= render("form.html", assigns) %>
+            </div>
+        </div>
+    </div>
+</div>
