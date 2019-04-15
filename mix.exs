@@ -20,7 +20,7 @@ defmodule WebCAT.Mixfile do
   def application do
     [
       mod: {WebCAT, []},
-      extra_applications: ~w(logger runtime_tools uuid)a
+      extra_applications: ~w(logger runtime_tools)a
     ]
   end
 
@@ -33,7 +33,7 @@ defmodule WebCAT.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:chartkick, "~>0.3.0"},
+      {:elixir_uuid, "~> 1.2"},
       {:earmark, "~> 1.3.1"},
       {:bamboo, "~> 1.0"},
       {:terminator, github: "bbuscarino/terminator", branch: "dev"},
