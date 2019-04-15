@@ -1,7 +1,6 @@
 defmodule WebCAT.Feedback.Grade do
   use Ecto.Schema
   import Ecto.Changeset
-  alias WebCAT.Accounts.User
 
   schema "grades" do
     field(:score, :integer)
@@ -13,8 +12,8 @@ defmodule WebCAT.Feedback.Grade do
     timestamps()
   end
 
-  @required ~w(score draft_id category_id)a
-  @optional ~w(note)a
+  @required ~w(score category_id)a
+  @optional ~w(draft_id note)a
 
   @doc """
   Create a changeset for a grade

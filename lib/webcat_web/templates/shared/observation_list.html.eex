@@ -1,0 +1,21 @@
+<div class="ui relaxed divided list">
+        <%= for observation <- @observations do %>
+        <div class="item">
+            <i class="eye icon"></i>
+            <div class="content">
+                <div class="header"><%= observation.content %></div>
+                <div class="description">Category: <%= observation.category.name %></div>
+                <div class="list">
+                    <%= for item <- observation.feedback do %>
+                    <div class="item">
+                        <i class="comment lines icon"></i>                                    
+                        <div class="content">
+                            <div class="header"><%= item.content %></div>
+                        </div>
+                    </div>    
+                    <% end %>
+                </div>
+            </div>
+        </div>
+        <% end %>
+    </div>

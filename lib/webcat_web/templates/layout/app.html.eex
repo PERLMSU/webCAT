@@ -22,7 +22,7 @@
 <body>
   <%= render(WebCATWeb.SharedView, "notifications.html", assigns)%>
   <%= render(WebCATWeb.SharedView, "menu.html", assigns) %>
-  <div class="pusher" style="margin-left: 15rem;">
+  <div class="pusher" style="margin-left: 15rem; margin-top: 2rem;">
     <%= render @view_module, @view_template, assigns %>
     <%= render(WebCATWeb.SharedView, "footer.html", assigns)%>
   </div>

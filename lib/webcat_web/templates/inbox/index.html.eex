@@ -1,32 +1,34 @@
-<%= if Map.has_key?(@drafts, "unreviewed") do %>
-<div class="box">
-    <h1 class="title">Unreviewed Drafts</h1>
-    <%= for draft <- @drafts["unreviewed"] do  %>
-    <%= render_draft(draft, assigns) %>
-    <% end %>
-</div>
-<% end %>
-<%= if Map.has_key?(@drafts, "needs_revision") do %>
-<div class="box">
-    <h1 class="title">Need Revision</h1>
-    <%= for draft <- @drafts["needs_revision"] do  %>
-    <%= render_draft(draft, assigns) %>
-    <% end %>
-</div>
-<% end %>
-<%= if Map.has_key?(@drafts, "approved") do %>
-<div class="box">
-    <h1 class="title">Approved Drafts</h1>
-    <%= for draft <- @drafts["approved"] do  %>
-    <%= render_draft(draft, assigns) %>
-    <% end %>
-</div>
-<% end %>
-<%= if Map.has_key?(@drafts, "emailed") do %>
-<div class="box">
-    <h1 class="title">Emailed Drafts</h1>
-    <%= for draft <- @drafts["emailed"] do  %>
-    <%= render_draft(draft, assigns) %>
-    <% end %>
-</div>
-<% end %>
+<%= render("menu.html", assigns) %>
+<table class="ui celled table">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Classroom</th>
+            <th>Rotation</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <%= for draft <- @drafts do %>
+        <tr>
+            <td><%= link("#{draft.user.first_name} #{draft.user.last_name}", to: Routes.inbox_path(@conn, :show, draft.id)) %></td>
+            <td><%= draft.rotation_group.rotation.section.semester.classroom.name %></td>
+            <td><%= draft.rotation_group.rotation.number %></td>
+            <td>
+                <%= case draft.status do %>
+                <%= "unreviewed" -> %>
+                <a class="ui red label">Unreviewed</a>
+                <%= "reviewing" -> %>
+                <a class="ui yellow label">Reviewing</a>
+                <%= "needs_revision" -> %>
+                <a class="ui orange label">Needs Revision</a>
+                <%= "approved" -> %>
+                <a class="ui green label">Approved</a>
+                <%= "emailed" -> %>
+                <a class="ui blue label">Emailed</a>
+                <% end %>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>

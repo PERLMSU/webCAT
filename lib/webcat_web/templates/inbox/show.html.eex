@@ -1,0 +1,41 @@
+<div class="ui segment">
+    <h1 class="ui header">Draft</h1>
+    <%= @draft.content |> Earmark.as_html!() |> raw() %>
+</div>
+<div class="ui segment">
+    <h1 class="ui header">Grades</h1>
+    <div class="list">
+        <%= for grade <- @draft.grades do %>
+        <div class="item"><%= grade.category.name %> - <%= grade.score %>%</div>
+        <% end %>
+    </div>
+    Average: <%= Enum.sum(Enum.map(@draft.grades, & &1.score)) / Enum.count(@draft.grades) %>%
+</div>
+<div class="ui segment">
+    <h1 class="ui header">Comments</h1>
+    <div class="ui comments">
+        <%= for comment <- @draft.comments do %>
+        <div class="comment">
+            <a class="avatar">
+                <img src="<%= "https://api.adorable.io/avatars/285/#{comment.user.email}.png" %>">
+            </a>
+            <div class="content">
+                <a class="author"><%= comment.user.first_name %> <%= comment.user.last_name %></a>
+                <div class="metadata">
+                    <span class="date"><%= Timex.format!(comment.inserted_at, "{relative}", :relative)%></span>
+                </div>
+                <div class="text">
+                    <%= comment.content %>
+                </div>
+            </div>
+        </div>
+        <% end %>
+        <%= form_for @comment_changeset, Routes.comment_path(@conn, :create, @draft.id), [class: "ui reply form"], fn f -> %>
+            <%= hidden_input(f, :user_id) %>
+            <div class="field">
+                <%= textarea(f, :content, class: "input") %>
+            </div>
+            <%= submit("Add Comment", class: "ui blue submit button") %>
+        <% end %>
+    </div>
+</div>

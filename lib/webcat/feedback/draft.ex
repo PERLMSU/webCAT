@@ -4,7 +4,7 @@ defmodule WebCAT.Feedback.Draft do
 
   schema "drafts" do
     field(:content, :string)
-    field(:status, :string)
+    field(:status, :string, default: "unreviewed")
 
     belongs_to(:user, WebCAT.Accounts.User)
     belongs_to(:rotation_group, WebCAT.Rotations.RotationGroup)
@@ -23,6 +23,7 @@ defmodule WebCAT.Feedback.Draft do
   def changeset(draft, attrs \\ %{}) do
     draft
     |> cast(attrs, @required)
+    |> cast_assoc(:grades)
     |> validate_required(@required)
     |> validate_inclusion(:status, ~w(unreviewed reviewing needs_revision approved emailed))
     |> foreign_key_constraint(:user_id)

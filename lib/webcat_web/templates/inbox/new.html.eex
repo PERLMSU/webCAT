@@ -1,9 +1,26 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<%= form_for(@changeset, Routes.inbox_path(@conn, :create), fn f ->  %>
-<%= hidden_input(f, :rotation_group_id, value: @changeset.data.rotation_group_id) %>
-<%= hidden_input(f, :user_id, value: @changeset.data.user_id) %>
-<%= textarea(f, :content, id: "md-editor") %>
-<%= submit("Submit", class: "button is-primary") %>
+
+Observations
+<div class="ui segment">
+    <%= render(WebCATWeb.SharedView, "observation_list.html", observations: @observations) %>
+</div>
+
+<%= form_for(@changeset, Routes.inbox_path(@conn, :create), [class: "ui form"], fn f ->  %>
+    <%= hidden_input(f, :rotation_group_id, value: @changeset.data.rotation_group_id) %>
+    <%= hidden_input(f, :user_id, value: @changeset.data.user_id) %>
+    <%= textarea(f, :content, id: "md-editor") %>
+    <h3 class="ui header">Grade</h3>
+    <div class="grouped fields">    
+        <%= inputs_for f, :grades, fn gf ->  %>
+        <%= hidden_input(gf, :category_id, value: gf.data.category_id) %>
+        <%# THIS HAS TO CHANGE SOON, WHY ELIXIR WON'T LET ME USE A STRING IDK %>
+        <div class="two fields">
+        <%= form_field(gf, gf.data.category.name, :score, :number, required: true) %>
+        <%= form_field(gf, "Note", :content) %>
+        </div>
+        <% end %>
+    </div>
+    <%= submit("Submit", class: "ui blue submit button") %>
 <% end) %>
 <script src='<%= Routes.static_path(@conn, "/js/draft.js") %>'></script>
 <script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

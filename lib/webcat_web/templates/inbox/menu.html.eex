@@ -1,0 +1,14 @@
+<div class="ui menu">
+    <div id="classroom_select" class="ui search selection dropdown item">
+        <div class="default text">Select Classroom</div>
+        <div class="menu">
+            <%= for classroom <- @classrooms do %>
+            <%= link(classroom.name, to: Routes.inbox_path(@conn, :index, Keyword.put(@params, :classroom_id, classroom.id)), class: "item", data: [value: classroom.id]) %>
+            <% end %>
+        </div>
+    </div>
+</div>
+<script>
+let classroom_select = $('#classroom_select');
+classroom_select.dropdown('set selected', <%= Keyword.get(@params, :classroom_id, -1) %>);
+</script>

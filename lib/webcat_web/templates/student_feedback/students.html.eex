@@ -19,27 +19,7 @@
                         <%= if not Enum.empty?(observations) do %>
                         Observations
                         <div class="ui segment">
-                            <div class="ui relaxed divided list">
-                                <%= for observation <- observations do %>
-                                <div class="item">
-                                    <i class="eye icon"></i>
-                                    <div class="content">
-                                        <div class="header"><%= observation.content %></div>
-                                        <div class="description">Category: <%= observation.category.name %></div>
-                                        <div class="list">
-                                            <%= for item <- observation.feedback do %>
-                                            <div class="item">
-                                                <i class="comment lines icon"></i>                                    
-                                                <div class="content">
-                                                    <div class="header"><%= item.content %></div>
-                                                </div>
-                                            </div>    
-                                            <% end %>
-                                        </div>
-                                    </div>
-                                </div>
-                                <% end %>
-                            </div>
+                            <%= render(WebCATWeb.SharedView, "observation_list.html", observations: observations) %>    
                         </div>
                         <% else %>
                         <div class="ui placeholder segment">
@@ -52,7 +32,7 @@
                     </div>
                     <div class="extra">
                     <%= icon_button("Record Feedback", "comment", class: "green right floated", to: Routes.student_feedback_path(@conn, :categories, @group.id, student.id)) %>
-                    <%= icon_button("Create Draft", "envelope", class: "blue right floated", to: Routes.inbox_path(@conn, :new, group_id: @group.id, student_id: student.id)) %>
+                    <%= icon_button("Create Draft", "envelope", class: "blue right floated", to: Routes.inbox_path(@conn, :new, group_id: @group.id, user_id: student.id)) %>
                     </div>
                 </div>
             </div>

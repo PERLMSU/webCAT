@@ -72,7 +72,7 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     resources("/", InboxController)
-    resources("/draft_id/comments", InboxController, except: ~w(index show edit new)a, name: "comments")
+    resources("/:draft_id/comments", CommentController, except: ~w(index show edit new)a)
   end
 
   scope "/dashboard", WebCATWeb do
