@@ -1,5 +1,5 @@
 defmodule WebCATWeb.RotationGroupView do
-  use WebCATWeb, :view
+  use WebCATWeb, :dashboard_view
 
   alias WebCAT.Rotations.Rotation
   alias WebCAT.CRUD

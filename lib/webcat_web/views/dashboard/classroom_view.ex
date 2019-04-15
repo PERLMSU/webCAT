@@ -1,5 +1,5 @@
 defmodule WebCATWeb.ClassroomView do
-  use WebCATWeb, :view
+  use WebCATWeb, :dashboard_view
 
   import Ecto.Changeset
   alias WebCAT.Accounts.Users

@@ -1,17 +1,17 @@
 <%= if not Enum.empty?(@observations) do %>
 <table class="ui very basic selectable fixed single line striped table">
     <thead>
-        <th>Category</th>
-        <th>Type</th>
         <th>Content</th>
+        <th>Type</th>
+        <th>Category</th>
         <th></th>
     </thead>
     <tbody>
         <%= for observation <- @observations do %>
         <tr>
-            <td><%= link(observation.category.name, to: Routes.category_path(@conn, :show, observation.category_id)) %></td>
+            <td><%= link(truncate(observation.content, 10), to: Routes.observation_path(@conn, :show, observation.id)) %></td>
             <td><%= observation.type %></td>
-            <td><%= truncate(observation.content, 10) %></td>
+            <td><%= link(observation.category.name, to: Routes.category_path(@conn, :show, observation.category_id)) %></td>
             <td>
                 <div class="ui small icon buttons">
                     <%= link(class: "ui blue basic button", data: [content: "Edit", variation: "tiny inverted"], to: Routes.observation_path(@conn, :edit, observation.id)) do %>

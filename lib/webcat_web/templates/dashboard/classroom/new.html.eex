@@ -1,13 +1,4 @@
 <div class="ui grid container">
-    <!-- Navigation Breadcrumbs -->
-    <div class="row">
-        <div class="eight wide column">
-            <%= breadcrumbs([
-                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
-                breadcrumb("New")
-            ]) %>
-        </div>
-    </div>
     <div class="row">
         <div class="column">
             <h1 class="header">New Classroom</h1>

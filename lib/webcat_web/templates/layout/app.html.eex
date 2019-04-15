@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title><%= Map.get(assigns, :title, "WebCAT") %></title>
+  <title><%= assigns |> Map.get(:title, "WebCAT") %></title>
 
   <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/semantic.min.css") %>" />
   <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/selectize.min.css") %>" />

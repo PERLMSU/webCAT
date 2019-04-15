@@ -1,8 +1,7 @@
 defmodule WebCATWeb.SemesterView do
-  use WebCATWeb, :view
+  use WebCATWeb, :dashboard_view
 
-  alias WebCAT.Rotations.{Section, Classroom, Classrooms}
-  alias WebCAT.CRUD
+  alias WebCAT.Rotations.Classrooms
 
   import Ecto.Changeset
 end

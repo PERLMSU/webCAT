@@ -4,16 +4,17 @@ category = Map.get(assigns, :category)
       Categories.list(category.classroom_id)
       |> Enum.map(&{&1.name, &1.id})
 path = case get_field(@changeset, :id) do
-    nil -> Routes.feedback_path(@conn, :create)
-    id -> Routes.feedback_path(@conn, :update, id)
+    nil -> Routes.observation_path(@conn, :create, category_id: category.id)
+    id -> Routes.observation_path(@conn, :update, id)
   end
  %>
 
  <%= form_for @changeset, path, [class: "ui form"], fn f -> %>
-   <%= form_field(f, "Content", :description, :textarea, required: true) %>
+   <%= form_field(f, "Content", :content, :textarea, required: true) %>
    <div class="two fields">
     <%= select_field(f, "Type", :type, [Positive: "positive", Neutral: "neutral", Negative: "negative"], required: true) %>
     <%= select_field(f, "Category", :category_id, categories, required: true, search: true) %>
    </div>
   <%= submit("Submit", class: "ui green button") %>
  <% end %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

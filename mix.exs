@@ -53,7 +53,7 @@ defmodule WebCAT.Mixfile do
       {:phoenix, "~> 1.4.0", override: true},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 4.0"},
-      {:phoenix_html, "~> 2.12"},
+      {:phoenix_html, "~> 2.13.2"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:postgrex, "~> 0.14.1"},
       {:timex, "~> 3.4"},

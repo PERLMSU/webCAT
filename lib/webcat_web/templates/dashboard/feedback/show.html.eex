@@ -6,11 +6,11 @@
             <%= breadcrumbs([
                     breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)) ,
                     breadcrumb(@feedback.observation.category.classroom.name, to: Routes.classroom_path(@conn, :show, @feedback.observation.category.classroom_id)) ,
-                    breadcrumb("Categories", to: Routes.category_path(@conn, :index, @feedback.observation.category.classroom_id)) ,
-                    breadcrumb(@feedback.observation.category.name, to: Routes.category_path(@conn, :show, @feedback.observation.category.classroom_id, @feedback.observation.category_id)) ,
-                    breadcrumb("Observations", to: Routes.observation_path(@conn, :index, @feedback.observation.category_id)),
-                    breadcrumb(truncate(@feedback.observation.content, 10), to: Routes.observation_path(@conn, :show, @feedback.observation.category_id, @feedback.observation_id)) ,
-                    breadcrumb("Feedback", to: Routes.feedback_path(@conn, :index, @feedback.observation_id)),
+                    breadcrumb("Categories", to: Routes.category_path(@conn, :index, classroom_id: @feedback.observation.category.classroom_id)) ,
+                    breadcrumb(@feedback.observation.category.name, to: Routes.category_path(@conn, :show, @feedback.observation.category_id)) ,
+                    breadcrumb("Observations", to: Routes.observation_path(@conn, :index, category_id: @feedback.observation.category_id)),
+                    breadcrumb(truncate(@feedback.observation.content, 10), to: Routes.observation_path(@conn, :show, @feedback.observation_id)) ,
+                    breadcrumb("Feedback", to: Routes.feedback_path(@conn, :index, observation_id: @feedback.observation_id)),
                     breadcrumb(truncate(@feedback.content, 10))
                 ]) %>
         </div>
@@ -20,8 +20,8 @@
             <h1 class="ui header">Feedback:
                 <%= truncate(@feedback.content, 10) %>
                 <div class="ui right floated buttons">
-                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.feedback_path(@conn, :edit, @feedback.observation_id, @feedback.id)) %>
-                    <%= icon_button("Delete", "times", class: "red", to: Routes.feedback_path(@conn, :delete, @feedback.observation_id, @feedback.id), onclick: "return confirm('Are you sure?');") %>
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.feedback_path(@conn, :edit, @feedback.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.feedback_path(@conn, :delete, @feedback.id), method: :delete, data: [confirm: "Are you sure?"]) %>
                 </div>
             </h1>
         </div>
@@ -39,7 +39,7 @@
                     </tr>
                     <tr>
                         <td><strong>Observation</strong></td>
-                        <td><%= link(truncate(@feedback.observation.content, 10), to: Routes.observation_path(@conn, :show, @feedback.observation.category_id, @feedback.observation_id)) %>
+                        <td><%= link(truncate(@feedback.observation.content, 10), to: Routes.observation_path(@conn, :show, @feedback.observation_id)) %>
                         </td>
                     </tr>
                 </table>

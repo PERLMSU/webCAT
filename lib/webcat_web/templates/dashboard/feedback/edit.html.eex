@@ -1,0 +1,30 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)) ,
+                    breadcrumb(@changeset.data.observation.category.classroom.name, to: Routes.classroom_path(@conn, :show, @changeset.data.observation.category.classroom_id)) ,
+                    breadcrumb("Categories", to: Routes.category_path(@conn, :index, classroom_id: @changeset.data.observation.category.classroom_id)) ,
+                    breadcrumb(@changeset.data.observation.category.name, to: Routes.category_path(@conn, :show, @changeset.data.observation.category_id)) ,
+                    breadcrumb("Observations", to: Routes.observation_path(@conn, :index, category_id: @changeset.data.observation.category_id)),
+                    breadcrumb(truncate(@changeset.data.observation.content, 10), to: Routes.observation_path(@conn, :show, @changeset.data.observation_id)) ,
+                    breadcrumb("Feedback", to: Routes.feedback_path(@conn, :index, observation_id: @changeset.data.observation_id)) ,
+                    breadcrumb(truncate(@changeset.data.content, 10), to: Routes.feedback_path(@conn, :show, @changeset.data.id)) ,
+                    breadcrumb("Edit")
+                ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="header">Edit Feedback: <%= truncate(@changeset.data.content, 10) %></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <%= render "form.html", assigns %>
+            </div>
+        </div>
+    </div>
+</div>

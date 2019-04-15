@@ -115,9 +115,8 @@ defmodule WebCAT.Accounts.Users do
     User
     |> join(:left, [u], p in assoc(u, :performer))
     |> join(:left, [_, p], r in assoc(p, :roles))
-    |> where([_, _, role], role.name == ^role)
+    |> where([_, _, role], role.identifier == ^role)
     |> preload([_, p, r], performer: {p, roles: r})
-    |> Repo.all()
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect email or password"}
@@ -149,6 +148,7 @@ defmodule WebCAT.Accounts.Users do
       left_join: rotation_groups in assoc(user, :rotation_groups),
       where: user.id == ^id,
       preload: [
+        roles: roles,
         performer: {performer, roles: roles},
         classrooms: classrooms,
         sections: sections,

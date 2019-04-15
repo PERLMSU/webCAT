@@ -12,9 +12,14 @@ defmodule WebCATWeb.IndexController do
   def index(conn, user, _params) do
     # Grab simple statistics
     counts = %{
-      students: Users.with_role("student") |> Enum.count(),
-      observations: Repo.aggregate(from(o in "student_feedback"), :count, :user_id),
-      emails: Repo.aggregate(from(d in "drafts"), :count, :id)
+      students:
+        Repo.aggregate(
+          Users.with_role("student"),
+          :count,
+          :id
+        ),
+      observations: Repo.one(from(o in "student_feedback", select: fragment("count(*)"))),
+      emails: Repo.aggregate(from(d in "drafts", where: d.status == "emailed"), :count, :id)
     }
 
     render(conn, "overview.html",

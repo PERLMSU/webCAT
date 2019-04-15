@@ -1,5 +1,5 @@
 defmodule WebCATWeb.SectionView do
-  use WebCATWeb, :view
+  use WebCATWeb, :dashboard_view
 
   alias WebCAT.Rotations.Semester
   alias WebCAT.CRUD

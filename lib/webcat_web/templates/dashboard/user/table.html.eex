@@ -10,12 +10,16 @@
     <tbody>
         <%= for user <- @users do %>
         <tr>
-            <td><%= user.email %></td>
+            <td><%= link(user.email, to: Routes.user_path(@conn, :show, user.id)) %></td>
             <td><%= user.last_name %></td>
             <td><%= user.first_name %></td>
             <td>
-            <%= if is_list(user.performer.roles) and not Enum.empty?(user.performer.roles) do %>
-              <%= Enum.map(user.performer.roles, &(&1.name)) |> Enum.join(",") %>
+            <%= if not Enum.empty?(user.performer.roles) do %>
+            <div class="ui list">
+                <%= for role <- user.performer.roles do %>
+                <div class="item"><%= String.capitalize(role.identifier) %></div>
+                <% end %>
+            </div>
             <% else %>
               None
             <% end %>

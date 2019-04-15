@@ -10,8 +10,9 @@ defmodule WebCAT.Rotations.Rotations do
       left_join: semester in assoc(section, :semester),
       left_join: classroom in assoc(semester, :classroom),
       left_join: rotation_groups in assoc(rotation, :rotation_groups),
+      left_join: rotation_group_rotation in assoc(rotation_groups, :rotation),
       preload: [
-        rotation_groups: rotation_groups,
+        rotation_groups: {rotation_groups, rotation: rotation_group_rotation},
         section: {section, semester: {semester, classroom: classroom}}
       ]
     )
@@ -25,8 +26,12 @@ defmodule WebCAT.Rotations.Rotations do
       left_join: semester in assoc(section, :semester),
       left_join: classroom in assoc(semester, :classroom),
       left_join: rotation_groups in assoc(rotation, :rotation_groups),
+      left_join: rotation_group_rotation in assoc(rotation_groups, :rotation),
+      left_join: users in assoc(classroom, :users),
+      left_join: performer in assoc(users, :performer),
+      left_join: roles in assoc(performer, :roles),
       preload: [
-        rotation_groups: rotation_groups,
+        rotation_groups: {rotation_groups, rotation: rotation_group_rotation},
         section: {section, semester: {semester, classroom: classroom}}
       ]
     )

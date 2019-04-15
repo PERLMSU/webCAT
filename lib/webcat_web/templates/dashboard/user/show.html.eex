@@ -49,11 +49,11 @@
                         <td><strong>Roles</strong></td>
                         <td>
                         <%= if is_list(@data.performer.roles) and not Enum.empty?(@data.performer.roles) do %>
-                            <ul>
+                            <div class="ui list">
                                 <%= for role <- @data.performer.roles do %>
-                                <li><%= role.name %></li>
+                                <div class="item"><%= role.identifier |> String.capitalize() %></div>
                                 <% end %>
-                            </ul>
+                            </div>
                         <% else %>
                             <p>No Roles Assigned</p>
                         <% end %>
@@ -89,7 +89,7 @@
                 <h2 class="header">
                     Rotation Groups
                 </h2>
-                <%= render(WebCATWeb.RotationGroupView, "table.html", conn: @conn, sections: @data.rotation_groups) %>
+                <%= render(WebCATWeb.RotationGroupView, "table.html", conn: @conn, rotation_groups: @data.rotation_groups) %>
             </div>
         </div>
     </div>

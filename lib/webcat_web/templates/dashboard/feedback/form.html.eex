@@ -11,7 +11,8 @@ case get_field(@changeset, :id) do
  %>
 
  <%= form_for @changeset, path, [class: "ui form"], fn f -> %>
-   <%= form_field("Content", :description, :textarea, required: true) %>
+   <%= form_field(f, "Content", :content, :textarea, required: true) %>
    <%= select_field(f, "Observation", :observation_id, observations, required: true, search: true) %>
   <%= submit("Submit", class: "ui green button") %>
  <% end %>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

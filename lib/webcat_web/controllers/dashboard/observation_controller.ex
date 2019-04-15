@@ -1,7 +1,7 @@
 defmodule WebCATWeb.ObservationController do
   use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
-  alias WebCAT.Feedback.{Observation, Observations}
+  alias WebCAT.Feedback.{Observation, Observations, Categories}
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -11,11 +11,13 @@ defmodule WebCATWeb.ObservationController do
     end
 
     with :ok <- is_authorized?(),
-         observations <- Observations.list(category_id) do
+         observations <- Observations.list(category_id),
+         {:ok, category} <- Categories.get(category_id) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
-        observations: observations
+        observations: observations,
+        category: category
       )
     end
   end
@@ -40,17 +42,19 @@ defmodule WebCATWeb.ObservationController do
       has_role(:admin)
     end
 
-    with :ok <- is_authorized?() do
+    with :ok <- is_authorized?(),
+         {:ok, category} <- Categories.get(category_id) do
       conn
       |> render("new.html",
         user: user,
         changeset: Observation.changeset(%Observation{category_id: category_id}),
-        selected: "classroom"
+        selected: "classroom",
+        category: category
       )
     end
   end
 
-  def create(conn, user, %{"observation" => params}) do
+  def create(conn, user, %{"observation" => params, "category_id" => category_id}) do
     permissions do
       has_role(:admin)
     end
@@ -63,12 +67,17 @@ defmodule WebCATWeb.ObservationController do
           |> redirect(to: Routes.observation_path(conn, :show, observation.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          conn
-          |> render("new.html",
-            user: user,
-            changeset: changeset,
-            selected: "classroom"
-          )
+          IO.inspect(changeset)
+
+          with {:ok, category} <- Categories.get(category_id) do
+            conn
+            |> render("new.html",
+              user: user,
+              changeset: changeset,
+              selected: "classroom",
+              category: category
+            )
+          end
       end
     end
   end

@@ -1,0 +1,15 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="column">
+            <h1 class="header">New Feedback</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <%= render "form.html", assigns %>
+            </div>
+        </div>
+    </div>
+</div>

@@ -37,14 +37,17 @@ defmodule WebCAT.Rotations.RotationGroup do
     ids =
       users
       |> Enum.map(fn user ->
-        cond do
-          is_map(user) ->
-            Map.get(user, "id")
+        case user do
+          %{id: id} ->
+            id
 
-          is_integer(user) ->
-            user
+          id when is_integer(id) ->
+            id
 
-          true ->
+          id when is_binary(id) ->
+            String.to_integer(id)
+
+          _ ->
             nil
         end
       end)

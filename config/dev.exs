@@ -33,7 +33,7 @@ config :webcat, WebCATWeb.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/webcat_web/views/.*(ex)$},
-      ~r{lib/yeet_web/templates/.*(eex)$}
+      ~r{lib/webcat_web/templates/.*(eex)$}
     ]
   ]
 

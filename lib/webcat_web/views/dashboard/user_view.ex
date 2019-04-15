@@ -1,5 +1,5 @@
 defmodule WebCATWeb.UserView do
-  use WebCATWeb, :view
+  use WebCATWeb, :dashboard_view
 
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Classroom

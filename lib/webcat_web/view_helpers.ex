@@ -9,7 +9,7 @@ defmodule WebCATWeb.ViewHelpers do
   """
   def error_tag(form, field) do
     Enum.map(Keyword.get_values(form.errors, field), fn {error, _} ->
-      content_tag(:p, error, class: "help is-danger")
+      content_tag(:div, error, class: "ui error message")
     end)
   end
 
