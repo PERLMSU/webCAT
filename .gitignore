@@ -60,4 +60,9 @@ webcat.iml
 .python-version
 
 # Semantic UI
-/assets/semantic/dist
+/assets/semantic/dist/semantic.css
+/assets/semantic/dist/semantic.js
+/assets/semantic/dist/components
+/assets/semantic/dist/themes/basic
+/assets/semantic/dist/themes/github
+/assets/semantic/dist/themes/material

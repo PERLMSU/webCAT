@@ -20,7 +20,7 @@ defmodule WebCAT.Mixfile do
   def application do
     [
       mod: {WebCAT, []},
-      extra_applications: ~w(logger runtime_tools)a
+      extra_applications: ~w(logger runtime_tools uuid)a
     ]
   end
 
