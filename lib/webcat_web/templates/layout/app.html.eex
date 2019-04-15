@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title><%= assigns |> Map.get(:title, "WebCAT") %></title>
+  <title><%= Map.get(assigns, :title, "WebCAT") %></title>
 
   <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/semantic.min.css") %>" />
   <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/selectize.min.css") %>" />
@@ -22,14 +22,11 @@
 <body>
   <%= render(WebCATWeb.SharedView, "notifications.html", assigns)%>
   <%= render(WebCATWeb.SharedView, "menu.html", assigns) %>
-  <div class="pusher">
-    <%= render(WebCATWeb.SharedView, "navbar.html", assigns) %>
-
+  <div class="pusher" style="margin-left: 15rem;">
     <%= render @view_module, @view_template, assigns %>
+    <%= render(WebCATWeb.SharedView, "footer.html", assigns)%>
   </div>
-  <%= render(WebCATWeb.SharedView, "footer.html", assigns)%>
   <script src='<%= Routes.static_path(@conn, "/js/messages.js") %>'></script>
   <script src='<%= Routes.static_path(@conn, "/js/app.js") %>'></script>
 </body>
-
 </html>

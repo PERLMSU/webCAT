@@ -1,4 +1,4 @@
-<div class="ui sidebar inverted vertical menu">
+<div class="ui visible inverted vertical sidebar menu">
     <div class="header item">
         WebCAT
     </div>
@@ -7,9 +7,8 @@
     <%= menu_entry("Users", "users", Routes.user_path(@conn, :index), @selected == "users") %>
     <%= menu_entry("Import", "file-import", Routes.index_path(@conn, :import), @selected == "import") %>
     <%= menu_entry("Feedback", "pen", Routes.student_feedback_path(@conn, :classrooms), @selected == "feedback") %>
-    <%# menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
+    <%= menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
     <div class="item">
-        Draft Inbox
         <div class="menu">
             <a class="item">
                 Unreviewed

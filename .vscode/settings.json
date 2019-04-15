@@ -1,4 +1,8 @@
 {
-    "elm.compiler": "./node_modules/.bin/elm",
-    "elm.makeCommand": "./node_modules/.bin/elm-make"
+    "emmet.includeLanguages": {
+        "HTML (Eex)": "html"
+    },
+    "emmet.syntaxProfiles": {
+        "HTML (Eex)": "html",
+    },
 }

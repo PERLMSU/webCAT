@@ -1,7 +1,4 @@
 <div class="ui inverted menu borderless">
-    <a id="sidebar-toggle" class="item">
-        <i class="sidebar icon"></i>
-    </a>
     <div class="right menu">
         <div class="ui simple dropdown item">
             <%= "#{@user.first_name} #{@user.last_name}" %>
@@ -15,10 +12,3 @@
         </div>
     </div>
 </div>
-<script>
-    $(document).ready(function () {
-        $('#sidebar-toggle').click(function () {
-            $('.ui.sidebar').sidebar('toggle');
-        });
-    });
-</script>

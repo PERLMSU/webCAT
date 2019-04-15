@@ -5,6 +5,10 @@
 
 <div class="ui grid container">
     <div class="row">
+        
+    </div>
+
+    <div class="row">
         <div class="eight wide column">
             <h1 class="ui header">
                 Dashboard
