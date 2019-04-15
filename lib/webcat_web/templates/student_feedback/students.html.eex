@@ -1,104 +1,70 @@
-<% by_role = User.by_role(@group.users) %>
-<% students = Map.get(by_role, "student", []) %>
-<% assistants = Map.get(by_role, "assistant", []) %>
-<nav class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">
-                Rotation Group <%= @group.number %>
-            </h1>
-        </div>
-    </div>
-    <div class="level-right">
-        <div class="level-item">
-        </div>
-    </div>
-</nav>
-<h2 class="title">
-    Assistants
-</h2>
-<div class="box">
-    <%= if not Enum.empty?(assistants) do %>
-    <%= for assistant <- assistants do %>
-    <article class="media">
-        <figure class="media-left">
-            <span class="icon">
-                <i class="fas fa-user-ninja"></i>
-            </span>
-        </figure>
-        <div class="media-content">
-            <ul>
-                <li><strong><%= assistant.first_name %> <%= assistant.last_name %></strong></li>
-                <li><%= assistant.email %></li>
-            </ul>
-        </div>
-    </article>
-    <% end %>
-    <% else %>
-    <h2 class="subtitle has-text-warning">No Assistants</h2>
-    <% end %>
-</div>
-<h2 class="title">
-    Students
-</h2>
-<div class="box">
+
+
+<div class="ui container">
+    <h1 class="ui header">Rotation Group <%= @group.number %></h1>
+    <% students = @group.users |> User.by_role() |> Map.get("student", []) %>
     <%= if not Enum.empty?(students) do %>
-    <%= for student <- students do %>
-    <article class="media">
-        <figure class="media-left">
-            <span class="icon">
-                <i class="fas fa-user"></i>
-            </span>
-        </figure>
-        <div class="media-content">
-            <div class="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <ul>
-                            <li><strong><%= student.first_name %> <%= student.last_name %></strong></li>
-                            <li><%= student.email %></li>
-                        </ul>
-                    </div>
+    <div class="ui segment">
+        <div class="ui divided items">
+            <%= for student <- students do %>
+            <div class="item">
+                <div class="ui tiny rounded image">
+                <img src="<%= "https://api.adorable.io/avatars/285/#{student.email}.png" %>">
                 </div>
-                <div class="level-right">
-                    <div class="level-item">
-                        <%= icon_button("Record Feedback", "comment", class: "is-primary", to: Routes.student_feedback_path(@conn, :categories, @group.id, student.id)) %>
+                <div class="content">
+                    <div class="header"><%= student.first_name %> <%= student.last_name %></div>
+                    <div class="meta"><span><%= student.email %></span></div>
+                    <div class="description">
+                        <% observations = StudentFeedback.by_observation(@group.id, student.id) %>
+                        <%= if not Enum.empty?(observations) do %>
+                        Observations
+                        <div class="ui segment">
+                            <div class="ui relaxed divided list">
+                                <%= for observation <- observations do %>
+                                <div class="item">
+                                    <i class="eye icon"></i>
+                                    <div class="content">
+                                        <div class="header"><%= observation.content %></div>
+                                        <div class="description">Category: <%= observation.category.name %></div>
+                                        <div class="list">
+                                            <%= for item <- observation.feedback do %>
+                                            <div class="item">
+                                                <i class="comment lines icon"></i>                                    
+                                                <div class="content">
+                                                    <div class="header"><%= item.content %></div>
+                                                </div>
+                                            </div>    
+                                            <% end %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% end %>
+                            </div>
+                        </div>
+                        <% else %>
+                        <div class="ui placeholder segment">
+                            <div class="ui icon header">
+                                <i class="pencil outline icon"></i>
+                                No Feedback Yet
+                            </div>
+                        </div>
+                        <% end %>
                     </div>
-                    <div class="level-item">
-                        <%= icon_button("New Draft", "file-alt", class: "is-primary", to: Routes.inbox_path(@conn, :new, group_id: @group.id, user_id: student.id))%>
+                    <div class="extra">
+                    <%= icon_button("Record Feedback", "comment", class: "green right floated", to: Routes.student_feedback_path(@conn, :categories, @group.id, student.id)) %>
+                    <%= icon_button("Create Draft", "envelope", class: "blue right floated", to: Routes.inbox_path(@conn, :new, group_id: @group.id, student_id: student.id)) %>
                     </div>
                 </div>
             </div>
-            <!-- Observations -->
-            <h1 class="title">Observations</h1>
-            <% observations = StudentFeedback.by_observation(@group.id, student.id) %>
-            <%= if not Enum.empty?(observations) do %>
-            <%= for observation <- observations do %>
-            <article class="media">
-                <figure class="media-left">
-
-                </figure>
-                <div class="media-content">
-                    <ul>
-                        <li>Category: <%= observation.category.name %></li>
-                        <li>Observation: <%= observation.content %></li>
-                    </ul>
-                    <!-- Feedback -->
-                    <%= for item <- observation.feedback do %>
-                    <article class="media">
-                        <%= item.content %>
-                    </article>
-                    <% end %>
-                </div>
-            </article> 
-            <% end %>
-            <% else %>
-            <h2 class="subtitle">No Feedback Recorded</h2>
             <% end %>
         </div>
-    </article>
-    <% end %>
+    </div>
     <% else %>
-    <h2 class="subtitle has-text-warning">No Students</h2>
-    <% end %>
+    <div class="ui placeholder segment">
+        <div class="ui icon header">
+            <i class="users outline icon"></i>
+            No Students in this Rotation Group
+        </div>
+    </div>
+    <% end %>    
 </div>

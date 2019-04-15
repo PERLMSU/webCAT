@@ -1,0 +1,65 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(@rotation_group.rotation.section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @rotation_group.rotation.section.semester.classroom_id)),
+                    breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @rotation_group.rotation.section.semester.classroom_id)),
+                    breadcrumb(@rotation_group.rotation.section.semester.name, to: Routes.semester_path(@conn, :show, @rotation_group.rotation.section.semester_id)),
+                    breadcrumb("Sections", to: Routes.section_path(@conn, :index, semester_id: @rotation_group.rotation.section.semester_id)),
+                    breadcrumb(@rotation_group.rotation.section.number, to: Routes.section_path(@conn, :show, @rotation_group.rotation.section_id)),
+                    breadcrumb("Rotations", to: Routes.rotation_path(@conn, :index, section_id: @rotation_group.rotation.section_id)),
+                    breadcrumb(@rotation_group.rotation.number, to: Routes.rotation_path(@conn, :show, @rotation_group.rotation_id)),
+                    breadcrumb("Rotation Groups", to: Routes.rotation_group_path(@conn, :index, rotation_id: @rotation_group.rotation_id)),
+                    breadcrumb(@rotation_group.number)
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Rotation Group <%= @rotation_group.number %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.rotation_group_path(@conn, :edit, @rotation_group.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.rotation_group_path(@conn, :delete, @rotation_group.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
+            </h1>
+        </div>
+    </div>
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
+                </h2>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Number</strong></td>
+                        <td><%= @rotation_group.number %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rotation</strong></td>
+                        <td><%= link(@rotation_group.rotation.number, to: Routes.rotation_path(@conn, :show, @rotation_group.rotation_id)) %>
+                        </td>
+                    </tr>
+                    <%= if @rotation_group.description != nil do %>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td><%= @rotation_group.description %></td>
+                    </tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Users
+                </h2>
+                <%= render(WebCATWeb.UserView, "table.html", conn: @conn, users: @rotation_group.users) %>
+            </div>
+        </div>
+    </div>
+</div>

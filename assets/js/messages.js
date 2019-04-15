@@ -1,9 +1,12 @@
-import $ from 'jquery';
+$('.message .close')
+  .on('click', function () {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+      ;
+  });
+;
 
-$(document).ready(function () {
-    let delete_button = $("button.delete");
-    let message = delete_button.parent();
-    delete_button.click(function () {
-        message.remove();
-    });
-});
+setTimeout(function () {
+  $('.message').transition('fade down');
+}, 3000)

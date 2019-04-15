@@ -1,14 +1,24 @@
-<aside class="menu">
-    <p class="menu-label">Dashboard</p>
-    <ul class="menu-list">
-        <%= menu_entry("Overview", "tachometer", Routes.index_path(@conn, :index), @selected == "overview") %>
-        <%= menu_entry("Classroom", "university", Routes.classroom_path(@conn, :index), @selected == "classroom") %>
-        <%= menu_entry("Users", "users", Routes.user_path(@conn, :index), @selected == "users") %>
-        <%= menu_entry("Import", "file-import", Routes.index_path(@conn, :import), @selected == "import") %>
-    </ul>
-    <p class="menu-label">Feedback</p>
-    <ul class="menu-list">
-        <%= menu_entry("Feedback", "pen", Routes.student_feedback_path(@conn, :classrooms), @selected == "feedback") %>
-        <%= menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
-    </ul>
-</aside>
+<div class="ui sidebar inverted vertical menu">
+    <div class="header item">
+        WebCAT
+    </div>
+    <%= menu_entry("Overview", "tachometer", Routes.index_path(@conn, :index), @selected == "overview") %>
+    <%= menu_entry("Classroom", "university", Routes.classroom_path(@conn, :index), @selected == "classroom") %>
+    <%= menu_entry("Users", "users", Routes.user_path(@conn, :index), @selected == "users") %>
+    <%= menu_entry("Import", "file-import", Routes.index_path(@conn, :import), @selected == "import") %>
+    <%= menu_entry("Feedback", "pen", Routes.student_feedback_path(@conn, :classrooms), @selected == "feedback") %>
+    <%# menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
+    <div class="item">
+        Draft Inbox
+        <div class="menu">
+            <a class="item">
+                Unreviewed
+                <div class="ui label">5</div>
+            </a>
+            <a class="item">
+                Approved
+                <div class="ui label">2</div>
+            </a>
+        </div>
+    </div>
+</div>

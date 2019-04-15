@@ -1,0 +1,28 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="sixteen wide column">
+          <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)) ,
+                breadcrumb(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)) ,
+                breadcrumb("Categories", to: Routes.category_path(@conn, :index, classroom_id: @category.classroom_id)) ,
+                breadcrumb(@category.name, to: Routes.category_path(@conn, :show, @category.id)) ,
+                breadcrumb("Observations")
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="fourteen wide column">
+            <h1 class="ui header">Observations</h1>
+        </div>
+        <div class="two wide right aligned column">
+            <%= icon_button("Create", "plus", class: "green", to: Routes.observation_path(@conn, :new, category_id: @category.id)) %>
+        </div>
+    </div>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="sixteen wide column">
+            <%= render "table.html", assigns %>
+        </div>
+    </div>
+</div>

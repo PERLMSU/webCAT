@@ -1,0 +1,48 @@
+<%= if not Enum.empty?(@users) do %>
+<table class="ui very basic selectable fixed single line striped table">
+    <thead>
+        <th>Email</th>
+        <th>Last Name</th>
+        <th>First Name</th>
+        <th>Roles</th>
+        <th></th>
+    </thead>
+    <tbody>
+        <%= for user <- @users do %>
+        <tr>
+            <td><%= link(user.email, to: Routes.user_path(@conn, :show, user.id)) %></td>
+            <td><%= user.last_name %></td>
+            <td><%= user.first_name %></td>
+            <td>
+            <%= if not Enum.empty?(user.performer.roles) do %>
+            <div class="ui list">
+                <%= for role <- user.performer.roles do %>
+                <div class="item"><%= String.capitalize(role.identifier) %></div>
+                <% end %>
+            </div>
+            <% else %>
+              None
+            <% end %>
+            </td>
+            <td>
+                <div class="ui small icon buttons">
+                    <%= link(class: "ui blue basic button", data: [content: "Edit", variation: "tiny inverted"], to: Routes.user_path(@conn, :edit, user.id)) do %>
+                        <i class="edit icon"></i>
+                    <% end %>
+                    <%= link(class: "ui red basic button", data: [content: "Delete", variation: "tiny inverted", confirm: "Are you sure?"], method: :delete, to: Routes.user_path(@conn, :delete, user.id)) do %>
+                        <i class="trash icon"></i>
+                    <% end %>
+                </div>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>    
+<% else %>
+<div class="ui placeholder segment">
+    <div class="ui icon header">
+        <i class="users outline icon"></i>
+        No Users Yet
+    </div>
+</div>
+<% end %>

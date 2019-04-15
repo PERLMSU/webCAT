@@ -24,7 +24,6 @@ defmodule WebCAT.Mixfile do
     ]
   end
 
-
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ~w(lib test/support priv/repo/migrations)
   defp elixirc_paths(_), do: ~w(lib priv/repo/migrations)
@@ -34,6 +33,7 @@ defmodule WebCAT.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:chartkick, "~>0.3.0"},
       {:earmark, "~> 1.3.1"},
       {:bamboo, "~> 1.0"},
       {:terminator, github: "bbuscarino/terminator", branch: "dev"},
@@ -53,7 +53,7 @@ defmodule WebCAT.Mixfile do
       {:phoenix, "~> 1.4.0", override: true},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 4.0"},
-      {:phoenix_html, "~> 2.12"},
+      {:phoenix_html, "~> 2.13.2"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:postgrex, "~> 0.14.1"},
       {:timex, "~> 3.4"},

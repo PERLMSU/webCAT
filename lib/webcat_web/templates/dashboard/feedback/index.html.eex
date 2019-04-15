@@ -1,0 +1,36 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="sixteen wide column">
+        <% observation_id = Map.get(@params, "observation_id") %>
+        <%= if observation_id do %>
+          <% observation = CRUD.get(Observation, observation_id) %>
+          <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)) ,
+                breadcrumb(observation.category.classroom.name, to: Routes.classroom_path(@conn, :show, observation.category.classroom_id)) ,
+                breadcrumb("Categories", to: Routes.category_path(@conn, :index, classroom_id: observation.category.classroom_id)) ,
+                breadcrumb(observation.category.name, to: Routes.category_path(@conn, :show, observation.category_id)) ,
+                breadcrumb("Observations", to: Routes.observation_path(@conn, :index, category_id: observation.category_id)),
+                breadcrumb(truncate(observation.content, 10), to: Routes.observation_path(@conn, :show, observation.id)),
+                breadcrumb("Feedback")
+            ]) %>
+        <% else %>
+          <%= breadcrumbs([breadcrumb("Feedback")]) %>
+        <% end %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="fourteen wide column">
+            <h1 class="ui header">Feedback</h1>
+        </div>
+        <div class="two wide right aligned column">
+            <%= icon_button("Create", "plus", class: "green", to: Routes.feedback_path(@conn, :new, observation_id: observation_id)) %>
+        </div>
+    </div>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="sixteen wide column">
+            <%= render "table.html", assigns %>
+        </div>
+    </div>
+</div>

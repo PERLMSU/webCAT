@@ -5,7 +5,6 @@ defmodule WebCATWeb.ImportTest do
   describe "from_path/1" do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(WebCAT.Repo)
 
-
     path = Path.join(__DIR__, "../support/import.xlsx")
     {:ok, data} = Import.from_path(path)
 

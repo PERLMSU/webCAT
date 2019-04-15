@@ -11,7 +11,10 @@ defmodule WebCAT.Rotations.RotationGroup do
 
     belongs_to(:rotation, WebCAT.Rotations.Rotation)
 
-    many_to_many(:users, WebCAT.Accounts.User, join_through: "rotation_group_users", on_replace: :delete)
+    many_to_many(:users, WebCAT.Accounts.User,
+      join_through: "rotation_group_users",
+      on_replace: :delete
+    )
 
     timestamps()
   end
@@ -34,14 +37,17 @@ defmodule WebCAT.Rotations.RotationGroup do
     ids =
       users
       |> Enum.map(fn user ->
-        cond do
-          is_map(user) ->
-            Map.get(user, "id")
+        case user do
+          %{id: id} ->
+            id
 
-          is_integer(user) ->
-            user
+          id when is_integer(id) ->
+            id
 
-          true ->
+          id when is_binary(id) ->
+            String.to_integer(id)
+
+          _ ->
             nil
         end
       end)

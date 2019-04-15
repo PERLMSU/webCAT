@@ -10,17 +10,28 @@ defmodule WebCATWeb.IndexController do
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, user, _params) do
-    student_count = from(u in Users.by_role(User, "student"), group_by: u.id, select: count(u.id))
-
     # Grab simple statistics
     counts = %{
-      students: student_count,
-      observations: Repo.aggregate(from(o in "observations"), :count, :id),
-      emails: Repo.aggregate(from(d in "drafts"), :count, :id),
-      users: Repo.aggregate(from(u in "users"), :count, :id) - student_count
+      students:
+        Repo.aggregate(
+          Users.with_role("student"),
+          :count,
+          :id
+        ),
+      observations: Repo.one(from(o in "student_feedback", select: fragment("count(*)"))),
+      emails: Repo.aggregate(from(d in "drafts", where: d.status == "emailed"), :count, :id)
     }
 
-    render(conn, "overview.html", user: user, counts: counts, selected: "overview")
+    render(conn, "overview.html",
+      user: user,
+      counts: counts,
+      selected: "overview",
+      chart_data: %{
+        observations:
+          Jason.encode!([["Mar 6", 2.2], ["Mar 13", 4.5], ["Mar 20", 3.4], ["Mar 27", 5.5]]),
+        drafts: Jason.encode!([["Approved", 50], ["Reviewing", 20], ["Unreviewed", 70]])
+      }
+    )
   end
 
   def redirect_index(conn, _user, _params) do

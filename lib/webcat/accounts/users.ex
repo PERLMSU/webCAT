@@ -109,15 +109,14 @@ defmodule WebCAT.Accounts.Users do
   end
 
   @doc """
-  Filter users by role
+  Get all users with a specific role
   """
-  def by_role(query, role) do
-    from(u in query,
-      left_join: p in assoc(u, :performer),
-      left_join: r in assoc(p, :roles),
-      where: r.name == ^role,
-      preload: [performer: {p, roles: r}]
-    )
+  def with_role(role) do
+    User
+    |> join(:left, [u], p in assoc(u, :performer))
+    |> join(:left, [_, p], r in assoc(p, :roles))
+    |> where([_, _, role], role.identifier == ^role)
+    |> preload([_, p, r], performer: {p, roles: r})
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect email or password"}
@@ -126,6 +125,40 @@ defmodule WebCAT.Accounts.Users do
     case Pbkdf2.checkpw(password, hashed_password) do
       true -> {:ok, credential}
       false -> {:error, "Incorrect email or password"}
+    end
+  end
+
+  def list() do
+    from(user in User,
+      left_join: performer in assoc(user, :performer),
+      left_join: roles in assoc(performer, :roles),
+      preload: [
+        performer: {performer, roles: roles}
+      ]
+    )
+    |> Repo.all()
+  end
+
+  def get(id) do
+    from(user in User,
+      left_join: performer in assoc(user, :performer),
+      left_join: roles in assoc(performer, :roles),
+      left_join: classrooms in assoc(user, :classrooms),
+      left_join: sections in assoc(user, :sections),
+      left_join: rotation_groups in assoc(user, :rotation_groups),
+      where: user.id == ^id,
+      preload: [
+        roles: roles,
+        performer: {performer, roles: roles},
+        classrooms: classrooms,
+        sections: sections,
+        rotation_groups: rotation_groups
+      ]
+    )
+    |> Repo.one()
+    |> case do
+      nil -> {:error, :not_found}
+      user -> {:ok, user}
     end
   end
 end

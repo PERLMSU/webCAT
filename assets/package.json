@@ -6,20 +6,17 @@
     "build:dev": "webpack --mode development",
     "build": "webpack --mode production",
     "start": "yarn run watch",
-    "watch": "webpack --mode development --watch-stdin",
-    "elm": "elm"
+    "watch": "webpack --mode development --watch-stdin"
   },
   "dependencies": {
     "@fortawesome/fontawesome-pro": "5.4.1",
-    "@vizuaalog/bulmajs": "0.8.1",
-    "bulma": "0.7.4",
-    "bulmaswatch": "0.7.2",
     "jquery": "3.3.1",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
     "popper.js": "1.14.7",
     "selectize": "0.12.6",
-    "simplemde": "1.11.2"
+    "simplemde": "1.11.2",
+    "semantic-ui": "2.4.2"
   },
   "devDependencies": {
     "@babel/core": "7.3.3",
@@ -31,8 +28,6 @@
     "copy-webpack-plugin": "5.0.0",
     "css-loader": "2.1.0",
     "cssnano": "4.1.10",
-    "elm": "0.19.0-bugfix6",
-    "elm-webpack-loader": "5.0.0",
     "mini-css-extract-plugin": "0.5.0",
     "node-sass": "4.11.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",

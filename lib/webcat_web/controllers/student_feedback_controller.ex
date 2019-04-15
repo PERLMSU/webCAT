@@ -133,7 +133,7 @@ defmodule WebCATWeb.StudentFeedbackController do
     end
   end
 
-  def categories(conn, user, params) do
+  def categories(conn, user, %{"user_id" => user_id, "group_id" => group_id} = params) do
     permissions do
       has_role(:admin)
       has_role(:assistant)
@@ -144,34 +144,51 @@ defmodule WebCATWeb.StudentFeedbackController do
 
       categories =
         if parent_category_id do
-          Category
-          |> where([c], c.parent_category_id == ^parent_category_id)
-          |> join(:left, [c], o in assoc(c, :observations))
-          |> join(:left, [_, o], f in assoc(o, :feedback))
-          |> join(:left, [c], s in assoc(c, :sub_categories))
-          |> preload([_, o, f, s], sub_categories: s, observations: {o, feedback: f})
+          from(categories in Category,
+            where: categories.parent_category_id == ^parent_category_id,
+            left_join: observations in assoc(categories, :observations),
+            left_join: feedback in assoc(observations, :feedback),
+            left_join: sub_categories in assoc(categories, :sub_categories),
+            preload: [
+              sub_categories: sub_categories,
+              observations: {observations, feedback: feedback}
+            ]
+          )
           |> Repo.all()
         else
-          Category
-          |> join(:left, [c], o in assoc(c, :observations))
-          |> join(:left, [_, o], f in assoc(o, :feedback))
-          |> join(:left, [c], s in assoc(c, :sub_categories))
-          |> preload([_, o, f, s], sub_categories: s, observations: {o, feedback: f})
+          from(categories in Category,
+            left_join: classroom in assoc(categories, :classroom),
+            left_join: semesters in assoc(classroom, :semesters),
+            left_join: sections in assoc(semesters, :sections),
+            left_join: rotations in assoc(sections, :rotations),
+            left_join: groups in assoc(rotations, :rotation_groups),
+            where: groups.id == ^group_id,
+            where: is_nil(categories.parent_category_id),
+            left_join: observations in assoc(categories, :observations),
+            left_join: feedback in assoc(observations, :feedback),
+            left_join: sub_categories in assoc(categories, :sub_categories),
+            preload: [
+              sub_categories: sub_categories,
+              observations: {observations, feedback: feedback}
+            ]
+          )
           |> Repo.all()
         end
 
       selected_feedback =
-        StudentFeedback
-        |> where([sf], sf.user_id == ^params["user_id"])
-        |> where([sf], sf.rotation_group_id == ^params["group_id"])
-        |> select([sf], sf.feedback_id)
+        from(sf in StudentFeedback,
+          where: sf.user_id == ^user_id,
+          where: sf.rotation_group_id == ^group_id,
+          select: sf.feedback_id
+        )
         |> Repo.all()
 
       render(conn, "categories.html",
         user: user,
         selected: "feedback",
         categories: categories,
-        params: params,
+        user_id: user_id,
+        group_id: group_id,
         selected_feedback: selected_feedback
       )
     end

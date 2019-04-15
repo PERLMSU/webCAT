@@ -1,0 +1,32 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                    breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                    breadcrumb(@changeset.data.rotation.section.semester.classroom.name, to: Routes.classroom_path(@conn, :show, @changeset.data.rotation.section.semester.classroom_id)),
+                    breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @changeset.data.rotation.section.semester.classroom_id)),
+                    breadcrumb(@changeset.data.rotation.section.semester.name, to: Routes.semester_path(@conn, :show, @changeset.data.rotation.section.semester_id)),
+                    breadcrumb("Sections", to: Routes.section_path(@conn, :index, semester_id: @changeset.data.rotation.section.semester_id)),
+                    breadcrumb(@changeset.data.rotation.section.number, to: Routes.section_path(@conn, :show, @changeset.data.rotation.section_id)),
+                    breadcrumb("Rotations", to: Routes.rotation_path(@conn, :index, section_id: @changeset.data.rotation.section_id)),
+                    breadcrumb(@changeset.data.rotation.number, to: Routes.rotation_path(@conn, :show, @changeset.data.rotation_id)),
+                    breadcrumb("Rotation Groups", to: Routes.rotation_group_path(@conn, :index, rotation_id: @changeset.data.rotation_id)),
+                    breadcrumb(@changeset.data.number, to: Routes.rotation_group_path(@conn, :show, @changeset.data.id)),
+                    breadcrumb("Edit")
+                ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="header">Edit Rotation Group: <%= @changeset.data.number %></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <%= render("form.html", assigns) %>
+            </div>
+        </div>
+    </div>
+</div>

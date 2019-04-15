@@ -1,11 +1,7 @@
 defmodule WebCATWeb.ObservationController do
   use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
-  alias WebCAT.Feedback.{Category, Observation}
-
-  @list_preload ~w(feedback category)a
-  @preload [feedback: ~w(observation)a, category: ~w(classroom)a]
-  @category_preload ~w(classroom)a
+  alias WebCAT.Feedback.{Observation, Observations, Categories}
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -15,13 +11,13 @@ defmodule WebCATWeb.ObservationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, category} <- CRUD.get(Category, category_id, preload: @category_preload),
-         observations <- CRUD.list(Observation, preload: @list_preload, where: [category_id: category_id]) do
+         observations <- Observations.list(category_id),
+         {:ok, category} <- Categories.get(category_id) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
-        category: category,
-        observations: observations
+        observations: observations,
+        category: category
       )
     end
   end
@@ -32,7 +28,7 @@ defmodule WebCATWeb.ObservationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, observation} <- CRUD.get(Observation, id, preload: @preload) do
+         {:ok, observation} <- Observations.get(id) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -47,18 +43,18 @@ defmodule WebCATWeb.ObservationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, category} <- CRUD.get(Category, category_id, preload: @category_preload) do
+         {:ok, category} <- Categories.get(category_id) do
       conn
       |> render("new.html",
         user: user,
-        changeset: Observation.changeset(%Observation{}, %{}),
-        category: category,
-        selected: "classroom"
+        changeset: Observation.changeset(%Observation{category_id: category_id}),
+        selected: "classroom",
+        category: category
       )
     end
   end
 
-  def create(conn, user, %{"observation" => params}) do
+  def create(conn, user, %{"observation" => params, "category_id" => category_id}) do
     permissions do
       has_role(:admin)
     end
@@ -68,18 +64,20 @@ defmodule WebCATWeb.ObservationController do
         {:ok, observation} ->
           conn
           |> put_flash(:info, "Observation created!")
-          |> redirect(to: Routes.observation_path(conn, :show, observation.category_id, observation.id))
+          |> redirect(to: Routes.observation_path(conn, :show, observation.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          {:ok, category} = CRUD.get(Category, params["category_id"], preload: @category_preload)
+          IO.inspect(changeset)
 
-          conn
-          |> render("new.html",
-            user: user,
-            changeset: changeset,
-            selected: "classroom",
-            category: category
-          )
+          with {:ok, category} <- Categories.get(category_id) do
+            conn
+            |> render("new.html",
+              user: user,
+              changeset: changeset,
+              selected: "classroom",
+              category: category
+            )
+          end
       end
     end
   end
@@ -90,7 +88,7 @@ defmodule WebCATWeb.ObservationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, observation} <- CRUD.get(Observation, id, preload: @preload) do
+         {:ok, observation} <- Observations.get(id) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -105,12 +103,12 @@ defmodule WebCATWeb.ObservationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, observation} <- CRUD.get(Observation, id, preload: @preload) do
+         {:ok, observation} <- Observations.get(id) do
       case CRUD.update(Observation, observation, update) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Observation updated!")
-          |> redirect(to: Routes.observation_path(conn, :show, observation.category_id, id))
+          |> redirect(to: Routes.observation_path(conn, :show, id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -127,18 +125,19 @@ defmodule WebCATWeb.ObservationController do
       has_role(:admin)
     end
 
-    with :ok <- is_authorized?(),
-         {:ok, observation} <- CRUD.get(Observation, id) do
+    with :ok <- is_authorized?() do
       case CRUD.delete(Observation, id) do
-        {:ok, _} ->
+        {:ok, observation} ->
           conn
           |> put_flash(:info, "Observation deleted successfully")
-          |> redirect(to: Routes.observation_path(conn, :index, observation.category_id))
+          |> redirect(
+            to: Routes.observation_path(conn, :index, category_id: observation.category_id)
+          )
 
-        {:error, _} ->
+        {:error, %Ecto.Changeset{}} ->
           conn
           |> put_flash(:error, "Observation deletion failed")
-          |> redirect(to: Routes.observation_path(conn, :index, observation.category_id))
+          |> redirect(to: Routes.observation_path(conn, :index))
       end
     end
   end

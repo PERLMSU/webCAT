@@ -11,6 +11,12 @@ defmodule WebCATWeb.Router do
     plug(:put_secure_browser_headers)
   end
 
+  pipeline :api do
+    plug(:accepts, ["json"])
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+  end
+
   pipeline :not_authenticated do
     plug(WebCATWeb.Auth.Pipeline)
     plug(Guardian.Plug.EnsureNotAuthenticated)
@@ -20,6 +26,14 @@ defmodule WebCATWeb.Router do
     plug(WebCATWeb.Auth.Pipeline)
     plug(Guardian.Plug.EnsureAuthenticated)
     plug(Guardian.Plug.LoadResource)
+  end
+
+  scope "/api", WebCATWeb.API do
+    pipe_through(~w(api authenticated)a)
+
+    get("/feedback/:group_id/:student_id/:feedback_id", FeedbackController, :show)
+    put("/feedback/:group_id/:student_id/:feedback_id", FeedbackController, :update)
+    patch("/feedback/:group_id/:student_id/:feedback_id", FeedbackController, :update)
   end
 
   scope "/login", WebCATWeb do
@@ -44,7 +58,12 @@ defmodule WebCATWeb.Router do
     get("/rotations/:rotation_id/rotation_groups", StudentFeedbackController, :groups)
     get("/groups/:group_id", StudentFeedbackController, :students)
     get("/groups/:group_id/students/:user_id/categories", StudentFeedbackController, :categories)
-    get("/groups/:group_id/students/:user_id/categories/:category_id/observations", StudentFeedbackController, :observations)
+
+    get(
+      "/groups/:group_id/students/:user_id/categories/:category_id/observations",
+      StudentFeedbackController,
+      :observations
+    )
 
     post("/groups/:group_id/students/:user_id/feedback", StudentFeedbackController, :feedback)
   end
@@ -53,7 +72,7 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(browser authenticated)a)
 
     resources("/", InboxController)
-    resources("/draft_id/comments", InboxController, except: ~w(index show)a, name: "comments")
+    resources("/draft_id/comments", InboxController, except: ~w(index show edit new)a, name: "comments")
   end
 
   scope "/dashboard", WebCATWeb do
@@ -64,20 +83,20 @@ defmodule WebCATWeb.Router do
     get("/import", IndexController, :import)
     post("/import", IndexController, :do_import)
 
-    importable_resources("/users", UserController)
+    resources("/users", UserController)
     get("/users/:id/confirmation", UserController, :send_confirmation)
 
-    importable_resources("/students", StudentController)
+    resources("/students", StudentController)
 
-    importable_resources("/classrooms", ClassroomController)
-    importable_resources("/classrooms/:classroom_id/semesters", SemesterController)
-    importable_resources("/semesters/:semester_id/sections", SectionController)
-    importable_resources("/sections/:section_id/rotations", RotationController)
-    importable_resources("/rotations/:rotation_id/rotation_groups", RotationGroupController)
+    resources("/classrooms", ClassroomController)
+    resources("/semesters", SemesterController)
+    resources("/sections", SectionController)
+    resources("/rotations", RotationController)
+    resources("/rotation_groups", RotationGroupController)
 
-    importable_resources("/classrooms/:classroom_id/categories", CategoryController)
-    importable_resources("/categories/:category_id/observations", ObservationController)
-    importable_resources("/observations/:observation_id/feedback", FeedbackController)
+    resources("/categories", CategoryController)
+    resources("/observations", ObservationController)
+    resources("/feedback", FeedbackController)
   end
 
   scope "/profile", WebCATWeb do

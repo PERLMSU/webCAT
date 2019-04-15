@@ -150,7 +150,8 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
         )
         |> redirected_to()
 
-      assert redirect =~ Routes.student_feedback_path(conn, :students, student_feedback.rotation_group_id)
+      assert redirect =~
+               Routes.student_feedback_path(conn, :students, student_feedback.rotation_group_id)
     end
   end
 

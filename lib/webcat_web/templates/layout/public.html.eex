@@ -8,29 +8,20 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>WebCAT</title>
+  <title><%= Map.get(assigns, :title, "WebCAT") %></title>
 
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/semantic.min.css") %>" />
   <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
-
+  <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
 </head>
 
 <body>
-  <%= with "" <> message <- get_flash(@conn, :info) do %>
-  <div class="notification is-info">
-    <button class="delete"></button>
-    <%= message %>
-  </div>
-  <% end %>
-  <%= with "" <> message <- get_flash(@conn, :error) do %>
-  <div class="notification is-danger">
-    <button class="delete"></button>
-    <%= message %>
-  </div>
-  <% end %>
-  <%= render @view_module, @view_template, assigns %>
+  <%= render(WebCATWeb.SharedView, "notifications.html", assigns)%>
+  <script src='<%= Routes.static_path(@conn, "/js/semantic.min.js") %>'></script>
   <script src='<%= Routes.static_path(@conn, "/js/messages.js") %>'></script>
-  <%= render(WebCATWeb.SharedView, "footer.html", conn: @conn)%>
+  <%= render @view_module, @view_template, assigns %>
+  <%= render(WebCATWeb.SharedView, "footer.html", assigns)%>
 </body>
 </html>

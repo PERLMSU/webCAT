@@ -1,0 +1,40 @@
+<%= if not Enum.empty?(@rotations) do %>
+<table class="ui very basic selectable fixed single line striped table">
+    <thead>
+        <th>Name</th>
+        <th>Section</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Description</th>
+        <th></th>
+    </thead>
+    <tbody>
+        <%= for rotation <- @rotations do %>
+        <tr>
+            <td><%= link(rotation.number, to: Routes.rotation_path(@conn, :show, rotation.id)) %></td>
+            <td><%= link(rotation.section.number, to: Routes.section_path(@conn, :show, rotation.section_id)) %></td>
+            <td><%= Timex.format!(rotation.start_date, "{M}-{D}-{YYYY}") %></td>
+            <td><%= Timex.format!(rotation.end_date, "{M}-{D}-{YYYY}") %></td>
+            <td><%= rotation.description %></td>
+            <td>
+                <div class="ui small icon buttons">
+                    <%= link(class: "ui blue basic button", data: [content: "Edit", variation: "tiny inverted"], to: Routes.rotation_path(@conn, :edit, rotation.id)) do %>
+                        <i class="edit icon"></i>
+                    <% end %>
+                    <%= link(class: "ui red basic button", data: [content: "Delete", variation: "tiny inverted", confirm: "Are you sure?"], method: :delete, to: Routes.rotation_path(@conn, :delete, rotation.id)) do %>
+                        <i class="trash icon"></i>
+                    <% end %>
+                </div>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>    
+<% else %>
+<div class="ui placeholder segment">
+    <div class="ui icon header">
+        <i class="users outline icon"></i>
+        No Rotations Yet
+    </div>
+</div>
+<% end %>

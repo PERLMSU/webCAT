@@ -1,0 +1,12 @@
+<%= if info = get_flash(@conn, :info) do %>
+<div class="ui info message">
+    <i class="close icon"></i>
+    <div class="header"><%= info %></div>
+</div>
+<% end %>
+<%= if error = get_flash(@conn, :error) do %>
+<div class="ui error message">
+    <i class="close icon"></i>
+    <div class="header"><%= error %></div>
+</div>
+<% end %>

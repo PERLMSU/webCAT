@@ -1,0 +1,14 @@
+<div class="ui grid container">
+    <div class="row">
+        <div class="column">
+            <h1 class="header">New Classroom</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <%= render("form.html", assigns) %>
+            </div>
+        </div>
+    </div>
+</div>

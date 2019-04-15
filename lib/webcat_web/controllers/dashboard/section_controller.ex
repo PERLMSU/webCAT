@@ -1,10 +1,7 @@
 defmodule WebCATWeb.SectionController do
   use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
-  alias WebCAT.Rotations.{Semester, Section}
-
-  @list_preload [users: [performer: ~w(roles)a], rotations: [:rotation_groups]]
-  @preload [semester: [:classroom]] ++ @list_preload
+  alias WebCAT.Rotations.{Section, Sections, Semesters}
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -14,14 +11,13 @@ defmodule WebCATWeb.SectionController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, semester} <- CRUD.get(Semester, semester_id, preload: ~w(classroom)a),
-         sections <-
-           CRUD.list(Section, preload: @list_preload, where: [semester_id: semester_id]) do
+         sections <- Sections.list(semester_id),
+         {:ok, semester} <- Semesters.get(semester_id) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
-        semester: semester,
-        sections: sections
+        sections: sections,
+        semester: semester
       )
     end
   end
@@ -32,7 +28,7 @@ defmodule WebCATWeb.SectionController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, section} <- CRUD.get(Section, id, preload: @preload) do
+         {:ok, section} <- Sections.get(id) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -47,12 +43,11 @@ defmodule WebCATWeb.SectionController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, semester} <- CRUD.get(Semester, semester_id, preload: ~w(classroom)a) do
+         {:ok, semester} <- Semesters.get(semester_id) do
       conn
       |> render("new.html",
         user: user,
-        changeset: Section.changeset(%Section{}, %{}),
-        semester: semester,
+        changeset: Section.changeset(%Section{semester: semester, semester_id: semester_id}),
         selected: "classroom"
       )
     end
@@ -68,18 +63,15 @@ defmodule WebCATWeb.SectionController do
         {:ok, section} ->
           conn
           |> put_flash(:info, "Section created!")
-          |> redirect(to: Routes.section_path(conn, :show, section.semester_id, section.id))
+          |> redirect(to: Routes.section_path(conn, :show, section.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          with {:ok, semester} <- CRUD.get(Semester, Map.get(params, "semester_id"), preload: ~w(classroom)a) do
-            conn
-            |> render("new.html",
-              user: user,
-              changeset: changeset,
-              selected: "classroom",
-              semester: semester
-            )
-          end
+          conn
+          |> render("new.html",
+            user: user,
+            changeset: changeset,
+            selected: "classroom"
+          )
       end
     end
   end
@@ -90,7 +82,7 @@ defmodule WebCATWeb.SectionController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, section} <- CRUD.get(Section, id, preload: @preload) do
+         {:ok, section} <- Sections.get(id) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -105,12 +97,12 @@ defmodule WebCATWeb.SectionController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, section} <- CRUD.get(Section, id, preload: @preload) do
+         {:ok, section} <- Sections.get(id) do
       case CRUD.update(Section, section, update) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Section updated!")
-          |> redirect(to: Routes.section_path(conn, :show, section.semester_id, id))
+          |> redirect(to: Routes.section_path(conn, :show, id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -127,18 +119,17 @@ defmodule WebCATWeb.SectionController do
       has_role(:admin)
     end
 
-    with :ok <- is_authorized?(),
-         {:ok, section} <- CRUD.get(Section, id) do
+    with :ok <- is_authorized?() do
       case CRUD.delete(Section, id) do
-        {:ok, _} ->
+        {:ok, section} ->
           conn
           |> put_flash(:info, "Section deleted successfully")
-          |> redirect(to: Routes.section_path(conn, :index, section.semester_id))
+          |> redirect(to: Routes.section_path(conn, :index, semester_id: section.semester_id))
 
-        {:error, _} ->
+        {:error, %Ecto.Changeset{}} ->
           conn
           |> put_flash(:error, "Section deletion failed")
-          |> redirect(to: Routes.section_path(conn, :index, section.semester_id))
+          |> redirect(to: Routes.section_path(conn, :index))
       end
     end
   end

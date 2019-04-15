@@ -126,7 +126,9 @@ defmodule WebCATWeb.CategoryControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.category_path(conn, :update, data.classroom_id, data.id), %{category: update})
+        |> put(Routes.category_path(conn, :update, data.classroom_id, data.id), %{
+          category: update
+        })
         |> html_response(200)
 
       assert response =~ "Edit Category"

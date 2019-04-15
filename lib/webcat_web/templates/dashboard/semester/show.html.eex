@@ -1,0 +1,79 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                breadcrumb(@semester.classroom.name, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)),
+                breadcrumb("Semesters", to: Routes.semester_path(@conn, :index, classroom_id: @semester.classroom_id)),
+                breadcrumb(@semester.name, to: Routes.semester_path(@conn, :show, @semester.id))
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Semester:
+                <%= @semester.name %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.semester_path(@conn, :edit, @semester.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.semester_path(@conn, :delete, @semester.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
+            </h1>
+        </div>
+    </div>
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
+                </h2>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td><%= @semester.name %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Start Date</strong></td>
+                        <td><%= Timex.format!(@semester.start_date, "{M}-{D}-{YYYY}") %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>End Date</strong></td>
+                        <td><%= Timex.format!(@semester.end_date, "{M}-{D}-{YYYY}") %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Classroom</strong></td>
+                        <td><%= link(@semester.classroom.course_code, to: Routes.classroom_path(@conn, :show, @semester.classroom_id)) %>
+                        </td>
+                    </tr>
+                    <%= if @semester.description != nil do %>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td><%= @semester.description %></td>
+                    </tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Sections
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.section_path(@conn, :new, semester_id: @semester.id)) %>
+                </h2>
+                <%= render(WebCATWeb.SectionView, "table.html", conn: @conn, sections: @semester.sections) %>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Users
+                </h2>
+                <%= render(WebCATWeb.UserView, "table.html", conn: @conn, users: @semester.users) %>
+            </div>
+        </div>
+    </div>
+</div>

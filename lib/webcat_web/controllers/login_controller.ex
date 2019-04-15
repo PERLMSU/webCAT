@@ -48,7 +48,10 @@ defmodule WebCATWeb.LoginController do
          {:ok, user} <- Users.login(token) do
       conn
       |> Auth.sign_in(user)
-      |> put_flash(:info, "Temporary token login successful! This will only work for 24 hours after issuance, change/set your password :)")
+      |> put_flash(
+        :info,
+        "Temporary token login successful! This will only work for 24 hours after issuance, change/set your password :)"
+      )
       |> redirect(to: Map.get(params, "redirect", Routes.index_path(conn, :index)))
     else
       _ ->

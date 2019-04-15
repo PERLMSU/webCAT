@@ -1,18 +1,11 @@
 <% {version, build_date} = build_info() %>
-<footer class="footer">
-    <div class="has-text-centered has-text-grey-light">
-        Version <%= version %> - Built on <%= build_date %> -
-        <%= link("Changelog", to: Routes.index_path(@conn, :changes))%>
-        <!--<br>
-        <a href="https://github.com/bbuscarino" target="_blank">
-            <span class="icon">
-                <i class="fab fa-github"></i>
-            </span>
-        </a>
-        <a href="https://github.com/PERLMSU" target="_blank">
-            <span class="icon">
-                <i class="fal fa-atom"></i>
-            </span>
-        </a>-->
+<div class="ui hidden divider"></div>
+<div class="ui inverted vertical footer segment">
+  <div class="ui center aligned container">
+    <div class="ui inverted horizontal small divided link list">
+      <a class="item">Version <%= version %></a>
+      <a class="item">Built on <%= build_date %></a>
+      <%= link("Changelog", to: Routes.index_path(@conn, :changes), class: "item")%>
     </div>
-</footer>
+  </div>
+</div>

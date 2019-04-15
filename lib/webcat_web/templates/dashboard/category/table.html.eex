@@ -1,0 +1,42 @@
+<%= if not Enum.empty?(@categories) do %>
+<table class="ui very basic selectable fixed single line striped table">
+    <thead>
+        <th>Name</th>
+        <th>Parent Category</th>
+        <th>Description</th>
+        <th></th>
+    </thead>
+    <tbody>
+        <%= for category <- @categories do %>
+        <tr>
+            <td><%= link(category.name, to: Routes.category_path(@conn, :show, category.id)) %></td>
+            <td>
+            <%= if category.parent_category_id != nil do %>
+              <%= link(category.parent_category.name, to: Routes.category_path(@conn, :show, category.parent_category_id)) %>
+            <% else %>
+              N/A
+            <% end %>
+            </td>
+            <td><%= category.description %></td>
+            <td>
+                <div class="ui small icon buttons">
+                    <%= link(class: "ui blue basic button", data: [content: "Edit", variation: "tiny inverted"], to: Routes.category_path(@conn, :edit, category.id)) do %>
+                        <i class="edit icon"></i>
+                    <% end %>
+                    <%= link(class: "ui red basic button", data: [content: "Delete", variation: "tiny inverted", confirm: "Are you sure?"], method: :delete, to: Routes.category_path(@conn, :delete, category.id)) do %>
+                        <i class="trash icon"></i>
+                    <% end %>
+                </div>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>    
+<% else %>
+<div class="ui placeholder segment">
+    <div class="ui icon header">
+        <i class="th large outline icon"></i>
+        No Categories Yet
+    </div>
+</div>
+<% end %>

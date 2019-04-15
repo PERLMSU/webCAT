@@ -1,0 +1,78 @@
+<%= render(WebCATWeb.SharedView, "table-script.html", assigns) %>
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                breadcrumb(@classroom.name)
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Classroom:
+                <%= @classroom.name %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.classroom_path(@conn, :edit, @classroom.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.classroom_path(@conn, :delete, @classroom.id), onclick: "return confirm('Are you sure?');") %>
+                </div>
+            </h1>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
+                </h2>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Course Code</strong></td>
+                        <td><%= @classroom.course_code %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td><%= @classroom.name %></td>
+                    </tr>
+                    <%= if @classroom.description != nil do %>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td><%= @classroom.description %></td>
+                    </tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Semesters
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.semester_path(@conn, :new, classroom_id: @classroom.id)) %>
+                </h2>
+                <%= render(WebCATWeb.SemesterView, "table.html", conn: @conn, semesters: @classroom.semesters) %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+    <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Users
+                </h2>
+                <%= render(WebCATWeb.UserView, "table.html", conn: @conn, users: @classroom.users) %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Categories
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.category_path(@conn, :new, classroom_id: @classroom.id)) %>
+                </h2>
+                <%= render(WebCATWeb.CategoryView, "table.html", conn: @conn, categories: @classroom.categories) %>
+            </div>
+        </div>
+    </div>
+</div>

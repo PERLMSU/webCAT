@@ -1,26 +1,29 @@
-<%= for section <- @sections do %>
-<div class="box">
-    <h1 class="title">Section: <%= section.number %></h1>
-    <h2 class="subtitle">Rotations</h2>
-    <%= if not Enum.empty?(section.rotations) do %>
-    <%= for rotation <- section.rotations do %>
-    <article class="media">
-        <figure class="media-left">
-
-        </figure>
-        <div class="media-content">
-            <p>
-                <%= link("Rotation #{rotation.number}", to: Routes.student_feedback_path(@conn, :groups, rotation.id)) %>
-            </p><br>
-            <p>
-                Date: <%= Timex.format!(rotation.start_date, "{M}/{D}/{YYYY}") %> -
-                <%= Timex.format!(rotation.end_date, "{M}/{D}/{YYYY}") %>
-            </p>
+<div class="ui fluid grid container">
+    <%= for row <- Enum.chunk_every(@sections, 4) do %>
+    <div class="stretched row">
+        <%= for section <- row do %>
+        <div class="six wide column">
+            <div class="ui raised segment">
+                <h1 class="ui header">Section <%= section.number %></h1>
+                <h2 class="ui header">Rotations</h2>
+                <div class="ui relaxed divided list">
+                    <%= for rotation <- section.rotations do %>
+                    <div class="item">
+                        <i class="large users middle aligned icon"></i>
+                        <div class="content">
+                            <%= link("Rotation #{rotation.number}", to: Routes.student_feedback_path(@conn, :groups, rotation.id), class: "header") %>
+                            <div class="description">
+                            <%= Timex.format!(rotation.start_date, "{M}/{D}/{YYYY}") %>
+                            <i class="right arrow top aligned icon"></i>
+                            <%= Timex.format!(rotation.end_date, "{M}/{D}/{YYYY}") %>
+                            </div>
+                        </div>
+                    </div>
+                    <% end %>
+                </div>
+            </div>
         </div>
-    </article>
-    <% end %>
-    <% else %>
-    <h2 class="subtitle has-text-warning">No Rotations</h2>
+        <% end %>
+    </div>
     <% end %>
 </div>
-<% end %>

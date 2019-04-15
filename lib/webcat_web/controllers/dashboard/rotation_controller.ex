@@ -1,11 +1,7 @@
 defmodule WebCATWeb.RotationController do
   use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
-  alias WebCAT.Rotations.{Section, Rotation}
-
-  @list_preload [rotation_groups: [:users]]
-  @preload [section: [semester: [:classroom]]] ++ @list_preload
-  @section_preload [semester: [:classroom]]
+  alias WebCAT.Rotations.{Rotation, Rotations, Sections}
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -15,13 +11,13 @@ defmodule WebCATWeb.RotationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, section} <- CRUD.get(Section, section_id, preload: @section_preload),
-         rotations <- CRUD.list(Rotation, preload: @list_preload, where: [section_id: section_id]) do
+         rotations <- Rotations.list(section_id),
+         {:ok, section} <- Sections.get(section_id) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
-        section: section,
-        rotations: rotations
+        rotations: rotations,
+        section: section
       )
     end
   end
@@ -32,7 +28,7 @@ defmodule WebCATWeb.RotationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, rotation} <- CRUD.get(Rotation, id, preload: @preload) do
+         {:ok, rotation} <- Rotations.get(id) do
       render(conn, "show.html",
         user: user,
         selected: "classroom",
@@ -47,13 +43,13 @@ defmodule WebCATWeb.RotationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, section} <- CRUD.get(Section, section_id, preload: @section_preload) do
+         {:ok, section} <- Sections.get(section_id) do
       conn
       |> render("new.html",
         user: user,
-        changeset: Rotation.changeset(%Rotation{}, %{}),
-        section: section,
-        selected: "classroom"
+        changeset: Rotation.changeset(%Rotation{section_id: section_id}),
+        selected: "classroom",
+        section: section
       )
     end
   end
@@ -68,17 +64,14 @@ defmodule WebCATWeb.RotationController do
         {:ok, rotation} ->
           conn
           |> put_flash(:info, "Rotation created!")
-          |> redirect(to: Routes.rotation_path(conn, :show, rotation.section_id, rotation.id))
+          |> redirect(to: Routes.rotation_path(conn, :show, rotation.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          {:ok, section} = CRUD.get(Section, params["section_id"], preload: @section_preload)
-
           conn
           |> render("new.html",
             user: user,
             changeset: changeset,
-            selected: "classroom",
-            section: section
+            selected: "classroom"
           )
       end
     end
@@ -90,7 +83,7 @@ defmodule WebCATWeb.RotationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, rotation} <- CRUD.get(Rotation, id, preload: @preload) do
+         {:ok, rotation} <- Rotations.get(id) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
@@ -105,12 +98,12 @@ defmodule WebCATWeb.RotationController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, rotation} <- CRUD.get(Rotation, id, preload: @preload) do
+         {:ok, rotation} <- Rotations.get(id) do
       case CRUD.update(Rotation, rotation, update) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Rotation updated!")
-          |> redirect(to: Routes.rotation_path(conn, :show, rotation.section_id, id))
+          |> redirect(to: Routes.rotation_path(conn, :show, id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -122,23 +115,22 @@ defmodule WebCATWeb.RotationController do
     end
   end
 
-  def delete(conn, user, %{"id" => id}) do
+  def delete(conn, _user, %{"id" => id}) do
     permissions do
       has_role(:admin)
     end
 
-    with :ok <- is_authorized?(),
-         {:ok, rotation} <- CRUD.get(Rotation, id) do
+    with :ok <- is_authorized?() do
       case CRUD.delete(Rotation, id) do
-        {:ok, _} ->
+        {:ok, rotation} ->
           conn
           |> put_flash(:info, "Rotation deleted successfully")
-          |> redirect(to: Routes.rotation_path(conn, :index, rotation.section_id))
+          |> redirect(to: Routes.rotation_path(conn, :index, section_id: rotation.section_id))
 
-        {:error, _} ->
+        {:error, %Ecto.Changeset{}} ->
           conn
           |> put_flash(:error, "Rotation deletion failed")
-          |> redirect(to: Routes.rotation_path(conn, :index, rotation.section_id))
+          |> redirect(to: Routes.rotation_path(conn, :index))
       end
     end
   end

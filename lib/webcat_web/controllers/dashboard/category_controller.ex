@@ -1,13 +1,10 @@
 defmodule WebCATWeb.CategoryController do
   use WebCATWeb, :authenticated_controller
   alias WebCAT.CRUD
-  alias WebCAT.Rotations.Classroom
   alias WebCAT.Feedback.{Category, Categories}
+  alias WebCAT.Rotations.Classrooms
 
   action_fallback(WebCATWeb.FallbackController)
-
-  @list_preload ~w(sub_categories)a
-  @preload ~w(classroom parent_category observations)a ++ @list_preload
 
   def index(conn, user, %{"classroom_id" => classroom_id}) do
     permissions do
@@ -15,13 +12,13 @@ defmodule WebCATWeb.CategoryController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, classroom} <- CRUD.get(Classroom, classroom_id),
+         {:ok, classroom} <- Classrooms.get(classroom_id),
          categories <- Categories.list(classroom_id) do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
-        classroom: classroom,
-        categories: categories
+        categories: categories,
+        classroom: classroom
       )
     end
   end
@@ -46,26 +43,18 @@ defmodule WebCATWeb.CategoryController do
       has_role(:admin)
     end
 
-    parent_category_id =
-      with "" <> param <- Map.get(params, "parent_category_id"),
-           {num, _} <- Integer.parse(param) do
-        num
-      else
-        _ -> nil
-      end
-
     with :ok <- is_authorized?(),
-         {:ok, classroom} <- CRUD.get(Classroom, classroom_id) do
+         {:ok, classroom} <- Classrooms.get(classroom_id) do
       conn
       |> render("new.html",
         user: user,
         changeset:
           Category.changeset(%Category{
             classroom_id: classroom_id,
-            parent_category_id: parent_category_id
+            parent_category_id: Map.get(params, "parent_category_id")
           }),
-        classroom: classroom,
-        selected: "classroom"
+        selected: "classroom",
+        classroom: classroom
       )
     end
   end
@@ -80,17 +69,14 @@ defmodule WebCATWeb.CategoryController do
         {:ok, category} ->
           conn
           |> put_flash(:info, "Category created!")
-          |> redirect(to: Routes.category_path(conn, :show, category.classroom_id, category.id))
+          |> redirect(to: Routes.category_path(conn, :show, category.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          {:ok, classroom} = CRUD.get(Classroom, params["classroom_id"])
-
           conn
           |> render("new.html",
             user: user,
             changeset: changeset,
-            selected: "classroom",
-            classroom: classroom
+            selected: "classroom"
           )
       end
     end
@@ -102,11 +88,12 @@ defmodule WebCATWeb.CategoryController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
+         {:ok, category} <- Categories.get(id) do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
-        changeset: Category.changeset(category)
+        changeset: Category.changeset(category),
+        classroom: category.classroom
       )
     end
   end
@@ -117,12 +104,12 @@ defmodule WebCATWeb.CategoryController do
     end
 
     with :ok <- is_authorized?(),
-         {:ok, category} <- CRUD.get(Category, id, preload: @preload) do
+         {:ok, category} <- Categories.get(id) do
       case CRUD.update(Category, category, update) do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Category updated!")
-          |> redirect(to: Routes.category_path(conn, :show, category.classroom_id, id))
+          |> redirect(to: Routes.category_path(conn, :show, id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
           render(conn, "edit.html",
@@ -145,12 +132,12 @@ defmodule WebCATWeb.CategoryController do
         {:ok, _} ->
           conn
           |> put_flash(:info, "Category deleted successfully")
-          |> redirect(to: Routes.category_path(conn, :index, category.classroom_id))
+          |> redirect(to: Routes.category_path(conn, :index, classroom_id: category.classroom_id))
 
-        {:error, _} ->
+        {:error, %Ecto.Changeset{}} ->
           conn
           |> put_flash(:error, "Category deletion failed")
-          |> redirect(to: Routes.category_path(conn, :index, category.classroom_id))
+          |> redirect(to: Routes.category_path(conn, :index, classroom_id: category.classroom_id))
       end
     end
   end

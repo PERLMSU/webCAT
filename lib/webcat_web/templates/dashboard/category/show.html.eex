@@ -1,0 +1,74 @@
+<div class="ui grid container">
+    <!-- Navigation Breadcrumbs -->
+    <div class="row">
+        <div class="eight wide column">
+            <%= breadcrumbs([
+                breadcrumb("Classrooms", to: Routes.classroom_path(@conn, :index)),
+                breadcrumb(@category.classroom.name, to: Routes.classroom_path(@conn, :show, @category.classroom_id)),
+                breadcrumb("Categories", to: Routes.category_path(@conn, :index, classroom_id: @category.classroom_id)),
+                breadcrumb(@category.name)
+            ]) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">Category:
+                <%= @category.name %>
+                <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.category_path(@conn, :edit, @category.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.category_path(@conn, :delete, @category.id), method: :delete, data: [confirm: "Are you sure?"]) %>
+                </div>
+            </h1>
+        </div>
+    </div>
+    <div class="stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Details
+                </h2>
+                <table class="ui very basic collapsing table">
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td><%= @category.name %></td>
+                    </tr>
+                    <%= if @category.parent_category_id != nil do %>
+                    <tr>
+                        <td><strong>Parent Category</strong></td>
+                        <td><%= link(@category.parent_category.name, to: Routes.category_path(@conn, :show, @category.parent_category_id)) %>
+                        </td>
+                    </tr>
+                    <% end %>
+                    <%= if @category.description != nil do %>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td><%= @category.description %></td>
+                    </tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Sub-Categories
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.category_path(@conn, :new, classroom_id: @category.classroom_id, parent_category_id: @category.id)) %>
+                </h2>
+                <%= render("table.html", conn: @conn, categories: @category.sub_categories) %>
+            </div>
+        </div>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h2 class="header">
+                    Observations
+                    <%= icon_button("Create", "plus", class: "green right floated", to: Routes.observation_path(@conn, :new, category_id: @category.id)) %>
+                </h2>
+                <%= render(WebCATWeb.ObservationView, "table.html", conn: @conn, observations: @category.observations) %>
+            </div>
+        </div>
+    </div>
+</div>
