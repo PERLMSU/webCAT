@@ -1,6 +1,8 @@
 defmodule WebCATWeb.IndexView do
   use WebCATWeb, :view
 
+
+
   @external_resource changelog_path = Path.join(File.cwd!(), "./CHANGELOG.md")
   @changelog_path changelog_path
 

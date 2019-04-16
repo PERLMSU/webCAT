@@ -1,6 +1,6 @@
 defmodule WebCAT.Rotations.Classrooms do
   alias WebCAT.Repo
-  alias WebCAT.Rotations.Classroom
+  alias WebCAT.Rotations.{Classroom, Rotation}
   import Ecto.Query
 
   def list() do
@@ -38,5 +38,18 @@ defmodule WebCAT.Rotations.Classrooms do
       %Classroom{} = classroom -> {:ok, classroom}
       nil -> {:error, :not_found}
     end
+  end
+
+  def get_active_rotation(%Classroom{id: classroom_id}) do
+    date = Timex.now()
+
+    from(rotation in Rotation,
+      left_join: section in assoc(rotation, :section),
+      left_join: semester in assoc(section, :semester),
+      where: semester.classroom_id == ^classroom_id,
+      where: rotation.start_date <= ^date,
+      where: rotation.end_date >= ^date
+    )
+    |> Repo.one()
   end
 end

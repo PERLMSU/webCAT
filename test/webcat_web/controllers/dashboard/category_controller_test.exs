@@ -10,7 +10,7 @@ defmodule WebCATWeb.CategoryControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.category_path(conn, :index, classroom.id))
+        |> get(Routes.category_path(conn, :index, classroom_id: classroom.id))
         |> html_response(200)
 
       assert response =~ "Categories"
@@ -26,7 +26,7 @@ defmodule WebCATWeb.CategoryControllerTest do
       response =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.category_path(conn, :show, data.classroom_id, data.id))
+        |> get(Routes.category_path(conn, :show, data.id))
         |> html_response(200)
 
       assert response =~ data.name

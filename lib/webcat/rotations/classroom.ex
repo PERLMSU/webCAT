@@ -28,7 +28,7 @@ defmodule WebCAT.Rotations.Classroom do
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
     |> unique_constraint(:course_code, name: :classrooms_course_code_index)
-    |> put_users(Map.get(attrs, "users"))
+    |> put_users(Map.get(attrs, "users", []))
   end
 
   defp put_users(%{valid?: true} = changeset, users) when is_list(users) do

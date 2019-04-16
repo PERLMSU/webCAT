@@ -1,11 +1,41 @@
+
+
 <div class="ui visible inverted vertical sidebar menu">
+    <%# Header item %>
     <div class="header item">
-        WebCAT
+        <a class="ui avatar image">
+            <img src="<%= "https://api.adorable.io/avatars/285/#{@user.email}.png" %>">        
+        </a>
+        <div class="content">
+            <div class="header">WebCAT</div>
+            <div class="description">
+                <%= link("#{@user.first_name} #{@user.last_name}", to: Routes.profile_path(@conn, :show)) %>
+            </div>
+        </div>
     </div>
-    <%= menu_entry("Overview", "tachometer", Routes.index_path(@conn, :index), @selected == "overview") %>
-    <%= menu_entry("Classroom", "university", Routes.classroom_path(@conn, :index), @selected == "classroom") %>
-    <%= menu_entry("Users", "users", Routes.user_path(@conn, :index), @selected == "users") %>
-    <%= menu_entry("Import", "file-import", Routes.index_path(@conn, :import), @selected == "import") %>
-    <%= menu_entry("Feedback", "pen", Routes.student_feedback_path(@conn, :classrooms), @selected == "feedback") %>
-    <%= menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
+    <%# Classroom Selection %>
+    <div id="classroom_dropdown" class="ui right dropdown item">
+        <input type="hidden" name="gender"/>
+        <i class="dropdown icon"></i>
+        <div class="default text">Classroom</div>
+        <div class="menu">
+            <% classrooms = Repo.all(from(c in Classroom, left_join: u in assoc(c, :users), where: u.id == ^@user.id)) %>
+            <%= for classroom <- classrooms do %>
+                <%= link(classroom.course_code, to: Routes.index_path(@conn, :index, classroom_id: classroom.id), class: "item", data: [value: classroom.id]) %>
+            <% end %>
+        </div>
+        </div>
+    <div class="item">
+        <div class="menu">
+            <%= menu_entry("Overview", "tachometer", Routes.index_path(@conn, :index), @selected == "overview") %>
+            <%= menu_entry("Classroom", "university", Routes.classroom_path(@conn, :index), @selected == "classroom") %>
+            <%= menu_entry("Users", "users", Routes.user_path(@conn, :index), @selected == "users") %>
+            <%= menu_entry("Import", "file-import", Routes.index_path(@conn, :import), @selected == "import") %>
+            <%= menu_entry("Feedback", "pen", Routes.student_feedback_path(@conn, :classrooms), @selected == "feedback") %>
+            <%= menu_entry("Inbox", "inbox", Routes.inbox_path(@conn, :index), @selected == "inbox") %>
+        </div>
+    </div>
 </div>
+<script>
+$("#classroom_dropdown").dropdown('set selected', <%= if assigns[:classroom], do: @classroom.id %>)
+</script>

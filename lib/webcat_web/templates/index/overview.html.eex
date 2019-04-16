@@ -4,10 +4,11 @@
     integrity="sha256-IkmA5ohhf967cOx4YAYiagXFMBzkxNaFGf4PNGoILRI=" crossorigin="anonymous"></script>
 
 <div class="ui grid container">
-    <div class="row">
+    <%= if @classroom != nil do %>
+          <div class="row">
         <div class="eight wide column">
             <h1 class="ui header">
-                Dashboard
+                <%= @classroom.course_code %> - Dashboard
             </h1>
         </div>
         <div class="eight wide right aligned column">
@@ -39,33 +40,64 @@
                 <h2 class="ui header">Observations per Student
                     <div class="sub header">Last Four Weeks</div>
                 </h2>
-                <%= WebCATWeb.ChartView.line_chart(@chart_data.observations) |> raw() %>
+                <%= WebCATWeb.ChartView.line_chart(Jason.encode!(@chart_data.observations)) |> raw() %>
             </div>
         </div>
         <div class="six wide column">
-            <div class="ui raised segment">
+            <%= if @chart_data.drafts != nil do %>
+              <div class="ui raised segment">
                 <h2 class="ui header">Draft Status Breakdown
                     <div class="sub header">Current Rotation</div>
                 </h2>
-                <%= WebCATWeb.ChartView.pie_chart(@chart_data.drafts, donut: true) |> raw() %>
+                <%= WebCATWeb.ChartView.pie_chart(Jason.encode!(@chart_data.drafts), donut: true) |> raw() %>
             </div>
+            <% else %>
+                          <div class="ui placeholder segment">
+                <div class="ui icon header">
+                <i class="university outline icon"></i>
+                No Active Rotation
+                </div>
+            </div>
+            <% end %>
         </div>
     </div>
     <div class="equal width row">
         <div class="column">
-            <div class="ui raised segment">
+            <%= if @chart_data.weekly_draft_progress != nil do %>
+              <div class="ui raised segment">
                 <h2 class="ui header">Weekly Draft Progress</h2>
-                <div class="ui yellow progress" data-percent="74">
+                <div class="ui yellow progress" data-percent="<%= @chart_data.weekly_draft_progress.written %>">
                     <div class="bar"></div>
-                    <div class="label">74% Written</div>
+                    <div class="label"><%= @chart_data.weekly_draft_progress.written %>% Written</div>
                 </div>
-                <div class="ui green progress" data-percent="43">
+                <div class="ui green progress" data-percent="<%= @chart_data.weekly_draft_progress.approved %>">
                     <div class="bar"></div>
-                    <div class="label">43% Approved</div>
+                    <div class="label"><%= @chart_data.weekly_draft_progress.approved %>% Approved</div>
                 </div>
             </div>
+            <% else %>
+            <div class="ui placeholder segment">
+                <div class="ui icon header">
+                <i class="university outline icon"></i>
+                No Active Rotation
+                </div>
+            </div>
+            <% end %>
         </div>
     </div>
+    <% else %>
+    <div class="row">
+        <div class="column">
+        <div class="ui placeholder segment">
+        <div class="ui icon header">
+            <i class="university outline icon"></i>
+            No Classroom Selected
+        </div>
+        <%= link("View Classrooms", to: Routes.classroom_path(@conn, :index), class: "ui primary button") %>
+    </div>
+        </div>
+    </div>
+    <% end %>
 
 
 </div>

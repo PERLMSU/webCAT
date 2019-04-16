@@ -7,7 +7,7 @@
     <div class="row">
         <div class="column">
             <div class="ui raised segment">
-                <%= render("form.html", assigns) %>
+                <%= render("_form.html", assigns) %>
             </div>
         </div>
     </div>

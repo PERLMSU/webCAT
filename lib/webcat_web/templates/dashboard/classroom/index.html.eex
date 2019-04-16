@@ -18,7 +18,7 @@
     <div class="ui divider"></div>
     <div class="row">
         <div class="sixteen wide column">
-            <%= render "table.html", assigns %>
+            <%= render "_table.html", assigns %>
         </div>
     </div>
 </div>

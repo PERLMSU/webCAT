@@ -8,6 +8,28 @@ defmodule WebCAT.Accounts.Users do
   alias Ecto.Changeset
   alias Ecto.Multi
   import Ecto.Query
+  alias WebCAT.Rotations.Classroom
+  alias WebCAT.CRUD
+
+  @doc """
+  Get default classroom for user
+  """
+  def get_classroom(%User{} = user, params) when is_map(params) do
+    with %{"classroom_id" => id} <- params,
+         {:ok, c} <- CRUD.get(Classroom, id) do
+      c
+    else
+      _ ->
+        user
+        |> Repo.preload(:classrooms)
+        |> Map.fetch!(:classrooms)
+        |> List.first()
+        |> case do
+          %Classroom{} = classroom -> classroom
+          _ -> nil
+        end
+    end
+  end
 
   @doc """
   Get a user by their email if they have one associated

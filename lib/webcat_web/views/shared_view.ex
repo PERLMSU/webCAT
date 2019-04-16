@@ -1,5 +1,10 @@
 defmodule WebCATWeb.SharedView do
   use WebCATWeb, :view
+  alias WebCAT.CRUD
+  alias WebCAT.Rotations.Classroom
+  alias WebCAT.Repo
+  import Ecto.Query
+
 
   def menu_entry(entry, icon, to, selected) do
     content_tag(:a, class: if(selected == true, do: "active item", else: "item"), href: to) do

@@ -3,17 +3,23 @@ defmodule WebCATWeb.ClassroomController do
 
   alias WebCAT.CRUD
   alias WebCAT.Rotations.{Classroom, Classrooms}
+  alias WebCAT.Accounts.Users
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, user, _params) do
+  def index(conn, user, params) do
     permissions do
       has_role(:admin)
     end
 
     with :ok <- is_authorized?(),
          classrooms <- Classrooms.list() do
-      render(conn, "index.html", user: user, selected: "classroom", classrooms: classrooms)
+      render(conn, "index.html",
+        user: user,
+        selected: "classroom",
+        classrooms: classrooms,
+        classroom: Users.get_classroom(user, params)
+      )
     end
   end
 
@@ -32,7 +38,7 @@ defmodule WebCATWeb.ClassroomController do
     end
   end
 
-  def new(conn, user, _params) do
+  def new(conn, user, params) do
     permissions do
       has_role(:admin)
     end
@@ -42,7 +48,8 @@ defmodule WebCATWeb.ClassroomController do
       |> render("new.html",
         user: user,
         changeset: Classroom.changeset(%Classroom{}),
-        selected: "classroom"
+        selected: "classroom",
+        classroom: Users.get_classroom(user, params)
       )
     end
   end
@@ -80,7 +87,8 @@ defmodule WebCATWeb.ClassroomController do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
-        changeset: Classroom.changeset(classroom)
+        changeset: Classroom.changeset(classroom),
+        classroom: classroom
       )
     end
   end
@@ -89,6 +97,8 @@ defmodule WebCATWeb.ClassroomController do
     permissions do
       has_role(:admin)
     end
+
+    IO.inspect(update)
 
     with :ok <- is_authorized?(),
          {:ok, classroom} <- Classrooms.get(id) do
