@@ -1,7 +1,16 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 
+<%
+id = get_field(@changeset, :id)
+
+ path =  
+case id do
+    nil -> Routes.inbox_path(@conn, :create)
+    _ -> Routes.inbox_path(@conn, :update, id)
+  end %>
+
 <% statuses = ~w(reviewing needs_revision approved) |> Enum.map(&{Phoenix.Naming.humanize(&1),&1})  %>
-<%= form_for(@changeset, Routes.inbox_path(@conn, :update, @changeset.data.id), [class: "ui form"], fn f ->  %>
+<%= form_for(@changeset, path, [class: "ui form"], fn f ->  %>
     <%= hidden_input(f, :rotation_group_id, value: @changeset.data.rotation_group_id) %>
     <%= hidden_input(f, :user_id, value: @changeset.data.user_id) %>
     <%= textarea(f, :content, id: "md-editor") %>
