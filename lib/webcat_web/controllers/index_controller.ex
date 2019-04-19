@@ -71,7 +71,7 @@ defmodule WebCATWeb.IndexController do
 
           {:error, message} ->
             conn
-            |> put_flash(:error, "Import failed: #{message}")
+            |> put_flash(:error, "Import failed: duplicate data")
             |> redirect(to: Routes.index_path(conn, :import))
         end
 

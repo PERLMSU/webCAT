@@ -69,7 +69,7 @@
                 <h2 class="header">
                     Classrooms
                 </h2>
-                <%= render(WebCATWeb.ClassroomView, "table.html", conn: @conn, classrooms: @data.classrooms) %>
+                <%= render(WebCATWeb.ClassroomView, "_table.html", conn: @conn, classrooms: @data.classrooms) %>
             </div>
         </div>
     </div>

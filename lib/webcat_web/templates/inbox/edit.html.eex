@@ -1,0 +1,27 @@
+
+<div class="ui container grid">
+    <div class="row">
+        <div class="column">
+<div class="ui segment">
+            
+    <div class="ui header">Observations</div>
+    <%= render(WebCATWeb.SharedView, "observation_list.html", observations: @observations) %>
+</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="ui raised segment">
+                <h1 class="ui header">
+                    Edit Draft
+                    <div class="sub header"><%= @changeset.data.user.first_name %> <%= @changeset.data.user.last_name %> - Rotation Group <%= @changeset.data.rotation_group.number %></div>
+                </h1>
+                <%= render "_form.html", assigns %>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src='<%= Routes.static_path(@conn, "/js/draft.js") %>'></script>
+<script src='<%= Routes.static_path(@conn, "/js/form.js") %>'></script>

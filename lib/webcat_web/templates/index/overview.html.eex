@@ -5,14 +5,11 @@
 
 <div class="ui grid container">
     <%= if @classroom != nil do %>
-          <div class="row">
+    <div class="row">
         <div class="eight wide column">
             <h1 class="ui header">
                 <%= @classroom.course_code %> - Dashboard
             </h1>
-        </div>
-        <div class="eight wide right aligned column">
-            <%= link("Send Drafts", to: "#", class: "ui primary button") %>
         </div>
     </div>
 
@@ -52,7 +49,7 @@
                 <%= WebCATWeb.ChartView.pie_chart(Jason.encode!(@chart_data.drafts), donut: true) |> raw() %>
             </div>
             <% else %>
-                          <div class="ui placeholder segment">
+            <div class="ui placeholder segment">
                 <div class="ui icon header">
                 <i class="university outline icon"></i>
                 No Active Rotation

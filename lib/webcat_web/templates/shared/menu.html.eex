@@ -9,7 +9,7 @@
         <div class="content">
             <div class="header">WebCAT</div>
             <div class="description">
-                <%= link("#{@user.first_name} #{@user.last_name}", to: Routes.profile_path(@conn, :show)) %>
+                <%= link("#{@user.first_name} #{@user.last_name}", to: "#") %>
             </div>
         </div>
     </div>

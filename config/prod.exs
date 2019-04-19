@@ -30,9 +30,20 @@ config :webcat, WebCAT.Repo,
   pool_size: 10
 
 config :webcat, WebCAT.Mailer,
-  adapter: Bamboo.MailgunAdapter,
-  domain: "${MAILGUN_DOMAIN}",
-  api_key: "${MAILGUN_KEY}"
+  adapter: Bamboo.SMTPAdapter,
+  server: "smtp.gmail.com",
+  # hostname: "",
+  port: 587,
+  username: "${SMTP_USERNAME}",
+  password: "${SMTP_PASWORD}",
+  tls: :if_available,
+  allowed_tls_versions: [:tlsv1, :"tlsv1.1", :"tlsv1.2"],
+  ssl: true,
+  retries: 1,
+  # can be `true`
+  no_mx_lookups: false,
+  # can be `always`. If your smtp relay requires authentication set it to `always`.
+  auth: :if_available
 
 # Do not print debug messages in production
 config :logger, level: :info

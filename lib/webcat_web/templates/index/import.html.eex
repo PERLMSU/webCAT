@@ -1,20 +1,17 @@
-<%= form_for(@conn, Routes.index_path(@conn, :do_import), [multipart: true, as: :import], fn f -> %>
-<div class="file has-name">
-    <label class="file-label">
-        <%= file_input f, :file, class: "file-input" %>
-        <span class="file-cta">
-            <span class="file-icon">
-                <i class="fas fa-upload"></i>
-            </span>
-            <span class="file-label">
-                Choose a file to import...
-            </span>
-        </span>
-        <span class="file-name"></span>
-    </label>
+<div class="ui container grid">
+    <div class="row">
+        <div class="column">
+            <h1 class="header">Import</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <%= form_for(@conn, Routes.index_path(@conn, :do_import), [multipart: true, as: :import, class: "ui form"], fn f -> %>
+                <div class="field">
+                <%= file_input f, :file %>
+                </div>
+                <%= submit("Import", class: "ui button")%>
+            <% end) %>
+        </div>
+    </div>
 </div>
-<div class="control">
-    <%= submit("Import", class: "button is-primary")%>
-</div>
-<% end) %>
-<script src='<%= Routes.static_path(@conn, "/js/file.js") %>'></script>

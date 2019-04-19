@@ -16,12 +16,12 @@ defmodule WebCATWeb.ViewHelpers do
   def icon_button(text, icon, opts \\ []) do
     to = Keyword.get(opts, :to, "")
     class = Keyword.get(opts, :class, "")
+    method = Keyword.get(opts, :method, :get)
+    data = Keyword.get(opts, :data, [])
 
-    on_click = Keyword.get(opts, :onclick, "")
-
-    content_tag(:a, href: to, class: "ui button #{class}", onclick: on_click) do
+    link(to: to, class: "ui button #{class}", method: method, data: data) do
       [
-        content_tag(:i, "", class: "icon far fa-#{icon}"),
+        content_tag(:i, "", class: "#{icon} icon"),
         text
       ]
     end

@@ -1,34 +1,49 @@
-<%= render("menu.html", assigns) %>
-<table class="ui celled table">
-    <thead>
-        <tr>
-            <th>Student</th>
-            <th>Classroom</th>
-            <th>Rotation</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <%= for draft <- @drafts do %>
-        <tr>
-            <td><%= link("#{draft.user.first_name} #{draft.user.last_name}", to: Routes.inbox_path(@conn, :show, draft.id)) %></td>
-            <td><%= draft.rotation_group.rotation.section.semester.classroom.name %></td>
-            <td><%= draft.rotation_group.rotation.number %></td>
-            <td>
-                <%= case draft.status do %>
-                <%= "unreviewed" -> %>
-                <a class="ui red label">Unreviewed</a>
-                <%= "reviewing" -> %>
-                <a class="ui yellow label">Reviewing</a>
-                <%= "needs_revision" -> %>
-                <a class="ui orange label">Needs Revision</a>
-                <%= "approved" -> %>
-                <a class="ui green label">Approved</a>
-                <%= "emailed" -> %>
-                <a class="ui blue label">Emailed</a>
-                <% end %>
-            </td>
-        </tr>
-        <% end %>
-    </tbody>
-</table>
+<div class="ui grid container">
+    <div class="row">
+        <div class="eight wide column">
+            <h1 class="ui header">
+                Inbox
+            </h1>
+        </div>
+        <div class="eight wide right aligned column">
+            <%= link("Send Drafts", to: Routes.send_path(@conn, :create), method: :post, data: [confirm: "Are you sure? This will send all approved drafts"], class: "ui primary button") %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Classroom</th>
+                        <th>Rotation</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%= for draft <- @drafts do %>
+                    <tr>
+                        <td><%= link("#{draft.user.first_name} #{draft.user.last_name}", to: Routes.inbox_path(@conn, :show, draft.id)) %></td>
+                        <td><%= draft.rotation_group.rotation.section.semester.classroom.name %></td>
+                        <td><%= draft.rotation_group.rotation.number %></td>
+                        <td>
+                            <%= case draft.status do %>
+                            <%= "unreviewed" -> %>
+                            <a class="ui red label">Unreviewed</a>
+                            <%= "reviewing" -> %>
+                            <a class="ui yellow label">Reviewing</a>
+                            <%= "needs_revision" -> %>
+                            <a class="ui orange label">Needs Revision</a>
+                            <%= "approved" -> %>
+                            <a class="ui green label">Approved</a>
+                            <%= "emailed" -> %>
+                            <a class="ui blue label">Emailed</a>
+                            <% end %>
+                        </td>
+                    </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

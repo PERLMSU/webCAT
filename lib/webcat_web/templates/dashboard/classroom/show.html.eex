@@ -15,7 +15,7 @@
                 <%= @classroom.name %>
                 <div class="ui right floated buttons">
                     <%= icon_button("Edit", "wrench", class: "blue", to: Routes.classroom_path(@conn, :edit, @classroom.id)) %>
-                    <%= icon_button("Delete", "times", class: "red", to: Routes.classroom_path(@conn, :delete, @classroom.id), onclick: "return confirm('Are you sure?');") %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.classroom_path(@conn, :delete, @classroom.id), method: :delete, data: [confirm: "Are you sure?"]) %>
                 </div>
             </h1>
         </div>

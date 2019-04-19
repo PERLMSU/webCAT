@@ -4,6 +4,29 @@ defmodule WebCAT.Feedback.Drafts do
   alias WebCAT.Feedback.Draft
   alias WebCAT.Rotations.Rotation
 
+  def get(id) do
+    from(draft in Draft,
+      where: draft.id == ^id,
+      left_join: comments in assoc(draft, :comments),
+      left_join: rotation_group in assoc(draft, :rotation_group),
+      left_join: user in assoc(draft, :user),
+      left_join: grades in assoc(draft, :grades),
+      left_join: category in assoc(grades, :category),
+      left_join: comment_users in assoc(comments, :user),
+      preload: [
+        rotation_group: rotation_group,
+        user: user,
+        grades: {grades, category: category},
+        comments: {comments, user: comment_users}
+      ]
+    )
+    |> Repo.one()
+    |> case do
+      %Draft{} = draft -> {:ok, draft}
+      nil -> {:error, :not_found}
+    end
+  end
+
   def draft_status_breakdown(nil), do: nil
 
   def draft_status_breakdown(%Rotation{id: id}) do

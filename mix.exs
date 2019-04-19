@@ -34,6 +34,7 @@ defmodule WebCAT.Mixfile do
   defp deps do
     [
       {:elixir_uuid, "~> 1.2"},
+      {:bamboo_smtp, "~> 1.6.0"},
       {:earmark, "~> 1.3.1"},
       {:bamboo, "~> 1.0"},
       {:terminator, github: "bbuscarino/terminator", branch: "dev"},

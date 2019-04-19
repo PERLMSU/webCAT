@@ -40,6 +40,8 @@ defmodule WebCAT.Rotations.Classrooms do
     end
   end
 
+  def get_active_rotation(nil), do: nil
+
   def get_active_rotation(%Classroom{id: classroom_id}) do
     date = Timex.now()
 

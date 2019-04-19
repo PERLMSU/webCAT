@@ -1,6 +1,7 @@
 defmodule WebCATWeb.Email do
   use Bamboo.Phoenix, view: WebCATWeb.EmailView
   import WebCATWeb.Router.Helpers
+  alias WebCAT.Feedback.Draft
 
   @doc """
   Create an email to be sent in the case of a password beimg reset
@@ -26,5 +27,15 @@ defmodule WebCATWeb.Email do
     |> render("confirmation.html",
       link: login_url(WebCATWeb.Endpoint, :credential_login, token: token)
     )
+  end
+
+  def draft(%Draft{} = draft) do
+    date = Timex.format!(Timex.now(), "{M}/{D}/{YYYY}")
+
+    new_email()
+    |> to(draft.user.email)
+    |> from("no-reply@webcat.io")
+    |> subject("Weekly Feedback - #{date}")
+    |> render("draft.html", draft: draft, date: date)
   end
 end

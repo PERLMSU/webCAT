@@ -1,41 +1,91 @@
-<div class="ui segment">
-    <h1 class="ui header">Draft</h1>
-    <%= @draft.content |> Earmark.as_html!() |> raw() %>
-</div>
-<div class="ui segment">
-    <h1 class="ui header">Grades</h1>
-    <div class="list">
-        <%= for grade <- @draft.grades do %>
-        <div class="item"><%= grade.category.name %> - <%= grade.score %>%</div>
-        <% end %>
-    </div>
-    Average: <%= Enum.sum(Enum.map(@draft.grades, & &1.score)) / Enum.count(@draft.grades) %>%
-</div>
-<div class="ui segment">
-    <h1 class="ui header">Comments</h1>
-    <div class="ui comments">
-        <%= for comment <- @draft.comments do %>
-        <div class="comment">
-            <a class="avatar">
-                <img src="<%= "https://api.adorable.io/avatars/285/#{comment.user.email}.png" %>">
-            </a>
-            <div class="content">
-                <a class="author"><%= comment.user.first_name %> <%= comment.user.last_name %></a>
-                <div class="metadata">
-                    <span class="date"><%= Timex.format!(comment.inserted_at, "{relative}", :relative)%></span>
-                </div>
-                <div class="text">
-                    <%= comment.content %>
-                </div>
+<div class="ui grid container">
+    <div class="row">
+        <div class="column">
+            <h1 class="ui header">
+                Draft
+                <%= case @draft.status do %>
+                    <% "unreviewed" -> %>
+                    <a class="ui red label">Unreviewed</a>
+                    <% "reviewing" -> %>
+                    <a class="ui yellow label">Reviewing</a>
+                    <% "needs_revision" -> %>
+                    <a class="ui orange label">Needs Revision</a>
+                    <% "approved" -> %>
+                    <a class="ui green label">Approved</a>
+                    <% "emailed" -> %>
+                    <a class="ui black label">Emailed</a>
+                <% end %>
+            <div class="sub header"><%= @draft.user.first_name %> <%= @draft.user.last_name %> - Rotation Group <%= @draft.rotation_group.number %></div>
+            </h1>
+            <div class="ui right floated buttons">
+                    <%= icon_button("Edit", "wrench", class: "blue", to: Routes.inbox_path(@conn, :edit, @draft.id)) %>
+                    <%= icon_button("Delete", "times", class: "red", to: Routes.inbox_path(@conn, :delete, @draft.id), method: :delete, data: [confirm: "Are you sure?"]) %>
             </div>
         </div>
-        <% end %>
-        <%= form_for @comment_changeset, Routes.comment_path(@conn, :create, @draft.id), [class: "ui reply form"], fn f -> %>
-            <%= hidden_input(f, :user_id) %>
-            <div class="field">
-                <%= textarea(f, :content, class: "input") %>
+    </div>
+    <div class="equal width stretched row">
+        <div class="column">
+            <div class="ui segment">
+                <h2 class="ui dividing header">
+                    Content
+                </h2>
+                <%= @draft.content |> Earmark.as_html!() |> raw() %>
             </div>
-            <%= submit("Add Comment", class: "ui blue submit button") %>
-        <% end %>
+        </div>
+        <div class="column">
+            <div class="ui segment">
+                <h2 class="ui header">
+                Grades <div class="sub header"><%= if not Enum.empty?(@draft.grades) do %>
+                  <%= Enum.sum(Enum.map(@draft.grades, & &1.score)) / Enum.count(@draft.grades) %>%
+                <% end %></div>
+                </h2>
+                <%= if not Enum.empty?(@draft.grades) do %>
+                <div class="list">
+                    <%= for grade <- @draft.grades do %>
+                    <div class="item"><%= grade.category.name %> - <%= grade.score %>%</div>
+                    <% end %>
+                </div>
+                <% else %>
+                <div class="ui placeholder segment">
+                    <div class="ui icon header">
+                    <i class="book outline icon"></i>
+                    No Grades given
+                    </div>
+                </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+                <div class="ui segment">
+                    <h1 class="ui dividing header">Comments</h1>
+                    <div class="ui comments">
+                        <%= for comment <- @draft.comments do %>
+                        <div class="comment">
+                            <a class="avatar">
+                                <img src="<%= "https://api.adorable.io/avatars/285/#{comment.user.email}.png" %>">
+                            </a>
+                            <div class="content">
+                                <a class="author"><%= comment.user.first_name %> <%= comment.user.last_name %></a>
+                                <div class="metadata">
+                                    <span class="date"><%= Timex.format!(comment.inserted_at, "{relative}", :relative)%></span>
+                                </div>
+                                <div class="text">
+                                    <%= comment.content %>
+                                </div>
+                            </div>
+                        </div>
+                        <% end %>
+                        <%= form_for @comment_changeset, Routes.comment_path(@conn, :create, @draft.id), [class: "ui reply form"], fn f -> %>
+                            <%= hidden_input(f, :user_id) %>
+                            <div class="field">
+                                <%= textarea(f, :content, class: "input") %>
+                            </div>
+                            <%= submit("Add Comment", class: "ui blue submit button") %>
+                        <% end %>
+                    </div>
+                </div>
+        </div>
     </div>
 </div>

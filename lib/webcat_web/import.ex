@@ -160,8 +160,18 @@ defmodule WebCATWeb.Import do
           end)
 
         case Repo.transaction(import_transaction) do
-          {:ok, data} -> {:ok, data}
-          {:error, _} -> :error
+          {:ok, data} ->
+            {:ok, data}
+
+          {:error, _, changeset, _} ->
+            errors =
+              Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+                Enum.reduce(opts, msg, fn {key, value}, acc ->
+                  String.replace(acc, "%{#{key}}", to_string(value))
+                end)
+              end)
+
+            {:error, errors}
         end
     end
   end

@@ -168,13 +168,14 @@ defmodule WebCAT.Accounts.Users do
       left_join: classrooms in assoc(user, :classrooms),
       left_join: sections in assoc(user, :sections),
       left_join: rotation_groups in assoc(user, :rotation_groups),
+      left_join: rotations in assoc(rotation_groups, :rotation),
       where: user.id == ^id,
       preload: [
         roles: roles,
         performer: {performer, roles: roles},
         classrooms: classrooms,
         sections: sections,
-        rotation_groups: rotation_groups
+        rotation_groups: {rotation_groups, rotation: rotations}
       ]
     )
     |> Repo.one()
@@ -182,5 +183,13 @@ defmodule WebCAT.Accounts.Users do
       nil -> {:error, :not_found}
       user -> {:ok, user}
     end
+  end
+
+  def has_role?(%User{} = user, role) do
+    user
+    |> Repo.preload(performer: [:roles])
+    |> Map.fetch!(:performer)
+    |> Map.fetch!(:roles)
+    |> Enum.find_value(false, fn r -> Map.get(r, :identifier) == role end)
   end
 end

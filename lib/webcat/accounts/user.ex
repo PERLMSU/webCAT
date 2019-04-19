@@ -19,11 +19,15 @@ defmodule WebCAT.Accounts.User do
 
     belongs_to(:performer, Terminator.Performer)
 
-    many_to_many(:classrooms, Classroom, join_through: "classroom_users")
-    many_to_many(:semesters, Semester, join_through: "semester_users")
-    many_to_many(:sections, Section, join_through: "section_users")
-    many_to_many(:rotations, Rotation, join_through: "rotation_users")
-    many_to_many(:rotation_groups, RotationGroup, join_through: "rotation_group_users")
+    many_to_many(:classrooms, Classroom, join_through: "classroom_users", on_replace: :delete)
+    many_to_many(:semesters, Semester, join_through: "semester_users", on_replace: :delete)
+    many_to_many(:sections, Section, join_through: "section_users", on_replace: :delete)
+    many_to_many(:rotations, Rotation, join_through: "rotation_users", on_replace: :delete)
+
+    many_to_many(:rotation_groups, RotationGroup,
+      join_through: "rotation_group_users",
+      on_replace: :delete
+    )
 
     has_many(:notifications, WebCAT.Accounts.Notification)
 
@@ -49,7 +53,7 @@ defmodule WebCAT.Accounts.User do
     |> unique_constraint(:email)
     |> put_performer()
     |> put_roles(Map.get(attrs, "roles"))
-    |> put_classrooms(Map.get(attrs, "classrooms"))
+    |> put_classrooms(Map.get(attrs, "classrooms", []))
   end
 
   defp put_performer(%{valid?: true} = changeset) do
@@ -80,7 +84,26 @@ defmodule WebCAT.Accounts.User do
   defp put_roles(changeset, _), do: changeset
 
   defp put_classrooms(%{valid?: true} = changeset, classrooms) when is_list(classrooms) do
-    put_assoc(changeset, :classrooms, Repo.all(from(c in Classroom, where: c.id in ^classrooms)))
+    ids =
+      classrooms
+      |> Enum.map(fn classroom ->
+        case classroom do
+          %{id: id} ->
+            id
+
+          id when is_integer(id) ->
+            id
+
+          id when is_binary(id) ->
+            String.to_integer(id)
+
+          _ ->
+            nil
+        end
+      end)
+      |> Enum.reject(&is_nil/1)
+
+    put_assoc(changeset, :classrooms, Repo.all(from(c in Classroom, where: c.id in ^ids)))
   end
 
   defp put_classrooms(changeset, _), do: changeset

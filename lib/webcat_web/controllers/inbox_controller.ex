@@ -73,28 +73,14 @@ defmodule WebCATWeb.InboxController do
       has_role(:assistant)
     end
 
-    with :ok <- is_authorized?() do
-      from(draft in Draft,
-        where: draft.id == ^id,
-        left_join: comments in assoc(draft, :comments),
-        left_join: grades in assoc(draft, :grades),
-        left_join: category in assoc(grades, :category),
-        left_join: user in assoc(comments, :user),
-        preload: [grades: {grades, category: category}, comments: {comments, user: user}]
+    with :ok <- is_authorized?(),
+         {:ok, draft} <- Drafts.get(id) do
+      render(conn, "show.html",
+        user: user,
+        selected: "inbox",
+        draft: draft,
+        comment_changeset: Comment.changeset(%Comment{user_id: user.id})
       )
-      |> Repo.one()
-      |> case do
-        %Draft{} = draft ->
-          render(conn, "show.html",
-            user: user,
-            selected: "inbox",
-            draft: draft,
-            comment_changeset: Comment.changeset(%Comment{user_id: user.id})
-          )
-
-        nil ->
-          {:error, :not_found}
-      end
     end
   end
 
@@ -150,8 +136,6 @@ defmodule WebCATWeb.InboxController do
       has_role(:assistant)
     end
 
-    IO.inspect(draft)
-
     with :ok <- is_authorized?() do
       case CRUD.create(Draft, draft) do
         {:ok, draft} ->
@@ -160,86 +144,87 @@ defmodule WebCATWeb.InboxController do
           |> redirect(to: Routes.inbox_path(conn, :show, draft.id))
 
         {:error, changeset} ->
-          IO.inspect(changeset)
-
-          with {:ok, student} <- CRUD.get(User, changeset.data.user_id),
-               observations =
-                 StudentFeedback.by_observation(
-                   changeset.data.rotation_group_id,
-                   changeset.data.user_id
-                 ) do
-            render(conn, "new.html",
-              user: user,
-              selected: "inbox",
-              student: student,
-              observations: observations,
-              changeset: changeset
+          observations =
+            StudentFeedback.by_observation(
+              changeset.data.rotation_group_id,
+              changeset.data.user_id
             )
-          end
+
+          render(conn, "new.html",
+            user: user,
+            selected: "inbox",
+            observations: observations,
+            changeset: changeset
+          )
       end
     end
   end
 
-  def edit(conn, %{"id" => id}) do
-    user = Auth.current_resource(conn)
+  def edit(conn, user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+      has_role(:assistant)
+    end
 
-    with {:ok, draft} <- CRUD.get(Draft, id),
-         :ok <- Bodyguard.permit(Draft, :update, user, draft) do
-      students =
-        Student
-        |> join(:left, [s], rg in assoc(s, :rotation_groups))
-        |> where([_, rg], rg.id == ^draft.rotation_group_id)
-        |> Repo.all()
-
+    with :ok <- is_authorized?(),
+         {:ok, draft} <- Drafts.get(id) do
       observations =
-        Observation
-        |> where([o], o.rotation_group_id == ^draft.rotation_group_id)
-        |> Repo.all()
+        StudentFeedback.by_observation(
+          draft.rotation_group_id,
+          draft.user_id
+        )
 
       render(conn, "edit.html",
         user: user,
-        selected: "feedback",
-        students: students,
+        selected: "inbox",
         observations: observations,
         changeset: Draft.changeset(draft)
       )
     end
   end
 
-  def update(conn, %{"id" => id, "draft" => update}) do
-    user = Auth.current_resource(conn)
+  def update(conn, user, %{"id" => id, "draft" => update}) do
+    permissions do
+      has_role(:admin)
+      has_role(:assistant)
+    end
 
-    with {:ok, draft} <- CRUD.get(Draft, id),
-         :ok <- Bodyguard.permit(Draft, :update, user, draft) do
+    with :ok <- is_authorized?(),
+         {:ok, draft} <- Drafts.get(id) do
       case CRUD.update(Draft, draft, update) do
         {:ok, _} ->
-          {:ok, observation} = CRUD.get(Observation, draft.observation_id)
-
           conn
           |> put_flash(:info, "Draft updated!")
-          |> redirect(
-            to: Routes.feedback_path(conn, :observations, observation.rotation_group_id)
-          )
+          |> redirect(to: Routes.inbox_path(conn, :show, draft.id))
 
         {:error, %Ecto.Changeset{} = changeset} ->
-          students =
-            Student
-            |> join(:left, [s], rg in assoc(s, :rotation_groups))
-            |> where([_, rg], rg.id == ^draft.rotation_group_id)
-            |> Repo.all()
-
-          observations =
-            Observation
-            |> where([o], o.rotation_group_id == ^draft.rotation_group_id)
-            |> Repo.all()
-
           render(conn, "edit.html",
             user: user,
-            selected: "feedback",
-            students: students,
-            observations: observations,
+            selected: "inbox",
             changeset: changeset
           )
+      end
+    end
+  end
+
+  def delete(conn, _user, %{"id" => id}) do
+    permissions do
+      has_role(:admin)
+      has_role(:assistant)
+    end
+
+    with :ok <- is_authorized?(),
+         {:ok, _draft} <- CRUD.get(Draft, id) do
+      case CRUD.delete(Draft, id) do
+        {:ok, _} ->
+          conn
+          |> put_flash(:info, "Draft deleted successfully")
+          |> redirect(to: Routes.inbox_path(conn, :index))
+
+        {:error, %Ecto.Changeset{}} ->
+          conn
+          |> put_flash(:error, "Draft deletion failed")
+          |> redirect(to: Routes.inbox_path(conn, :index))
       end
     end
   end

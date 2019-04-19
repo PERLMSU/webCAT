@@ -73,6 +73,7 @@ defmodule WebCATWeb.Router do
 
     resources("/", InboxController)
     resources("/:draft_id/comments", CommentController, except: ~w(index show edit new)a)
+    resources("/send", SendController, only: ~w(index create)a)
   end
 
   scope "/dashboard", WebCATWeb do

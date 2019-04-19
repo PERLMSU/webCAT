@@ -16,13 +16,13 @@ config :ecto, json_library: Jason
 # Configures the endpoint
 config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "super-duper-secret-UwU",
+  secret_key_base: :crypto.strong_rand_bytes(64),
   render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(html)],
   pubsub: [name: WebCATWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
 config :webcat, WebCATWeb.Auth.Guardian,
   issuer: "webcat",
-  secret_key: "super-duper-guardian-secret-Ow"
+  secret_key: :crypto.strong_rand_bytes(64)
 
 config :phoenix, :json_library, Jason
 
