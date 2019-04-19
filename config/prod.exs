@@ -15,15 +15,24 @@ config :webcat, WebCATWeb.Endpoint,
   # Possibly not needed, but doesn't hurt
   http: [port: {:system, "PORT"}],
   url: [host: "flawed-disloyal-invisiblerail.gigalixirapp.com", port: 80],
-  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+  secret_key_base: "${SECRET_KEY_BASE}",
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   server: true
 
+config :webcat, WebCATWeb.Auth.Guardian,
+  issuer: "webcat",
+  secret_key: "${SECRET_KEY_BASE}"
+
 config :webcat, WebCAT.Repo,
   adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL"),
+  url: "${DATABASE_URL}",
   ssl: true,
   pool_size: 10
+
+config :webcat, WebCAT.Mailer,
+  adapter: Bamboo.MailgunAdapter,
+  domain: "${MAILGUN_DOMAIN}",
+  api_key: "${MAILGUN_API}"
 
 # Do not print debug messages in production
 config :logger, level: :info

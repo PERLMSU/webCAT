@@ -16,20 +16,17 @@ config :ecto, json_library: Jason
 # Configures the endpoint
 config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "s9GTMEgc/xgeVdIwZ3VZy3kTo/1xPo6k7NezFUo0Oe+vomSV4eJDes3GQnwJp4rh",
+  secret_key_base: "super-duper-secret-UwU",
   render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(html)],
   pubsub: [name: WebCATWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
 config :webcat, WebCATWeb.Auth.Guardian,
   issuer: "webcat",
-  secret_key: "kQeiAAeH0pWGrvZSqwghRwWe+t2hkXXBiWn6OiagghxzJwejPhiqHG+h1C3r1bsw"
+  secret_key: "super-duper-guardian-secret-Ow"
 
 config :phoenix, :json_library, Jason
 
-config :webcat, WebCAT.Mailer,
-  adapter: Bamboo.MailgunAdapter,
-  domain: "sandbox17aeaeb906ad4816bd4ba04ccc6ee113.mailgun.org",
-  api_key: "493778cca90233e14c73ddb2855904cf-de7062c6-d819699b"
+config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
 
 # Configures Elixir's Logger
 config :logger, :console,
