@@ -1,6 +1,0 @@
-/*******************************
-     User Global Variables
-*******************************/
-
-@fontPath  : '../../../webfonts';
-@imagePath  : '../../../images';

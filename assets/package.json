@@ -3,38 +3,25 @@
   "license": "ISC",
   "sideEffects": false,
   "scripts": {
-    "build:dev": "webpack --mode development",
-    "build": "webpack --mode production",
-    "start": "yarn run watch",
-    "watch": "webpack --mode development --watch-stdin"
+    "deploy": "parcel build js/index.js css/styles.scss static/**/* --out-dir ../priv/static",
+    "watch": "parcel watch js/index.js css/styles.scss static/**/* --out-dir ../priv/static"
   },
   "dependencies": {
     "@fortawesome/fontawesome-pro": "5.4.1",
-    "jquery": "3.3.1",
     "phoenix": "file:../deps/phoenix",
-    "phoenix_html": "file:../deps/phoenix_html",
-    "popper.js": "1.14.7",
-    "selectize": "0.12.6",
     "simplemde": "1.11.2",
-    "semantic-ui": "2.4.2"
+    "tailwindcss": "^0.7.4"
   },
   "devDependencies": {
-    "@babel/core": "7.3.3",
-    "@babel/plugin-transform-modules-commonjs": "7.2.0",
-    "@babel/preset-env": "7.3.1",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
     "autoprefixer": "9.4.9",
-    "babel-cli": "6.26.0",
-    "babel-loader": "8.0.5",
-    "copy-webpack-plugin": "5.0.0",
-    "css-loader": "2.1.0",
-    "cssnano": "4.1.10",
-    "mini-css-extract-plugin": "0.5.0",
-    "node-sass": "4.11.0",
-    "optimize-css-assets-webpack-plugin": "5.0.1",
-    "postcss-loader": "3.0.0",
-    "sass-loader": "7.1.0",
-    "uglifyjs-webpack-plugin": "^1.0.0",
-    "webpack": "4.29.5",
-    "webpack-cli": "3.2.3"
+    "cssnano": "^4.1.10",
+    "elm": "^0.19.0-bugfix6",
+    "elm-hot": "^1.0.1",
+    "node-elm-compiler": "^5.0.3",
+    "sass": "^1.19.0",
+    "uglify-js": "3.5.9"
   }
 }
