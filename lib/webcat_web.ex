@@ -57,21 +57,6 @@ defmodule WebCATWeb do
     end
   end
 
-  def dashboard_view do
-    quote do
-      use Phoenix.View,
-        root: "lib/webcat_web/templates/dashboard",
-        namespace: WebCATWeb
-
-      # Import convenience functions from controllers
-      import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
-      # Use all HTML functionality (forms, tags, etc)
-      use Phoenix.HTML
-      alias WebCATWeb.Router.Helpers, as: Routes
-      import WebCATWeb.ViewHelpers
-    end
-  end
-
   def router do
     quote do
       use Phoenix.Router
