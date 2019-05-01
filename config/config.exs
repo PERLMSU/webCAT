@@ -11,13 +11,13 @@ config :webcat,
 
 config :terminator, repo: WebCAT.Repo
 
-config :ecto, json_library: Jason
+config :phoenix, :format_encoders, json: WebCATWeb.JSONEncoder
 
 # Configures the endpoint
 config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: :crypto.strong_rand_bytes(64),
-  render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(html)],
+  render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: WebCATWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
 config :webcat, WebCATWeb.Auth.Guardian,
@@ -32,6 +32,11 @@ config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
+
+config :cors_plug,
+  origin: ["*"],
+  max_age: 86_400,
+  methods: ["GET", "POST", "PATCH", "DELETE"]
 
 config :sentry,
   dsn: "https://04d54265f946462f96fb82fd3b1ee728@sentry.io/1369784",

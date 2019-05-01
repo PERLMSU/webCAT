@@ -24,7 +24,6 @@ config :webcat, WebCATWeb.Auth.Guardian,
   secret_key: "${SECRET_KEY_BASE}"
 
 config :webcat, WebCAT.Repo,
-  adapter: Ecto.Adapters.Postgres,
   url: "${DATABASE_URL}",
   ssl: true,
   pool_size: 10
