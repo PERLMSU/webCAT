@@ -5,7 +5,6 @@ defmodule WebCAT.Accounts.PasswordResets do
 
   alias WebCAT.Repo
   alias WebCAT.Accounts.{PasswordReset, User, Users, PasswordCredential}
-  alias Comeonin.Pbkdf2
   alias Ecto.Multi
 
   @doc """
