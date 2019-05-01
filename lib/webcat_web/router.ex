@@ -13,6 +13,7 @@ defmodule WebCATWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
+    plug(:fetch_session)
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
   end
@@ -28,91 +29,39 @@ defmodule WebCATWeb.Router do
     plug(Guardian.Plug.LoadResource)
   end
 
-  scope "/api", WebCATWeb.API do
+  scope "/auth", WebCATWeb do
+    pipe_through(~w(api)a)
+
+    post("/login", AuthController, :login)
+    post("/password_reset", AuthController, :start_password_reset)
+    post("/password_reset/finish", AuthController, :finish_password_reset)
+  end
+
+  scope "/api", WebCATWeb do
     pipe_through(~w(api authenticated)a)
 
-    get("/feedback/:group_id/:student_id/:feedback_id", FeedbackController, :show)
-    put("/feedback/:group_id/:student_id/:feedback_id", FeedbackController, :update)
-    patch("/feedback/:group_id/:student_id/:feedback_id", FeedbackController, :update)
-  end
-
-  scope "/login", WebCATWeb do
-    pipe_through(:browser)
-
-    get("/", LoginController, :index)
-    post("/", LoginController, :login)
-
-    get("/credential", LoginController, :credential_login)
-
-    get("/reset", PasswordResetController, :index)
-    post("/reset", PasswordResetController, :create)
-    get("/reset/:token", PasswordResetController, :reset)
-    post("/reset/:token", PasswordResetController, :finish_reset)
-  end
-
-  scope "/student_feedback", WebCATWeb do
-    pipe_through(~w(browser authenticated)a)
-
-    get("/", StudentFeedbackController, :classrooms)
-    get("/semesters/:semester_id/sections", StudentFeedbackController, :sections)
-    get("/rotations/:rotation_id/rotation_groups", StudentFeedbackController, :groups)
-    get("/groups/:group_id", StudentFeedbackController, :students)
-    get("/groups/:group_id/students/:user_id/categories", StudentFeedbackController, :categories)
-
-    get(
-      "/groups/:group_id/students/:user_id/categories/:category_id/observations",
-      StudentFeedbackController,
-      :observations
-    )
-
-    post("/groups/:group_id/students/:user_id/feedback", StudentFeedbackController, :feedback)
-  end
-
-  scope "/inbox", WebCATWeb do
-    pipe_through(~w(browser authenticated)a)
-
-    resources("/", InboxController)
-    resources("/:draft_id/comments", CommentController, except: ~w(index show edit new)a)
-    resources("/send", SendController, only: ~w(index create)a)
-  end
-
-  scope "/dashboard", WebCATWeb do
-    pipe_through(~w(browser authenticated)a)
-
-    get("/", IndexController, :index)
-    get("/changes", IndexController, :changes)
-    get("/import", IndexController, :import)
-    post("/import", IndexController, :do_import)
-
+    # Accounts
     resources("/users", UserController)
-    get("/users/:id/confirmation", UserController, :send_confirmation)
 
-    resources("/students", StudentController)
-
+    # Classrooms
     resources("/classrooms", ClassroomController)
     resources("/semesters", SemesterController)
     resources("/sections", SectionController)
-    resources("/rotations", RotationController)
-    resources("/rotation_groups", RotationGroupController)
+    resources("/rotations", RotationsController)
+    resources("/rotation_groups", RotationGroupsController)
 
+    # Feedback
     resources("/categories", CategoryController)
     resources("/observations", ObservationController)
     resources("/feedback", FeedbackController)
+    resources("/drafts", DraftController)
+    resources("/drafts/:draft_id/comments", CommentController)
+    resources("/drafts/:draft_id/grades", GradeController)
   end
 
-  scope "/profile", WebCATWeb do
-    pipe_through(~w(browser authenticated)a)
+  scope "/app", WebCATWeb do
+    pipe_through(~w(browser)a)
 
-    resources("/", ProfileController, only: ~w(show edit update)a, singleton: true)
-    get("/password/edit", ProfileController, :edit_password)
-    put("/password", ProfileController, :update_password)
-    patch("/password", ProfileController, :update_password)
-  end
-
-  scope "/", WebCATWeb do
-    pipe_through(~w(browser authenticated)a)
-
-    get("/", IndexController, :redirect_index)
-    get("/logout", LoginController, :logout)
+    get("/*path", IndexController, :index)
   end
 end

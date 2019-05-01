@@ -1,6 +1,6 @@
 defmodule WebCATWeb.Email do
   use Bamboo.Phoenix, view: WebCATWeb.EmailView
-  import WebCATWeb.Router.Helpers
+  alias WebCATWeb.Router.Helpers, as: Routes
   alias WebCAT.Feedback.Draft
 
   @doc """
@@ -12,7 +12,9 @@ defmodule WebCATWeb.Email do
     |> to(email)
     |> from("no-reply@webcat.io")
     |> subject("Password Reset")
-    |> render("reset.html", link: password_reset_url(WebCATWeb.Endpoint, :reset, token))
+    |> render("reset.html",
+      link: Routes.index_url(WebCATWeb.Endpoint, :index, ["app"], reset_token: token)
+    )
   end
 
   @doc """
@@ -25,7 +27,7 @@ defmodule WebCATWeb.Email do
     |> from("no-reply@webcat.io")
     |> subject("Confirm Email")
     |> render("confirmation.html",
-      link: login_url(WebCATWeb.Endpoint, :credential_login, token: token)
+      link: Routes.index_url(WebCATWeb.Endpoint, :index, ["app"], confirmation_token: token)
     )
   end
 

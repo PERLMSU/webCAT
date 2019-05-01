@@ -1,0 +1,2 @@
+<div id="elm-main"></div>
+<script src='<%= Routes.static_path(@conn, "/js/index.js") %>'></script>

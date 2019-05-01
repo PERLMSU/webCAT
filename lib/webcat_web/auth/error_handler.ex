@@ -1,23 +1,9 @@
 defmodule WebCATWeb.Auth.ErrorHandler do
-  use WebCATWeb, :controller
+  import Plug.Conn
 
-  def auth_error(conn, {:no_resource_found, _reason}, _opts) do
-    request_path = Map.fetch!(conn, :request_path)
-
+  def auth_error(conn, {type, reason}, _opts) do
     conn
-    |> put_flash(:error, "Please log in to view this page.")
-    |> redirect(to: Routes.login_path(conn, :index, redirect: request_path))
-  end
-
-  def auth_error(conn, {:unauthenticated, _reason}, _opts) do
-    request_path = Map.fetch!(conn, :request_path)
-
-    conn
-    |> put_flash(:error, "Please log in to view this page.")
-    |> redirect(to: Routes.login_path(conn, :index, redirect: request_path))
-  end
-
-  def auth_error(conn, {:already_authenticated, _reason}, _opts) do
-    redirect(conn, to: Routes.index_path(conn, :index))
+    |> put_resp_content_type("application/json")
+    |> send_resp(401, Jason.encode!(%{error: to_string(type), message: reason}))
   end
 end

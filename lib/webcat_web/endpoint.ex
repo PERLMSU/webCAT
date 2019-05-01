@@ -7,8 +7,8 @@ defmodule WebCATWeb.Endpoint do
   plug(Plug.Static,
     at: "/",
     from: :webcat,
-    gzip: false,
-    only: ~w(css js images webfonts favicon.ico robots.txt)
+    gzip: false
+    # only: ~w(css js images webfonts favicon.ico robots.txt)
   )
 
   # Code reloading can be explicitly enabled under the
