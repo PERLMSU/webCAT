@@ -14,7 +14,7 @@ defmodule WebCAT.Rotations.Classroom do
     has_many(:categories, WebCAT.Feedback.Category)
     many_to_many(:users, User, join_through: "classroom_users", on_replace: :delete)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(course_code name)a

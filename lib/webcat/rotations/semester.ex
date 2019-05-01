@@ -16,7 +16,7 @@ defmodule WebCAT.Rotations.Semester do
     has_many(:sections, WebCAT.Rotations.Section)
     many_to_many(:users, User, join_through: "semester_users", on_replace: :delete)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(name start_date end_date classroom_id)a

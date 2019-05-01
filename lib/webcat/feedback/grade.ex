@@ -9,7 +9,7 @@ defmodule WebCAT.Feedback.Grade do
     belongs_to(:draft, WebCAT.Feedback.Draft)
     belongs_to(:category, WebCAT.Feedback.Category)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(score category_id)a

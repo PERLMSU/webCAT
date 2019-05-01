@@ -37,7 +37,7 @@ defmodule WebCAT.Accounts.User do
     # For role assignment TODO: Needs better solution
     has_many(:roles, through: ~w(performer roles)a)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(email first_name last_name)a

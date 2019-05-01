@@ -12,10 +12,10 @@ defmodule WebCAT.Feedback.StudentFeedback do
   @primary_key false
   schema "student_feedback" do
     belongs_to(:user, User, primary_key: true)
-    belongs_to(:feedback, Feedback, primary_key: true)
     belongs_to(:rotation_group, RotationGroup, primary_key: true)
+    belongs_to(:feedback, Feedback, primary_key: true)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(feedback_id user_id rotation_group_id)a

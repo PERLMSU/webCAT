@@ -16,7 +16,7 @@ defmodule WebCAT.Rotations.RotationGroup do
       on_replace: :delete
     )
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(number rotation_id)a

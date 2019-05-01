@@ -16,7 +16,7 @@ defmodule WebCAT.Rotations.Rotation do
     has_many(:rotation_groups, WebCAT.Rotations.RotationGroup)
     many_to_many(:users, User, join_through: "rotation_users", on_replace: :delete)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(number start_date end_date section_id)a

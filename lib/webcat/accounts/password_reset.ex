@@ -12,7 +12,7 @@ defmodule WebCAT.Accounts.PasswordReset do
 
     belongs_to(:user, WebCAT.Accounts.User)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(expire user_id)a

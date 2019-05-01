@@ -9,7 +9,7 @@ defmodule WebCAT.Feedback.Feedback do
 
     belongs_to(:observation, WebCAT.Feedback.Observation)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(content observation_id)a

@@ -8,7 +8,7 @@ defmodule WebCAT.Feedback.Email do
 
     belongs_to(:draft, WebCAT.Feedback.Draft)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(status draft_id)a

@@ -17,7 +17,7 @@ defmodule WebCAT.Accounts.PasswordCredential do
     field(:new_password, :string, virtual: true)
     field(:confirm_new_password, :string, virtual: true)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(password user_id)a

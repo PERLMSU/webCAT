@@ -11,7 +11,7 @@ defmodule WebCAT.Feedback.Observation do
 
     has_many(:feedback, WebCAT.Feedback.Feedback)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(content type category_id)a

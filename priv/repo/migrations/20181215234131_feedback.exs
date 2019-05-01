@@ -12,7 +12,7 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       add(:parent_category_id, references(:categories, on_delete: :delete_all))
       add_req(:classroom_id, references(:classrooms, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:observations) do
@@ -20,14 +20,14 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       add_req(:type, :observation_type)
       add_req(:category_id, references(:categories, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:feedback) do
       add_req(:content, :text)
       add_req(:observation_id, references(:observations, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:student_feedback, primary_key: false) do
@@ -35,7 +35,7 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       add_req(:rotation_group_id, :integer, primary_key: true)
       add_req(:user_id, :integer, primary_key: true)
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     execute(
@@ -53,7 +53,7 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       add_req(:user_id, :integer)
       add_req(:rotation_group_id, :integer)
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     execute(
@@ -70,14 +70,14 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       add(:draft_id, references(:drafts, on_delete: :delete_all))
       add(:user_id, references(:users, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:emails) do
       add_req(:status, :text)
       add_req(:draft_id, references(:drafts, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:notifications) do
@@ -86,7 +86,7 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       add_req(:draft_id, references(:drafts, on_delete: :delete_all))
       add_req(:user_id, references(:users, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:grades) do
@@ -95,7 +95,7 @@ defmodule WebCAT.Repo.Migrations.Feedback do
       add_req(:category_id, references(:categories, on_delete: :delete_all))
       add_req(:draft_id, references(:drafts, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create(unique_index(:categories, ~w(name)a))

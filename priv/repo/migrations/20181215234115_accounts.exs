@@ -21,14 +21,14 @@ defmodule WebCAT.Repo.Migrations.Accounts do
 
       add_req(:performer_id, references(Terminator.Performer.table()))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:password_credentials, primary_key: false) do
       add_req(:user_id, references(:users), primary_key: true)
       add_req(:password, :text)
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:token_credentials, primary_key: false) do
@@ -36,7 +36,7 @@ defmodule WebCAT.Repo.Migrations.Accounts do
       add_req(:expire, :utc_datetime)
       add_req(:user_id, references(:users))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:password_resets, primary_key: false) do
@@ -44,7 +44,7 @@ defmodule WebCAT.Repo.Migrations.Accounts do
       add_req(:token, :text, primary_key: true)
       add_req(:expire, :utc_datetime)
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create(unique_index(:users, ~w(email)a))

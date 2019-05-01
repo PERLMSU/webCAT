@@ -8,7 +8,7 @@ defmodule WebCAT.Repo.Migrations.Rotations do
       add_req(:name, :text)
       add(:description, :text)
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:semesters) do
@@ -19,7 +19,7 @@ defmodule WebCAT.Repo.Migrations.Rotations do
 
       add_req(:classroom_id, references(:classrooms, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:sections) do
@@ -28,7 +28,7 @@ defmodule WebCAT.Repo.Migrations.Rotations do
 
       add_req(:semester_id, references(:semesters, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:rotations) do
@@ -39,7 +39,7 @@ defmodule WebCAT.Repo.Migrations.Rotations do
 
       add_req(:section_id, references(:sections, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     create table(:rotation_groups) do
@@ -48,7 +48,7 @@ defmodule WebCAT.Repo.Migrations.Rotations do
 
       add_req(:rotation_id, references(:rotations, on_delete: :delete_all))
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
     # Join tables

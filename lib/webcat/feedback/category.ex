@@ -11,7 +11,7 @@ defmodule WebCAT.Feedback.Category do
     has_many(:sub_categories, WebCAT.Feedback.Category, foreign_key: :parent_category_id)
     has_many(:observations, WebCAT.Feedback.Observation, foreign_key: :category_id)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(name classroom_id)a

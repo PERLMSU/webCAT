@@ -12,7 +12,7 @@ defmodule WebCAT.Feedback.Draft do
     has_many(:comments, WebCAT.Feedback.Comment)
     has_many(:grades, WebCAT.Feedback.Grade)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(content status user_id rotation_group_id)a

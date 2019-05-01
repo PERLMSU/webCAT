@@ -8,7 +8,7 @@ defmodule WebCAT.Feedback.Comment do
     belongs_to(:draft, WebCAT.Feedback.Draft)
     belongs_to(:user, WebCAT.Accounts.User)
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @required ~w(content draft_id user_id)a
