@@ -33,7 +33,7 @@ defmodule WebCAT.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:elixir_uuid, "~> 1.2"},
+      {:proper_case, "~> 1.0.2"},
       {:bamboo_smtp, "~> 1.6.0"},
       {:earmark, "~> 1.3.1"},
       {:bamboo, "~> 1.0"},
