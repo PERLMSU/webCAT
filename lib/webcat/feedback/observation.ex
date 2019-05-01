@@ -1,7 +1,6 @@
 defmodule WebCAT.Feedback.Observation do
   use Ecto.Schema
   import Ecto.Changeset
-  alias WebCAT.Accounts.{User, Groups}
 
   schema "observations" do
     field(:content, :string)

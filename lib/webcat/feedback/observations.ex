@@ -1,7 +1,6 @@
 defmodule WebCAT.Feedback.Observations do
   import Ecto.Query
   alias WebCAT.Feedback.Observation
-  alias WebCAT.Rotations.Classroom
   alias WebCAT.Repo
 
   def list(category_id) do
@@ -30,11 +29,5 @@ defmodule WebCAT.Feedback.Observations do
       observation ->
         {:ok, observation}
     end
-  end
-
-  def observations_per_student(nil), do: nil
-
-  def observations_per_student(%Classroom{id: classroom_id}) do
-    [["Mar 6", 2.2], ["Mar 13", 4.5], ["Mar 20", 3.4], ["Mar 27", 5.5]]
   end
 end
