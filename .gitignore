@@ -54,7 +54,6 @@ cover
 .python-version
 webcat.iml
 /assets/yarn-error.log
-/assets/elm-stuff
 
 # pyenv Python version
 .python-version
@@ -66,3 +65,7 @@ webcat.iml
 /assets/semantic/dist/themes/basic
 /assets/semantic/dist/themes/github
 /assets/semantic/dist/themes/material
+
+# Elm
+/assets/.cache
+/assets/elm-stuff
