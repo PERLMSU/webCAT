@@ -5,7 +5,7 @@ defmodule WebCAT.Mixfile do
     [
       app: :webcat,
       version: "0.3.0-dev",
-      elixir: "~> 1.4",
+      elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -33,33 +33,42 @@ defmodule WebCAT.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:proper_case, "~> 1.0.2"},
-      {:bamboo_smtp, "~> 1.6.0"},
-      {:earmark, "~> 1.3.1"},
-      {:bamboo, "~> 1.0"},
-      {:terminator, github: "bbuscarino/terminator", branch: "dev"},
-      {:comeonin, "~> 4.0"},
-      {:cors_plug, "~> 1.5"},
-      {:plug_cowboy, "~> 2.0"},
-      {:plug, "~> 1.7"},
-      {:ecto_sql, "~> 3.0"},
-      {:distillery, "~> 2.0", runtime: false},
-      {:dialyxir, github: "jeremyjh/dialyxir", only: [:dev], runtime: false},
-      {:faker, "~> 0.10", exclude: :prod},
-      {:ex_machina, "~> 2.2", exclude: :prod},
+      # I18n
       {:gettext, "~> 0.16"},
-      {:guardian, "~> 1.0"},
+      # JSON
       {:jason, "~> 1.1"},
-      {:pbkdf2_elixir, "~> 0.12"},
+      {:jsonapi, "~> 1.2"},
+      # HTTP and Phoenix
+      {:plug, "~> 1.7"},
+      {:plug_cowboy, "~> 2.0"},
       {:phoenix, "~> 1.4.0", override: true},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.13.2"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      # Database
+      {:ecto_sql, "~> 3.0"},
       {:postgrex, "~> 0.14.1"},
-      {:timex, "~> 3.4"},
+      # Security
+      {:terminator, github: "bbuscarino/terminator", branch: "dev"},
+      {:cors_plug, "~> 1.5"},
+      {:comeonin, "~> 4.0"},
+      {:guardian, "~> 1.0"},
+      {:pbkdf2_elixir, "~> 0.12"},
+      # Monitoring
       {:sentry, "~> 7.0"},
-      {:xlsxir, github: "jsonkenl/xlsxir"}
+      # Time and Date
+      {:timex, "~> 3.4"},
+      # Email
+      {:bamboo, "~> 1.0"},
+      # Spreadsheets
+      {:xlsxir, github: "jsonkenl/xlsxir"},
+      # Testing
+      {:ex_machina, "~> 2.2", exclude: :prod},
+      {:faker, "~> 0.10", exclude: :prod},
+      {:dialyxir, github: "jeremyjh/dialyxir", only: [:dev], runtime: false},
+      # Build
+      {:distillery, "~> 2.0", runtime: false}
     ]
   end
 
