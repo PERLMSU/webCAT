@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Page.Login exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
@@ -7,20 +7,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Url
-import 
-
--- MAIN
-
-
-main : Program () Model Msg
-main =
-    Browser.application
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
 
 
 -- MODEL
@@ -31,15 +17,12 @@ type alias Model =
     , password : String
     }
 
-
-init : () -> ( Model, Cmd Msg )
-init flags =
-    ( Model "" "", Cmd.none )
-
-
+type alias Form =
+    { email : String
+    , password : String
+    }
 
 -- UPDATE
-
 
 type Msg
     = EmailChanged String
@@ -60,25 +43,16 @@ update msg model =
             ( { model | password = pass }, Cmd.none )
 
         SignIn ->
-            (model, Cmd.none)
+            Debug.todo "submit form"
 
         ForgotPassword ->
-            (model, Cmd.none)
+            Debug.todo "forgot password"
 
         Loading ->
-            (model, Cmd.none)
+            Debug.todo "yeet"
 
         Response _ ->
-            (model, Cmd.none)
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+            Debug.todo "yeet"
 
 
 

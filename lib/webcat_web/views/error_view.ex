@@ -1,26 +1,42 @@
 defmodule WebCATWeb.ErrorView do
   use WebCATWeb, :view
 
-  def render("400.json", assigns) do
-    %{error: "Malformed request", details: Map.drop(assigns, ~w(conn view_module view_template)a)}
-  end
-
-  def render("401.json", assigns) do
-    %{error: "Unauthorized", details: Map.drop(assigns, ~w(conn view_module view_template)a)}
-  end
-
-  def render("403.json", assigns) do
-    %{error: "Forbidden", details: Map.drop(assigns, ~w(conn view_module view_template)a)}
-  end
-
-  def render("404.json", assigns) do
-    %{error: "404 Not Found", details: Map.drop(assigns, ~w(conn view_module view_template)a)}
-  end
-
-  def render("500.json", assigns) do
+  def render("400.json", _assigns) do
     %{
-      error: "Internal server error",
-      details: Map.drop(assigns, ~w(conn view_module view_template)a)
+      errors: [
+        %{status: "400", title: "Malformed request"}
+      ]
+    }
+  end
+
+  def render("401.json", _assigns) do
+    %{
+      errors: [
+        %{status: "401", title: "Unauthorized"}
+      ]
+    }
+  end
+
+  def render("403.json", _assigns) do
+    %{
+      errors: [
+        %{status: "403", title: "Forbidden"}
+      ]
+    }
+  end
+
+  def render("404.json", _assigns) do
+    %{errors: [%{status: "404", title: "Not found"}]}
+  end
+
+  def render("500.json", _assigns) do
+    %{
+      errors: [
+        %{
+          status: "500",
+          title: "Internal server error"
+        }
+      ]
     }
   end
 end

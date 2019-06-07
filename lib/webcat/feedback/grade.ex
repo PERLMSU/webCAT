@@ -12,8 +12,8 @@ defmodule WebCAT.Feedback.Grade do
     timestamps(type: :utc_datetime)
   end
 
-  @required ~w(score category_id)a
-  @optional ~w(draft_id note)a
+  @required ~w(score category_id draft_id)a
+  @optional ~w(note)a
 
   @doc """
   Create a changeset for a grade

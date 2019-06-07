@@ -9,8 +9,8 @@ defmodule WebCAT.Rotations.Rotation do
   schema "rotations" do
     field(:number, :integer)
     field(:description, :string)
-    field(:end_date, :date)
     field(:start_date, :date)
+    field(:end_date, :date)
 
     belongs_to(:section, WebCAT.Rotations.Section)
     has_many(:rotation_groups, WebCAT.Rotations.RotationGroup)

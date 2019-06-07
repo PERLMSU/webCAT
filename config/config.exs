@@ -11,8 +11,6 @@ config :webcat,
 
 config :terminator, repo: WebCAT.Repo
 
-config :phoenix, :format_encoders, json: WebCATWeb.JSONEncoder
-
 # Configures the endpoint
 config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],
@@ -27,6 +25,8 @@ config :webcat, WebCATWeb.Auth.Guardian,
 config :phoenix, :json_library, Jason
 
 config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
+
+config :jsonapi, field_transformation: :camelize
 
 # Configures Elixir's Logger
 config :logger, :console,

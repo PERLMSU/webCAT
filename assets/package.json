@@ -1,27 +1,28 @@
 {
-  "repository": {},
-  "license": "ISC",
-  "sideEffects": false,
-  "scripts": {
-    "deploy": "parcel build js/index.js css/styles.scss static/**/* --out-dir ../priv/static",
-    "watch": "parcel watch js/index.js css/styles.scss static/**/* --out-dir ../priv/static"
-  },
-  "dependencies": {
-    "@fortawesome/fontawesome-pro": "5.4.1",
-    "phoenix": "file:../deps/phoenix",
-    "simplemde": "1.11.2",
-    "tailwindcss": "^0.7.4"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/plugin-transform-modules-commonjs": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
-    "autoprefixer": "9.4.9",
-    "cssnano": "^4.1.10",
-    "elm": "^0.19.0-bugfix6",
-    "elm-hot": "^1.0.1",
-    "node-elm-compiler": "^5.0.3",
-    "sass": "^1.19.0",
-    "uglify-js": "3.5.9"
-  }
+    "repository": {},
+    "license": "ISC",
+    "sideEffects": false,
+    "scripts": {
+        "deploy": "parcel build src/Main.elm css/styles.scss static/**/* --out-dir ../priv/static",
+        "watch": "parcel watch js/index.js css/styles.scss static/**/* --out-dir ../priv/static",
+        "elm": "elm make src/Main.elm --output=/dev/null"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-pro": "5.4.1",
+        "phoenix": "file:../deps/phoenix",
+        "simplemde": "1.11.2",
+        "tailwindcss": "^0.7.4"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.4.4",
+        "@babel/plugin-transform-modules-commonjs": "^7.4.4",
+        "@babel/preset-env": "^7.4.4",
+        "autoprefixer": "9.4.9",
+        "cssnano": "^4.1.10",
+        "elm": "^0.19.0-bugfix6",
+        "elm-hot": "^1.0.1",
+        "node-elm-compiler": "^5.0.3",
+        "sass": "^1.20.1",
+        "uglify-js": "3.5.9"
+    }
 }

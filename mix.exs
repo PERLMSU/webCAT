@@ -59,8 +59,9 @@ defmodule WebCAT.Mixfile do
       {:sentry, "~> 7.0"},
       # Time and Date
       {:timex, "~> 3.4"},
-      # Email
+      # Email and markdown
       {:bamboo, "~> 1.0"},
+      {:earmark, "~> 1.3.2"},
       # Spreadsheets
       {:xlsxir, github: "jsonkenl/xlsxir"},
       # Testing
