@@ -92,7 +92,8 @@ defmodule WebCATWeb.ObservationController do
       render(conn, "edit.html",
         user: user,
         selected: "classroom",
-        changeset: Observation.changeset(observation)
+        changeset: Observation.changeset(observation),
+        category: observation.category
       )
     end
   end

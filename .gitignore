@@ -66,3 +66,6 @@ webcat.iml
 /assets/semantic/dist/themes/basic
 /assets/semantic/dist/themes/github
 /assets/semantic/dist/themes/material
+
+# Emacs temp files
+.#*

@@ -5,7 +5,7 @@ defmodule WebCATWeb.FeedbackController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def index(conn, user, %{"observation_id" => observation_id}) do
+  def index(conn, user, %{"observation_id" => observation_id} = params) do
     permissions do
       has_role(:admin)
     end
@@ -15,7 +15,8 @@ defmodule WebCATWeb.FeedbackController do
       render(conn, "index.html",
         user: user,
         selected: "classroom",
-        feedback: feedback
+        feedback: feedback,
+        params: params
       )
     end
   end

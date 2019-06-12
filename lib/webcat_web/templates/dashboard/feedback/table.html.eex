@@ -9,7 +9,7 @@
         <%= for item <- @feedback do %>
         <tr>
             <td><%= item.content %></td>
-            <td><%= link(item.observation.content, to: Routes.observation_path(@conn, :show, item.observation_id)) %></td>
+            <td><%= link("Observation", to: Routes.observation_path(@conn, :show, item.observation_id)) %></td>
             <td>
                 <div class="ui small icon buttons">
                     <%= link(class: "ui blue basic button", data: [content: "Edit", variation: "tiny inverted"], to: Routes.feedback_path(@conn, :edit, item.id)) do %>
