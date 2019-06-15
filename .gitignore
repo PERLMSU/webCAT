@@ -34,6 +34,9 @@ Temporary Items
 /*.ez
 /.elixir_ls
 
+# Secret configurations
+*.secret.exs
+
 # Compiled static files
 /priv/static/
 
@@ -69,3 +72,6 @@ webcat.iml
 
 # Emacs temp files
 .#*
+
+.hex
+.mix

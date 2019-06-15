@@ -1,7 +1,7 @@
 #=================================
 # Build Stage
 #=================================
-FROM elixir:1.7-alpine as build
+FROM elixir:alpine as build
 
 # Install yarn
 RUN apk add --no-cache yarn git --fresh
