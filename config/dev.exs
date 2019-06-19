@@ -59,6 +59,7 @@ config :webcat, WebCAT.Repo,
   pool_size: 10
 
 config :terminator, Terminator.Repo,
+  adapter: Ecto.Adapters.Postgres,
   username: "webcat",
   password: "webcat",
   database: "webcat_dev",
