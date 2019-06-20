@@ -34,6 +34,9 @@ Temporary Items
 /*.ez
 /.elixir_ls
 
+# Secret configurations
+*.secret.exs
+
 # Compiled static files
 /priv/static/
 
@@ -54,6 +57,7 @@ cover
 .python-version
 webcat.iml
 /assets/yarn-error.log
+/assets/elm-stuff
 
 # pyenv Python version
 .python-version
@@ -66,6 +70,10 @@ webcat.iml
 /assets/semantic/dist/themes/github
 /assets/semantic/dist/themes/material
 
-# Elm
-/assets/.cache
-/assets/elm-stuff
+# Emacs temp files
+.#*
+
+.hex
+.mix
+
+/rel

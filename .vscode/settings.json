@@ -1,8 +1,0 @@
-{
-    "emmet.includeLanguages": {
-        "HTML (Eex)": "html"
-    },
-    "emmet.syntaxProfiles": {
-        "HTML (Eex)": "html",
-    },
-}
