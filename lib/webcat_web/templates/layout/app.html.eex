@@ -7,7 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <meta name="author" content="">
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/styles.css") %>" />
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
+</head>
 </head>
 
 <body>

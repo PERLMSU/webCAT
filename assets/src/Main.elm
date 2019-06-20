@@ -7,14 +7,13 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Url
-import 
 
 -- MAIN
 
 
 main : Program () Model Msg
 main =
-    Browser.application
+    Browser.document
         { init = init
         , view = view
         , update = update
