@@ -9,3 +9,5 @@ assets/node_modules
 cover
 rel/artifacts
 priv/static
+assets/.elm
+assets/elm-stuff

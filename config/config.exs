@@ -14,6 +14,7 @@ config :terminator, repo: WebCAT.Repo
 # Configures the endpoint
 config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],
+  static_url: [host: "localhost", path: "/static"],
   secret_key_base: :crypto.strong_rand_bytes(64),
   render_errors: [view: WebCATWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: WebCATWeb.PubSub, adapter: Phoenix.PubSub.PG2]

@@ -39,9 +39,9 @@ defmodule WebCAT.Mixfile do
       {:jason, "~> 1.1"},
       {:jsonapi, "~> 1.2"},
       # HTTP and Phoenix
-      {:plug, "~> 1.7"},
+      {:plug, "~> 1.8.2"},
       {:plug_cowboy, "~> 2.0"},
-      {:phoenix, "~> 1.4.0", override: true},
+      {:phoenix, "~> 1.4.8", override: true},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.13.2"},

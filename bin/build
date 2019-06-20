@@ -17,13 +17,14 @@ mix local.hex --if-missing --force
 export MIX_ENV=prod
 
 # Fetch deps and compile
-mix do deps.get, compile
+mix do clean, deps.get, compile --force
 
 # Build front end artifacts
 cd assets
+rm -rf .elm elm-stuff
 yarn && yarn build
 cd ../
-mix phoenix.digest
+mix phx.digest
 
 # Build the release
 mix release

@@ -5,10 +5,10 @@ defmodule WebCATWeb.Endpoint do
   socket("/socket", WebCATWeb.UserSocket, websocket: true)
 
   plug(Plug.Static,
-    at: "/",
+    at: "/static", 
     from: :webcat,
-    gzip: false
-    # only: ~w(css js images webfonts favicon.ico robots.txt)
+    gzip: false,
+    only: ~w(css js images webfonts favicon.ico robots.txt)
   )
 
   # Code reloading can be explicitly enabled under the

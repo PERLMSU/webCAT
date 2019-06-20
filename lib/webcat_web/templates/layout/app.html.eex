@@ -7,12 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <meta name="author" content="">
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
-  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
+  <link rel="stylesheet" integrity='<%= Routes.static_integrity(@conn, "/css/app.css") %>' href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
+  <link rel="stylesheet" integrity='<%= Routes.static_integrity(@conn, "/css/fa.min.css") %>' href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
+  
+  <script integrity='<%= Routes.static_integrity(@conn, "/js/app.js") %>' src='<%= Routes.static_path(@conn, "/js/app.js") %>'></script>
 </head>
-</head>
-
 <body>
+<div id="elm-main"></div>
 <%= render @view_module, @view_template, assigns %>
 </body>
 </html>

@@ -64,9 +64,10 @@ defmodule WebCATWeb.Router do
     resources("/drafts/:draft_id/grades", GradeController, except: ~w(new edit)a)
   end
 
-  scope "/app", WebCATWeb do
+  scope "/", WebCATWeb do
     pipe_through(~w(browser)a)
 
-    get("/*path", IndexController, :index)
+    get("/", IndexController, :redirect_index)
+    get("/app/*path", IndexController, :index)
   end
 end

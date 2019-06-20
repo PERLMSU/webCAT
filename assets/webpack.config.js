@@ -4,11 +4,25 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCSSExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (env, options) => ({
     optimization: {
         minimizer: [
-            new OptimizeCSSAssetsPlugin({})
+            new OptimizeCSSAssetsPlugin({}),
+            new TerserPlugin({
+                test: /app\.js$/,
+                terserOptions: {
+                    "compress": {
+                        "pure_funcs": ["F1", "F2", "F3", "F4", "F5", "F6", "F6", "F8", "F9", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9"],
+                        "pure_getters": true,
+                        "keep_fargs": false,
+                        "unsafe_comps": true,
+                        "unsafe": true,
+                        "ecma": 6
+                    }
+                }
+            })
         ]
     },
     entry: {

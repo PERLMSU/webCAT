@@ -26,6 +26,7 @@ config :webcat, WebCATWeb.Endpoint,
   check_origin: false,
   watchers: [yarn: ["run", "watch", cd: Path.expand("../assets", __DIR__)]]
 
+
 # Watch static and templates for browser reloading.
 config :webcat, WebCATWeb.Endpoint,
   live_reload: [

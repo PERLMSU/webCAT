@@ -50,6 +50,7 @@ cover
 webcat.iml
 /assets/yarn-error.log
 /assets/elm-stuff
+.elm/
 
 # pyenv Python version
 .python-version
