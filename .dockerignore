@@ -1,7 +1,11 @@
+.git
+.mix
+.hex
 _build
 .elixir_ls
 deps
 test
-.git
 assets/node_modules
 cover
+rel/artifacts
+priv/static
