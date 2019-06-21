@@ -8,9 +8,9 @@ defmodule WebCATWeb.AuthControllerTest do
       result =
         conn
         |> post(Routes.auth_path(conn, :login), %{email: user.email, password: "password"})
-        |> json_response(201)
+        |> text_response(201)
 
-      assert Map.has_key?(result, "token")
+      assert result == "OK"
     end
 
     test "errors correctly when wrong parameters supplied", %{conn: conn} do

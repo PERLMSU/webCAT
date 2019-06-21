@@ -18,7 +18,9 @@ defmodule WebCATWeb.AuthController do
       conn
       |> put_status(201)
       |> Auth.sign_in(user)
-      |> send_resp(201, "OK")
+      |> put_status(201)
+      |> text("OK")
+
     else
       {:params, _} ->
         {:error, "Authentication details not correctly supplied"}

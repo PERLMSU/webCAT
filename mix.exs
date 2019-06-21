@@ -37,7 +37,6 @@ defmodule WebCAT.Mixfile do
       {:gettext, "~> 0.16"},
       # JSON
       {:jason, "~> 1.1"},
-      {:jsonapi, "~> 1.2"},
       # HTTP and Phoenix
       {:plug, "~> 1.8.2"},
       {:plug_cowboy, "~> 2.0"},

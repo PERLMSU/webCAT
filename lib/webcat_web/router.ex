@@ -15,9 +15,6 @@ defmodule WebCATWeb.Router do
     plug(:fetch_session)
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
-
-    plug(JSONAPI.EnsureSpec)
-    plug(JSONAPI.UnderscoreParameters)
   end
 
   pipeline :not_authenticated do

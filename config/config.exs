@@ -27,8 +27,6 @@ config :phoenix, :json_library, Jason
 
 config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
 
-config :jsonapi, field_transformation: :camelize
-
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
