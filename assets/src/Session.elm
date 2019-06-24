@@ -1,6 +1,6 @@
 module Session exposing (Session, navKey, user, token)
 
-import API.Accounts exposing (User)
+import Types exposing (User)
 import API.Auth exposing (Token)
 import Browser.Navigation as Nav
 
@@ -10,9 +10,8 @@ import Browser.Navigation as Nav
 
 
 type Session
-    = Authenticated Nav.Key User Token
+    = Authenticated Nav.Key User
     | Unauthenticated Nav.Key
-
 
 
 -- Utility functions
@@ -21,25 +20,17 @@ type Session
 navKey : Session -> Nav.Key
 navKey session =
     case session of
-        Authenticated key _ _ ->
+        Authenticated key _ ->
             key
 
         Unauthenticated key ->
             key
 
-                
+
 user : Session -> Maybe User
 user session =
     case session of
-        Authenticated _ user _ ->
+        Authenticated _ user ->
             Just user
-        Unauthenticated _ ->
-            Nothing
-
-token : Session -> Maybe Token
-token session =
-    case session of
-        Authenticated _ _ token ->
-            Just token
         Unauthenticated _ ->
             Nothing

@@ -35,7 +35,7 @@ config :logger, :console,
 config :cors_plug,
   origin: ["*"],
   max_age: 86_400,
-  methods: ["GET", "POST", "PATCH", "DELETE"]
+  methods: ~w(GET POST PUT PATCH DELETE)
 
 config :sentry,
   dsn: "https://04d54265f946462f96fb82fd3b1ee728@sentry.io/1369784",

@@ -6,30 +6,22 @@ defmodule WebCATWeb.AuthController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  def csrf(conn, _params) do
-    conn
-    |> put_status(200)
-    |> json(%{token: get_csrf_token()})
-  end
-
   def login(conn, params) do
     with {:params, %{"email" => email, "password" => password}} <- {:params, params},
-         {:login, {:ok, user}} <- {:login, Users.login(email, password)} do
+         {:login, {:ok, user}} <- {:login, Users.login(email, password)},
+         {:token, {:ok, token, _}} <- {:token, WebCATWeb.Auth.Guardian.encode_and_sign(user)} do
       conn
       |> put_status(201)
-      |> Auth.sign_in(user)
-      |> put_status(201)
-      |> text("OK")
-
+      |> json(%{token: token})
     else
       {:params, _} ->
         {:error, "Authentication details not correctly supplied"}
 
       {:login, {:error, _}} ->
-        {:error, "Incorrect email or password"}
+        {:error, :unauthenticated}
 
       {:token, _} ->
-        {:error, "Problem generating auth token"}
+        {:error, :server_error}
     end
   end
 

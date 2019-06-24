@@ -26,7 +26,6 @@ config :webcat, WebCATWeb.Endpoint,
   check_origin: false,
   watchers: [yarn: ["run", "watch", cd: Path.expand("../assets", __DIR__)]]
 
-
 # Watch static and templates for browser reloading.
 config :webcat, WebCATWeb.Endpoint,
   live_reload: [
@@ -37,11 +36,6 @@ config :webcat, WebCATWeb.Endpoint,
       ~r{lib/webcat_web/templates/.*(eex)$}
     ]
   ]
-
-config :cors_plug,
-  origin: ["*"],
-  max_age: 86_400,
-  methods: ["GET", "POST", "PATCH", "DELETE"]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

@@ -5,21 +5,12 @@ defmodule WebCATWeb.Router do
 
   pipeline :browser do
     plug(:accepts, ["html"])
-    plug(:fetch_session)
-    plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
   end
 
   pipeline :api do
     plug(:accepts, ["json"])
-    plug(:fetch_session)
-    plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
-  end
-
-  pipeline :not_authenticated do
-    plug(WebCATWeb.Auth.Pipeline)
-    plug(Guardian.Plug.EnsureNotAuthenticated)
   end
 
   pipeline :authenticated do
@@ -28,7 +19,7 @@ defmodule WebCATWeb.Router do
     plug(Guardian.Plug.LoadResource)
   end
 
-  scope "/auth", WebCATWeb do
+  scope "/api/auth", WebCATWeb do
     pipe_through(~w(api)a)
 
     get("/csrf", AuthController, :csrf)
@@ -41,8 +32,8 @@ defmodule WebCATWeb.Router do
     pipe_through(~w(api authenticated)a)
 
     # Accounts
+    resources("/user", ProfileController, singleton: true, only: ~w(show update)a)
     resources("/users", UserController, except: ~w(new edit)a)
-    resources("/profile", ProfileController, singleton: true, only: ~w(show update)a)
 
     # Classrooms
     resources("/classrooms", ClassroomController, except: ~w(new edit)a)
@@ -56,9 +47,14 @@ defmodule WebCATWeb.Router do
     resources("/categories", CategoryController, except: ~w(new edit)a)
     resources("/observations", ObservationController, except: ~w(new edit)a)
     resources("/feedback", FeedbackController, except: ~w(new edit)a)
+    resources("/explanations", ExplanationController, except: ~w(new edit)a)
     resources("/drafts", DraftController, except: ~w(new edit)a)
     resources("/drafts/:draft_id/comments", CommentController, except: ~w(new edit)a)
     resources("/drafts/:draft_id/grades", GradeController, except: ~w(new edit)a)
+
+    resources("/rotation_groups/:rotation_group_id/feedback", StudentFeedbackController,
+      except: ~w(new edit)a
+    )
   end
 
   scope "/", WebCATWeb do

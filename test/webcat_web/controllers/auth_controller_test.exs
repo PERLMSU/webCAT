@@ -8,9 +8,9 @@ defmodule WebCATWeb.AuthControllerTest do
       result =
         conn
         |> post(Routes.auth_path(conn, :login), %{email: user.email, password: "password"})
-        |> text_response(201)
+        |> json_response(201)
 
-      assert result == "OK"
+      assert String.length(result["token"]) > 0
     end
 
     test "errors correctly when wrong parameters supplied", %{conn: conn} do
@@ -32,18 +32,18 @@ defmodule WebCATWeb.AuthControllerTest do
 
       conn
       |> post(Routes.auth_path(conn, :login), %{email: user.email, password: "not_password"})
-      |> json_response(400)
+      |> json_response(401)
 
       conn
       |> post(Routes.auth_path(conn, :login), %{email: "not.email@aaa.bbb", password: "password"})
-      |> json_response(400)
+      |> json_response(401)
 
       conn
       |> post(Routes.auth_path(conn, :login), %{
         email: "not.email@aaa.bbb",
         password: "not_password"
       })
-      |> json_response(400)
+      |> json_response(401)
     end
   end
 

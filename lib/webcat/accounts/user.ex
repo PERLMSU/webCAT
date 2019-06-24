@@ -53,7 +53,7 @@ defmodule WebCAT.Accounts.User do
     |> unique_constraint(:email)
     |> put_performer()
     |> put_roles(Map.get(attrs, "roles"))
-    |> put_classrooms(Map.get(attrs, "classrooms", []))
+    |> put_classrooms(Map.get(attrs, "classrooms"))
   end
 
   defp put_performer(%{valid?: true} = changeset) do

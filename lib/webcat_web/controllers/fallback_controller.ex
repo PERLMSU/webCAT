@@ -9,11 +9,18 @@ defmodule WebCATWeb.FallbackController do
     |> render("404.json")
   end
 
+  def call(conn, {:error, :unauthenticated}) do
+    conn
+    |> put_status(401)
+    |> put_view(ErrorView)
+    |> render("401.json")
+  end
+
   def call(conn, {:error, :unauthorized}) do
     conn
     |> put_status(403)
     |> put_view(ErrorView)
-    |> render("403.html")
+    |> render("403.json")
   end
 
   def call(conn, {:error, message}) when is_binary(message) do

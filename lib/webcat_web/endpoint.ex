@@ -2,10 +2,8 @@ defmodule WebCATWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :webcat
   use Sentry.Phoenix.Endpoint
 
-  socket("/socket", WebCATWeb.UserSocket, websocket: true)
-
   plug(Plug.Static,
-    at: "/static", 
+    at: "/static",
     from: :webcat,
     gzip: false,
     only: ~w(css js images webfonts favicon.ico robots.txt)
@@ -30,15 +28,6 @@ defmodule WebCATWeb.Endpoint do
 
   plug(Plug.MethodOverride)
   plug(Plug.Head)
-
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
-  plug(Plug.Session,
-    store: :cookie,
-    key: "_webcat_key",
-    signing_salt: "Bzmi11dE"
-  )
 
   plug(CORSPlug)
 

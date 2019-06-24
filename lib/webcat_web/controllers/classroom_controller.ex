@@ -1,8 +1,8 @@
-defmodule WebCATWeb.UserController do
+defmodule WebCATWeb.ClassroomController do
   use WebCATWeb, :authenticated_controller
 
-  alias WebCATWeb.UserView
-  alias WebCAT.Accounts.{Users, User}
+  alias WebCATWeb.ClassroomView
+  alias WebCAT.Rotations.{Classroom, Classrooms}
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
@@ -10,16 +10,16 @@ defmodule WebCATWeb.UserController do
   def index(conn, _user, _params) do
     conn
     |> put_status(200)
-    |> put_view(UserView)
-    |> render("list.json", users: Users.list())
+    |> put_view(ClassroomView)
+    |> render("list.json", classrooms: Classrooms.list())
   end
 
   def show(conn, _user, %{"id" => id}) do
-    with {:ok, user} <- Users.get(id) do
+    with {:ok, classroom} <- Classrooms.get(id) do
       conn
       |> put_status(200)
-      |> put_view(UserView)
-      |> render("show.json", user: user)
+      |> put_view(ClassroomView)
+      |> render("show.json", classroom: classroom)
     end
   end
 
@@ -29,11 +29,11 @@ defmodule WebCATWeb.UserController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, user} <- CRUD.create(User, params) do
+         {:ok, classroom} <- CRUD.create(Classroom, params) do
       conn
       |> put_status(201)
-      |> put_view(UserView)
-      |> render("show.json", user: user)
+      |> put_view(ClassroomView)
+      |> render("show.json", classroom: classroom)
     else
       {:auth, _} -> {:error, :unauthorized}
       {:error, _} = it -> it
@@ -46,11 +46,11 @@ defmodule WebCATWeb.UserController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, updated} <- CRUD.update(User, id, params) do
+         {:ok, updated} <- CRUD.update(Classroom, id, params) do
       conn
       |> put_status(200)
-      |> put_view(UserView)
-      |> render("show.json", user: updated)
+      |> put_view(ClassroomView)
+      |> render("show.json", classroom: updated)
     else
       {:auth, _} -> {:error, :unauthorized}
       {:error, _} = it -> it
@@ -63,7 +63,7 @@ defmodule WebCATWeb.UserController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, _deleted} <- CRUD.delete(User, id) do
+         {:ok, _deleted} <- CRUD.delete(Classroom, id) do
       conn
       |> put_status(204)
       |> text("")
