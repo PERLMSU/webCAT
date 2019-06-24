@@ -1,5 +1,5 @@
 remote_user = root
-remote_host = 174.138.125.85
+remote_host = 45.55.122.140
 remote_dir = /var/webcat
 
 build-image:
