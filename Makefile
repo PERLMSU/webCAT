@@ -1,5 +1,5 @@
 remote_user = root
-remote_host = 174.138.125.85
+remote_host = 167.71.175.221
 remote_dir = /var/webcat
 
 build-image:
@@ -12,5 +12,3 @@ deploy:
 	ssh $(remote_user)@$(remote_host) tar -xvzf $(remote_dir)/server.tar.gz -C $(remote_dir)
 	ssh $(remote_user)@$(remote_host)	'test $$(ps -A | grep beam | wc -c) != 0 && $(remote_dir)/bin/webcat stop'
 	ssh $(remote_user)@$(remote_host) $(remote_dir)/bin/webcat start
-
-

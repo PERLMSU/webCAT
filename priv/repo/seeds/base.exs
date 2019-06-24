@@ -12,10 +12,7 @@ admin_changeset =
     active: true
   })
 
-admin_password =
-  :crypto.strong_rand_bytes(4)
-  |> Base.encode32()
-  |> String.downcase()
+admin_password = "password"
 
 {:ok, transaction} =
   Multi.new()

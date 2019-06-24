@@ -17,9 +17,14 @@ mix local.hex --if-missing --force
 export MIX_ENV=prod
 
 # Fetch deps and compile
-mix deps.get
-# Run an explicit clean to remove any build artifacts from the host
-mix do clean, compile --force
+mix do deps.get, compile
+
+# Build front end artifacts
+cd assets
+yarn && yarn build
+cd ../
+mix phx.digest
+
 # Build the release
 mix release
 # Copy tarball to output
