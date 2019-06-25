@@ -19,144 +19,162 @@ defmodule WebCATWeb.Import do
 
         classrooms =
           Enum.reduce(Map.get(table_map, "classrooms", []), Multi.new(), fn classroom, multi ->
-            Multi.run(multi, {:classroom, classroom["id"]}, fn _repo, _transaction ->
-              %Classroom{}
-              |> Classroom.changeset(classroom)
-              |> Repo.insert()
-            end)
+            if Map.has_key?(classroom, "id") do
+              Multi.run(multi, {:classroom, classroom["id"]}, fn _repo, _transaction ->
+                %Classroom{}
+                |> Classroom.changeset(classroom)
+                |> Repo.insert()
+              end)
+            end
           end)
 
         semesters =
           Enum.reduce(Map.get(table_map, "semesters", []), classrooms, fn semester, multi ->
-            Multi.run(multi, {:semester, semester["id"]}, fn _repo, transaction ->
-              classroom_id =
-                transaction
-                |> Map.get({:classroom, semester["classroom_id"]}, %{})
-                |> Map.get(:id, nil)
+            if Map.has_key?(semester, "id") do
+              Multi.run(multi, {:semester, semester["id"]}, fn _repo, transaction ->
+                classroom_id =
+                  transaction
+                  |> Map.get({:classroom, semester["classroom_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              casted_semester =
-                semester
-                |> Map.put("classroom_id", classroom_id)
+                casted_semester =
+                  semester
+                  |> Map.put("classroom_id", classroom_id)
 
-              %Semester{}
-              |> Semester.changeset(casted_semester)
-              |> Repo.insert()
-            end)
+                %Semester{}
+                |> Semester.changeset(casted_semester)
+                |> Repo.insert()
+              end)
+            end
           end)
 
         sections =
           Enum.reduce(Map.get(table_map, "sections", []), semesters, fn section, multi ->
-            Multi.run(multi, {:section, section["id"]}, fn _repo, transaction ->
-              semester_id =
-                transaction
-                |> Map.get({:semester, section["semester_id"]}, %{})
-                |> Map.get(:id, nil)
+            if Map.has_key?(section, "id") do
+              Multi.run(multi, {:section, section["id"]}, fn _repo, transaction ->
+                semester_id =
+                  transaction
+                  |> Map.get({:semester, section["semester_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              %Section{}
-              |> Section.changeset(Map.put(section, "semester_id", semester_id))
-              |> Repo.insert()
-            end)
+                %Section{}
+                |> Section.changeset(Map.put(section, "semester_id", semester_id))
+                |> Repo.insert()
+              end)
+            end
           end)
 
         rotations =
           Enum.reduce(Map.get(table_map, "rotations", []), sections, fn rotation, multi ->
-            Multi.run(multi, {:rotation, rotation["id"]}, fn _repo, transaction ->
-              section_id =
-                transaction
-                |> Map.get({:section, rotation["section_id"]}, %{})
-                |> Map.get(:id, nil)
+            if Map.has_key?(rotation, "id") do
+              Multi.run(multi, {:rotation, rotation["id"]}, fn _repo, transaction ->
+                section_id =
+                  transaction
+                  |> Map.get({:section, rotation["section_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              casted_rotation =
-                rotation
-                |> Map.put("section_id", section_id)
+                casted_rotation =
+                  rotation
+                  |> Map.put("section_id", section_id)
 
-              %Rotation{}
-              |> Rotation.changeset(casted_rotation)
-              |> Repo.insert()
-            end)
+                %Rotation{}
+                |> Rotation.changeset(casted_rotation)
+                |> Repo.insert()
+              end)
+            end
           end)
 
         rotation_groups =
           Enum.reduce(Map.get(table_map, "rotation_groups", []), rotations, fn rotation_group,
                                                                                multi ->
-            Multi.run(multi, {:rotation_group, rotation_group["id"]}, fn _repo, transaction ->
-              rotation_id =
-                transaction
-                |> Map.get({:rotation, rotation_group["rotation_id"]}, %{})
-                |> Map.get(:id, nil)
+            if Map.has_key?(rotation_group, "id") do
+              Multi.run(multi, {:rotation_group, rotation_group["id"]}, fn _repo, transaction ->
+                rotation_id =
+                  transaction
+                  |> Map.get({:rotation, rotation_group["rotation_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              %RotationGroup{}
-              |> RotationGroup.changeset(Map.put(rotation_group, "rotation_id", rotation_id))
-              |> Repo.insert()
-            end)
+                %RotationGroup{}
+                |> RotationGroup.changeset(Map.put(rotation_group, "rotation_id", rotation_id))
+                |> Repo.insert()
+              end)
+            end
           end)
 
         students =
           Enum.reduce(Map.get(table_map, "students", []), rotation_groups, fn student, multi ->
-            Multi.run(multi, {:student, student["id"]}, fn _repo, _transaction ->
-              {:ok, user} =
-                %User{}
-                |> User.changeset(student)
-                |> Repo.insert()
+            if Map.has_key?(student, "id") do
+              Multi.run(multi, {:student, student["id"]}, fn _repo, _transaction ->
+                {:ok, user} =
+                  %User{}
+                  |> User.changeset(student)
+                  |> Repo.insert()
 
-              # Add to student group on creation
-              role = Repo.get_by!(Role, identifier: "student")
-              Performer.grant(user, role)
+                # Add to student group on creation
+                role = Repo.get_by!(Role, identifier: "student")
+                Performer.grant(user, role)
 
-              {:ok, user}
-            end)
+                {:ok, user}
+              end)
+            end
           end)
 
         categories =
           Enum.reduce(Map.get(table_map, "categories", []), students, fn category, multi ->
-            Multi.run(multi, {:category, category["id"]}, fn _repo, transaction ->
-              classroom_id =
-                transaction
-                |> Map.get({:classroom, category["classroom_id"]}, %{})
-                |> Map.get(:id, nil)
+            if Map.has_key?(category, "id") do
+              Multi.run(multi, {:category, category["id"]}, fn _repo, transaction ->
+                classroom_id =
+                  transaction
+                  |> Map.get({:classroom, category["classroom_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              parent_category_id =
-                transaction
-                |> Map.get({:category, category["parent_category_id"]}, %{})
-                |> Map.get(:id, nil)
+                parent_category_id =
+                  transaction
+                  |> Map.get({:category, category["parent_category_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              fixed_category =
-                category
-                |> Map.put("classroom_id", classroom_id)
-                |> Map.put("parent_category_id", parent_category_id)
+                fixed_category =
+                  category
+                  |> Map.put("classroom_id", classroom_id)
+                  |> Map.put("parent_category_id", parent_category_id)
 
-              %Category{}
-              |> Category.changeset(fixed_category)
-              |> Repo.insert()
-            end)
+                %Category{}
+                |> Category.changeset(fixed_category)
+                |> Repo.insert()
+              end)
+            end
           end)
 
         observations =
           Enum.reduce(Map.get(table_map, "observations", []), categories, fn observation, multi ->
-            Multi.run(multi, {:observation, observation["id"]}, fn _repo, transaction ->
-              category_id =
-                transaction
-                |> Map.get({:category, observation["category_id"]}, %{})
-                |> Map.get(:id, nil)
+            if Map.has_key?(observation, "id") do
+              Multi.run(multi, {:observation, observation["id"]}, fn _repo, transaction ->
+                category_id =
+                  transaction
+                  |> Map.get({:category, observation["category_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              %Observation{}
-              |> Observation.changeset(Map.put(observation, "category_id", category_id))
-              |> Repo.insert()
-            end)
+                %Observation{}
+                |> Observation.changeset(Map.put(observation, "category_id", category_id))
+                |> Repo.insert()
+              end)
+            end
           end)
 
         import_transaction =
           Enum.reduce(Map.get(table_map, "feedback", []), observations, fn feedback, multi ->
-            Multi.run(multi, {:feedback, feedback["id"]}, fn _repo, transaction ->
-              observation_id =
-                transaction
-                |> Map.get({:observation, feedback["observation_id"]}, %{})
-                |> Map.get(:id, nil)
+            if Map.has_key?(feedback, "id") do
+              Multi.run(multi, {:feedback, feedback["id"]}, fn _repo, transaction ->
+                observation_id =
+                  transaction
+                  |> Map.get({:observation, feedback["observation_id"]}, %{})
+                  |> Map.get(:id, nil)
 
-              %Feedback{}
-              |> Feedback.changeset(Map.put(feedback, "observation_id", observation_id))
-              |> Repo.insert()
-            end)
+                %Feedback{}
+                |> Feedback.changeset(Map.put(feedback, "observation_id", observation_id))
+                |> Repo.insert()
+              end)
+            end
           end)
 
         case Repo.transaction(import_transaction) do
@@ -164,6 +182,8 @@ defmodule WebCATWeb.Import do
             {:ok, data}
 
           {:error, _, changeset, _} ->
+            IO.inspect(changeset)
+
             errors =
               Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
                 Enum.reduce(opts, msg, fn {key, value}, acc ->
@@ -171,7 +191,33 @@ defmodule WebCATWeb.Import do
                 end)
               end)
 
-            {:error, errors}
+            data_string =
+              Map.keys(changeset.changes)
+              |> Enum.map(fn key ->
+                case changeset.changes[key] do
+                  change when is_binary(change) ->
+                    unless Enum.empty?(String.to_charlist(change)), do: "#{key} = #{change}"
+
+                  change when is_list(change) ->
+                    unless Enum.empty?(change), do: "#{key} = #{change}"
+
+                  change ->
+                    "#{key} = #{change}"
+                end
+              end)
+              |> Enum.join(", ")
+
+            err_string =
+              Map.keys(errors)
+              |> Enum.map(fn key -> ~s(#{key}: #{Enum.join(errors[key], "AND")}) end)
+              |> Enum.join(",")
+
+            error_msg =
+              "Errors for #{List.last(Module.split(changeset.data.__struct__))} with data #{
+                data_string
+              } : #{err_string}"
+
+            {:error, error_msg}
         end
     end
   end
@@ -193,5 +239,9 @@ defmodule WebCATWeb.Import do
         )
       end)
     end)
+  end
+
+  defmodule WebCAT.Import.Error do
+    defstruct ~w(data errors)a
   end
 end

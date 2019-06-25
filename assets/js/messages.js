@@ -6,7 +6,3 @@ $('.message .close')
       ;
   });
 ;
-
-setTimeout(function () {
-  $('.message').transition('fade down');
-}, 3000)
