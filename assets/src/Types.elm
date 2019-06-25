@@ -407,7 +407,7 @@ type alias Feedback =
     , content : String
 
     -- Foreign keys
-    , observation_id : ObservationId
+    , observationId : ObservationId
 
     -- Related data
     , observation : Maybe Observation
@@ -421,6 +421,18 @@ type alias Feedback =
 
 type FeedbackList
     = FeedbackList (List Feedback)
+
+
+feedbackDecoder : Decoder Feedback
+feedbackDecoder =
+    Decode.succeed Feedback
+        |> required "id" (map FeedbackId int)
+        |> required "content" string
+        |> required "observationId" (map ObservationId int)
+        |> required "observation" (nullable (lazy (\_ -> observationDecoder)))
+        |> required "explanations" (nullable (map Explanations (list (lazy (\_ -> explanationDecoder)))))
+        |> required "insertedAt" (nullable (map Time.millisToPosix int))
+        |> required "updatedAt" (nullable (map Time.millisToPosix int))
 
 
 type ExplanationId
@@ -446,6 +458,16 @@ type alias Explanation =
 type Explanations
     = Explanations (List Explanation)
 
+explanationDecoder : Decoder Explanation
+explanationDecoder =
+    Decode.succeed Explanation
+        |> required "id" (map ExplanationId int)
+        |> required "content" string
+        |> required "feedbackId" (map FeedbackId int)
+        |> required "feedback" (nullable (lazy (\_ -> feedbackDecoder)))
+        |> required "insertedAt" (nullable (map Time.millisToPosix int))
+        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+
 
 type DraftId
     = DraftId Int
@@ -458,6 +480,22 @@ type DraftStatus
     | Approved
     | Emailed
 
+draftStatusDecoder : Decoder DraftStatus
+draftStatusDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\str ->
+                case str of
+                    "unreviewed" -> Decode.succeed Unreviewed
+                    "reviewing" -> Decode.succeed Reviewing
+                    "needs_revision" -> Decode.succeed NeedsRevision
+                    "approved" -> Decode.succeed Approved
+                    "emailed" -> Decode.succeed Emailed
+
+
+                    else_ ->
+                        Decode.fail <| "Unknown draft status: " ++ else_
+            )
 
 type alias Draft =
     { id : DraftId
@@ -479,6 +517,20 @@ type alias Draft =
     , updatedAt : Maybe Time.Posix
     }
 
+draftDecoder : Decoder Draft
+draftDecoder =
+    Decode.succeed Draft
+        |> required "id" (map DraftId int)
+        |> required "content" string
+        |> required "status" draftStatusDecoder
+        |> required "userId" (map UserId int)
+        |> required "rotationGroupId" (map RotationGroupId int)
+        |> required "user" (nullable (lazy (\_ -> userDecoder)))
+        |> required "rotationGroup" (nullable (lazy (\_ -> rotationGroupDecoder)))
+        |> required "comments" (nullable (map Comments (list (lazy (\_ -> commentDecoder)))))
+        |> required "grades" (nullable (map Grades (list (lazy (\_ -> gradeDecoder)))))
+        |> required "insertedAt" (nullable (map Time.millisToPosix int))
+        |> required "updatedAt" (nullable (map Time.millisToPosix int))
 
 type CommentId
     = CommentId Int
@@ -490,7 +542,7 @@ type alias Comment =
 
     -- Foreign keys
     , draftId : DraftId
-    , userId : DraftId
+    , userId : UserId
 
     -- Related data
     , draft : Maybe Draft
@@ -504,6 +556,18 @@ type alias Comment =
 
 type Comments
     = Comments (List Comment)
+
+commentDecoder : Decoder Comment
+commentDecoder =
+    Decode.succeed Comment
+        |> required "id" (map CommentId int)
+        |> required "content" string
+        |> required "draftId" (map DraftId int)
+        |> required "userId" (map UserId int)
+        |> required "draft" (nullable (lazy (\_ -> draftDecoder)))
+        |> required "user" (nullable (lazy (\_ -> userDecoder)))
+        |> required "insertedAt" (nullable (map Time.millisToPosix int))
+        |> required "updatedAt" (nullable (map Time.millisToPosix int))
 
 
 type GradeId
@@ -527,6 +591,20 @@ type alias Grade =
     , insertedAt : Maybe Time.Posix
     , updatedAt : Maybe Time.Posix
     }
+
+
+gradeDecoder : Decoder Grade
+gradeDecoder =
+    Decode.succeed Grade
+        |> required "id" (map GradeId int)
+        |> required "score" int
+        |> required "note" (nullable string)
+        |> required "categoryId" (map CategoryId int)
+        |> required "draftId" (map DraftId int)
+        |> required "category" (nullable (lazy (\_ -> categoryDecoder)))
+        |> required "draft" (nullable (lazy (\_ -> draftDecoder)))
+        |> required "insertedAt" (nullable (map Time.millisToPosix int))
+        |> required "updatedAt" (nullable (map Time.millisToPosix int))
 
 
 type Grades
