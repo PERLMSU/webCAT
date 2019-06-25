@@ -1,7 +1,8 @@
-module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), observationTypeDecoder, roleDecoder, userDecoder)
+module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), observationTypeDecoder, roleDecoder, userDecoder, userEncoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as Encode exposing (Value)
 import Time as Time
 
 
@@ -282,6 +283,20 @@ userDecoder =
         |> required "updatedAt" (nullable (map Time.millisToPosix int))
 
 
+userEncoder : User -> Value
+userEncoder user =
+    let
+        idEncoder (UserId val) =
+            Encode.int val
+    in
+    Encode.object
+        [ ( "id", idEncoder user.id )
+        , ( "email", Encode.string user.email)
+        , ( "firstName", Encode.string user.firstName)
+        , ( "middleName", Encode.string user.lastName)
+        ]
+
+
 
 -- Feedback types
 
@@ -458,6 +473,7 @@ type alias Explanation =
 type Explanations
     = Explanations (List Explanation)
 
+
 explanationDecoder : Decoder Explanation
 explanationDecoder =
     Decode.succeed Explanation
@@ -480,22 +496,32 @@ type DraftStatus
     | Approved
     | Emailed
 
+
 draftStatusDecoder : Decoder DraftStatus
 draftStatusDecoder =
     Decode.string
         |> Decode.andThen
             (\str ->
                 case str of
-                    "unreviewed" -> Decode.succeed Unreviewed
-                    "reviewing" -> Decode.succeed Reviewing
-                    "needs_revision" -> Decode.succeed NeedsRevision
-                    "approved" -> Decode.succeed Approved
-                    "emailed" -> Decode.succeed Emailed
+                    "unreviewed" ->
+                        Decode.succeed Unreviewed
 
+                    "reviewing" ->
+                        Decode.succeed Reviewing
+
+                    "needs_revision" ->
+                        Decode.succeed NeedsRevision
+
+                    "approved" ->
+                        Decode.succeed Approved
+
+                    "emailed" ->
+                        Decode.succeed Emailed
 
                     else_ ->
                         Decode.fail <| "Unknown draft status: " ++ else_
             )
+
 
 type alias Draft =
     { id : DraftId
@@ -517,6 +543,7 @@ type alias Draft =
     , updatedAt : Maybe Time.Posix
     }
 
+
 draftDecoder : Decoder Draft
 draftDecoder =
     Decode.succeed Draft
@@ -531,6 +558,7 @@ draftDecoder =
         |> required "grades" (nullable (map Grades (list (lazy (\_ -> gradeDecoder)))))
         |> required "insertedAt" (nullable (map Time.millisToPosix int))
         |> required "updatedAt" (nullable (map Time.millisToPosix int))
+
 
 type CommentId
     = CommentId Int
@@ -556,6 +584,7 @@ type alias Comment =
 
 type Comments
     = Comments (List Comment)
+
 
 commentDecoder : Decoder Comment
 commentDecoder =
@@ -645,3 +674,4 @@ type alias StudentFeedback =
     , insertedAt : Maybe Time.Posix
     , updatedAt : Maybe Time.Posix
     }
+
