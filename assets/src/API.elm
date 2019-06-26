@@ -1,4 +1,4 @@
-port module API exposing (Credential(..), application, cacheStorageKey, credentialDecoder, credentialHeader, credentialStorageKey, decode, decodeFromChange, decoderFromCredential, delete, get, logout, onStoreChange, post, put, storageDecoder, storeCache, storeCredWith, viewerChanges)
+port module API exposing (Credential, application, cacheStorageKey, credentialDecoder, credentialHeader, credentialStorageKey, decode, decodeFromChange, decoderFromCredential, delete, get, logout, onStoreChange, post, put, storageDecoder, storeCache, storeCredWith, viewerChanges)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -17,6 +17,11 @@ import Url exposing (Url)
 
 type Credential
     = Credential User String
+
+
+credentialUser : Credential -> User
+credentialUser (Credential user _) =
+    user
 
 
 credentialHeader : Credential -> Http.Header
@@ -96,16 +101,16 @@ application :
         , view : model -> Browser.Document msg
         }
     -> Program Value model msg
-application viewerDecoder config =
+application credDecoder config =
     let
         init flags url navKey =
             let
-                maybeViewer =
+                maybeCred =
                     Decode.decodeValue Decode.string flags
-                        |> Result.andThen (Decode.decodeString (storageDecoder viewerDecoder))
+                        |> Result.andThen (Decode.decodeString (storageDecoder credDecoder))
                         |> Result.toMaybe
             in
-            config.init maybeViewer url navKey
+            config.init maybeCred url navKey
     in
     Browser.application
         { init = init

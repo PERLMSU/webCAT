@@ -1,30 +1,41 @@
-module API.Auth exposing (login)
+module API.Auth exposing (login, Token)
 
-import Http
-import Json.Decode as D
+import API exposing (post)
+import API.Endpoint as Endpoint
+import Http exposing (jsonBody)
+import Json.Decode as D exposing (Decoder, string)
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode as E
 import String
 import Url.Builder
-import API exposing (Message, messageDecoder)
+
+
+type alias Token =
+    { token : String }
+
+
 
 -- DECODER
+
+
+tokenDecoder : Decoder Token
+tokenDecoder =
+    D.succeed Token
+        |> required "token" string
+
+
+
+-- ENCODER
+
 
 encodeLogin : String -> String -> E.Value
 encodeLogin email password =
     E.object
-        [ ( "email", E.string email)
+        [ ( "email", E.string email )
         , ( "password", E.string password )
         ]
 
 
-login : String -> String -> (Result Http.Error Message -> msg) -> Cmd msg
+login : String -> String -> (Result Http.Error Token -> msg) -> Cmd msg
 login email password toMsg =
-    Http.request
-        { body = Http.jsonBody (encodeLogin email password)
-        , method = "POST"
-        , expect = Http.expectJson toMsg messageDecoder
-        , headers = []
-        , url = Url.Builder.absolute [ "auth", "login" ] []
-        , timeout = Nothing
-        , tracker = Nothing
-        }
+    post Endpoint.login Nothing (jsonBody (encodeLogin email password)) tokenDecoder toMsg

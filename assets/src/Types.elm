@@ -1,7 +1,7 @@
 module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), observationTypeDecoder, roleDecoder, userDecoder, userEncoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode exposing (Value)
 import Time as Time
 

@@ -1,6 +1,7 @@
-module Session exposing (Session, navKey, user, token)
+module Session exposing (Session, navKey, credential, fromCredential)
 
 import Types exposing (User)
+import API exposing (Credential)
 import API.Auth exposing (Token)
 import Browser.Navigation as Nav
 
@@ -10,7 +11,7 @@ import Browser.Navigation as Nav
 
 
 type Session
-    = Authenticated Nav.Key User
+    = Authenticated Nav.Key Credential
     | Unauthenticated Nav.Key
 
 
@@ -27,10 +28,23 @@ navKey session =
             key
 
 
-user : Session -> Maybe User
-user session =
+credential : Session -> Maybe Credential
+credential session =
     case session of
-        Authenticated _ user ->
-            Just user
+        Authenticated _ cred ->
+            Just cred
         Unauthenticated _ ->
             Nothing
+
+
+fromCredential : Nav.Key -> Maybe Credential -> Session
+fromCredential key maybeCred =
+    -- It's stored in localStorage as a JSON String;
+    -- first decode the Value as a String, then
+    -- decode that String as JSON.
+    case maybeCred of
+        Just cred ->
+            Authenticated key cred
+
+        Nothing ->
+            Unauthenticated key
