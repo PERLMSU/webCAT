@@ -1,9 +1,9 @@
-module Session exposing (Session, navKey, credential, fromCredential)
+module Session exposing (Session, changes, credential, fromCredential, navKey)
 
-import Types exposing (User)
 import API exposing (Credential)
 import API.Auth exposing (Token)
 import Browser.Navigation as Nav
+import Types exposing (User)
 
 
 
@@ -13,6 +13,7 @@ import Browser.Navigation as Nav
 type Session
     = Authenticated Nav.Key Credential
     | Unauthenticated Nav.Key
+
 
 
 -- Utility functions
@@ -33,6 +34,7 @@ credential session =
     case session of
         Authenticated _ cred ->
             Just cred
+
         Unauthenticated _ ->
             Nothing
 
@@ -48,3 +50,10 @@ fromCredential key maybeCred =
 
         Nothing ->
             Unauthenticated key
+
+
+changes : (Session -> msg) -> Nav.Key -> Sub msg
+changes toMsg key =
+    API.credChanges (\maybeCred -> toMsg (fromCredential key maybeCred))
+
+

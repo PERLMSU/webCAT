@@ -1,6 +1,8 @@
-module Route exposing (LoginToken(..), PasswordResetToken(..), Route(..), fromUrl, pushUrl, replaceUrl)
+module Route exposing (LoginToken(..), PasswordResetToken(..), Route(..), fromUrl, href, pushUrl, replaceUrl)
 
 import Browser.Navigation as Nav
+import Html exposing (Attribute)
+import Html.Attributes as Attr
 import Types exposing (ClassroomId(..), DraftId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
 import Url exposing (Url)
 import Url.Builder as Builder exposing (absolute)
@@ -20,6 +22,7 @@ type Route
     = Dashboard (Maybe ClassroomId)
       -- Login routes
     | Login (Maybe LoginToken)
+    | Logout
     | ForgotPassword (Maybe PasswordResetToken)
       -- Classroom control panel
     | Classrooms
@@ -81,6 +84,11 @@ pushUrl key route =
     Nav.pushUrl key (routeToString route)
 
 
+href : Route -> Attribute msg
+href targetRoute =
+    Attr.href (routeToString targetRoute)
+
+
 idQueryParser : (Int -> a) -> String -> Query.Parser (Maybe a)
 idQueryParser id key =
     Query.custom key <|
@@ -118,6 +126,7 @@ parser =
 
         -- Login
         , Parser.map Login (s "login" <?> tokenQueryParser LoginToken "loginToken")
+        , Parser.map Logout (s "logout")
         , Parser.map ForgotPassword (s "forgotPassword" <?> tokenQueryParser PasswordResetToken "resetToken")
 
         -- Classroom control panel
@@ -193,6 +202,9 @@ routeToString route =
 
         Login maybeToken ->
             absolute [ "login" ] (Maybe.withDefault [] (Maybe.map (\(LoginToken token) -> [ Builder.string "loginToken" token ]) maybeToken))
+
+        Logout ->
+            absolute [ "logout" ] []
 
         ForgotPassword maybeToken ->
             absolute [ "forgotPassword" ] (Maybe.withDefault [] (Maybe.map (\(PasswordResetToken token) -> [ Builder.string "loginToken" token ]) maybeToken))

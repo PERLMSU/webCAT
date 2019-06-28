@@ -1,4 +1,4 @@
-module Page.Login exposing (..)
+module Page.Login exposing (Form, Model, Msg(..), Problem(..), TrimmedForm(..), ValidatedField(..), fieldsToValidate, init, labelView, primaryButton, subscriptions, tertiaryButton, textInput, toSession, update, validate, validateField, view, viewProblem)
 
 import Browser
 import Browser.Navigation as Nav
@@ -6,23 +6,48 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import Session exposing (Session)
 import Url
+
 
 
 -- MODEL
 
 
 type alias Model =
-    { email : String
-    , password : String
+    { session : Session
+    , errors : List Problem
+    , form : Form
     }
+
 
 type alias Form =
     { email : String
     , password : String
     }
 
+
+type Problem
+    = InvalidEntry ValidatedField String
+    | ServerError String
+
+
+init : Session -> ( Model, Cmd msg )
+init session =
+    ( { session = session
+      , problems = []
+      , form =
+            { email = ""
+            , password = ""
+            }
+      }
+    , Cmd.none
+    )
+
+
+
 -- UPDATE
+
 
 type Msg
     = EmailChanged String
@@ -87,6 +112,20 @@ view model =
     }
 
 
+viewProblem : Problem -> Html msg
+viewProblem problem =
+    let
+        errorMessage =
+            case problem of
+                InvalidEntry _ str ->
+                    str
+
+                ServerError str ->
+                    str
+    in
+    li [] [ text errorMessage ]
+
+
 labelView : String -> String -> Html msg
 labelView content for =
     label [ class "block text-grey-darker text-sm font-bold mb-2", Html.Attributes.for for ]
@@ -95,7 +134,7 @@ labelView content for =
 
 textInput : (String -> Msg) -> String -> String -> Html Msg
 textInput toMsg id_ placeholder_ =
-    input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline", id id_, placeholder placeholder_, onInput toMsg ] [text ""]
+    input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline", id id_, placeholder placeholder_, onInput toMsg ] [ text "" ]
 
 
 primaryButton : Msg -> String -> Html Msg
@@ -106,3 +145,74 @@ primaryButton toMsg content =
 tertiaryButton : Msg -> String -> Html Msg
 tertiaryButton toMsg content =
     button [ class "text-gray", type_ "button", onClick toMsg ] [ text content ]
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Session.changes GotSession (Session.navKey model.session)
+
+
+
+-- FORM
+
+
+{-| When adding a variant here, add it to `fieldsToValidate` too!
+-}
+type ValidatedField
+    = Email
+    | Password
+
+
+fieldsToValidate : List ValidatedField
+fieldsToValidate =
+    [ Email
+    , Password
+    ]
+
+
+{-| Trim the form and validate its fields. If there are problems, report them!
+-}
+validate : Form -> Result (List Problem) Form
+validate form =
+    let
+        trimmedForm = { email = String.trim form.email
+                      , password = String.trim form.password }
+    in
+    case List.concatMap (validateField trimmedForm) fieldsToValidate of
+        [] ->
+            Ok trimmedForm
+
+        problems ->
+            Err problems
+
+
+validateField : Form -> ValidatedField -> List Problem
+validateField form field =
+    List.map (InvalidEntry field) <|
+        case field of
+            Email ->
+                if String.isEmpty form.email then
+                    [ "email can't be blank." ]
+
+                else
+                    []
+
+            Password ->
+                if String.isEmpty form.password then
+                    [ "password can't be blank." ]
+
+                else
+                    []
+
+
+
+-- EXPORT
+
+
+toSession : Model -> Session
+toSession model =
+    model.session
