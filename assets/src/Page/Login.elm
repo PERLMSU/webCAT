@@ -1,11 +1,13 @@
-module Page.Login exposing (Form, Model, Msg(..), Problem(..), TrimmedForm(..), ValidatedField(..), fieldsToValidate, init, labelView, primaryButton, subscriptions, tertiaryButton, textInput, toSession, update, validate, validateField, view, viewProblem)
+module Page.Login exposing (Form, Model, Msg(..), Problem(..), ValidatedField(..), fieldsToValidate, init, labelView, primaryButton, subscriptions, tertiaryButton, textInput, toSession, update, validate, validateField, view, viewProblem)
 
+import API exposing (Credential, Error(..))
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import Route as Route
 import Session exposing (Session)
 import Url
 
@@ -32,10 +34,10 @@ type Problem
     | ServerError String
 
 
-init : Session -> ( Model, Cmd msg )
+init : Session -> ( Model, Cmd Msg )
 init session =
     ( { session = session
-      , problems = []
+      , errors = []
       , form =
             { email = ""
             , password = ""
@@ -55,17 +57,18 @@ type Msg
     | SignIn
     | ForgotPassword
     | Loading
-    | Response (Result Http.Error String)
+    | Response (Result Error Credential)
+    | GotSession Session
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         EmailChanged email ->
-            ( { model | email = email }, Cmd.none )
+            updateForm (\form -> { form | email = email }) model
 
         PasswordChanged pass ->
-            ( { model | password = pass }, Cmd.none )
+            updateForm (\form -> { form | password = pass }) model
 
         SignIn ->
             Debug.todo "submit form"
@@ -74,32 +77,60 @@ update msg model =
             Debug.todo "forgot password"
 
         Loading ->
-            Debug.todo "yeet"
+            Debug.todo "Loading"
 
-        Response _ ->
-            Debug.todo "yeet"
+        Response (Err error) ->
+            let
+                serverErrors =
+                    case error of
+                        BadRequest errMsg -> [ServerError errMsg]
+                        Unauthorized errMsg -> [ServerError errMsg]
+                        Forbidden errMsg -> [ServerError errMsg]
+                        NotFound errMsg -> [ServerError errMsg]
+                        API.ServerError errMsg -> [ServerError errMsg]
+                        BadUrl errMsg -> [ServerError errMsg]
+                        Timeout errMsg -> [ServerError errMsg]
+                        NetworkError errMsg -> [ServerError errMsg]
+                        BadBody errMsg -> [ServerError errMsg]
+            in
+            ( { model | errors = List.append model.errors serverErrors }
+            , Cmd.none
+            )
+
+        Response (Ok cred) ->
+            ( model, API.storeCred cred )
+
+        GotSession session ->
+            ( { model | session = session }
+            , Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing)
+            )
+
+
+updateForm : (Form -> Form) -> Model -> ( Model, Cmd Msg )
+updateForm transform model =
+    ( { model | form = transform model.form }, Cmd.none )
 
 
 
 -- VIEW
 
 
-view : Model -> Browser.Document Msg
+view : Model -> { title : String, content : Html Msg }
 view model =
     { title = "WebCAT - Login"
-    , body =
-        [ div [ class "flex justify-center bg-grey-lighter py-32" ]
+    , content =
+        div [ class "flex justify-center bg-grey-lighter py-32" ]
             [ div [ class "w-full h-screen max-w-xs" ]
                 [ Html.form [ class "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
                     [ div [ class "mb-4" ]
                         [ labelView "Email" "email"
                         , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker leading-tight focus:outline-none focus:shadow-outline", id "email", placeholder "Email", type_ "text" ]
-                            [ text model.email ]
+                            [ text model.form.email ]
                         ]
                     , div [ class "mb-6" ]
                         [ labelView "Password" "password"
                         , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline", id "password", placeholder "************", type_ "password" ]
-                            [ text model.password ]
+                            [ text model.form.password ]
                         ]
                     , div [ class "flex items-center justify-between" ]
                         [ primaryButton SignIn "Sign In"
@@ -108,7 +139,7 @@ view model =
                     ]
                 ]
             ]
-        ]
+       
     }
 
 
@@ -179,8 +210,10 @@ fieldsToValidate =
 validate : Form -> Result (List Problem) Form
 validate form =
     let
-        trimmedForm = { email = String.trim form.email
-                      , password = String.trim form.password }
+        trimmedForm =
+            { email = String.trim form.email
+            , password = String.trim form.password
+            }
     in
     case List.concatMap (validateField trimmedForm) fieldsToValidate of
         [] ->

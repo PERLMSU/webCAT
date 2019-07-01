@@ -1,4 +1,4 @@
-port module API exposing (Credential, application, cacheStorageKey, credChanges, credentialDecoder, credentialHeader, credentialStorageKey, decode, decoderFromCredential, delete, get, logout, onStoreChange, post, put, storageDecoder, storeCache, storeCredWith)
+port module API exposing (Credential, Error(..), application, cacheStorageKey, credChanges, credentialDecoder, credentialHeader, credentialStorageKey, decode, decoderFromCredential, delete, get, logout, onStoreChange, post, put, storageDecoder, storeCache, storeCred, credentialUser)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -37,6 +37,23 @@ credentialDecoder =
 
 
 
+-- The API can error out
+
+
+type Error
+    = BadRequest String
+    | Unauthorized String
+    | Forbidden String
+    | NotFound String
+    | ServerError String
+      -- Errors that occur because of the transport mechanism
+    | BadUrl String
+    | Timeout String
+    | NetworkError String
+    | BadBody String
+
+
+
 -- PERSISTENCE
 
 
@@ -57,8 +74,8 @@ credChanges toMsg =
     onStoreChange (\value -> toMsg (Decode.decodeValue Decode.string value |> Result.andThen (\str -> Decode.decodeString credentialDecoder str) |> Result.toMaybe))
 
 
-storeCredWith : Credential -> Cmd msg
-storeCredWith (Credential user token) =
+storeCred : Credential -> Cmd msg
+storeCred (Credential user token) =
     let
         json =
             Encode.object
@@ -120,12 +137,12 @@ storageDecoder viewerDecoder =
 -- HTTP
 
 
-get : Endpoint -> Maybe Credential -> Decoder a -> (Result Http.Error a -> msg) -> Cmd msg
+get : Endpoint -> Maybe Credential -> Decoder a -> (Result Error a -> msg) -> Cmd msg
 get url maybeCred decoder toMsg =
     Endpoint.request
         { method = "GET"
         , url = url
-        , expect = Http.expectJson toMsg decoder
+        , expect = expectJson toMsg decoder
         , headers =
             case maybeCred of
                 Just cred ->
@@ -139,12 +156,12 @@ get url maybeCred decoder toMsg =
         }
 
 
-put : Endpoint -> Credential -> Body -> Decoder a -> (Result Http.Error a -> msg) -> Cmd msg
+put : Endpoint -> Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
 put url cred body decoder toMsg =
     Endpoint.request
         { method = "PUT"
         , url = url
-        , expect = Http.expectJson toMsg decoder
+        , expect = expectJson toMsg decoder
         , headers = [ credentialHeader cred ]
         , body = body
         , timeout = Nothing
@@ -152,12 +169,12 @@ put url cred body decoder toMsg =
         }
 
 
-post : Endpoint -> Maybe Credential -> Body -> Decoder a -> (Result Http.Error a -> msg) -> Cmd msg
+post : Endpoint -> Maybe Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
 post url maybeCred body decoder toMsg =
     Endpoint.request
         { method = "POST"
         , url = url
-        , expect = Http.expectJson toMsg decoder
+        , expect = expectJson toMsg decoder
         , headers =
             case maybeCred of
                 Just cred ->
@@ -171,12 +188,12 @@ post url maybeCred body decoder toMsg =
         }
 
 
-delete : Endpoint -> Credential -> Body -> Decoder a -> (Result Http.Error a -> msg) -> Cmd msg
+delete : Endpoint -> Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
 delete url cred body decoder toMsg =
     Endpoint.request
         { method = "DELETE"
         , url = url
-        , expect = Http.expectJson toMsg decoder
+        , expect = expectJson toMsg decoder
         , headers = [ credentialHeader cred ]
         , body = body
         , timeout = Nothing
@@ -189,6 +206,65 @@ decoderFromCredential decoder =
     Decode.map2 (\fromCred cred -> fromCred cred)
         decoder
         credentialDecoder
+
+
+expectJson : (Result Error a -> msg) -> Decoder a -> Expect msg
+expectJson toMsg decoder =
+    Http.expectStringResponse toMsg <|
+        \response ->
+            case response of
+                Http.BadUrl_ url ->
+                    Err (BadUrl ("Problem with url: " ++ url))
+
+                Http.Timeout_ ->
+                    Err (Timeout "Request timed out")
+
+                Http.NetworkError_ ->
+                    Err (NetworkError "Network error")
+
+                Http.BadStatus_ metadata body ->
+                    case metadata.statusCode of
+                        400 ->
+                            Err (decodeErrorString BadRequest body)
+
+                        401 ->
+                            Err (decodeErrorString Unauthorized body)
+
+                        403 ->
+                            Err (decodeErrorString Forbidden body)
+
+                        404 ->
+                            Err (decodeErrorString NotFound body)
+
+                        _ ->
+                            Err (decodeErrorString ServerError body)
+
+                Http.GoodStatus_ _ body ->
+                    case decodeString decoder body of
+                        Ok value ->
+                            Ok value
+
+                        Err err ->
+                            Err (BadBody (Decode.errorToString err))
+
+
+
+-- ERRORS
+
+
+decodeErrorString : (String -> a) -> String -> a
+decodeErrorString error str =
+    case decodeString errorDecoder str of
+        Ok errorMsg ->
+            error errorMsg
+
+        Err decodeError ->
+            error ("Problem decoding error message: " ++ Decode.errorToString decodeError)
+
+
+errorDecoder : Decoder String
+errorDecoder =
+    field "error" string
 
 
 

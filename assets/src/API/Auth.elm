@@ -36,6 +36,6 @@ encodeLogin email password =
         ]
 
 
-login : String -> String -> (Result Http.Error Token -> msg) -> Cmd msg
+login : String -> String -> (Result API.Error Token -> msg) -> Cmd msg
 login email password toMsg =
     post Endpoint.login Nothing (jsonBody (encodeLogin email password)) tokenDecoder toMsg

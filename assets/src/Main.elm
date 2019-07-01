@@ -1,21 +1,28 @@
 module Main exposing (main)
 
+import API as API exposing (Credential, credentialDecoder)
 import Browser exposing (Document)
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Json.Decode as Decode exposing (Value)
+import Page
+import Page.Blank as Blank
 import Page.Login as Login
-import Route exposing (Route(..), LoginToken)
+import Page.NotFound as NotFound
+import Route exposing (LoginToken, Route(..))
 import Session exposing (Session)
 import Task
 import Time
 import Url exposing (Url)
-import API as API exposing (Credential, credentialDecoder)
-import Json.Decode as Decode exposing (Value)
+
+
 
 -- MAIN
+
+
 main : Program Value Model Msg
 main =
-    API.application credentialDecoder
+    API.application
         { init = init
         , onUrlChange = ChangedUrl
         , onUrlRequest = ClickedLink
@@ -38,7 +45,7 @@ init maybeCred url navKey =
 type Model
     = Redirect Session
     | NotFound Session
-    | Login (Maybe LoginToken) Login.Model
+    | Login Login.Model
 
 
 
@@ -61,7 +68,7 @@ toSession page =
         NotFound session ->
             session
 
-        Login _ login ->
+        Login login ->
             Login.toSession login
 
 
@@ -76,11 +83,14 @@ changeRouteTo maybeRoute model =
             ( NotFound session, Cmd.none )
 
         Just Route.Root ->
-            ( model, Route.replaceUrl (Session.navKey session) Route.Dashboard )
+            ( model, Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing) )
 
         Just (Route.Login maybeToken) ->
             Login.init session
-                |> updateWith (Login maybeToken) GotLoginMsg model
+                |> updateWith Login GotLoginMsg model
+
+        Just _ ->
+            ( model, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,11 +119,22 @@ update msg model =
         ( ChangedRoute route, _ ) ->
             changeRouteTo route model
 
+        ( GotLoginMsg subMsg, Login login ) ->
+            Login.update subMsg login
+                |> updateWith Login GotLoginMsg model
+
+        ( _, _ ) ->
+            -- Disregard messages that arrived for the wrong page.
+            ( model, Cmd.none )
+
+
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
 updateWith toModel toMsg model ( subModel, subCmd ) =
     ( toModel subModel
     , Cmd.map toMsg subCmd
     )
+
+
 
 -- SUBSCRIPTIONS
 
@@ -130,13 +151,13 @@ subscriptions _ =
 view : Model -> Document Msg
 view model =
     let
-        viewer =
-            Session.viewer (toSession model)
+        user =
+            Maybe.map API.credentialUser (Session.credential (toSession model))
 
         viewPage page toMsg config =
             let
                 { title, body } =
-                    Page.view viewer page config
+                    Page.view user page config
             in
             { title = title
             , body = List.map (Html.map toMsg) body
@@ -144,10 +165,10 @@ view model =
     in
     case model of
         Redirect _ ->
-            Page.view viewer Page.Other Blank.view
+            Page.view user Page.Other Blank.view
 
         NotFound _ ->
-            Page.view viewer Page.Other NotFound.view
+            Page.view user Page.Other NotFound.view
 
         Login login ->
             viewPage Page.Other GotLoginMsg (Login.view login)
