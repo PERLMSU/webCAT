@@ -3,6 +3,7 @@ defmodule WebCATWeb.AuthController do
 
   alias WebCAT.Accounts.PasswordResets
   alias WebCAT.Accounts.Users
+  alias WebCATWeb.UserView
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -12,7 +13,7 @@ defmodule WebCATWeb.AuthController do
          {:token, {:ok, token, _}} <- {:token, WebCATWeb.Auth.Guardian.encode_and_sign(user)} do
       conn
       |> put_status(201)
-      |> json(%{token: token})
+      |> json(%{token: token, user: UserView.render("show.json", user: user)})
     else
       {:params, _} ->
         {:error, "Authentication details not correctly supplied"}

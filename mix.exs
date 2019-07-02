@@ -57,7 +57,7 @@ defmodule WebCAT.Mixfile do
       # Monitoring
       {:sentry, "~> 7.0"},
       # Time and Date
-      {:timex, "~> 3.4"},
+      {:timex, "~> 3.6"},
       # Email and markdown
       {:bamboo, "~> 1.0"},
       {:earmark, "~> 1.3.2"},
