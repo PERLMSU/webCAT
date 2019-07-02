@@ -1,4 +1,4 @@
-module Route exposing (LoginToken(..), PasswordResetToken(..), Route(..), fromUrl, href, pushUrl, replaceUrl)
+module Route exposing (LoginToken(..), PasswordResetToken(..), Route(..), fromUrl, href, pushUrl, replaceUrl, routeToString)
 
 import Browser.Navigation as Nav
 import Html exposing (Attribute)
@@ -116,11 +116,15 @@ tokenQueryParser id key =
 
                 _ ->
                     Nothing
+applicationRoot : String
+applicationRoot = "app"
 
+appAbsolute : List String -> List Builder.QueryParameter -> String
+appAbsolute paths query = absolute (applicationRoot :: paths) query
 
 parser : Parser (Route -> a) a
 parser =
-    oneOf
+    s applicationRoot </> oneOf
         [ Parser.map Root top
         , Parser.map Dashboard (s "dashboard" <?> idQueryParser ClassroomId "classroomId")
 
@@ -195,116 +199,116 @@ routeToString : Route -> String
 routeToString route =
     case route of
         Root ->
-            absolute [] []
+            appAbsolute [ ] []
 
         Dashboard maybeId ->
-            absolute [ "dashboard" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
+            appAbsolute [ "dashboard" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
 
         Login maybeToken ->
-            absolute [ "login" ] (Maybe.withDefault [] (Maybe.map (\(LoginToken token) -> [ Builder.string "loginToken" token ]) maybeToken))
+            appAbsolute [ "login" ] (Maybe.withDefault [] (Maybe.map (\(LoginToken token) -> [ Builder.string "loginToken" token ]) maybeToken))
 
         Logout ->
-            absolute [ "logout" ] []
+            appAbsolute [ "logout" ] []
 
         ForgotPassword maybeToken ->
-            absolute [ "forgotPassword" ] (Maybe.withDefault [] (Maybe.map (\(PasswordResetToken token) -> [ Builder.string "loginToken" token ]) maybeToken))
+            appAbsolute [ "forgotPassword" ] (Maybe.withDefault [] (Maybe.map (\(PasswordResetToken token) -> [ Builder.string "resetToken" token ]) maybeToken))
 
         -- Classrooms
         Classrooms ->
-            absolute [ "classrooms" ] []
+            appAbsolute [ "classrooms" ] []
 
         Classroom (ClassroomId id) ->
-            absolute [ "classrooms", String.fromInt id ] []
+            appAbsolute ["classrooms", String.fromInt id ] []
 
         NewClassroom ->
-            absolute [ "classrooms", "new" ] []
+            appAbsolute [ "classrooms", "new" ] []
 
         EditClassroom (ClassroomId id) ->
-            absolute [ "classrooms", String.fromInt id, "edit" ] []
+            appAbsolute [ "classrooms", String.fromInt id, "edit" ] []
 
         -- Semesters
         Semesters maybeId ->
-            absolute [ "semesters" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
+            appAbsolute [ "semesters" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
 
         Semester (SemesterId id) ->
-            absolute [ "semesters", String.fromInt id ] []
+            appAbsolute [ "semesters", String.fromInt id ] []
 
         NewSemester maybeId ->
-            absolute [ "semesters", "new" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
+            appAbsolute [ "semesters", "new" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
 
         EditSemester (SemesterId id) ->
-            absolute [ "semesters", String.fromInt id, "edit" ] []
+            appAbsolute [ "semesters", String.fromInt id, "edit" ] []
 
         -- Sections
         Sections maybeId ->
-            absolute [ "sections" ] (Maybe.withDefault [] (Maybe.map (\(SemesterId id) -> [ Builder.int "semesterId" id ]) maybeId))
+            appAbsolute [ "sections" ] (Maybe.withDefault [] (Maybe.map (\(SemesterId id) -> [ Builder.int "semesterId" id ]) maybeId))
 
         Section (SectionId id) ->
-            absolute [ "sections", String.fromInt id ] []
+            appAbsolute [ "sections", String.fromInt id ] []
 
         NewSection maybeId ->
-            absolute [ "sections", "new" ] (Maybe.withDefault [] (Maybe.map (\(SemesterId id) -> [ Builder.int "semesterId" id ]) maybeId))
+            appAbsolute [ "sections", "new" ] (Maybe.withDefault [] (Maybe.map (\(SemesterId id) -> [ Builder.int "semesterId" id ]) maybeId))
 
         EditSection (SectionId id) ->
-            absolute [ "sections", String.fromInt id, "edit" ] []
+            appAbsolute [ "sections", String.fromInt id, "edit" ] []
 
         -- Rotations
         Rotations maybeId ->
-            absolute [ "rotations" ] (Maybe.withDefault [] (Maybe.map (\(SectionId id) -> [ Builder.int "sectionId" id ]) maybeId))
+            appAbsolute [ "rotations" ] (Maybe.withDefault [] (Maybe.map (\(SectionId id) -> [ Builder.int "sectionId" id ]) maybeId))
 
         Rotation (RotationId id) ->
-            absolute [ "rotations", String.fromInt id ] []
+            appAbsolute [ "rotations", String.fromInt id ] []
 
         NewRotation maybeId ->
-            absolute [ "rotations", "new" ] (Maybe.withDefault [] (Maybe.map (\(SectionId id) -> [ Builder.int "sectionId" id ]) maybeId))
+            appAbsolute [ "rotations", "new" ] (Maybe.withDefault [] (Maybe.map (\(SectionId id) -> [ Builder.int "sectionId" id ]) maybeId))
 
         EditRotation (RotationId id) ->
-            absolute [ "rotations", String.fromInt id, "edit" ] []
+            appAbsolute [ "rotations", String.fromInt id, "edit" ] []
 
         -- Rotation Groups
         RotationGroups maybeId ->
-            absolute [ "rotationGroups" ] (Maybe.withDefault [] (Maybe.map (\(RotationId id) -> [ Builder.int "rotationId" id ]) maybeId))
+            appAbsolute [ "rotationGroups" ] (Maybe.withDefault [] (Maybe.map (\(RotationId id) -> [ Builder.int "rotationId" id ]) maybeId))
 
         RotationGroup (RotationGroupId id) ->
-            absolute [ "rotationGroups", String.fromInt id ] []
+            appAbsolute [ "rotationGroups", String.fromInt id ] []
 
         NewRotationGroup maybeId ->
-            absolute [ "rotationGroups", "new" ] (Maybe.withDefault [] (Maybe.map (\(RotationId id) -> [ Builder.int "rotationId" id ]) maybeId))
+            appAbsolute [ "rotationGroups", "new" ] (Maybe.withDefault [] (Maybe.map (\(RotationId id) -> [ Builder.int "rotationId" id ]) maybeId))
 
         EditRotationGroup (RotationGroupId id) ->
-            absolute [ "rotationGroups", String.fromInt id, "edit" ] []
+            appAbsolute [ "rotationGroups", String.fromInt id, "edit" ] []
 
         -- Users
         Users ->
-            absolute [ "users" ] []
+            appAbsolute [ "users" ] []
 
         User (UserId id) ->
-            absolute [ "users", String.fromInt id ] []
+            appAbsolute [ "users", String.fromInt id ] []
 
         NewUser ->
-            absolute [ "users", "new" ] []
+            appAbsolute [ "users", "new" ] []
 
         EditUser (UserId id) ->
-            absolute [ "users", String.fromInt id, "edit" ] []
+            appAbsolute [ "users", String.fromInt id, "edit" ] []
 
         -- Users
         Drafts ->
-            absolute [ "drafts" ] []
+            appAbsolute [ "drafts" ] []
 
         Draft (DraftId id) ->
-            absolute [ "drafts", String.fromInt id ] []
+            appAbsolute [ "drafts", String.fromInt id ] []
 
         NewDraft (RotationGroupId groupId) (UserId userId) ->
-            absolute [ "drafts", "new" ] []
+            appAbsolute [ "drafts", "new", String.fromInt groupId, String.fromInt userId ] []
 
         EditDraft (DraftId id) ->
-            absolute [ "drafts", String.fromInt id, "edit" ] []
+            appAbsolute [ "drafts", String.fromInt id, "edit" ] []
 
         Import ->
-            absolute [ "import" ] []
+            appAbsolute [ "import" ] []
 
         Feedback ->
-            absolute [ "feedback" ] []
+            appAbsolute [ "feedback" ] []
 
         Profile ->
-            absolute [ "profile" ] []
+            appAbsolute [ "profile" ] []
