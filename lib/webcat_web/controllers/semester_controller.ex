@@ -1,8 +1,8 @@
-defmodule WebCATWeb.UserController do
+defmodule WebCATWeb.SemesterController do
   use WebCATWeb, :authenticated_controller
 
-  alias WebCATWeb.UserView
-  alias WebCAT.Accounts.{Users, User}
+  alias WebCATWeb.SemesterView
+  alias WebCAT.Rotations.{Semester, Semesters}
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
@@ -10,16 +10,16 @@ defmodule WebCATWeb.UserController do
   def index(conn, _user, _params) do
     conn
     |> put_status(200)
-    |> put_view(UserView)
-    |> render("list.json", users: Users.list())
+    |> put_view(SemesterView)
+    |> render("list.json", semesters: Semesters.list())
   end
 
   def show(conn, _user, %{"id" => id}) do
-    with {:ok, user} <- Users.get(id) do
+    with {:ok, semester} <- Semesters.get(id) do
       conn
       |> put_status(200)
-      |> put_view(UserView)
-      |> render("show.json", user: user)
+      |> put_view(SemesterView)
+      |> render("show.json", semester: semester)
     end
   end
 
@@ -29,13 +29,13 @@ defmodule WebCATWeb.UserController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, user} <- CRUD.create(User, params) do
+         {:ok, semester} <- CRUD.create(Semester, params) do
       conn
       |> put_status(201)
-      |> put_view(UserView)
-      |> render("show.json", user: user)
+      |> put_view(SemesterView)
+      |> render("show.json", semester: semester)
     else
-      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to create user")}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to create semester")}
       {:error, _} = it -> it
     end
   end
@@ -46,13 +46,13 @@ defmodule WebCATWeb.UserController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, updated} <- CRUD.update(User, id, params) do
+         {:ok, updated} <- CRUD.update(Semester, id, params) do
       conn
       |> put_status(200)
-      |> put_view(UserView)
-      |> render("show.json", user: updated)
+      |> put_view(SemesterView)
+      |> render("show.json", semester: updated)
     else
-      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to update user")}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to update semester")}
       {:error, _} = it -> it
     end
   end
@@ -63,12 +63,12 @@ defmodule WebCATWeb.UserController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, _deleted} <- CRUD.delete(User, id) do
+         {:ok, _deleted} <- CRUD.delete(Semester, id) do
       conn
       |> put_status(204)
       |> text("")
     else
-      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete user")}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete semester")}
       {:error, _} = it -> it
     end
   end

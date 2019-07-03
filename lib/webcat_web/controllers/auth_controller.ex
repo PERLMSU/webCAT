@@ -16,13 +16,13 @@ defmodule WebCATWeb.AuthController do
       |> json(%{token: token, user: UserView.render("show.json", user: user)})
     else
       {:params, _} ->
-        {:error, "Authentication details not correctly supplied"}
+        {:error, :bad_request, dgettext("errors", "Login details not supplied")}
 
       {:login, {:error, _}} ->
-        {:error, :unauthenticated}
+        {:error, :not_found, dgettext("errors", "Email or password incorrect")}
 
       {:token, _} ->
-        {:error, :server_error}
+        {:error, :server_error, dgettext("errors", "Problem generating authentication token")}
     end
   end
 
@@ -35,10 +35,10 @@ defmodule WebCATWeb.AuthController do
       |> render("token.json", token: reset.token)
     else
       {:params, _} ->
-        {:error, "Reset details not correctly supplied"}
+        {:error, :bad_request, dgettext("errors", "Reset details not correctly supplied")}
 
       {:email, _} ->
-        {:error, "Email not found"}
+        {:error, :not_found, dgettext("errors", "Email not found")}
     end
   end
 
@@ -51,10 +51,10 @@ defmodule WebCATWeb.AuthController do
       |> render("user.json", user: user)
     else
       {:params, _} ->
-        {:error, "Reset details not correctly supplied."}
+        {:error, :bad_request, dgettext("errors", "Reset details not correctly supplied.")}
 
       {:reset, _} ->
-        {:error, "There was a problem with your token."}
+        {:error, :not_found, dgettext("errors", "Reset token not found")}
     end
   end
 end

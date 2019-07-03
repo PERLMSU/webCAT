@@ -35,7 +35,7 @@ defmodule WebCATWeb.ClassroomController do
       |> put_view(ClassroomView)
       |> render("show.json", classroom: classroom)
     else
-      {:auth, _} -> {:error, :unauthorized}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to create classroom")}
       {:error, _} = it -> it
     end
   end
@@ -52,7 +52,7 @@ defmodule WebCATWeb.ClassroomController do
       |> put_view(ClassroomView)
       |> render("show.json", classroom: updated)
     else
-      {:auth, _} -> {:error, :unauthorized}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to update classroom")}
       {:error, _} = it -> it
     end
   end
@@ -68,7 +68,7 @@ defmodule WebCATWeb.ClassroomController do
       |> put_status(204)
       |> text("")
     else
-      {:auth, _} -> {:error, :unauthorized}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete classroom")}
       {:error, _} = it -> it
     end
   end

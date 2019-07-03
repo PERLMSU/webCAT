@@ -33,18 +33,18 @@ defmodule WebCATWeb.AuthControllerTest do
 
       conn
       |> post(Routes.auth_path(conn, :login), %{email: user.email, password: "not_password"})
-      |> json_response(401)
+      |> json_response(404)
 
       conn
       |> post(Routes.auth_path(conn, :login), %{email: "not.email@aaa.bbb", password: "password"})
-      |> json_response(401)
+      |> json_response(404)
 
       conn
       |> post(Routes.auth_path(conn, :login), %{
         email: "not.email@aaa.bbb",
         password: "not_password"
       })
-      |> json_response(401)
+      |> json_response(404)
     end
   end
 
@@ -63,7 +63,7 @@ defmodule WebCATWeb.AuthControllerTest do
     test "fails with a faulty email", %{conn: conn} do
       conn
       |> post(Routes.auth_path(conn, :start_password_reset), %{email: "does.not.exist@yeet.meat"})
-      |> json_response(400)
+      |> json_response(404)
     end
   end
 
@@ -110,7 +110,7 @@ defmodule WebCATWeb.AuthControllerTest do
         token: "aaaaaaa",
         new_password: "new_password"
       })
-      |> json_response(400)
+      |> json_response(404)
     end
   end
 
