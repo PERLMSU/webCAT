@@ -25,7 +25,7 @@ defmodule WebCATWeb.SectionView do
         )
 
       map ->
-        Map.delete(map, :rotation)
+        Map.delete(map, :semester)
     end
     |> case do
       %{rotations: rotations} = map when is_list(rotations) ->

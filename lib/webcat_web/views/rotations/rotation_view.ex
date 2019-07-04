@@ -15,7 +15,7 @@ defmodule WebCATWeb.RotationView do
     rotation
     |> Map.from_struct()
     |> Map.drop(~w(__meta__)a)
-    |> Map.update!(:start_date, &Timex.format!(&1, "{ISOdate}"))
+    |> Map.update!(:start_date, &Timex.to_unix/1)
     |> Map.update!(:end_date, &Timex.format!(&1, "{ISOdate}"))
     |> timestamps_format()
     |> case do
@@ -27,7 +27,7 @@ defmodule WebCATWeb.RotationView do
         )
 
       map ->
-        Map.delete(map, :rotation)
+        Map.delete(map, :section)
     end
     |> case do
       %{rotation_groups: groups} = map when is_list(groups) ->

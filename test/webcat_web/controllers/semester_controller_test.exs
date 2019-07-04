@@ -68,9 +68,7 @@ defmodule WebCATWeb.SemesterControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      update =
-        Factory.string_params_for(:semester)
-        |> Map.drop(~w(users))
+      update = Factory.string_params_for(:semester)
 
       res =
         conn

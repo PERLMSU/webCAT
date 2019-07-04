@@ -22,7 +22,6 @@ defmodule WebCATWeb.Router do
   scope "/api/auth", WebCATWeb do
     pipe_through(~w(api)a)
 
-    get("/csrf", AuthController, :csrf)
     post("/login", AuthController, :login)
     post("/password_reset", AuthController, :start_password_reset)
     post("/password_reset/finish", AuthController, :finish_password_reset)
@@ -39,8 +38,8 @@ defmodule WebCATWeb.Router do
     resources("/classrooms", ClassroomController, except: ~w(new edit)a)
     resources("/semesters", SemesterController, except: ~w(new edit)a)
     resources("/sections", SectionController, except: ~w(new edit)a)
-    resources("/rotations", RotationsController, except: ~w(new edit)a)
-    resources("/rotation_groups", RotationGroupsController, except: ~w(new edit)a)
+    resources("/rotations", RotationController, except: ~w(new edit)a)
+    resources("/rotation_groups", RotationGroupController, except: ~w(new edit)a)
     resources("/import", ImportController, except: ~w(new edit update delete)a)
 
     # Feedback

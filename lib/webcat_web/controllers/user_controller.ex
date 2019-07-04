@@ -2,20 +2,36 @@ defmodule WebCATWeb.UserController do
   use WebCATWeb, :authenticated_controller
 
   alias WebCATWeb.UserView
-  alias WebCAT.Accounts.{Users, User}
+  alias WebCAT.Accounts.User
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
 
+  plug WebCATWeb.Plug.Query,
+    sort: ~w(email first_name last_name middle_name nickname active)a,
+    filter: ~w(active)a,
+    fields: User.__schema__(:fields) |> List.delete(:performer_id),
+    include: User.__schema__(:associations) |> Enum.reject(&(&1 in ~w(performer notifications)a))
+
   def index(conn, _user, _params) do
+    query =
+      conn.assigns.parsed_query
+      |> Map.from_struct()
+      |> Map.to_list()
+
     conn
     |> put_status(200)
     |> put_view(UserView)
-    |> render("list.json", users: Users.list())
+    |> render("list.json", users: CRUD.list(User, query))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    with {:ok, user} <- Users.get(id) do
+    query =
+      conn.assigns.parsed_query
+      |> Map.from_struct()
+      |> Map.to_list()
+
+    with {:ok, user} <- CRUD.get(User, id, query) do
       conn
       |> put_status(200)
       |> put_view(UserView)

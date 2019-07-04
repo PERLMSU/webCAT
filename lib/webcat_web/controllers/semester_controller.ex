@@ -2,20 +2,36 @@ defmodule WebCATWeb.SemesterController do
   use WebCATWeb, :authenticated_controller
 
   alias WebCATWeb.SemesterView
-  alias WebCAT.Rotations.{Semester, Semesters}
+  alias WebCAT.Rotations.Semester
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
 
+  plug WebCATWeb.Plug.Query,
+    sort: ~w(name start_date end_date)a,
+    filter: ~w(classroom_id)a,
+    fields: Semester.__schema__(:fields),
+    include: Semester.__schema__(:associations)
+
   def index(conn, _user, _params) do
+    query =
+      conn.assigns.parsed_query
+      |> Map.from_struct()
+      |> Map.to_list()
+
     conn
     |> put_status(200)
     |> put_view(SemesterView)
-    |> render("list.json", semesters: Semesters.list())
+    |> render("list.json", semesters: CRUD.list(Semester, query))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    with {:ok, semester} <- Semesters.get(id) do
+    query =
+      conn.assigns.parsed_query
+      |> Map.from_struct()
+      |> Map.to_list()
+
+    with {:ok, semester} <- CRUD.get(Semester, id, query) do
       conn
       |> put_status(200)
       |> put_view(SemesterView)

@@ -1,17 +1,17 @@
-defmodule WebCATWeb.ClassroomController do
+defmodule WebCATWeb.SectionController do
   use WebCATWeb, :authenticated_controller
 
-  alias WebCATWeb.ClassroomView
-  alias WebCAT.Rotations.Classroom
+  alias WebCATWeb.SectionView
+  alias WebCAT.Rotations.Section
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
 
   plug WebCATWeb.Plug.Query,
-    sort: ~w(course_code name)a,
-    filter: ~w()a,
-    fields: Classroom.__schema__(:fields),
-    include: Classroom.__schema__(:associations)
+    sort: ~w(number semester_id)a,
+    filter: ~w(semester_id)a,
+    fields: Section.__schema__(:fields),
+    include: Section.__schema__(:associations)
 
   def index(conn, _user, _params) do
     query =
@@ -21,8 +21,8 @@ defmodule WebCATWeb.ClassroomController do
 
     conn
     |> put_status(200)
-    |> put_view(ClassroomView)
-    |> render("list.json", classrooms: CRUD.list(Classroom, query))
+    |> put_view(SectionView)
+    |> render("list.json", sections: CRUD.list(Section, query))
   end
 
   def show(conn, _user, %{"id" => id}) do
@@ -31,11 +31,11 @@ defmodule WebCATWeb.ClassroomController do
       |> Map.from_struct()
       |> Map.to_list()
 
-    with {:ok, classroom} <- CRUD.get(Classroom, id, query) do
+    with {:ok, section} <- CRUD.get(Section, id, query) do
       conn
       |> put_status(200)
-      |> put_view(ClassroomView)
-      |> render("show.json", classroom: classroom)
+      |> put_view(SectionView)
+      |> render("show.json", section: section)
     end
   end
 
@@ -45,13 +45,13 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, classroom} <- CRUD.create(Classroom, params) do
+         {:ok, section} <- CRUD.create(Section, params) do
       conn
       |> put_status(201)
-      |> put_view(ClassroomView)
-      |> render("show.json", classroom: classroom)
+      |> put_view(SectionView)
+      |> render("show.json", section: section)
     else
-      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to create classroom")}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to create section")}
       {:error, _} = it -> it
     end
   end
@@ -62,13 +62,13 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, updated} <- CRUD.update(Classroom, id, params) do
+         {:ok, updated} <- CRUD.update(Section, id, params) do
       conn
       |> put_status(200)
-      |> put_view(ClassroomView)
-      |> render("show.json", classroom: updated)
+      |> put_view(SectionView)
+      |> render("show.json", section: updated)
     else
-      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to update classroom")}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to update section")}
       {:error, _} = it -> it
     end
   end
@@ -79,12 +79,12 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, _deleted} <- CRUD.delete(Classroom, id) do
+         {:ok, _deleted} <- CRUD.delete(Section, id) do
       conn
       |> put_status(204)
       |> text("")
     else
-      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete classroom")}
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete section")}
       {:error, _} = it -> it
     end
   end

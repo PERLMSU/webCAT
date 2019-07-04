@@ -11,11 +11,10 @@ defmodule WebCAT.CRUD do
   """
   def list(schema, options \\ []) do
     schema
-    |> where(^Keyword.get(options, :where, []))
-    |> preload(^Keyword.get(options, :preload, []))
-    |> limit(^Keyword.get(options, :limit, nil))
-    |> offset(^Keyword.get(options, :offset, nil))
-    |> order_by(~w(updated_at inserted_at))
+    |> where(^fetch_opt(options, :filter, []))
+    |> preload(^fetch_opt(options, :include, []))
+    |> order_by(^fetch_opt(options, :sort, []))
+    |> select(^fetch_opt(options, :fields, schema.__schema__(:fields)))
     |> Repo.all()
   end
 
@@ -25,7 +24,8 @@ defmodule WebCAT.CRUD do
   def get(schema, id, options \\ []) do
     schema
     |> where([s], s.id == ^id)
-    |> preload(^Keyword.get(options, :preload, []))
+    |> preload(^fetch_opt(options, :include, []))
+    |> select(^fetch_opt(options, :fields, schema.__schema__(:fields)))
     |> Repo.one()
     |> case do
       nil -> {:error, :not_found}
@@ -64,5 +64,10 @@ defmodule WebCAT.CRUD do
     with {:ok, it} <- get(schema, id) do
       Repo.delete(it)
     end
+  end
+
+  defp fetch_opt(opt, key, default) do
+    val = Keyword.get(opt, key, [])
+    if val == [], do: default, else: val
   end
 end

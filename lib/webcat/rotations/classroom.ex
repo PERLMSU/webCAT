@@ -51,7 +51,9 @@ defmodule WebCAT.Rotations.Classroom do
       end)
       |> Enum.reject(&is_nil/1)
 
-    put_assoc(changeset, :users, Repo.all(from(u in User, where: u.id in ^ids)))
+    changeset
+    |> Map.put(:data, Map.put(changeset.data, :users, []))
+    |> put_assoc(changeset, :users, Repo.all(from(u in User, where: u.id in ^ids)))
   end
 
   defp put_users(changeset, _), do: changeset

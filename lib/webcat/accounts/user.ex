@@ -103,7 +103,10 @@ defmodule WebCAT.Accounts.User do
       end)
       |> Enum.reject(&is_nil/1)
 
-    put_assoc(changeset, :classrooms, Repo.all(from(c in Classroom, where: c.id in ^ids)))
+    # Heed the warning in draft.ex before copying this behavior
+    changeset
+    |> Map.put(:data, Map.put(changeset.data, :classrooms, []))
+    |> put_assoc(:classrooms, Repo.all(from(c in Classroom, where: c.id in ^ids)))
   end
 
   defp put_classrooms(changeset, _), do: changeset

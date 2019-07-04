@@ -1,16 +1,16 @@
-defmodule WebCATWeb.ClassroomControllerTest do
+defmodule WebCATWeb.ExplanationControllerTest do
   use WebCATWeb.ConnCase
 
   describe "index/3" do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      Factory.insert_list(3, :classroom)
+      Factory.insert_list(3, :explanation)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :index))
+        |> get(Routes.explanation_path(conn, :index))
         |> json_response(200)
 
       assert Enum.count(result) >= 3
@@ -18,7 +18,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
-      |> get(Routes.classroom_path(conn, :index))
+      |> get(Routes.explanation_path(conn, :index))
       |> json_response(401)
     end
   end
@@ -27,15 +27,15 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      classroom_id = Factory.insert(:classroom).id
+      explanation_id = Factory.insert(:explanation).id
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :show, classroom_id))
+        |> get(Routes.explanation_path(conn, :show, explanation_id))
         |> json_response(200)
 
-      assert res["id"] == classroom_id
+      assert res["id"] == explanation_id
     end
   end
 
@@ -43,23 +43,23 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.string_params_for(:classroom)
+      data = Factory.string_params_with_assocs(:explanation)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.classroom_path(conn, :create), data)
+        |> post(Routes.explanation_path(conn, :create), data)
         |> json_response(201)
 
       assert res["name"] == data["name"]
     end
 
-    test "doesn't allow normal users to create classrooms", %{conn: conn} do
+    test "doesn't allow normal users to create explanations", %{conn: conn} do
       {:ok, user} = login_user()
 
       conn
       |> Auth.sign_in(user)
-      |> post(Routes.classroom_path(conn, :create), Factory.string_params_for(:classroom))
+      |> post(Routes.explanation_path(conn, :create), Factory.string_params_for(:explanation))
       |> json_response(403)
     end
   end
@@ -68,25 +68,27 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      update = Factory.string_params_for(:classroom)
+      update =
+        Factory.string_params_for(:explanation)
+        |> Map.drop(~w(users))
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.classroom_path(conn, :update, Factory.insert(:classroom).id), update)
+        |> put(Routes.explanation_path(conn, :update, Factory.insert(:explanation).id), update)
         |> json_response(200)
 
       assert res["name"] == update["name"]
     end
 
-    test "doesn't allow normal users to update classrooms", %{conn: conn} do
+    test "doesn't allow normal users to update explanations", %{conn: conn} do
       {:ok, user} = login_user()
 
-      update = Factory.string_params_for(:classroom)
+      update = Factory.string_params_for(:explanation)
 
       conn
       |> Auth.sign_in(user)
-      |> put(Routes.classroom_path(conn, :update, Factory.insert(:classroom).id), update)
+      |> put(Routes.explanation_path(conn, :update, Factory.insert(:explanation).id), update)
       |> json_response(403)
     end
   end
@@ -97,16 +99,16 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.classroom_path(conn, :delete, Factory.insert(:classroom).id))
+      |> delete(Routes.explanation_path(conn, :delete, Factory.insert(:explanation).id))
       |> text_response(204)
     end
 
-    test "doesn't allow normal users to delete classrooms", %{conn: conn} do
+    test "doesn't allow normal users to delete explanations", %{conn: conn} do
       {:ok, user} = login_user()
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.classroom_path(conn, :delete, Factory.insert(:classroom).id))
+      |> delete(Routes.explanation_path(conn, :delete, Factory.insert(:explanation).id))
       |> json_response(403)
     end
   end

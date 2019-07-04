@@ -11,7 +11,8 @@ defmodule WebCATWeb.DraftViewTest do
       assert rendered[:id] == draft.id
       assert rendered[:content] == draft.content
       assert rendered[:status] == draft.status
-      assert rendered[:user_id] == draft.user_id
+      assert rendered[:student_id] == draft.student_id
+      assert rendered[:reviewer_id] == draft.reviewer_id
       assert rendered[:rotation_group_id] == draft.rotation_group_id
     end
 

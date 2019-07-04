@@ -11,6 +11,7 @@ defmodule WebCAT.Factory do
     Feedback,
     Grade,
     Observation,
+    Explanation,
     StudentFeedback
   }
 
@@ -125,7 +126,9 @@ defmodule WebCAT.Factory do
     %Draft{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
       status: sequence(:status, ~w(unreviewed reviewing needs_revision approved emailed)),
-      user: student,
+      authors: Factory.build_list(2, :assistant),
+      student: student,
+      reviewer: Factory.insert(:admin),
       rotation_group: rotation_group
     }
   end
@@ -141,6 +144,13 @@ defmodule WebCAT.Factory do
     %Feedback{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
       observation: Factory.build(:observation)
+    }
+  end
+
+  def explanation_factory do
+    %Explanation{
+      content: Enum.join(Faker.Lorem.sentences(), "\n"),
+      feedback: Factory.build(:feedback)
     }
   end
 

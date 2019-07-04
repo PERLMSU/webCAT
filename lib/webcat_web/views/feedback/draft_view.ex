@@ -20,11 +20,25 @@ defmodule WebCATWeb.DraftView do
     |> Map.drop(~w(__meta__)a)
     |> timestamps_format()
     |> case do
-      %{user: %User{} = user} = map ->
-        Map.put(map, :user, render_one(user, UserView, "user.json"))
+      %{authors: authors} = map when is_list(authors) ->
+        Map.put(map, :authors, render_many(authors, UserView, "user.json"))
 
       map ->
-        Map.delete(map, :user)
+        Map.delete(map, :authors)
+    end
+    |> case do
+      %{student: %User{} = student} = map ->
+        Map.put(map, :student, render_one(student, UserView, "user.json"))
+
+      map ->
+        Map.delete(map, :student)
+    end
+    |> case do
+      %{reviewer: %User{} = user} = map ->
+        Map.put(map, :reviewer, render_one(user, UserView, "user.json"))
+
+      map ->
+        Map.delete(map, :reviewer)
     end
     |> case do
       %{rotation_group: %RotationGroup{} = group} = map ->
