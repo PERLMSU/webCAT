@@ -40,7 +40,7 @@ defmodule WebCATWeb.Router do
     resources("/sections", SectionController, except: ~w(new edit)a)
     resources("/rotations", RotationController, except: ~w(new edit)a)
     resources("/rotation_groups", RotationGroupController, except: ~w(new edit)a)
-    resources("/import", ImportController, except: ~w(new edit update delete)a)
+    resources("/import", ImportController, only: ~w(index create)a)
 
     # Feedback
     resources("/categories", CategoryController, except: ~w(new edit)a)
@@ -51,8 +51,23 @@ defmodule WebCATWeb.Router do
     resources("/drafts/:draft_id/comments", CommentController, except: ~w(new edit)a)
     resources("/drafts/:draft_id/grades", GradeController, except: ~w(new edit)a)
 
-    resources("/rotation_groups/:rotation_group_id/feedback", StudentFeedbackController,
-      except: ~w(new edit)a
+    # Feedback writer
+    get(
+      "/rotation_groups/:rotation_group_id/feedback/:student_id",
+      StudentFeedbackController,
+      :index
+    )
+
+    post(
+      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id",
+      StudentFeedbackController,
+      :create
+    )
+
+    delete(
+      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id",
+      StudentFeedbackController,
+      :delete
     )
   end
 

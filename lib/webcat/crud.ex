@@ -4,6 +4,8 @@ defmodule WebCAT.CRUD do
   """
   alias WebCAT.Repo
 
+  alias WebCAT.Rotations.{Section, Classroom}
+
   import Ecto.Query
 
   @doc """
@@ -36,21 +38,21 @@ defmodule WebCAT.CRUD do
   @doc """
   Create
   """
-  def create(schema, params) do
+  def create(schema, params, options \\ []) do
     schema.__struct__
     |> schema.changeset(params)
-    |> Repo.insert()
+    |> Repo.insert(on_conflict: Keyword.get(options, :on_conflict, :raise))
   end
 
   @doc """
   Update
   """
-  def update(schema, struct, update) when is_map(struct) do
+  def update(schema, struct, update) when is_map(struct) and is_map(update) do
     schema.changeset(struct, update)
     |> Repo.update()
   end
 
-  def update(schema, id, update) do
+  def update(schema, id, update) when (is_binary(id) or is_integer(id)) and is_map(update) do
     with {:ok, it} <- get(schema, id) do
       schema.changeset(it, update)
       |> Repo.update()

@@ -1,17 +1,17 @@
-defmodule WebCATWeb.CommentController do
+defmodule WebCATWeb.GradeController do
   use WebCATWeb, :authenticated_controller
 
-  alias WebCATWeb.CommentView
-  alias WebCAT.Feedback.Comment
+  alias WebCATWeb.GradeView
+  alias WebCAT.Feedback.Grade
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
 
   plug WebCATWeb.Plug.Query,
-    sort: ~w()a,
-    filter: ~w(draft_id user_id)a,
-    fields: Comment.__schema__(:fields),
-    include: Comment.__schema__(:associations)
+    sort: ~w(score category_id)a,
+    filter: ~w(draft_id category_id)a,
+    fields: Grade.__schema__(:fields),
+    include: Grade.__schema__(:associations)
 
   def index(conn, _user, %{"draft_id" => draft_id}) do
     query =
@@ -22,8 +22,8 @@ defmodule WebCATWeb.CommentController do
 
     conn
     |> put_status(200)
-    |> put_view(CommentView)
-    |> render("list.json", comments: CRUD.list(Comment, query))
+    |> put_view(GradeView)
+    |> render("list.json", grades: CRUD.list(Grade, query))
   end
 
   def show(conn, _user, %{"draft_id" => draft_id, "id" => id}) do
@@ -33,11 +33,11 @@ defmodule WebCATWeb.CommentController do
       |> Map.update!(:filter, fn filters -> Keyword.put(filters, :draft_id, draft_id) end)
       |> Map.to_list()
 
-    with {:ok, comment} <- CRUD.get(Comment, id, query) do
+    with {:ok, grade} <- CRUD.get(Grade, id, query) do
       conn
       |> put_status(200)
-      |> put_view(CommentView)
-      |> render("show.json", comment: comment)
+      |> put_view(GradeView)
+      |> render("show.json", grade: grade)
     end
   end
 
@@ -47,14 +47,14 @@ defmodule WebCATWeb.CommentController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, comment} <- CRUD.create(Comment, params) do
+         {:ok, grade} <- CRUD.create(Grade, params) do
       conn
       |> put_status(201)
-      |> put_view(CommentView)
-      |> render("show.json", comment: comment)
+      |> put_view(GradeView)
+      |> render("show.json", grade: grade)
     else
       {:auth, _} ->
-        {:error, :forbidden, dgettext("errors", "Not authorized to create comment")}
+        {:error, :forbidden, dgettext("errors", "Not authorized to create grade")}
 
       {:error, _} = it ->
         it
@@ -67,14 +67,14 @@ defmodule WebCATWeb.CommentController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, updated} <- CRUD.update(Comment, id, params) do
+         {:ok, updated} <- CRUD.update(Grade, id, params) do
       conn
       |> put_status(200)
-      |> put_view(CommentView)
-      |> render("show.json", comment: updated)
+      |> put_view(GradeView)
+      |> render("show.json", grade: updated)
     else
       {:auth, _} ->
-        {:error, :forbidden, dgettext("errors", "Not authorized to update comment")}
+        {:error, :forbidden, dgettext("errors", "Not authorized to update grade")}
 
       {:error, _} = it ->
         it
@@ -87,13 +87,13 @@ defmodule WebCATWeb.CommentController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, _deleted} <- CRUD.delete(Comment, id) do
+         {:ok, _deleted} <- CRUD.delete(Grade, id) do
       conn
       |> put_status(204)
       |> text("")
     else
       {:auth, _} ->
-        {:error, :forbidden, dgettext("errors", "Not authorized to delete comment")}
+        {:error, :forbidden, dgettext("errors", "Not authorized to delete grade")}
 
       {:error, _} = it ->
         it

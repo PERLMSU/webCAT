@@ -220,6 +220,7 @@ defmodule WebCAT.Factory do
       start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: -3)),
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 9)),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
+      users: Factory.insert_list(3, :assistant),
       classroom: Factory.build(:classroom),
       name: sequence(:name, ~w(Fall Spring))
     }

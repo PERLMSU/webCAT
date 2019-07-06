@@ -44,7 +44,7 @@ defmodule WebCATWeb.SectionControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.string_params_with_assocs(:section)
+      data = Factory.string_params_with_assocs(:section) |> Map.drop(~w(users))
 
       res =
         conn
@@ -69,7 +69,7 @@ defmodule WebCATWeb.SectionControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      update = Factory.string_params_for(:section)
+      update = Factory.string_params_for(:section) |> Map.drop(~w(users))
 
       res =
         conn

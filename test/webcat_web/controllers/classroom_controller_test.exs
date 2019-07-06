@@ -43,7 +43,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.string_params_for(:classroom)
+      data = Factory.string_params_with_assocs(:classroom) |> Map.drop(~w(users))
 
       res =
         conn
@@ -68,7 +68,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      update = Factory.string_params_for(:classroom)
+      update = Factory.string_params_for(:classroom) |> Map.drop(~w(users))
 
       res =
         conn

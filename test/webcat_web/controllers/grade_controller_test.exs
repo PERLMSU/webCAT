@@ -1,16 +1,17 @@
-defmodule WebCATWeb.SemesterControllerTest do
+defmodule WebCATWeb.GradeControllerTest do
   use WebCATWeb.ConnCase
 
   describe "index/3" do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      Factory.insert_list(3, :semester)
+      draft = Factory.insert(:draft)
+      Factory.insert_list(3, :grade, draft: draft)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.semester_path(conn, :index))
+        |> get(Routes.grade_path(conn, :index, draft.id))
         |> json_response(200)
 
       assert Enum.count(result) >= 3
@@ -18,7 +19,7 @@ defmodule WebCATWeb.SemesterControllerTest do
 
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
-      |> get(Routes.semester_path(conn, :index))
+      |> get(Routes.grade_path(conn, :index, Factory.insert(:draft).id))
       |> json_response(401)
     end
   end
@@ -27,15 +28,15 @@ defmodule WebCATWeb.SemesterControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      id = Factory.insert(:semester).id
+      grade = Factory.insert(:grade)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.semester_path(conn, :show, id))
+        |> get(Routes.grade_path(conn, :show, grade.draft_id, grade.id))
         |> json_response(200)
 
-      assert res["id"] == id
+      assert res["id"] == grade.id
     end
   end
 
@@ -43,23 +44,25 @@ defmodule WebCATWeb.SemesterControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.string_params_with_assocs(:semester) |> Map.drop(~w(users))
+      data = Factory.string_params_with_assocs(:grade)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.semester_path(conn, :create), data)
+        |> post(Routes.grade_path(conn, :create, data["draft_id"]), data)
         |> json_response(201)
 
       assert res["name"] == data["name"]
     end
 
-    test "doesn't allow normal users to create", %{conn: conn} do
+    test "doesn't allow normal users to create grades", %{conn: conn} do
       {:ok, user} = login_user()
+
+      data = Factory.string_params_with_assocs(:grade)
 
       conn
       |> Auth.sign_in(user)
-      |> post(Routes.semester_path(conn, :create), Factory.string_params_for(:semester))
+      |> post(Routes.grade_path(conn, :create, data["draft_id"]), data)
       |> json_response(403)
     end
   end
@@ -68,25 +71,27 @@ defmodule WebCATWeb.SemesterControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      update = Factory.string_params_for(:semester) |> Map.drop(~w(users))
+      data = Factory.insert(:grade)
+      update = Factory.string_params_with_assocs(:grade)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.semester_path(conn, :update, Factory.insert(:semester).id), update)
+        |> put(Routes.grade_path(conn, :update, data.draft_id, data.id), update)
         |> json_response(200)
 
       assert res["name"] == update["name"]
     end
 
-    test "doesn't allow normal users to update", %{conn: conn} do
+    test "doesn't allow normal users to update grades", %{conn: conn} do
       {:ok, user} = login_user()
 
-      update = Factory.string_params_for(:semester)
+      data = Factory.insert(:grade)
+      update = Factory.string_params_for(:grade)
 
       conn
       |> Auth.sign_in(user)
-      |> put(Routes.semester_path(conn, :update, Factory.insert(:semester).id), update)
+      |> put(Routes.grade_path(conn, :update, data.draft_id, data.id), update)
       |> json_response(403)
     end
   end
@@ -95,18 +100,22 @@ defmodule WebCATWeb.SemesterControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
+      data = Factory.insert(:grade)
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.semester_path(conn, :delete, Factory.insert(:semester).id))
+      |> delete(Routes.grade_path(conn, :delete, data.draft_id, data.id))
       |> text_response(204)
     end
 
-    test "doesn't allow normal users to delete", %{conn: conn} do
+    test "doesn't allow normal users to delete grades", %{conn: conn} do
       {:ok, user} = login_user()
+
+      data = Factory.insert(:grade)
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.semester_path(conn, :delete, Factory.insert(:semester).id))
+      |> delete(Routes.grade_path(conn, :delete, data.draft_id, data.id))
       |> json_response(403)
     end
   end
