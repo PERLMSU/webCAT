@@ -140,8 +140,10 @@ updateWith toModel toMsg model ( subModel, subCmd ) =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model of
+        NotFound _ -> Sub.none
+        Redirect _ -> Session.changes GotSession (Session.navKey (toSession model))
 
 
 
@@ -171,4 +173,9 @@ view model =
             Page.view user Page.Other NotFound.view
 
         Login login ->
-            viewPage Page.Other GotLoginMsg (Login.view login)
+            let
+                { title, content } =
+                    Login.view login
+            in
+            { title = title, body = List.map (Html.map GotLoginMsg) [content] }
+             

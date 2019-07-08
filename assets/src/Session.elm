@@ -1,7 +1,6 @@
 module Session exposing (Session, changes, credential, fromCredential, navKey)
 
 import API exposing (Credential)
-import API.Auth exposing (Token)
 import Browser.Navigation as Nav
 import Types exposing (User)
 

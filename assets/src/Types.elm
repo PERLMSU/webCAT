@@ -1,7 +1,7 @@
 module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), observationTypeDecoder, roleDecoder, userDecoder, userEncoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline exposing (required, optional)
 import Json.Encode as Encode exposing (Value)
 import Time as Time
 
@@ -270,17 +270,17 @@ userDecoder =
     Decode.succeed User
         |> required "id" (map UserId int)
         |> required "email" string
-        |> required "firstName" string
-        |> required "middleName" (nullable string)
-        |> required "lastName" string
-        |> required "nickName" (nullable string)
+        |> required "first_name" string
+        |> required "middle_name" (nullable string)
+        |> required "last_name" string
+        |> required "nickname" (nullable string)
         |> required "active" bool
-        |> required "roles" (nullable (list (lazy (\_ -> roleDecoder))))
-        |> required "classrooms" (nullable (map Classrooms (list (lazy (\_ -> classroomDecoder)))))
-        |> required "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder)))))
-        |> required "rotationGroups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> optional "roles" (nullable (list (lazy (\_ -> roleDecoder)))) Nothing
+        |> optional "classrooms" (nullable (map Classrooms (list (lazy (\_ -> classroomDecoder))))) Nothing
+        |> optional "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder))))) Nothing
+        |> optional "rotation_groups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder))))) Nothing
+        |> required "inserted_at" (nullable (map Time.millisToPosix int))
+        |> required "updated_at" (nullable (map Time.millisToPosix int))
 
 
 userEncoder : User -> Value

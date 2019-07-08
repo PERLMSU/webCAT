@@ -11,9 +11,12 @@ defmodule WebCAT do
       # Start the Ecto repository
       supervisor(WebCAT.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(WebCATWeb.Endpoint, [])
-      # Start your own worker by calling: WebCAT.Worker.start_link(arg1, arg2, arg3)
-      # worker(WebCAT.Worker, [arg1, arg2, arg3]),
+      supervisor(WebCATWeb.Endpoint, []),
+      # Start the import service
+      %{
+        id: WebCAT.Import.Registry,
+        start: {WebCAT.Import.Registry, :start_link, []}
+      }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,13 +1,14 @@
 module Page.Login exposing (Form, Model, Msg(..), Problem(..), ValidatedField(..), fieldsToValidate, init, labelView, primaryButton, subscriptions, tertiaryButton, textInput, toSession, update, validate, validateField, view, viewProblem)
 
 import API exposing (Credential, Error(..))
+import API.Auth as Auth
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Route as Route
+import Route
 import Session exposing (Session)
 import Url
 
@@ -19,6 +20,7 @@ import Url
 type alias Model =
     { session : Session
     , errors : List Problem
+    , loading : Bool
     , form : Form
     }
 
@@ -38,6 +40,7 @@ init : Session -> ( Model, Cmd Msg )
 init session =
     ( { session = session
       , errors = []
+      , loading = False
       , form =
             { email = ""
             , password = ""
@@ -56,7 +59,6 @@ type Msg
     | PasswordChanged String
     | SignIn
     | ForgotPassword
-    | Loading
     | Response (Result Error Credential)
     | GotSession Session
 
@@ -71,34 +73,57 @@ update msg model =
             updateForm (\form -> { form | password = pass }) model
 
         SignIn ->
-            Debug.todo "submit form"
+            case validate model.form of
+                Ok form ->
+                    ( { model | errors = [], loading = True }
+                    , Auth.login form.email form.password Response
+                    )
+
+                Err errors ->
+                    ( { model | errors = errors }
+                    , Cmd.none
+                    )
 
         ForgotPassword ->
             Debug.todo "forgot password"
-
-        Loading ->
-            Debug.todo "Loading"
 
         Response (Err error) ->
             let
                 serverErrors =
                     case error of
-                        BadRequest errMsg -> [ServerError errMsg]
-                        Unauthorized errMsg -> [ServerError errMsg]
-                        Forbidden errMsg -> [ServerError errMsg]
-                        NotFound errMsg -> [ServerError errMsg]
-                        API.ServerError errMsg -> [ServerError errMsg]
-                        BadUrl errMsg -> [ServerError errMsg]
-                        Timeout errMsg -> [ServerError errMsg]
-                        NetworkError errMsg -> [ServerError errMsg]
-                        BadBody errMsg -> [ServerError errMsg]
+                        BadRequest errMsg ->
+                            [ ServerError errMsg ]
+
+                        Unauthorized errMsg ->
+                            [ ServerError errMsg ]
+
+                        Forbidden errMsg ->
+                            [ ServerError errMsg ]
+
+                        NotFound errMsg ->
+                            [ ServerError errMsg ]
+
+                        API.ServerError errMsg ->
+                            [ ServerError errMsg ]
+
+                        BadUrl errMsg ->
+                            [ ServerError errMsg ]
+
+                        Timeout errMsg ->
+                            [ ServerError errMsg ]
+
+                        NetworkError errMsg ->
+                            [ ServerError errMsg ]
+
+                        BadBody errMsg ->
+                            [ ServerError errMsg ]
             in
-            ( { model | errors = List.append model.errors serverErrors }
+            ( { model | errors = List.append model.errors serverErrors, loading = False }
             , Cmd.none
             )
 
         Response (Ok cred) ->
-            ( model, API.storeCred cred )
+            ( { model | loading = False }, API.storeCred cred )
 
         GotSession session ->
             ( { model | session = session }
@@ -122,14 +147,16 @@ view model =
         div [ class "flex justify-center bg-grey-lighter py-32" ]
             [ div [ class "w-full h-screen max-w-xs" ]
                 [ Html.form [ class "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
-                    [ div [ class "mb-4" ]
+                    [ ul [ class "error-messages" ]
+                        (List.map viewProblem model.errors)
+                    , div [ class "mb-4" ]
                         [ labelView "Email" "email"
-                        , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker leading-tight focus:outline-none focus:shadow-outline", id "email", placeholder "Email", type_ "text" ]
+                        , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker leading-tight focus:outline-none focus:shadow-outline", id "email", placeholder "Email", type_ "text", onInput EmailChanged ]
                             [ text model.form.email ]
                         ]
                     , div [ class "mb-6" ]
                         [ labelView "Password" "password"
-                        , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline", id "password", placeholder "************", type_ "password" ]
+                        , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline", id "password", placeholder "************", type_ "password", onInput PasswordChanged ]
                             [ text model.form.password ]
                         ]
                     , div [ class "flex items-center justify-between" ]
@@ -139,7 +166,6 @@ view model =
                     ]
                 ]
             ]
-       
     }
 
 

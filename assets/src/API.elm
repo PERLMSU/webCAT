@@ -1,4 +1,4 @@
-port module API exposing (Credential, Error(..), application, cacheStorageKey, credChanges, credentialDecoder, credentialHeader, credentialStorageKey, decode, decoderFromCredential, delete, get, logout, onStoreChange, post, put, storageDecoder, storeCache, storeCred, credentialUser)
+port module API exposing (Credential, Error(..), application, credChanges, credentialDecoder, credentialHeader, credentialUser, decode, decoderFromCredential, delete, get, logout, onStoreChange, post, put, storageDecoder, storeCache, storeCred)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -265,17 +265,3 @@ decodeErrorString error str =
 errorDecoder : Decoder String
 errorDecoder =
     field "error" string
-
-
-
--- LOCALSTORAGE KEYS
-
-
-cacheStorageKey : String
-cacheStorageKey =
-    "cache"
-
-
-credentialStorageKey : String
-credentialStorageKey =
-    "credential"
