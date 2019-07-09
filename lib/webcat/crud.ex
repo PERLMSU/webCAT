@@ -3,9 +3,6 @@ defmodule WebCAT.CRUD do
   Helper functions for doing basic CRUD actions
   """
   alias WebCAT.Repo
-
-  alias WebCAT.Rotations.{Section, Classroom}
-
   import Ecto.Query
 
   @doc """

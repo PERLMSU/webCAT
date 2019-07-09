@@ -2,7 +2,7 @@ defmodule WebCATWeb.ProfileController do
   use WebCATWeb, :authenticated_controller
 
   alias WebCATWeb.UserView
-  alias WebCAT.Accounts.{Users, User}
+  alias WebCAT.Accounts.User
   alias WebCAT.CRUD
 
   action_fallback(WebCAT.FallbackController)

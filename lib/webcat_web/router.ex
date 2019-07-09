@@ -40,7 +40,6 @@ defmodule WebCATWeb.Router do
     resources("/sections", SectionController, except: ~w(new edit)a)
     resources("/rotations", RotationController, except: ~w(new edit)a)
     resources("/rotation_groups", RotationGroupController, except: ~w(new edit)a)
-    resources("/import", ImportController, only: ~w(index create)a)
 
     # Feedback
     resources("/categories", CategoryController, except: ~w(new edit)a)

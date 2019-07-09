@@ -1,9 +1,7 @@
 defmodule WebCAT.Rotations.Rotation do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
   import WebCAT.Validators
-  alias WebCAT.Repo
 
   schema "rotations" do
     field(:number, :integer)

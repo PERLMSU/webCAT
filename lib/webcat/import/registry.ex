@@ -1,5 +1,7 @@
 defmodule WebCAT.Import.Registry do
   use GenServer
+
+
   ## Client API
 
   @doc """
@@ -21,6 +23,10 @@ defmodule WebCAT.Import.Registry do
     GenServer.call(__MODULE__, :queue)
   end
 
+  def clear() do
+    GenServer.call(__MODULE__, :clear)
+  end
+
   def start_link() do
     GenServer.start_link(__MODULE__, %{results: [], queue: :queue.new()}, name: __MODULE__)
   end
@@ -33,7 +39,8 @@ defmodule WebCAT.Import.Registry do
 
   @impl GenServer
   def handle_cast({:add, path}, %{queue: queue} = state) do
-    {:noreply, Map.put(state, :queue, :queue.in(path, queue))}
+    {:noreply,
+     Map.put(state, :queue, :queue.in(%{start_time: Timex.now(), path: path}, queue))}
   end
 
   @impl GenServer
@@ -47,10 +54,17 @@ defmodule WebCAT.Import.Registry do
   end
 
   @impl GenServer
+  def handle_call(:clear, _from, _state) do
+    {:reply, :ok, %{results: [], queue: :queue.new()}}
+  end
+
+  @impl GenServer
   def handle_info(:work, %{results: results, queue: queue} = state) do
     case :queue.out(queue) do
-      {{:ok, path}, out_queue} ->
-        result = WebCATWeb.Import.from_path(path)
+      {{:ok, _item}, out_queue} ->
+        # Old import logic, no-op
+        # result = WebCATWeb.Import.from_item(item)
+        result = nil
         {:noreply, %{results: result ++ results, queue: out_queue}}
 
       _ ->

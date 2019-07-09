@@ -34,7 +34,7 @@ with_abilities =
         nil ->
           repo.insert(ability)
 
-        found ->
+        _found ->
           IO.puts("*** Abilities already created, skipping ***")
           {:ok, nil}
       end
@@ -49,7 +49,7 @@ with_roles =
         nil ->
           repo.insert(role)
 
-        found ->
+        _found ->
           IO.puts("*** Roles already created, skipping ***")
           {:ok, nil}
       end
