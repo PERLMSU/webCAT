@@ -13,7 +13,7 @@
         "@fortawesome/fontawesome-pro": "5.4.1",
         "phoenix": "file:../deps/phoenix",
         "simplemde": "1.11.2",
-        "tailwindcss": "0.7.4"
+        "tailwindcss": "1.0.4"
     },
     "devDependencies": {
         "@babel/core": "7.4.4",

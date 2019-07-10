@@ -3,7 +3,7 @@ const supportedBrowsers = ['last 2 versions'];
 
 module.exports = {
   plugins: [
-    require('tailwindcss')('./tailwind.js'),
+    require('tailwindcss'),
     require('autoprefixer')({ browsers: supportedBrowsers }),
     require('cssnano')()
   ]
