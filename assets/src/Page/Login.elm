@@ -1,6 +1,6 @@
 module Page.Login exposing (Form, Model, Msg(..), Problem(..), ValidatedField(..), fieldsToValidate, init, labelView, primaryButton, subscriptions, tertiaryButton, textInput, toSession, update, validate, validateField, view, viewProblem)
 
-import API exposing (Credential, Error(..))
+import API exposing (Credential, Error(..), ErrorBody)
 import API.Auth as Auth
 import Browser
 import Browser.Navigation as Nav
@@ -11,8 +11,6 @@ import Http
 import Route
 import Session exposing (Session)
 import Url
-
-
 
 -- MODEL
 
@@ -38,16 +36,23 @@ type Problem
 
 init : Session -> ( Model, Cmd Msg )
 init session =
-    ( { session = session
-      , errors = []
-      , loading = False
-      , form =
-            { email = ""
-            , password = ""
+    let
+        model =
+            { session = session
+            , errors = []
+            , loading = False
+            , form =
+                { email = ""
+                , password = ""
+                }
             }
-      }
-    , Cmd.none
-    )
+    in
+    case Session.credential session of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just _ ->
+            ( model, Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing) )
 
 
 
@@ -91,20 +96,20 @@ update msg model =
             let
                 serverErrors =
                     case error of
-                        BadRequest errMsg ->
-                            [ ServerError errMsg ]
+                        BadRequest errBody ->
+                            [ ServerError <| API.errorBodyToString errBody ]
 
-                        Unauthorized errMsg ->
-                            [ ServerError errMsg ]
+                        Unauthorized errBody ->
+                            [ ServerError <| API.errorBodyToString errBody ]
 
-                        Forbidden errMsg ->
-                            [ ServerError errMsg ]
+                        Forbidden errBody ->
+                            [ ServerError <| API.errorBodyToString errBody ]
 
-                        NotFound errMsg ->
-                            [ ServerError errMsg ]
+                        NotFound errBody ->
+                            [ ServerError <| API.errorBodyToString errBody ]
 
-                        API.ServerError errMsg ->
-                            [ ServerError errMsg ]
+                        API.ServerError errBody ->
+                            [ ServerError <| API.errorBodyToString errBody ]
 
                         BadUrl errMsg ->
                             [ ServerError errMsg ]
@@ -126,9 +131,12 @@ update msg model =
             ( { model | loading = False }, API.storeCred cred )
 
         GotSession session ->
-            ( { model | session = session }
-            , Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing)
-            )
+            case Session.credential session of
+                Nothing ->
+                    ( { model | session = session }, Cmd.none )
+
+                Just _ ->
+                    ( { model | session = session, errors = [ ServerError "Problem decoding session" ] }, Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing) )
 
 
 updateForm : (Form -> Form) -> Model -> ( Model, Cmd Msg )

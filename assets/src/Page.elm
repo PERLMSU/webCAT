@@ -33,7 +33,7 @@ view maybeUser page { title, content } =
     , body =
         case page of
             Login ->
-                content :: [ viewFooter ]
+                [ content ]
 
             _ ->
                 viewHeader page maybeUser :: content :: [ viewFooter ]

@@ -6,7 +6,6 @@ import Json.Encode as Encode exposing (Value)
 import Time as Time
 
 
-
 -- Rotation types
 
 
@@ -292,8 +291,14 @@ userEncoder user =
     Encode.object
         [ ( "id", idEncoder user.id )
         , ( "email", Encode.string user.email)
-        , ( "firstName", Encode.string user.firstName)
-        , ( "middleName", Encode.string user.lastName)
+        , ( "first_name", Encode.string user.firstName)
+        , ( "middle_name", encodeMaybe Encode.string user.middleName)
+        , ( "last_name", Encode.string user.lastName)
+        , ( "nickname", encodeMaybe Encode.string user.nickname)
+        , ( "active", Encode.bool user.active)
+        -- Related data @TODO
+        , ( "inserted_at", encodeMaybe encodePosix user.insertedAt)
+        , ( "updated_at", encodeMaybe encodePosix user.updatedAt)
         ]
 
 
@@ -675,3 +680,12 @@ type alias StudentFeedback =
     , updatedAt : Maybe Time.Posix
     }
 
+-- Utility
+encodeMaybe : (a -> Value) -> Maybe a -> Value
+encodeMaybe toValue maybe =
+    case maybe of
+        Nothing -> Encode.null
+        Just a -> toValue a
+
+encodePosix : Time.Posix -> Value
+encodePosix time = Encode.int (Time.posixToMillis time)

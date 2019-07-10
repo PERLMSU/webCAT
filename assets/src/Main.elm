@@ -7,6 +7,7 @@ import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Page
 import Page.Blank as Blank
+import Page.Dashboard as Dashboard
 import Page.Login as Login
 import Page.NotFound as NotFound
 import Route exposing (LoginToken, Route(..))
@@ -46,6 +47,7 @@ type Model
     = Redirect Session
     | NotFound Session
     | Login Login.Model
+    | Dashboard Dashboard.Model
 
 
 
@@ -57,6 +59,8 @@ type Msg
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
     | GotLoginMsg Login.Msg
+    | GotDashboardMsg Dashboard.Msg
+    | GotSession Session
 
 
 toSession : Model -> Session
@@ -71,12 +75,18 @@ toSession page =
         Login login ->
             Login.toSession login
 
+        Dashboard dashboard ->
+            Dashboard.toSession dashboard
+
 
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute model =
     let
         session =
             toSession model
+
+        _ =
+            Debug.log "session" session
     in
     case maybeRoute of
         Nothing ->
@@ -88,6 +98,10 @@ changeRouteTo maybeRoute model =
         Just (Route.Login maybeToken) ->
             Login.init session
                 |> updateWith Login GotLoginMsg model
+
+        Just (Route.Dashboard maybeId) ->
+            Dashboard.init session maybeId
+                |> updateWith Dashboard GotDashboardMsg model
 
         Just _ ->
             ( model, Cmd.none )
@@ -142,8 +156,17 @@ updateWith toModel toMsg model ( subModel, subCmd ) =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     case model of
-        NotFound _ -> Sub.none
-        Redirect _ -> Session.changes GotSession (Session.navKey (toSession model))
+        NotFound _ ->
+            Sub.none
+
+        Redirect _ ->
+            Session.changes GotSession (Session.navKey (toSession model))
+
+        Login login ->
+            Sub.map GotLoginMsg (Login.subscriptions login)
+
+        Dashboard dashboard ->
+            Sub.map GotDashboardMsg (Dashboard.subscriptions dashboard)
 
 
 
@@ -173,9 +196,7 @@ view model =
             Page.view user Page.Other NotFound.view
 
         Login login ->
-            let
-                { title, content } =
-                    Login.view login
-            in
-            { title = title, body = List.map (Html.map GotLoginMsg) [content] }
-             
+            viewPage Page.Login GotLoginMsg (Login.view login)
+
+        Dashboard dashboard ->
+            viewPage Page.Dashboard GotDashboardMsg (Dashboard.view dashboard)

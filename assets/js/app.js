@@ -14,7 +14,7 @@ app.ports.storeCache.subscribe((val) => {
     }
     // Send a notification of storage success back to Elm
     setTimeout(() => {
-        app.ports.onStoreChange.send(val);
+        app.ports.onStoreChange.send(JSON.stringify(val));
     }, 0);
 });
 // Whenever localStorage changes in another tab, report it if necessary.

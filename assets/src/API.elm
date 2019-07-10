@@ -1,12 +1,13 @@
-port module API exposing (Credential, Error(..), application, credChanges, credentialDecoder, credentialHeader, credentialUser, decode, decoderFromCredential, delete, get, logout, onStoreChange, post, put, storageDecoder, storeCache, storeCred)
+port module API exposing (Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, logout, onStoreChange, post, put, storeCred)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
 import Browser.Navigation as Nav
 import Http exposing (Body, Expect)
-import Json.Decode as Decode exposing (Decoder, Value, decodeString, field, string)
+import Json.Decode as Decode exposing (Decoder, Value, decodeString, field, nullable, string)
 import Json.Decode.Pipeline as Pipeline exposing (optional, required)
 import Json.Encode as Encode
+import RemoteData exposing (RemoteData)
 import Types exposing (User, userDecoder, userEncoder)
 import Url exposing (Url)
 
@@ -41,11 +42,11 @@ credentialDecoder =
 
 
 type Error
-    = BadRequest String
-    | Unauthorized String
-    | Forbidden String
-    | NotFound String
-    | ServerError String
+    = BadRequest ErrorBody
+    | Unauthorized ErrorBody
+    | Forbidden ErrorBody
+    | NotFound ErrorBody
+    | ServerError ErrorBody
       -- Errors that occur because of the transport mechanism
     | BadUrl String
     | Timeout String
@@ -53,17 +54,15 @@ type Error
     | BadBody String
 
 
+type alias ErrorBody =
+    { message : Maybe String
+    , status : String
+    , title : String
+    }
+
+
 
 -- PERSISTENCE
-
-
-decode : Decoder (Credential -> viewer) -> Value -> Result Decode.Error viewer
-decode decoder value =
-    -- It's stored in localStorage as a JSON String;
-    -- first decode the Value as a String, then
-    -- decode that String as JSON.
-    Decode.decodeValue Decode.string value
-        |> Result.andThen (\str -> Decode.decodeString (Decode.field "user" (decoderFromCredential decoder)) str)
 
 
 port onStoreChange : (Value -> msg) -> Sub msg
@@ -128,11 +127,6 @@ application config =
         }
 
 
-storageDecoder : Decoder (Credential -> viewer) -> Decoder viewer
-storageDecoder viewerDecoder =
-    Decode.field "user" (decoderFromCredential viewerDecoder)
-
-
 
 -- HTTP
 
@@ -156,6 +150,11 @@ get url maybeCred decoder toMsg =
         }
 
 
+getRemote : Endpoint -> Maybe Credential -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
+getRemote url maybeCred decoder toMsg =
+    get url maybeCred decoder (RemoteData.fromResult >> toMsg)
+
+
 put : Endpoint -> Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
 put url cred body decoder toMsg =
     Endpoint.request
@@ -167,6 +166,11 @@ put url cred body decoder toMsg =
         , timeout = Nothing
         , tracker = Nothing
         }
+
+
+putRemote : Endpoint -> Credential -> Body -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
+putRemote url cred body decoder toMsg =
+    put url cred body decoder (RemoteData.fromResult >> toMsg)
 
 
 post : Endpoint -> Maybe Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
@@ -188,24 +192,27 @@ post url maybeCred body decoder toMsg =
         }
 
 
-delete : Endpoint -> Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
-delete url cred body decoder toMsg =
+postRemote : Endpoint -> Maybe Credential -> Body -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
+postRemote url maybeCred body decoder toMsg =
+    post url maybeCred body decoder (RemoteData.fromResult >> toMsg)
+
+
+delete : Endpoint -> Credential -> Decoder a -> (Result Error a -> msg) -> Cmd msg
+delete url cred decoder toMsg =
     Endpoint.request
         { method = "DELETE"
         , url = url
         , expect = expectJson toMsg decoder
         , headers = [ credentialHeader cred ]
-        , body = body
+        , body = Http.emptyBody
         , timeout = Nothing
         , tracker = Nothing
         }
 
 
-decoderFromCredential : Decoder (Credential -> a) -> Decoder a
-decoderFromCredential decoder =
-    Decode.map2 (\fromCred cred -> fromCred cred)
-        decoder
-        credentialDecoder
+deleteRemote : Endpoint -> Credential -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
+deleteRemote url cred decoder toMsg =
+    delete url cred decoder (RemoteData.fromResult >> toMsg)
 
 
 expectJson : (Result Error a -> msg) -> Decoder a -> Expect msg
@@ -225,19 +232,19 @@ expectJson toMsg decoder =
                 Http.BadStatus_ metadata body ->
                     case metadata.statusCode of
                         400 ->
-                            Err (decodeErrorString BadRequest body)
+                            Err (decodeErrorBody BadRequest body)
 
                         401 ->
-                            Err (decodeErrorString Unauthorized body)
+                            Err (decodeErrorBody Unauthorized body)
 
                         403 ->
-                            Err (decodeErrorString Forbidden body)
+                            Err (decodeErrorBody Forbidden body)
 
                         404 ->
-                            Err (decodeErrorString NotFound body)
+                            Err (decodeErrorBody NotFound body)
 
                         _ ->
-                            Err (decodeErrorString ServerError body)
+                            Err (decodeErrorBody ServerError body)
 
                 Http.GoodStatus_ _ body ->
                     case decodeString decoder body of
@@ -252,16 +259,33 @@ expectJson toMsg decoder =
 -- ERRORS
 
 
-decodeErrorString : (String -> a) -> String -> a
-decodeErrorString error str =
-    case decodeString errorDecoder str of
+decodeErrorBody : (ErrorBody -> a) -> String -> a
+decodeErrorBody error str =
+    case decodeString (field "error" errorDecoder) str of
         Ok errorMsg ->
             error errorMsg
 
         Err decodeError ->
-            error ("Problem decoding error message: " ++ Decode.errorToString decodeError)
+            error
+                { title = "Problem decoding error message"
+                , status = "500"
+                , message = Just <| Decode.errorToString decodeError
+                }
 
 
-errorDecoder : Decoder String
+errorBodyToString : ErrorBody -> String
+errorBodyToString { message, status, title } =
+    case message of
+        Just str ->
+            "Error: " ++ str ++ "."
+
+        Nothing ->
+            "Error " ++ status ++ ": " ++ title
+
+
+errorDecoder : Decoder ErrorBody
 errorDecoder =
-    field "error" string
+    Decode.succeed ErrorBody
+        |> required "message" (nullable string)
+        |> required "status" string
+        |> required "title" string
