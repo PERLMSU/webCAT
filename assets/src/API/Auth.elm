@@ -1,6 +1,6 @@
 module API.Auth exposing (login)
 
-import API exposing (post, Credential, credentialDecoder)
+import API exposing (Credential, credentialDecoder, post)
 import API.Endpoint as Endpoint
 import Http exposing (jsonBody)
 import Json.Decode as D exposing (Decoder, string)
@@ -8,6 +8,7 @@ import Json.Decode.Pipeline exposing (required)
 import Json.Encode as E
 import String
 import Url.Builder
+
 
 
 -- ENCODER

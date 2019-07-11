@@ -20,7 +20,7 @@ init : Session -> Maybe ClassroomId -> ( Model, Cmd Msg )
 init session maybeClassroomId =
     case Session.credential session of
         Nothing ->
-            ( { session = session, classroomId = maybeClassroomId }, Route.replaceUrl (Session.navKey session) (Route.Login Nothing))
+            ( { session = session, classroomId = maybeClassroomId }, Route.replaceUrl (Session.navKey session) (Route.Login Nothing) )
 
         Just _ ->
             ( { session = session, classroomId = maybeClassroomId }, Cmd.none )

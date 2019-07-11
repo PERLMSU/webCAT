@@ -7,7 +7,8 @@
         "build": "webpack --mode production",
         "start": "yarn run watch",
         "watch": "webpack --mode development --watch-stdin",
-        "elm": "elm make src/Main.elm --output=/dev/null"
+        "elm": "elm make src/Main.elm --output=/dev/null",
+        "test": "elm-format --validate . && elm-test"
     },
     "dependencies": {
         "@fortawesome/fontawesome-pro": "5.4.1",
@@ -25,7 +26,9 @@
         "css-loader": "3.0.0",
         "cssnano": "4.1.10",
         "elm": "0.19.0-bugfix6",
+        "elm-format": "0.8.1",
         "elm-hot": "1.0.1",
+        "elm-test": "0.19.0-rev6",
         "elm-webpack-loader": "5.0.0",
         "extract-text-webpack-plugin": "4.0.0-beta.0",
         "file-loader": "4.0.0",

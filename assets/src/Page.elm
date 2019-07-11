@@ -3,7 +3,7 @@ module Page exposing (Page(..), view, viewErrors)
 import API exposing (Credential)
 import Browser exposing (Document)
 import Html exposing (Html, a, button, div, footer, i, img, li, nav, p, span, text, ul)
-import Html.Attributes exposing (class, classList, href, style)
+import Html.Attributes exposing (class, classList, href, id, style)
 import Html.Events exposing (onClick)
 import Route exposing (Route)
 import Session exposing (Session)
@@ -33,27 +33,24 @@ view maybeUser page { title, content } =
     , body =
         case page of
             Login ->
-                [ content ]
+                content :: [ viewFooter ]
 
             _ ->
-                viewHeader page maybeUser :: content :: [ viewFooter ]
+                [ viewGrid (viewMenu page maybeUser) content viewFooter ]
     }
 
 
-viewHeader : Page -> Maybe User -> Html msg
-viewHeader page maybeUser =
-    nav [ class "navbar navbar-light" ]
-        [ div [ class "container" ]
-            [ a [ class "navbar-brand", Route.href (Route.Dashboard Nothing) ]
-                [ text "conduit" ]
-            , ul [ class "nav navbar-nav pull-xs-right" ] <|
-                navbarLink page (Route.Dashboard Nothing) [ text "Home" ]
-                    :: viewMenu page maybeUser
+viewGrid : Html msg -> Html msg -> Html msg -> Html msg
+viewGrid menu content footer =
+    div [ class "container", id "main-container" ]
+        [ div [ class "flex mb-4" ]
+            [ div [ class "w-full bg-gray-400 h-12" ] [ text "aaa" ]
             ]
+        , div [ class "flex mb-4" ] []
         ]
 
 
-viewMenu : Page -> Maybe User -> List (Html msg)
+viewMenu : Page -> Maybe User -> Html msg
 viewMenu page maybeUser =
     let
         linkTo =
@@ -61,12 +58,10 @@ viewMenu page maybeUser =
     in
     case maybeUser of
         Just user ->
-            [ linkTo Route.Logout [ text "Log out" ]
-            ]
+            linkTo Route.Logout [ text "Log out" ]
 
         Nothing ->
-            [ linkTo (Route.Login Nothing) [ text "Log in" ]
-            ]
+            linkTo (Route.Login Nothing) [ text "Log in" ]
 
 
 viewFooter : Html msg
@@ -95,7 +90,7 @@ isActive page route =
         ( Dashboard, Route.Dashboard _ ) ->
             True
 
-        ( Login, Route.Login _) ->
+        ( Login, Route.Login _ ) ->
             True
 
         _ ->

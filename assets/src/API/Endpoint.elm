@@ -1,4 +1,4 @@
-module API.Endpoint exposing (Endpoint, categories, category, classroom, classrooms, feedback, feedbackList, imports, login, observation, observations, password_reset, password_reset_finish, profile, rotation, rotation_group, rotation_groups, rotations, section, sections, semester, semesters, user, users, request)
+module API.Endpoint exposing (Endpoint, categories, category, classroom, classrooms, feedback, feedbackList, imports, login, observation, observations, password_reset, password_reset_finish, profile, request, rotation, rotation_group, rotation_groups, rotations, section, sections, semester, semesters, user, users)
 
 import Http
 import Types exposing (CategoryId(..), ClassroomId(..), CommentId(..), DraftId(..), ExplanationId(..), FeedbackId(..), GradeId(..), ObservationId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))

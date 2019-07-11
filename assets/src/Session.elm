@@ -54,5 +54,3 @@ fromCredential key maybeCred =
 changes : (Session -> msg) -> Nav.Key -> Sub msg
 changes toMsg key =
     API.credChanges (\maybeCred -> toMsg (fromCredential key maybeCred))
-
-

@@ -1,9 +1,10 @@
 module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), observationTypeDecoder, roleDecoder, userDecoder, userEncoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
-import Json.Decode.Pipeline exposing (required, optional)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode exposing (Value)
 import Time as Time
+
 
 
 -- Rotation types
@@ -290,15 +291,16 @@ userEncoder user =
     in
     Encode.object
         [ ( "id", idEncoder user.id )
-        , ( "email", Encode.string user.email)
-        , ( "first_name", Encode.string user.firstName)
-        , ( "middle_name", encodeMaybe Encode.string user.middleName)
-        , ( "last_name", Encode.string user.lastName)
-        , ( "nickname", encodeMaybe Encode.string user.nickname)
-        , ( "active", Encode.bool user.active)
+        , ( "email", Encode.string user.email )
+        , ( "first_name", Encode.string user.firstName )
+        , ( "middle_name", encodeMaybe Encode.string user.middleName )
+        , ( "last_name", Encode.string user.lastName )
+        , ( "nickname", encodeMaybe Encode.string user.nickname )
+        , ( "active", Encode.bool user.active )
+
         -- Related data @TODO
-        , ( "inserted_at", encodeMaybe encodePosix user.insertedAt)
-        , ( "updated_at", encodeMaybe encodePosix user.updatedAt)
+        , ( "inserted_at", encodeMaybe encodePosix user.insertedAt )
+        , ( "updated_at", encodeMaybe encodePosix user.updatedAt )
         ]
 
 
@@ -680,12 +682,21 @@ type alias StudentFeedback =
     , updatedAt : Maybe Time.Posix
     }
 
+
+
 -- Utility
+
+
 encodeMaybe : (a -> Value) -> Maybe a -> Value
 encodeMaybe toValue maybe =
     case maybe of
-        Nothing -> Encode.null
-        Just a -> toValue a
+        Nothing ->
+            Encode.null
+
+        Just a ->
+            toValue a
+
 
 encodePosix : Time.Posix -> Value
-encodePosix time = Encode.int (Time.posixToMillis time)
+encodePosix time =
+    Encode.int (Time.posixToMillis time)

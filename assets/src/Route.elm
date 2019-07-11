@@ -116,90 +116,97 @@ tokenQueryParser id key =
 
                 _ ->
                     Nothing
+
+
 applicationRoot : String
-applicationRoot = "app"
+applicationRoot =
+    "app"
+
 
 appAbsolute : List String -> List Builder.QueryParameter -> String
-appAbsolute paths query = absolute (applicationRoot :: paths) query
+appAbsolute paths query =
+    absolute (applicationRoot :: paths) query
+
 
 parser : Parser (Route -> a) a
 parser =
-    s applicationRoot </> oneOf
-        [ Parser.map Root top
-        , Parser.map Dashboard (s "dashboard" <?> idQueryParser ClassroomId "classroomId")
+    s applicationRoot
+        </> oneOf
+                [ Parser.map Root top
+                , Parser.map Dashboard (s "dashboard" <?> idQueryParser ClassroomId "classroomId")
 
-        -- Login
-        , Parser.map Login (s "login" <?> tokenQueryParser LoginToken "loginToken")
-        , Parser.map Logout (s "logout")
-        , Parser.map ForgotPassword (s "forgotPassword" <?> tokenQueryParser PasswordResetToken "resetToken")
+                -- Login
+                , Parser.map Login (s "login" <?> tokenQueryParser LoginToken "loginToken")
+                , Parser.map Logout (s "logout")
+                , Parser.map ForgotPassword (s "forgotPassword" <?> tokenQueryParser PasswordResetToken "resetToken")
 
-        -- Classroom control panel
-        , s "classrooms"
-            </> oneOf
-                    [ Parser.map Classrooms top
-                    , Parser.map Classroom (Parser.map ClassroomId int)
-                    , Parser.map NewClassroom (s "new")
-                    , Parser.map EditClassroom (Parser.map ClassroomId int </> s "edit")
-                    ]
-        , s "semesters"
-            </> oneOf
-                    [ Parser.map Semesters (top <?> idQueryParser ClassroomId "classroomId")
-                    , Parser.map Semester (Parser.map SemesterId int)
-                    , Parser.map NewSemester (s "new" <?> idQueryParser ClassroomId "classroomId")
-                    , Parser.map EditSemester (Parser.map SemesterId int </> s "edit")
-                    ]
-        , s "sections"
-            </> oneOf
-                    [ Parser.map Sections (top <?> idQueryParser SemesterId "semesterId")
-                    , Parser.map Section (Parser.map SectionId int)
-                    , Parser.map NewSection (s "new" <?> idQueryParser SemesterId "semesterId")
-                    , Parser.map EditSection (Parser.map SectionId int </> s "edit")
-                    ]
-        , s "rotations"
-            </> oneOf
-                    [ Parser.map Rotations (top <?> idQueryParser SectionId "sectionId")
-                    , Parser.map Rotation (Parser.map RotationId int)
-                    , Parser.map NewRotation (s "new" <?> idQueryParser SectionId "sectionId")
-                    , Parser.map EditRotation (Parser.map RotationId int </> s "edit")
-                    ]
-        , s "rotationGroups"
-            </> oneOf
-                    [ Parser.map RotationGroups (top <?> idQueryParser RotationId "rotationId")
-                    , Parser.map RotationGroup (Parser.map RotationGroupId int)
-                    , Parser.map NewRotationGroup (s "new" <?> idQueryParser RotationId "rotationId")
-                    , Parser.map EditRotationGroup (Parser.map RotationGroupId int </> s "edit")
-                    ]
-        , s "users"
-            </> oneOf
-                    [ Parser.map Users top
-                    , Parser.map User (Parser.map UserId int)
-                    , Parser.map NewUser (s "new")
-                    , Parser.map EditUser (Parser.map UserId int </> s "edit")
-                    ]
+                -- Classroom control panel
+                , s "classrooms"
+                    </> oneOf
+                            [ Parser.map Classrooms top
+                            , Parser.map Classroom (Parser.map ClassroomId int)
+                            , Parser.map NewClassroom (s "new")
+                            , Parser.map EditClassroom (Parser.map ClassroomId int </> s "edit")
+                            ]
+                , s "semesters"
+                    </> oneOf
+                            [ Parser.map Semesters (top <?> idQueryParser ClassroomId "classroomId")
+                            , Parser.map Semester (Parser.map SemesterId int)
+                            , Parser.map NewSemester (s "new" <?> idQueryParser ClassroomId "classroomId")
+                            , Parser.map EditSemester (Parser.map SemesterId int </> s "edit")
+                            ]
+                , s "sections"
+                    </> oneOf
+                            [ Parser.map Sections (top <?> idQueryParser SemesterId "semesterId")
+                            , Parser.map Section (Parser.map SectionId int)
+                            , Parser.map NewSection (s "new" <?> idQueryParser SemesterId "semesterId")
+                            , Parser.map EditSection (Parser.map SectionId int </> s "edit")
+                            ]
+                , s "rotations"
+                    </> oneOf
+                            [ Parser.map Rotations (top <?> idQueryParser SectionId "sectionId")
+                            , Parser.map Rotation (Parser.map RotationId int)
+                            , Parser.map NewRotation (s "new" <?> idQueryParser SectionId "sectionId")
+                            , Parser.map EditRotation (Parser.map RotationId int </> s "edit")
+                            ]
+                , s "rotationGroups"
+                    </> oneOf
+                            [ Parser.map RotationGroups (top <?> idQueryParser RotationId "rotationId")
+                            , Parser.map RotationGroup (Parser.map RotationGroupId int)
+                            , Parser.map NewRotationGroup (s "new" <?> idQueryParser RotationId "rotationId")
+                            , Parser.map EditRotationGroup (Parser.map RotationGroupId int </> s "edit")
+                            ]
+                , s "users"
+                    </> oneOf
+                            [ Parser.map Users top
+                            , Parser.map User (Parser.map UserId int)
+                            , Parser.map NewUser (s "new")
+                            , Parser.map EditUser (Parser.map UserId int </> s "edit")
+                            ]
 
-        -- Import
-        , Parser.map Import (s "import")
+                -- Import
+                , Parser.map Import (s "import")
 
-        -- Feedback
-        , Parser.map Feedback (s "feedback")
+                -- Feedback
+                , Parser.map Feedback (s "feedback")
 
-        -- Inbox
-        , s "drafts"
-            </> oneOf
-                    [ Parser.map Drafts top
-                    , Parser.map Draft (Parser.map DraftId int)
-                    , Parser.map NewDraft (s "new" </> Parser.map RotationGroupId int </> Parser.map UserId int)
-                    , Parser.map EditDraft (Parser.map DraftId int </> s "edit")
-                    ]
-        , Parser.map Profile (s "profile")
-        ]
+                -- Inbox
+                , s "drafts"
+                    </> oneOf
+                            [ Parser.map Drafts top
+                            , Parser.map Draft (Parser.map DraftId int)
+                            , Parser.map NewDraft (s "new" </> Parser.map RotationGroupId int </> Parser.map UserId int)
+                            , Parser.map EditDraft (Parser.map DraftId int </> s "edit")
+                            ]
+                , Parser.map Profile (s "profile")
+                ]
 
 
 routeToString : Route -> String
 routeToString route =
     case route of
         Root ->
-            appAbsolute [ ] []
+            appAbsolute [] []
 
         Dashboard maybeId ->
             appAbsolute [ "dashboard" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
@@ -218,7 +225,7 @@ routeToString route =
             appAbsolute [ "classrooms" ] []
 
         Classroom (ClassroomId id) ->
-            appAbsolute ["classrooms", String.fromInt id ] []
+            appAbsolute [ "classrooms", String.fromInt id ] []
 
         NewClassroom ->
             appAbsolute [ "classrooms", "new" ] []
