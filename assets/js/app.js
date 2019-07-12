@@ -1,5 +1,6 @@
 import { Elm } from "../src/Main.elm";
 import "../css/tailwind.css";
+import "../css/grid.css";
 
 var storageKey = "webcat_session_store";
 var flags = localStorage.getItem(storageKey);

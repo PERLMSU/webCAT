@@ -1,9 +1,9 @@
-module Page exposing (Page(..), view, viewErrors)
+module Page exposing (Page(..), view, viewErrors, viewPublic)
 
 import API exposing (Credential)
 import Browser exposing (Document)
-import Html exposing (Html, a, button, div, footer, i, img, li, nav, p, span, text, ul)
-import Html.Attributes exposing (class, classList, href, id, style)
+import Html exposing (Html, a, button, div, footer, h2, h3, hr, i, img, li, nav, p, span, text, ul)
+import Html.Attributes exposing (class, classList, href, id, src, style)
 import Html.Events exposing (onClick)
 import Route exposing (Route)
 import Session exposing (Session)
@@ -27,53 +27,52 @@ The caller provides the current user, so we can display in either
 isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 -}
-view : Maybe User -> Page -> { title : String, content : Html msg } -> Document msg
-view maybeUser page { title, content } =
+view : User -> Page -> { title : String, content : Html msg } -> Document msg
+view user page { title, content } =
     { title = title ++ " - WebCAT"
-    , body =
-        case page of
-            Login ->
-                content :: [ viewFooter ]
+    , body = [ viewGrid (viewMenu page user) content viewFooter ]
+    }
 
-            _ ->
-                [ viewGrid (viewMenu page maybeUser) content viewFooter ]
+
+viewPublic : { title : String, content : Html msg } -> Document msg
+viewPublic { title, content } =
+    { title = title ++ " - WebCAT"
+    , body = [ content ]
     }
 
 
 viewGrid : Html msg -> Html msg -> Html msg -> Html msg
 viewGrid menu content footer =
-    div [ class "container", id "main-container" ]
-        [ div [ class "flex mb-4" ]
-            [ div [ class "w-full bg-gray-400 h-12" ] [ text "aaa" ]
-            ]
-        , div [ class "flex mb-4" ] []
+    div [ id "main-container", class "w-screen h-screen" ]
+        [ div [ id "sidebar", class "bg-blue-900" ] [ div [ class "container p-1" ] [ menu ] ]
+        , div [ id "content", class "bg-gray-200" ] [ div [ class "container p-1" ] [ content ] ]
+        , div [ id "footer", class "bg-gray-300" ] [ div [ class "container p-1 mx-auto" ] [ footer ] ]
         ]
 
 
-viewMenu : Page -> Maybe User -> Html msg
-viewMenu page maybeUser =
-    let
-        linkTo =
-            navbarLink page
-    in
-    case maybeUser of
-        Just user ->
-            linkTo Route.Logout [ text "Log out" ]
+viewMenu : Page -> User -> Html msg
+viewMenu page user =
+    div []
+        [ userItem user
+        ]
 
-        Nothing ->
-            linkTo (Route.Login Nothing) [ text "Log in" ]
+
+userItem : User -> Html msg
+userItem user =
+    div [ class "flex items-center m-2" ]
+        [ img [ class "flex-shrink-0 h-10 w-10 rounded-lg mx-1", src "https://avatars3.githubusercontent.com/u/2858049?s=460&v=4" ] []
+        , div [ class "text-left w-32" ]
+            [ div [ class "mx-2 text-lg text-blue-200 font-sans truncate" ] [ text "PHY 183 - Studio Physics" ]
+            , div [ class "mx-2 text-xs text-blue-100 font-sans truncate" ] [ text (user.firstName ++ " " ++ user.lastName) ]
+            ]
+        ]
 
 
 viewFooter : Html msg
 viewFooter =
-    footer []
-        [ div [ class "container" ]
-            [ a [ class "logo-font", href "/" ] [ text "conduit" ]
-            , span [ class "attribution" ]
-                [ text "An interactive learning project from "
-                , a [ href "https://thinkster.io" ] [ text "Thinkster" ]
-                , text ". Code & design licensed under MIT."
-                ]
+    footer [ class "py-1" ]
+        [ div [ class "text-center" ]
+            [ p [ class "font-sans text-gray-600" ] [ text "Version 0.3.0-dev | Built on 2019-6-27 at 1:52pm EDT" ]
             ]
         ]
 

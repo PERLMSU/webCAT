@@ -176,27 +176,55 @@ subscriptions model =
 view : Model -> Document Msg
 view model =
     let
-        user =
+        maybeUser =
             Maybe.map API.credentialUser (Session.credential (toSession model))
-
-        viewPage page toMsg config =
-            let
-                { title, body } =
-                    Page.view user page config
-            in
-            { title = title
-            , body = List.map (Html.map toMsg) body
-            }
     in
-    case model of
-        Redirect _ ->
-            Page.view user Page.Other Blank.view
+    case maybeUser of
+        Just user ->
+            let
+                viewPage page toMsg config =
+                    let
+                        { title, body } =
+                            Page.view user page config
+                    in
+                    { title = title
+                    , body = List.map (Html.map toMsg) body
+                    }
+            in
+            case model of
+                Redirect _ ->
+                    Page.viewPublic Blank.view
 
-        NotFound _ ->
-            Page.view user Page.Other NotFound.view
+                NotFound _ ->
+                    Page.viewPublic NotFound.view
 
-        Login login ->
-            viewPage Page.Login GotLoginMsg (Login.view login)
+                -- Login shouldn't be visible when authenticated.
+                Login _ ->
+                    Page.viewPublic NotFound.view
 
-        Dashboard dashboard ->
-            viewPage Page.Dashboard GotDashboardMsg (Dashboard.view dashboard)
+                Dashboard dashboard ->
+                    viewPage Page.Dashboard GotDashboardMsg (Dashboard.view dashboard)
+
+        Nothing ->
+            let
+                viewPage toMsg config =
+                    let
+                        { title, body } =
+                            Page.viewPublic config
+                    in
+                    { title = title
+                    , body = List.map (Html.map toMsg) body
+                    }
+            in
+            case model of
+                Redirect _ ->
+                    Page.viewPublic Blank.view
+
+                NotFound _ ->
+                    Page.viewPublic NotFound.view
+
+                Login login ->
+                    viewPage GotLoginMsg (Login.view login)
+
+                Dashboard _ ->
+                    Page.viewPublic NotFound.view

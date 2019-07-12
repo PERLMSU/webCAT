@@ -8,6 +8,7 @@
         "start": "yarn run watch",
         "watch": "webpack --mode development --watch-stdin",
         "elm": "elm make src/Main.elm --output=/dev/null",
+        "format": "elm-format src/ tests/ --yes --elm-version 0.19",
         "test": "elm-format --validate . && elm-test"
     },
     "dependencies": {

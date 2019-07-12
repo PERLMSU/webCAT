@@ -1,0 +1,17 @@
+body {
+    margin: 0px
+}
+
+
+#main-container {
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    grid-template-rows: 1.75fr 1fr 0.15fr;
+    grid-template-areas: "Sidebar Content" "Sidebar Content" "Sidebar Footer";
+}
+
+#content { grid-area: Content; }
+
+#sidebar { grid-area: Sidebar; }
+
+#footer { grid-area: Footer; }

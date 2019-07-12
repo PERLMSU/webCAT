@@ -26,8 +26,8 @@ type alias Classroom =
     , users : Maybe Users
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -45,8 +45,8 @@ classroomDecoder =
         |> required "semesters" (nullable (map Semesters (list (lazy (\_ -> semesterDecoder)))))
         |> required "categories" (nullable (map Categories (list (lazy (\_ -> categoryDecoder)))))
         |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type SemesterId
@@ -69,8 +69,8 @@ type alias Semester =
     , users : Maybe Users
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -90,8 +90,8 @@ semesterDecoder =
         |> required "classroom" (nullable (lazy (\_ -> classroomDecoder)))
         |> required "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder)))))
         |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type SectionId
@@ -112,8 +112,8 @@ type alias Section =
     , users : Maybe Users
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -131,8 +131,8 @@ sectionDecoder =
         |> required "semester" (nullable (lazy (\_ -> semesterDecoder)))
         |> required "rotations" (nullable (map Rotations (list (lazy (\_ -> rotationDecoder)))))
         |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type RotationId
@@ -155,8 +155,8 @@ type alias Rotation =
     , users : Maybe Users
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -176,8 +176,8 @@ rotationDecoder =
         |> required "section" (nullable (lazy (\_ -> sectionDecoder)))
         |> required "rotationGroups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder)))))
         |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type RotationGroupId
@@ -197,8 +197,8 @@ type alias RotationGroup =
     , users : Maybe Users
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -212,11 +212,11 @@ rotationGroupDecoder =
         |> required "id" (map RotationGroupId int)
         |> required "number" int
         |> required "description" (nullable string)
-        |> required "rotationId" (map RotationId int)
+        |> required "rotation_id" (map RotationId int)
         |> required "rotation" (nullable (lazy (\_ -> rotationDecoder)))
         |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 
@@ -230,6 +230,9 @@ type UserId
 type alias Role =
     { identifier : String
     , name : String
+    , abilities : List String
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -238,6 +241,20 @@ roleDecoder =
     Decode.succeed Role
         |> required "identifier" string
         |> required "name" string
+        |> required "abilities" (list string)
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
+
+
+roleEncoder : Role -> Value
+roleEncoder role =
+    Encode.object
+        [ ( "identifier", Encode.string role.identifier )
+        , ( "name", Encode.string role.name )
+        , ( "abilities", Encode.list Encode.string role.abilities )
+        , ( "inserted_at", encodePosix role.insertedAt )
+        , ( "updated_at", encodePosix role.updatedAt )
+        ]
 
 
 type alias User =
@@ -256,8 +273,8 @@ type alias User =
     , rotationGroups : Maybe RotationGroups
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -279,8 +296,8 @@ userDecoder =
         |> optional "classrooms" (nullable (map Classrooms (list (lazy (\_ -> classroomDecoder))))) Nothing
         |> optional "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder))))) Nothing
         |> optional "rotation_groups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder))))) Nothing
-        |> required "inserted_at" (nullable (map Time.millisToPosix int))
-        |> required "updated_at" (nullable (map Time.millisToPosix int))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 userEncoder : User -> Value
@@ -297,10 +314,11 @@ userEncoder user =
         , ( "last_name", Encode.string user.lastName )
         , ( "nickname", encodeMaybe Encode.string user.nickname )
         , ( "active", Encode.bool user.active )
+        , ( "roles", encodeMaybe (Encode.list roleEncoder) user.roles )
 
         -- Related data @TODO
-        , ( "inserted_at", encodeMaybe encodePosix user.insertedAt )
-        , ( "updated_at", encodeMaybe encodePosix user.updatedAt )
+        , ( "inserted_at", encodePosix user.insertedAt )
+        , ( "updated_at", encodePosix user.updatedAt )
         ]
 
 
@@ -328,8 +346,8 @@ type alias Category =
     , observations : Maybe Observations
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -353,8 +371,29 @@ categoryDecoder =
         |> required "classroom" (nullable (lazy (\_ -> classroomDecoder)))
         |> required "subCategories" (nullable (map Categories (list (lazy (\_ -> categoryDecoder)))))
         |> required "observations" (nullable (map Observations (list (lazy (\_ -> observationDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
+
+
+categoryEncoder : Category -> Value
+categoryEncoder category =
+    let
+        idEncoder (CategoryId val) =
+            Encode.int val
+
+        classroomIdEncoder (ClassroomId val) =
+            Encode.int val
+    in
+    Encode.object
+        [ ( "id", idEncoder category.id )
+        , ( "name", Encode.string category.name )
+        , ( "description", encodeMaybe Encode.string category.description )
+        , ( "parentCategoryId", encodeMaybe idEncoder category.parentCategoryId )
+
+        -- Related data @TODO
+        , ( "inserted_at", encodePosix category.insertedAt )
+        , ( "updated_at", encodePosix category.updatedAt )
+        ]
 
 
 type ObservationId
@@ -399,8 +438,8 @@ type alias Observation =
     , feedback : Maybe FeedbackList
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -416,8 +455,8 @@ observationDecoder =
         |> required "type" observationTypeDecoder
         |> required "categoryId" (map CategoryId int)
         |> required "subCategories" (nullable (map FeedbackList (list (lazy (\_ -> feedbackDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type FeedbackId
@@ -436,8 +475,8 @@ type alias Feedback =
     , explanations : Maybe Explanations
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -453,8 +492,8 @@ feedbackDecoder =
         |> required "observationId" (map ObservationId int)
         |> required "observation" (nullable (lazy (\_ -> observationDecoder)))
         |> required "explanations" (nullable (map Explanations (list (lazy (\_ -> explanationDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type ExplanationId
@@ -472,8 +511,8 @@ type alias Explanation =
     , feedback : Maybe Feedback
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -488,8 +527,8 @@ explanationDecoder =
         |> required "content" string
         |> required "feedbackId" (map FeedbackId int)
         |> required "feedback" (nullable (lazy (\_ -> feedbackDecoder)))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type DraftId
@@ -546,8 +585,8 @@ type alias Draft =
     , grades : Maybe Grades
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -563,8 +602,8 @@ draftDecoder =
         |> required "rotationGroup" (nullable (lazy (\_ -> rotationGroupDecoder)))
         |> required "comments" (nullable (map Comments (list (lazy (\_ -> commentDecoder)))))
         |> required "grades" (nullable (map Grades (list (lazy (\_ -> gradeDecoder)))))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type CommentId
@@ -584,8 +623,8 @@ type alias Comment =
     , user : Maybe User
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -602,8 +641,8 @@ commentDecoder =
         |> required "userId" (map UserId int)
         |> required "draft" (nullable (lazy (\_ -> draftDecoder)))
         |> required "user" (nullable (lazy (\_ -> userDecoder)))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type GradeId
@@ -624,8 +663,8 @@ type alias Grade =
     , draft : Maybe Draft
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -639,8 +678,8 @@ gradeDecoder =
         |> required "draftId" (map DraftId int)
         |> required "category" (nullable (lazy (\_ -> categoryDecoder)))
         |> required "draft" (nullable (lazy (\_ -> draftDecoder)))
-        |> required "insertedAt" (nullable (map Time.millisToPosix int))
-        |> required "updatedAt" (nullable (map Time.millisToPosix int))
+        |> required "insertedAt" (map Time.millisToPosix int)
+        |> required "updatedAt" (map Time.millisToPosix int)
 
 
 type Grades
@@ -662,8 +701,8 @@ type alias Email =
     , draft : Maybe Draft
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
@@ -678,8 +717,8 @@ type alias StudentFeedback =
     , feedback : Maybe Feedback
 
     -- Timestamp data
-    , insertedAt : Maybe Time.Posix
-    , updatedAt : Maybe Time.Posix
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
     }
 
 
