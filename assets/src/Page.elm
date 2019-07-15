@@ -44,9 +44,9 @@ viewPublic { title, content } =
 viewGrid : Html msg -> Html msg -> Html msg -> Html msg
 viewGrid menu content footer =
     div [ id "main-container", class "w-screen h-screen" ]
-        [ div [ id "sidebar", class "bg-blue-900" ] [ div [ class "container p-1" ] [ menu ] ]
+        [ div [ id "sidebar", class "bg-primary" ] [ div [ class "container p-1" ] [ menu ] ]
         , div [ id "content", class "bg-gray-200" ] [ div [ class "container p-1" ] [ content ] ]
-        , div [ id "footer", class "bg-gray-300" ] [ div [ class "container p-1 mx-auto" ] [ footer ] ]
+        , div [ id "footer", class "bg-gray-200" ] [ div [ class "container p-1 mx-auto" ] [ footer ] ]
         ]
 
 
@@ -60,10 +60,10 @@ viewMenu page user =
 userItem : User -> Html msg
 userItem user =
     div [ class "flex items-center m-2" ]
-        [ img [ class "flex-shrink-0 h-10 w-10 rounded-lg mx-1", src "https://avatars3.githubusercontent.com/u/2858049?s=460&v=4" ] []
+        [ img [ class "flex-shrink-0 h-10 w-10 rounded-full mx-1", src "https://avatars3.githubusercontent.com/u/2858049?s=460&v=4" ] []
         , div [ class "text-left w-32" ]
-            [ div [ class "mx-2 text-lg text-blue-200 font-sans truncate" ] [ text "PHY 183 - Studio Physics" ]
-            , div [ class "mx-2 text-xs text-blue-100 font-sans truncate" ] [ text (user.firstName ++ " " ++ user.lastName) ]
+            [ div [ class "mx-2 text-lg text-blue-200 font-display truncate" ] [ text "PHY 183 - Studio Physics" ]
+            , div [ class "mx-2 text-xs text-blue-100 font-display truncate" ] [ text (user.firstName ++ " " ++ user.lastName) ]
             ]
         ]
 

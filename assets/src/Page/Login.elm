@@ -154,7 +154,7 @@ view : Model -> { title : String, content : Html Msg }
 view model =
     { title = "WebCAT - Login"
     , content =
-        div [ class "flex justify-center bg-grey-lighter py-32" ]
+        div [ class "flex justify-center bg-primary py-32" ]
             [ div [ class "w-full h-screen max-w-xs" ]
                 [ Html.form [ class "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
                     [ ul [ class "error-messages" ]

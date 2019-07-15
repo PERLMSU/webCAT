@@ -9,6 +9,7 @@
   <meta name="author" content="">
   <link rel="stylesheet" integrity='<%= Routes.static_integrity(@conn, "/css/app.css") %>' href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
   <link rel="stylesheet" integrity='<%= Routes.static_integrity(@conn, "/css/fa.min.css") %>' href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
   <script integrity='<%= Routes.static_integrity(@conn, "/js/app.js") %>' src='<%= Routes.static_path(@conn, "/js/app.js") %>' defer="defer"></script>
 </head>
 <body>
