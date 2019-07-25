@@ -18,7 +18,7 @@ defmodule WebCATWeb.Auth.ErrorHandlerTest do
         |> get(Routes.user_path(conn, :index))
         |> json_response(401)
 
-      assert Map.fetch!(response, "error") == "no_resource_found"
+      assert Map.fetch!(response, "error") |> Map.fetch!("status") == "401"
     end
 
     test "it handles the unauthenticated users", %{conn: conn} do
@@ -27,7 +27,7 @@ defmodule WebCATWeb.Auth.ErrorHandlerTest do
         |> get(Routes.user_path(conn, :index))
         |> json_response(401)
 
-      assert Map.fetch!(response, "error") == "unauthenticated"
+      assert Map.fetch!(response, "error") |> Map.fetch!("status") == "401"
     end
   end
 end
