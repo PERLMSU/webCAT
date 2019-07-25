@@ -40,7 +40,9 @@ view model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        GotSession session ->
+            init session model.classroomId
 
 
 

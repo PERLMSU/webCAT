@@ -1,4 +1,4 @@
-module Session exposing (Session, changes, credential, fromCredential, navKey)
+module Session exposing (Session, changes, credential, fromCredential, isAuthenticated, navKey)
 
 import API exposing (Credential)
 import Browser.Navigation as Nav
@@ -36,6 +36,16 @@ credential session =
 
         Unauthenticated _ ->
             Nothing
+
+
+isAuthenticated : Session -> Bool
+isAuthenticated session =
+    case session of
+        Authenticated _ _ ->
+            True
+
+        Unauthenticated _ ->
+            False
 
 
 fromCredential : Nav.Key -> Maybe Credential -> Session

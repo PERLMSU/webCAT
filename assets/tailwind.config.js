@@ -1,7 +1,7 @@
 module.exports = {
     theme: {
         fontFamily: {
-            display: ['Open Sans', 'sans-serif']
+            sans: ['Open Sans', 'sans-serif']
         },
         extend: {
             colors: {
@@ -10,9 +10,16 @@ module.exports = {
                 success: "#36F1CD",
                 warning: "#FFFD82",
                 danger: "#E54B4B",
+
+                slate: "#292933",
+                "light-slate": "#32323e",
             }
         }
     },
-    variants: {},
+    variants: {
+        opacity: ['responsive', 'hover'],
+        borderWidth: ['responsive', 'hover'],
+        borderRadius: ['responsive', 'hover'],
+    },
     plugins: []
 }

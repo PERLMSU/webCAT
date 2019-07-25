@@ -1,4 +1,4 @@
-port module API exposing (Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, logout, onStoreChange, post, put, storeCred)
+port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, getRemote, logout, onStoreChange, post, postRemote, put, putRemote, storeCred)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -8,7 +8,7 @@ import Json.Decode as Decode exposing (Decoder, Value, decodeString, field, null
 import Json.Decode.Pipeline as Pipeline exposing (optional, required)
 import Json.Encode as Encode
 import RemoteData exposing (RemoteData)
-import Types exposing (User, userDecoder, userEncoder)
+import Types exposing (User, encodeUser, userDecoder)
 import Url exposing (Url)
 
 
@@ -18,6 +18,14 @@ import Url exposing (Url)
 
 type Credential
     = Credential User String
+
+
+type alias APIData a =
+    RemoteData Error a
+
+
+type alias APIResult a =
+    Result Error a
 
 
 credentialUser : Credential -> User
@@ -37,7 +45,6 @@ credentialDecoder =
         |> required "token" Decode.string
 
 
-
 -- The API can error out
 
 
@@ -48,10 +55,10 @@ type Error
     | NotFound ErrorBody
     | ServerError ErrorBody
       -- Errors that occur because of the transport mechanism
-    | BadUrl String
-    | Timeout String
-    | NetworkError String
-    | BadBody String
+    | BadUrl ErrorBody
+    | Timeout ErrorBody
+    | NetworkError ErrorBody
+    | BadBody ErrorBody
 
 
 type alias ErrorBody =
@@ -78,7 +85,7 @@ storeCred (Credential user token) =
     let
         json =
             Encode.object
-                [ ( "user", userEncoder user )
+                [ ( "user", encodeUser user )
                 , ( "token", Encode.string token )
                 ]
     in
@@ -131,7 +138,7 @@ application config =
 -- HTTP
 
 
-get : Endpoint -> Maybe Credential -> Decoder a -> (Result Error a -> msg) -> Cmd msg
+get : Endpoint -> Maybe Credential -> Decoder a -> (APIResult a -> msg) -> Cmd msg
 get url maybeCred decoder toMsg =
     Endpoint.request
         { method = "GET"
@@ -150,30 +157,36 @@ get url maybeCred decoder toMsg =
         }
 
 
-getRemote : Endpoint -> Maybe Credential -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
+getRemote : Endpoint -> Maybe Credential -> Decoder a -> (APIData a -> msg) -> Cmd msg
 getRemote url maybeCred decoder toMsg =
     get url maybeCred decoder (RemoteData.fromResult >> toMsg)
 
 
-put : Endpoint -> Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
-put url cred body decoder toMsg =
+put : Endpoint -> Maybe Credential -> Body -> Decoder a -> (APIResult a -> msg) -> Cmd msg
+put url maybeCred body decoder toMsg =
     Endpoint.request
         { method = "PUT"
         , url = url
         , expect = expectJson toMsg decoder
-        , headers = [ credentialHeader cred ]
+        , headers =
+            case maybeCred of
+                Just cred ->
+                    [ credentialHeader cred ]
+
+                Nothing ->
+                    []
         , body = body
         , timeout = Nothing
         , tracker = Nothing
         }
 
 
-putRemote : Endpoint -> Credential -> Body -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
-putRemote url cred body decoder toMsg =
-    put url cred body decoder (RemoteData.fromResult >> toMsg)
+putRemote : Endpoint -> Maybe Credential -> Body -> Decoder a -> (APIData a -> msg) -> Cmd msg
+putRemote url maybeCred body decoder toMsg =
+    put url maybeCred body decoder (RemoteData.fromResult >> toMsg)
 
 
-post : Endpoint -> Maybe Credential -> Body -> Decoder a -> (Result Error a -> msg) -> Cmd msg
+post : Endpoint -> Maybe Credential -> Body -> Decoder a -> (APIResult a -> msg) -> Cmd msg
 post url maybeCred body decoder toMsg =
     Endpoint.request
         { method = "POST"
@@ -192,27 +205,33 @@ post url maybeCred body decoder toMsg =
         }
 
 
-postRemote : Endpoint -> Maybe Credential -> Body -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
+postRemote : Endpoint -> Maybe Credential -> Body -> Decoder a -> (APIData a -> msg) -> Cmd msg
 postRemote url maybeCred body decoder toMsg =
     post url maybeCred body decoder (RemoteData.fromResult >> toMsg)
 
 
-delete : Endpoint -> Credential -> Decoder a -> (Result Error a -> msg) -> Cmd msg
-delete url cred decoder toMsg =
+delete : Endpoint -> Maybe Credential -> Decoder a -> (APIResult a -> msg) -> Cmd msg
+delete url maybeCred decoder toMsg =
     Endpoint.request
         { method = "DELETE"
         , url = url
         , expect = expectJson toMsg decoder
-        , headers = [ credentialHeader cred ]
+        , headers =
+            case maybeCred of
+                Just cred ->
+                    [ credentialHeader cred ]
+
+                Nothing ->
+                    []
         , body = Http.emptyBody
         , timeout = Nothing
         , tracker = Nothing
         }
 
 
-deleteRemote : Endpoint -> Credential -> Decoder a -> (RemoteData Error a -> msg) -> Cmd msg
-deleteRemote url cred decoder toMsg =
-    delete url cred decoder (RemoteData.fromResult >> toMsg)
+deleteRemote : Endpoint -> Maybe Credential -> Decoder a -> (APIData a -> msg) -> Cmd msg
+deleteRemote url maybeCred decoder toMsg =
+    delete url maybeCred decoder (RemoteData.fromResult >> toMsg)
 
 
 expectJson : (Result Error a -> msg) -> Decoder a -> Expect msg
@@ -221,13 +240,13 @@ expectJson toMsg decoder =
         \response ->
             case response of
                 Http.BadUrl_ url ->
-                    Err (BadUrl ("Problem with url: " ++ url))
+                    Err (BadUrl { status = "400", title = "Client Error", message = Just <| "Problem with url: " ++ url })
 
                 Http.Timeout_ ->
-                    Err (Timeout "Request timed out")
+                    Err (Timeout { status = "400", title = "Client Error", message = Just "Timed out" })
 
                 Http.NetworkError_ ->
-                    Err (NetworkError "Network error")
+                    Err (NetworkError { status = "400", title = "Client Error", message = Just "Network Error" })
 
                 Http.BadStatus_ metadata body ->
                     case metadata.statusCode of
@@ -252,7 +271,7 @@ expectJson toMsg decoder =
                             Ok value
 
                         Err err ->
-                            Err (BadBody (Decode.errorToString err))
+                            Err (BadBody { status = "500", title = "Unknown Server Error", message = Just <| Decode.errorToString err })
 
 
 

@@ -7,6 +7,7 @@ import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Page
 import Page.Blank as Blank
+import Page.Classrooms as Classrooms
 import Page.Dashboard as Dashboard
 import Page.Login as Login
 import Page.NotFound as NotFound
@@ -47,7 +48,7 @@ type Model
     = Redirect Session
     | NotFound Session
     | Login Login.Model
-    | Dashboard Dashboard.Model
+    | Classrooms Classrooms.Model
 
 
 
@@ -59,7 +60,7 @@ type Msg
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
     | GotLoginMsg Login.Msg
-    | GotDashboardMsg Dashboard.Msg
+    | GotClassroomsMsg Classrooms.Msg
     | GotSession Session
 
 
@@ -75,8 +76,8 @@ toSession page =
         Login login ->
             Login.toSession login
 
-        Dashboard dashboard ->
-            Dashboard.toSession dashboard
+        Classrooms classrooms ->
+            Classrooms.toSession classrooms
 
 
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -84,24 +85,24 @@ changeRouteTo maybeRoute model =
     let
         session =
             toSession model
-
-        _ =
-            Debug.log "session" session
     in
     case maybeRoute of
         Nothing ->
             ( NotFound session, Cmd.none )
 
         Just Route.Root ->
-            ( model, Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing) )
+            ( model, Route.replaceUrl (Session.navKey session) Route.Classrooms )
 
         Just (Route.Login maybeToken) ->
             Login.init session
                 |> updateWith Login GotLoginMsg model
 
-        Just (Route.Dashboard maybeId) ->
-            Dashboard.init session maybeId
-                |> updateWith Dashboard GotDashboardMsg model
+        Just Route.Logout ->
+            ( model, API.logout )
+
+        Just Route.Classrooms ->
+            Classrooms.init session
+                |> updateWith Classrooms GotClassroomsMsg model
 
         Just _ ->
             ( model, Cmd.none )
@@ -113,14 +114,9 @@ update msg model =
         ( ClickedLink urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
-                    case url.fragment of
-                        Nothing ->
-                            ( model, Cmd.none )
-
-                        Just _ ->
-                            ( model
-                            , Nav.pushUrl (Session.navKey (toSession model)) (Url.toString url)
-                            )
+                    ( model
+                    , Nav.pushUrl (Session.navKey (toSession model)) (Url.toString url)
+                    )
 
                 Browser.External href ->
                     ( model
@@ -136,6 +132,10 @@ update msg model =
         ( GotLoginMsg subMsg, Login login ) ->
             Login.update subMsg login
                 |> updateWith Login GotLoginMsg model
+
+        ( GotClassroomsMsg subMsg, Classrooms classrooms ) ->
+            Classrooms.update subMsg classrooms
+                |> updateWith Classrooms GotClassroomsMsg model
 
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
@@ -165,8 +165,8 @@ subscriptions model =
         Login login ->
             Sub.map GotLoginMsg (Login.subscriptions login)
 
-        Dashboard dashboard ->
-            Sub.map GotDashboardMsg (Dashboard.subscriptions dashboard)
+        Classrooms classrooms ->
+            Sub.map GotClassroomsMsg (Classrooms.subscriptions classrooms)
 
 
 
@@ -202,8 +202,8 @@ view model =
                 Login _ ->
                     Page.viewPublic NotFound.view
 
-                Dashboard dashboard ->
-                    viewPage Page.Dashboard GotDashboardMsg (Dashboard.view dashboard)
+                Classrooms classrooms ->
+                    viewPage Page.Classrooms GotClassroomsMsg (Classrooms.view classrooms)
 
         Nothing ->
             let
@@ -226,5 +226,5 @@ view model =
                 Login login ->
                     viewPage GotLoginMsg (Login.view login)
 
-                Dashboard _ ->
+                Classrooms _ ->
                     Page.viewPublic NotFound.view

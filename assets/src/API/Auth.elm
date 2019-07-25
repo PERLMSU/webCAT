@@ -1,6 +1,6 @@
 module API.Auth exposing (login)
 
-import API exposing (Credential, credentialDecoder, post)
+import API exposing (Credential, credentialDecoder, postRemote, APIData)
 import API.Endpoint as Endpoint
 import Http exposing (jsonBody)
 import Json.Decode as D exposing (Decoder, string)
@@ -22,6 +22,6 @@ encodeLogin email password =
         ]
 
 
-login : String -> String -> (Result API.Error Credential -> msg) -> Cmd msg
+login : String -> String -> (APIData Credential -> msg) -> Cmd msg
 login email password toMsg =
-    post Endpoint.login Nothing (jsonBody (encodeLogin email password)) credentialDecoder toMsg
+    postRemote Endpoint.login Nothing (jsonBody (encodeLogin email password)) credentialDecoder toMsg

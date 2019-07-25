@@ -1,86 +1,45 @@
-module API.Classrooms exposing (Classroom, Rotation, RotationGroup, Section, Semester)
+module API.Classrooms exposing (ClassroomForm, classrooms, editClassroom, encodeClassroomForm, formFromClassroom)
 
-import API exposing (Schema)
-import API.Accounts exposing (User)
-import API.Feedback exposing (Category)
+import API exposing (APIData, APIResult)
+import API.Endpoint as Endpoint
+import Http exposing (jsonBody)
+import Json.Decode as Decode
+import Json.Encode as Encode
+import Session exposing (Session)
 import Time as Time
+import Types exposing (..)
 
 
 
--- API Types
+-- Classrooms
 
 
-type alias Classroom =
-    Schema
-        { courseCode : String
-        , name : String
-        , description : Maybe String
-
-        -- Related data
-        , semesters : Maybe (List Semester)
-        , categories : Maybe (List Category)
-        , users : Maybe (List User)
-        }
+classrooms : Session -> (APIData (List Classroom) -> msg) -> Cmd msg
+classrooms session toMsg =
+    API.getRemote Endpoint.classrooms (Session.credential session) (Decode.list classroomDecoder) toMsg
 
 
-type alias Semester =
-    Schema
-        { name : String
-        , description : Maybe String
-        , startDate : Time.Posix
-        , endDate : Time.Posix
-
-        -- Foreign keys
-        , classroomId : Int
-
-        -- Related data
-        , classroom : Maybe Classroom
-        , sections : Maybe (List Section)
-        , users : Maybe (List User)
-        }
+type alias ClassroomForm =
+    { courseCode : String, name : String, description : String }
 
 
-type alias Section =
-    Schema
-        { number : String
-        , description : Maybe String
-
-        -- Foreign keys
-        , semester_id : Int
-
-        -- Related data
-        , semester : Maybe Semester
-        , rotations : Maybe (List Rotation)
-        , users : Maybe (List User)
-        }
+formFromClassroom : Classroom -> ClassroomForm
+formFromClassroom classroom =
+    { courseCode = classroom.courseCode
+    , name = classroom.name
+    , description = Maybe.withDefault "" classroom.description
+    }
 
 
-type alias Rotation =
-    Schema
-        { number : Int
-        , description : Maybe String
-        , startDate : Time.Posix
-        , endDate : Time.Posix
-
-        -- Foreign keys
-        , sectionId : Int
-
-        -- Related data
-        , section : Maybe Section
-        , rotationGroups : Maybe (List RotationGroup)
-        , users : Maybe (List User)
-        }
+encodeClassroomForm : ClassroomForm -> Encode.Value
+encodeClassroomForm form =
+    Encode.object
+        [ ( "course_code", Encode.string form.courseCode )
+        , ( "name", Encode.string form.name )
+        , ( "description", Encode.string form.description )
+        ]
 
 
-type alias RotationGroup =
-    Schema
-        { number : Int
-        , description : Maybe String
-
-        -- Foreign keys
-        , rotationId : Int
-
-        -- Related data
-        , rotation : Maybe Rotation
-        , users : Maybe (List User)
-        }
+editClassroom : Session -> ClassroomId -> ClassroomForm -> (APIData Classroom -> msg) -> Cmd msg
+editClassroom session id form toMsg =
+    API.putRemote (Endpoint.classroom id) (Session.credential session) (jsonBody <| encodeClassroomForm form) classroomDecoder toMsg

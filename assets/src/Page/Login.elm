@@ -1,16 +1,21 @@
-module Page.Login exposing (Form, Model, Msg(..), Problem(..), ValidatedField(..), fieldsToValidate, init, labelView, primaryButton, subscriptions, tertiaryButton, textInput, toSession, update, validate, validateField, view, viewProblem)
+module Page.Login exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
-import API exposing (Credential, Error(..), ErrorBody)
+import API exposing (APIData, Credential, Error(..), ErrorBody)
 import API.Auth as Auth
 import Browser
 import Browser.Navigation as Nav
+import Components.Common as Common exposing (Style(..))
+import Components.Form as Form
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import Process as Process
+import RemoteData exposing (RemoteData(..))
 import Route
 import Session exposing (Session)
 import Url
+import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
 
 
 
@@ -19,8 +24,8 @@ import Url
 
 type alias Model =
     { session : Session
-    , errors : List Problem
-    , loading : Bool
+    , credential : APIData Credential
+    , formErrors : List ( Field, String )
     , form : Form
     }
 
@@ -31,18 +36,13 @@ type alias Form =
     }
 
 
-type Problem
-    = InvalidEntry ValidatedField String
-    | ServerError String
-
-
 init : Session -> ( Model, Cmd Msg )
 init session =
     let
         model =
             { session = session
-            , errors = []
-            , loading = False
+            , credential = NotAsked
+            , formErrors = []
             , form =
                 { email = ""
                 , password = ""
@@ -54,7 +54,7 @@ init session =
             ( model, Cmd.none )
 
         Just _ ->
-            ( model, Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing) )
+            ( model, Route.replaceUrl (Session.navKey session) Route.Classrooms )
 
 
 
@@ -66,7 +66,7 @@ type Msg
     | PasswordChanged String
     | SignIn
     | ForgotPassword
-    | Response (Result Error Credential)
+    | Response (APIData Credential)
     | GotSession Session
 
 
@@ -80,57 +80,31 @@ update msg model =
             updateForm (\form -> { form | password = pass }) model
 
         SignIn ->
-            case validate model.form of
-                Ok form ->
-                    ( { model | errors = [], loading = True }
+            case validate validator model.form of
+                Ok validated ->
+                    let
+                        form =
+                            Validate.fromValid validated
+                    in
+                    ( { model | formErrors = [], credential = Loading }
                     , Auth.login form.email form.password Response
                     )
 
                 Err errors ->
-                    ( { model | errors = errors }
+                    ( { model | formErrors = errors }
                     , Cmd.none
                     )
 
         ForgotPassword ->
             Debug.todo "forgot password"
 
-        Response (Err error) ->
-            let
-                serverErrors =
-                    case error of
-                        BadRequest errBody ->
-                            [ ServerError <| API.errorBodyToString errBody ]
+        Response res ->
+            case res of
+                Success cred ->
+                    ( { model | credential = res }, API.storeCred cred )
 
-                        Unauthorized errBody ->
-                            [ ServerError <| API.errorBodyToString errBody ]
-
-                        Forbidden errBody ->
-                            [ ServerError <| API.errorBodyToString errBody ]
-
-                        NotFound errBody ->
-                            [ ServerError <| API.errorBodyToString errBody ]
-
-                        API.ServerError errBody ->
-                            [ ServerError <| API.errorBodyToString errBody ]
-
-                        BadUrl errMsg ->
-                            [ ServerError errMsg ]
-
-                        Timeout errMsg ->
-                            [ ServerError errMsg ]
-
-                        NetworkError errMsg ->
-                            [ ServerError errMsg ]
-
-                        BadBody errMsg ->
-                            [ ServerError errMsg ]
-            in
-            ( { model | errors = List.append model.errors serverErrors, loading = False }
-            , Cmd.none
-            )
-
-        Response (Ok cred) ->
-            ( { model | loading = False }, API.storeCred cred )
+                _ ->
+                    ( { model | credential = res }, Cmd.none )
 
         GotSession session ->
             case Session.credential session of
@@ -138,7 +112,7 @@ update msg model =
                     ( { model | session = session }, Cmd.none )
 
                 Just _ ->
-                    ( { model | session = session, errors = [ ServerError "Problem decoding session" ] }, Route.replaceUrl (Session.navKey session) (Route.Dashboard Nothing) )
+                    ( { model | session = session }, Route.replaceUrl (Session.navKey session) Route.Classrooms )
 
 
 updateForm : (Form -> Form) -> Model -> ( Model, Cmd Msg )
@@ -154,64 +128,42 @@ view : Model -> { title : String, content : Html Msg }
 view model =
     { title = "WebCAT - Login"
     , content =
-        div [ class "flex justify-center bg-primary py-32" ]
-            [ div [ class "w-full h-screen max-w-xs" ]
-                [ Html.form [ class "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
-                    [ ul [ class "error-messages" ]
-                        (List.map viewProblem model.errors)
-                    , div [ class "mb-4" ]
-                        [ labelView "Email" "email"
-                        , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker leading-tight focus:outline-none focus:shadow-outline", id "email", placeholder "Email", type_ "text", onInput EmailChanged ]
-                            [ text model.form.email ]
-                        ]
-                    , div [ class "mb-6" ]
-                        [ labelView "Password" "password"
-                        , input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline", id "password", placeholder "************", type_ "password", onInput PasswordChanged ]
-                            [ text model.form.password ]
-                        ]
-                    , div [ class "flex items-center justify-between" ]
-                        [ primaryButton SignIn "Sign In"
-                        , tertiaryButton ForgotPassword "Forgot Password"
+        case model.credential of
+            Success _ ->
+                div [ class "flex justify-center bg-slate py-32" ]
+                    [ div [ class "w-full h-screen max-w-xs" ]
+                        [ Html.form [ class "bg-light-slate shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
+                            [ div [ class "text-center py-6" ] [ Common.icon Successful "checkbox" ]
+                            ]
                         ]
                     ]
-                ]
-            ]
+
+            Loading ->
+                div [ class "flex justify-center bg-slate py-32" ]
+                    [ div [ class "w-full h-screen max-w-xs" ]
+                        [ Html.form [ class "bg-light-slate shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
+                            [ Common.loading
+                            ]
+                        ]
+                    ]
+
+            _ ->
+                div [ class "flex justify-center bg-slate py-32" ]
+                    [ div [ class "w-full h-screen max-w-xs" ]
+                        [ Html.form [ class "bg-light-slate shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
+                            [ Form.label "Email" "email"
+                            , Form.textInput "email" Email model.formErrors EmailChanged model.form.email
+                            , Form.label "Password" "password"
+                            , Form.passwordInput "password" Password model.formErrors PasswordChanged model.form.password
+                            , div [ class "flex items-center justify-between" ]
+                                [ Common.successButton "Sign In" SignIn
+
+                                --, primaryButton ForgotPassword "Forgot Password"
+                                ]
+                            ]
+                        ]
+                    ]
     }
-
-
-viewProblem : Problem -> Html msg
-viewProblem problem =
-    let
-        errorMessage =
-            case problem of
-                InvalidEntry _ str ->
-                    str
-
-                ServerError str ->
-                    str
-    in
-    li [] [ text errorMessage ]
-
-
-labelView : String -> String -> Html msg
-labelView content for =
-    label [ class "block text-grey-darker text-sm font-bold mb-2", Html.Attributes.for for ]
-        [ text content ]
-
-
-textInput : (String -> Msg) -> String -> String -> Html Msg
-textInput toMsg id_ placeholder_ =
-    input [ class "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline", id id_, placeholder placeholder_, onInput toMsg ] [ text "" ]
-
-
-primaryButton : Msg -> String -> Html Msg
-primaryButton toMsg content =
-    button [ class "bg-blue hover:bg-blue-dark text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline", type_ "button", onClick toMsg ] [ text content ]
-
-
-tertiaryButton : Msg -> String -> Html Msg
-tertiaryButton toMsg content =
-    button [ class "text-gray", type_ "button", onClick toMsg ] [ text content ]
 
 
 
@@ -229,53 +181,20 @@ subscriptions model =
 
 {-| When adding a variant here, add it to `fieldsToValidate` too!
 -}
-type ValidatedField
+type Field
     = Email
     | Password
 
 
-fieldsToValidate : List ValidatedField
-fieldsToValidate =
-    [ Email
-    , Password
-    ]
-
-
-{-| Trim the form and validate its fields. If there are problems, report them!
--}
-validate : Form -> Result (List Problem) Form
-validate form =
-    let
-        trimmedForm =
-            { email = String.trim form.email
-            , password = String.trim form.password
-            }
-    in
-    case List.concatMap (validateField trimmedForm) fieldsToValidate of
-        [] ->
-            Ok trimmedForm
-
-        problems ->
-            Err problems
-
-
-validateField : Form -> ValidatedField -> List Problem
-validateField form field =
-    List.map (InvalidEntry field) <|
-        case field of
-            Email ->
-                if String.isEmpty form.email then
-                    [ "email can't be blank." ]
-
-                else
-                    []
-
-            Password ->
-                if String.isEmpty form.password then
-                    [ "password can't be blank." ]
-
-                else
-                    []
+validator : Validator ( Field, String ) Form
+validator =
+    Validate.all
+        [ Validate.firstError
+            [ ifBlank .email ( Email, "Please enter your email" )
+            , ifInvalidEmail .email (\email -> ( Email, email ++ " is not a valid email address" ))
+            ]
+        , ifBlank .password ( Password, "Please enter your password" )
+        ]
 
 
 

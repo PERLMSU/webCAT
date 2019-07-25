@@ -1,7 +1,6 @@
 defmodule WebCAT.Import.Registry do
   use GenServer
 
-
   ## Client API
 
   @doc """
@@ -39,8 +38,7 @@ defmodule WebCAT.Import.Registry do
 
   @impl GenServer
   def handle_cast({:add, path}, %{queue: queue} = state) do
-    {:noreply,
-     Map.put(state, :queue, :queue.in(%{start_time: Timex.now(), path: path}, queue))}
+    {:noreply, Map.put(state, :queue, :queue.in(%{start_time: Timex.now(), path: path}, queue))}
   end
 
   @impl GenServer

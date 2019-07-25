@@ -1,32 +1,22 @@
-module TypeFuzzers exposing (userFuzzer, userIdFuzzer, usersFuzzer)
+module TypeFuzzers exposing (userFuzzer)
 
-import Fuzz exposing (Fuzzer, bool, int, list, map, maybe, string)
+import Fuzz exposing (Fuzzer, andMap, bool, int, list, map, maybe, string)
 import FuzzUtils exposing (emailFuzzer, nameFuzzer, nothing, posixFuzzer, surnameFuzzer)
-import Types exposing (User, UserId(..), Users(..))
-
-
-userIdFuzzer : Fuzzer UserId
-userIdFuzzer =
-    map UserId int
+import Types exposing (..)
 
 
 userFuzzer : Fuzzer User
 userFuzzer =
-    map User userIdFuzzer
-        |> Fuzz.andMap emailFuzzer
-        |> Fuzz.andMap nameFuzzer
-        |> Fuzz.andMap (maybe nameFuzzer)
-        |> Fuzz.andMap surnameFuzzer
-        |> Fuzz.andMap (maybe nameFuzzer)
-        |> Fuzz.andMap bool
-        |> Fuzz.andMap nothing
-        |> Fuzz.andMap nothing
-        |> Fuzz.andMap nothing
-        |> Fuzz.andMap nothing
-        |> Fuzz.andMap posixFuzzer
-        |> Fuzz.andMap posixFuzzer
-
-
-usersFuzzer : Fuzzer Users
-usersFuzzer =
-    map Users (list userFuzzer)
+    map User (map UserId int)
+        |> andMap emailFuzzer
+        |> andMap nameFuzzer
+        |> andMap (maybe nameFuzzer)
+        |> andMap surnameFuzzer
+        |> andMap (maybe nameFuzzer)
+        |> andMap bool
+        |> andMap nothing
+        |> andMap nothing
+        |> andMap nothing
+        |> andMap nothing
+        |> andMap posixFuzzer
+        |> andMap posixFuzzer

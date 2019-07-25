@@ -1,4 +1,4 @@
-module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), observationTypeDecoder, roleDecoder, userDecoder, userEncoder)
+module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), categoryDecoder, classroomDecoder, commentDecoder, draftDecoder, draftStatusDecoder, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, observationDecoder, observationTypeDecoder, optionalMaybe, roleDecoder, roleEncoder, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, userDecoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Pipeline exposing (optional, required)
@@ -39,14 +39,14 @@ classroomDecoder : Decoder Classroom
 classroomDecoder =
     Decode.succeed Classroom
         |> required "id" (map ClassroomId int)
-        |> required "courseCode" string
+        |> required "course_code" string
         |> required "name" string
-        |> required "description" (nullable string)
-        |> required "semesters" (nullable (map Semesters (list (lazy (\_ -> semesterDecoder)))))
-        |> required "categories" (nullable (map Categories (list (lazy (\_ -> categoryDecoder)))))
-        |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> optionalMaybe "description" (nullable string)
+        |> optionalMaybe "semesters" (nullable (map Semesters (list (lazy (\_ -> semesterDecoder)))))
+        |> optionalMaybe "categories" (nullable (map Categories (list (lazy (\_ -> categoryDecoder)))))
+        |> optionalMaybe "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type SemesterId
@@ -83,15 +83,15 @@ semesterDecoder =
     Decode.succeed Semester
         |> required "id" (map SemesterId int)
         |> required "name" string
-        |> required "description" (nullable string)
-        |> required "startDate" (map Time.millisToPosix int)
-        |> required "endDate" (map Time.millisToPosix int)
-        |> required "classroomId" (map ClassroomId int)
-        |> required "classroom" (nullable (lazy (\_ -> classroomDecoder)))
-        |> required "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder)))))
-        |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> optionalMaybe "description" (nullable string)
+        |> required "start_date" (map Time.millisToPosix int)
+        |> required "end_date" (map Time.millisToPosix int)
+        |> required "classroom_id" (map ClassroomId int)
+        |> optionalMaybe "classroom" (nullable (lazy (\_ -> classroomDecoder)))
+        |> optionalMaybe "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder)))))
+        |> optionalMaybe "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type SectionId
@@ -126,13 +126,13 @@ sectionDecoder =
     Decode.succeed Section
         |> required "id" (map SectionId int)
         |> required "number" string
-        |> required "description" (nullable string)
-        |> required "semesterId" (map SemesterId int)
-        |> required "semester" (nullable (lazy (\_ -> semesterDecoder)))
-        |> required "rotations" (nullable (map Rotations (list (lazy (\_ -> rotationDecoder)))))
-        |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> optionalMaybe "description" (nullable string)
+        |> required "semester_id" (map SemesterId int)
+        |> optionalMaybe "semester" (nullable (lazy (\_ -> semesterDecoder)))
+        |> optionalMaybe "rotations" (nullable (map Rotations (list (lazy (\_ -> rotationDecoder)))))
+        |> optionalMaybe "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type RotationId
@@ -169,15 +169,15 @@ rotationDecoder =
     Decode.succeed Rotation
         |> required "id" (map RotationId int)
         |> required "number" int
-        |> required "description" (nullable string)
-        |> required "startDate" (map Time.millisToPosix int)
-        |> required "endDate" (map Time.millisToPosix int)
-        |> required "sectionId" (map SectionId int)
-        |> required "section" (nullable (lazy (\_ -> sectionDecoder)))
-        |> required "rotationGroups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder)))))
-        |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> optionalMaybe "description" (nullable string)
+        |> required "start_date" (map Time.millisToPosix int)
+        |> required "end_date" (map Time.millisToPosix int)
+        |> required "section_id" (map SectionId int)
+        |> optionalMaybe "section" (nullable (lazy (\_ -> sectionDecoder)))
+        |> optionalMaybe "rotation_groups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder)))))
+        |> optionalMaybe "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type RotationGroupId
@@ -211,10 +211,10 @@ rotationGroupDecoder =
     Decode.succeed RotationGroup
         |> required "id" (map RotationGroupId int)
         |> required "number" int
-        |> required "description" (nullable string)
+        |> optionalMaybe "description" (nullable string)
         |> required "rotation_id" (map RotationId int)
-        |> required "rotation" (nullable (lazy (\_ -> rotationDecoder)))
-        |> required "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
+        |> optionalMaybe "rotation" (nullable (lazy (\_ -> rotationDecoder)))
+        |> optionalMaybe "users" (nullable (map Users (list (lazy (\_ -> userDecoder)))))
         |> required "inserted_at" (map Time.millisToPosix int)
         |> required "updated_at" (map Time.millisToPosix int)
 
@@ -288,20 +288,20 @@ userDecoder =
         |> required "id" (map UserId int)
         |> required "email" string
         |> required "first_name" string
-        |> required "middle_name" (nullable string)
+        |> optionalMaybe "middle_name" (nullable string)
         |> required "last_name" string
-        |> required "nickname" (nullable string)
+        |> optionalMaybe "nickname" (nullable string)
         |> required "active" bool
-        |> optional "roles" (nullable (list (lazy (\_ -> roleDecoder)))) Nothing
-        |> optional "classrooms" (nullable (map Classrooms (list (lazy (\_ -> classroomDecoder))))) Nothing
-        |> optional "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder))))) Nothing
-        |> optional "rotation_groups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder))))) Nothing
+        |> optionalMaybe "roles" (nullable (list (lazy (\_ -> roleDecoder))))
+        |> optionalMaybe "classrooms" (nullable (map Classrooms (list (lazy (\_ -> classroomDecoder)))))
+        |> optionalMaybe "sections" (nullable (map Sections (list (lazy (\_ -> sectionDecoder)))))
+        |> optionalMaybe "rotation_groups" (nullable (map RotationGroups (list (lazy (\_ -> rotationGroupDecoder)))))
         |> required "inserted_at" (map Time.millisToPosix int)
         |> required "updated_at" (map Time.millisToPosix int)
 
 
-userEncoder : User -> Value
-userEncoder user =
+encodeUser : User -> Value
+encodeUser user =
     let
         idEncoder (UserId val) =
             Encode.int val
@@ -365,35 +365,14 @@ categoryDecoder =
         |> required "id" (map CategoryId int)
         |> required "name" string
         |> required "description" (nullable string)
-        |> required "parentCategoryId" (nullable (map CategoryId int))
-        |> required "classroomId" (map ClassroomId int)
-        |> required "parentCategory" (nullable (map ParentCategory (lazy (\_ -> categoryDecoder))))
-        |> required "classroom" (nullable (lazy (\_ -> classroomDecoder)))
-        |> required "subCategories" (nullable (map Categories (list (lazy (\_ -> categoryDecoder)))))
-        |> required "observations" (nullable (map Observations (list (lazy (\_ -> observationDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
-
-
-categoryEncoder : Category -> Value
-categoryEncoder category =
-    let
-        idEncoder (CategoryId val) =
-            Encode.int val
-
-        classroomIdEncoder (ClassroomId val) =
-            Encode.int val
-    in
-    Encode.object
-        [ ( "id", idEncoder category.id )
-        , ( "name", Encode.string category.name )
-        , ( "description", encodeMaybe Encode.string category.description )
-        , ( "parentCategoryId", encodeMaybe idEncoder category.parentCategoryId )
-
-        -- Related data @TODO
-        , ( "inserted_at", encodePosix category.insertedAt )
-        , ( "updated_at", encodePosix category.updatedAt )
-        ]
+        |> optionalMaybe "parent_category_id" (nullable (map CategoryId int))
+        |> required "classroom_id" (map ClassroomId int)
+        |> optionalMaybe "parent_category" (nullable (map ParentCategory (lazy (\_ -> categoryDecoder))))
+        |> optionalMaybe "classroom" (nullable (lazy (\_ -> classroomDecoder)))
+        |> optionalMaybe "sub_categories" (nullable (map Categories (list (lazy (\_ -> categoryDecoder)))))
+        |> optionalMaybe "observations" (nullable (map Observations (list (lazy (\_ -> observationDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type ObservationId
@@ -453,10 +432,10 @@ observationDecoder =
         |> required "id" (map ObservationId int)
         |> required "content" string
         |> required "type" observationTypeDecoder
-        |> required "categoryId" (map CategoryId int)
-        |> required "subCategories" (nullable (map FeedbackList (list (lazy (\_ -> feedbackDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> required "category_id" (map CategoryId int)
+        |> optionalMaybe "feedback" (nullable (map FeedbackList (list (lazy (\_ -> feedbackDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type FeedbackId
@@ -489,11 +468,11 @@ feedbackDecoder =
     Decode.succeed Feedback
         |> required "id" (map FeedbackId int)
         |> required "content" string
-        |> required "observationId" (map ObservationId int)
-        |> required "observation" (nullable (lazy (\_ -> observationDecoder)))
-        |> required "explanations" (nullable (map Explanations (list (lazy (\_ -> explanationDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> required "observation_id" (map ObservationId int)
+        |> optionalMaybe "observation" (nullable (lazy (\_ -> observationDecoder)))
+        |> optionalMaybe "explanations" (nullable (map Explanations (list (lazy (\_ -> explanationDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type ExplanationId
@@ -525,10 +504,10 @@ explanationDecoder =
     Decode.succeed Explanation
         |> required "id" (map ExplanationId int)
         |> required "content" string
-        |> required "feedbackId" (map FeedbackId int)
-        |> required "feedback" (nullable (lazy (\_ -> feedbackDecoder)))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> required "feedback_id" (map FeedbackId int)
+        |> optionalMaybe "feedback" (nullable (lazy (\_ -> feedbackDecoder)))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type DraftId
@@ -597,13 +576,13 @@ draftDecoder =
         |> required "content" string
         |> required "status" draftStatusDecoder
         |> required "userId" (map UserId int)
-        |> required "rotationGroupId" (map RotationGroupId int)
-        |> required "user" (nullable (lazy (\_ -> userDecoder)))
-        |> required "rotationGroup" (nullable (lazy (\_ -> rotationGroupDecoder)))
-        |> required "comments" (nullable (map Comments (list (lazy (\_ -> commentDecoder)))))
-        |> required "grades" (nullable (map Grades (list (lazy (\_ -> gradeDecoder)))))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> required "rotation_groupId" (map RotationGroupId int)
+        |> optionalMaybe "user" (nullable (lazy (\_ -> userDecoder)))
+        |> optionalMaybe "rotation_group" (nullable (lazy (\_ -> rotationGroupDecoder)))
+        |> optionalMaybe "comments" (nullable (map Comments (list (lazy (\_ -> commentDecoder)))))
+        |> optionalMaybe "grades" (nullable (map Grades (list (lazy (\_ -> gradeDecoder)))))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type CommentId
@@ -639,10 +618,10 @@ commentDecoder =
         |> required "content" string
         |> required "draftId" (map DraftId int)
         |> required "userId" (map UserId int)
-        |> required "draft" (nullable (lazy (\_ -> draftDecoder)))
-        |> required "user" (nullable (lazy (\_ -> userDecoder)))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> optionalMaybe "draft" (nullable (lazy (\_ -> draftDecoder)))
+        |> optionalMaybe "user" (nullable (lazy (\_ -> userDecoder)))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type GradeId
@@ -673,13 +652,13 @@ gradeDecoder =
     Decode.succeed Grade
         |> required "id" (map GradeId int)
         |> required "score" int
-        |> required "note" (nullable string)
+        |> optionalMaybe "note" (nullable string)
         |> required "categoryId" (map CategoryId int)
         |> required "draftId" (map DraftId int)
-        |> required "category" (nullable (lazy (\_ -> categoryDecoder)))
-        |> required "draft" (nullable (lazy (\_ -> draftDecoder)))
-        |> required "insertedAt" (map Time.millisToPosix int)
-        |> required "updatedAt" (map Time.millisToPosix int)
+        |> optionalMaybe "category" (nullable (lazy (\_ -> categoryDecoder)))
+        |> optionalMaybe "draft" (nullable (lazy (\_ -> draftDecoder)))
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type Grades
@@ -695,7 +674,7 @@ type alias Email =
     , status : String
 
     -- Foreign keys
-    , draftIf : DraftId
+    , draftId : DraftId
 
     -- Related data
     , draft : Maybe Draft
@@ -704,6 +683,17 @@ type alias Email =
     , insertedAt : Time.Posix
     , updatedAt : Time.Posix
     }
+
+
+emailDecoder : Decoder Email
+emailDecoder =
+    Decode.succeed Email
+        |> required "id" (map EmailId int)
+        |> required "status" string
+        |> required "draft_id" (map DraftId int)
+        |> optionalMaybe "draft" (nullable draftDecoder)
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "inserted_at" (map Time.millisToPosix int)
 
 
 type alias StudentFeedback =
@@ -739,3 +729,8 @@ encodeMaybe toValue maybe =
 encodePosix : Time.Posix -> Value
 encodePosix time =
     Encode.int (Time.posixToMillis time)
+
+
+optionalMaybe : String -> Decoder (Maybe a) -> Decoder (Maybe a -> b) -> Decoder b
+optionalMaybe key valDecoder decoder =
+    optional key valDecoder Nothing decoder

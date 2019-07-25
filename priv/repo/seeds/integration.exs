@@ -266,9 +266,13 @@ transaction =
     |> Draft.changeset(%{
       content: "Example draft",
       status: "approved",
-      user_id: transaction.fall_student_1.id,
+      reviewer_id: transaction.admin.id,
+      student_id: transaction.fall_student_1.id,
       rotation_group_id: transaction.rotation_group_1.id
     })
+    |> Changeset.put_assoc(:authors, [
+      transaction.assistant
+    ])
     |> repo.insert()
   end)
   |> Multi.run(:comment_1, fn repo, transaction ->

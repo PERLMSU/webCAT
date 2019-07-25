@@ -19,6 +19,7 @@ type Page
     = Other
     | Dashboard
     | Login
+    | Classrooms
 
 
 {-| Take a page's Html and frames it with a header and footer.
@@ -44,52 +45,59 @@ viewPublic { title, content } =
 viewGrid : Html msg -> Html msg -> Html msg -> Html msg
 viewGrid menu content footer =
     div [ id "main-container", class "w-screen h-screen" ]
-        [ div [ id "sidebar", class "bg-primary" ] [ div [ class "container p-1" ] [ menu ] ]
-        , div [ id "content", class "bg-gray-200" ] [ div [ class "container p-1" ] [ content ] ]
-        , div [ id "footer", class "bg-gray-200" ] [ div [ class "container p-1 mx-auto" ] [ footer ] ]
+        [ div [ id "sidebar", class "bg-light-slate" ] [ div [ class "" ] [ menu ] ]
+        , div [ id "content", class "bg-slate" ] [ div [ class "container p-1" ] [ content ] ]
+        , div [ id "footer", class "bg-slate border border-light-slate" ] [ div [ class "container p-1 mx-auto" ] [ footer ] ]
         ]
 
 
 viewMenu : Page -> User -> Html msg
 viewMenu page user =
-    div []
-        [ userItem user
-        ]
+    let
+        userItem =
+            div [ class "flex items-center m-2" ]
+                [ img [ class "flex-shrink-0 h-10 w-10 rounded-full mx-1", src "https://avatars3.githubusercontent.com/u/2858049?s=460&v=4" ] []
+                , div [ class "text-left w-32" ]
+                    [ div [ class "mx-2 text-lg text-blue-200 font-display truncate" ] [ text "PHY 183 - Studio Physics" ]
+                    , div [ class "mx-2 text-xs text-blue-100 font-display truncate" ] [ text (user.firstName ++ " " ++ user.lastName) ]
+                    ]
+                ]
 
-
-userItem : User -> Html msg
-userItem user =
-    div [ class "flex items-center m-2" ]
-        [ img [ class "flex-shrink-0 h-10 w-10 rounded-full mx-1", src "https://avatars3.githubusercontent.com/u/2858049?s=460&v=4" ] []
-        , div [ class "text-left w-32" ]
-            [ div [ class "mx-2 text-lg text-blue-200 font-display truncate" ] [ text "PHY 183 - Studio Physics" ]
-            , div [ class "mx-2 text-xs text-blue-100 font-display truncate" ] [ text (user.firstName ++ " " ++ user.lastName) ]
+        menuItem txt icon route =
+            div [ classList [ ( "my-2 py-1 mx-1", True ), ( "bg-slate rounded", isActive page route ) ] ]
+                [ a [ Route.href route, class "pl-4 text-blue-100 no-underline w-full" ]
+                    [ i [ class ("w-4 fas fa-" ++ icon) ] []
+                    , span [ class "font-display ml-4" ] [ text txt ]
+                    ]
+                ]
+    in
+    div [ class "flex flex-col" ]
+        [ div [ class "my-2" ] [ userItem ]
+        , div [ class "my-2" ]
+            [ menuItem "Classrooms" "university" Route.Classrooms
+            , menuItem "Users" "users" Route.Users
+            , menuItem "Feedback" "pen" Route.Feedback
+            , menuItem "Inbox" "inbox" Route.Drafts
+            ]
+        , div [ class "my-2" ]
+            [ menuItem "Logout" "sign-out-alt" Route.Logout
             ]
         ]
 
 
 viewFooter : Html msg
 viewFooter =
-    footer [ class "py-1" ]
-        [ div [ class "text-center" ]
-            [ p [ class "font-sans text-gray-600" ] [ text "Version 0.3.0-dev | Built on 2019-6-27 at 1:52pm EDT" ]
-            ]
+    footer [ class "flex justify-center py-1" ]
+        [ p [ class "text-center text-gray-600 mx-2" ] [ text "Version 0.4.0-dev" ]
+        , p [ class "text-center text-gray-600 mx-2" ] [ text "|" ]
+        , p [ class "text-center text-gray-600 mx-2" ] [ text "Built on 2019-6-27 at 1:52pm EDT" ]
         ]
-
-
-navbarLink : Page -> Route -> List (Html msg) -> Html msg
-navbarLink page route linkContent =
-    li [ classList [ ( "nav-item", True ), ( "active", isActive page route ) ] ]
-        [ a [ class "nav-link", Route.href route ] linkContent ]
 
 
 isActive : Page -> Route -> Bool
 isActive page route =
     case ( page, route ) of
-        ( Dashboard, Route.Dashboard _ ) ->
-            True
-
-        ( Login, Route.Login _ ) ->
+        ( Classrooms, Route.Classrooms ) ->
             True
 
         _ ->
