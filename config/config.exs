@@ -25,7 +25,7 @@ config :webcat, WebCATWeb.Auth.Guardian,
   secret_key: :crypto.strong_rand_bytes(64)
 
 config :phoenix, :json_library, Jason
-
+config :bamboo, :json_library, Jason
 config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
 
 # Configures Elixir's Logger
