@@ -25,6 +25,8 @@ config :webcat, WebCATWeb.Auth.Guardian,
 
 config :phoenix, :json_library, Jason
 
+config :bamboo, :json_library, Jason
+
 config :webcat, WebCAT.Mailer, adapter: Bamboo.LocalAdapter
 
 # Configures Elixir's Logger
