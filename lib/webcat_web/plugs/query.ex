@@ -24,7 +24,7 @@ defmodule WebCATWeb.Plug.Query do
 
   defp parse_sort(%{sort: sort} = query, sort_opts) when is_list(sort) do
     Map.update!(query, :sort, fn sort ->
-      sort
+      parsed = sort
       |> Enum.map(fn field ->
         [_, direction, field] = Regex.run(~r/(-?)(\S*)/, field)
 
@@ -37,6 +37,9 @@ defmodule WebCATWeb.Plug.Query do
         Enum.any?(sort_opts, fn opt -> opt == field or to_string(opt) == field end)
       end)
       |> Enum.map(fn {dir, field} -> {dir, String.to_atom(field)} end)
+
+      # All schemas have timestamps, so all can be sorted by timestamps
+      [:inserted_at | [:updated_at | parsed]]
     end)
   end
 

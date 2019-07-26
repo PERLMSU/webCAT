@@ -8,8 +8,8 @@ defmodule WebCATWeb.FeedbackController do
   action_fallback(WebCATWeb.FallbackController)
 
   plug WebCATWeb.Plug.Query,
-    sort: ~w(name parent_category_id classroom_id)a,
-    filter: ~w(parent_category_id classroom_id)a,
+    sort: ~w(content observation_id)a,
+    filter: ~w(observation_id)a,
     fields: Feedback.__schema__(:fields),
     include: Feedback.__schema__(:associations)
 

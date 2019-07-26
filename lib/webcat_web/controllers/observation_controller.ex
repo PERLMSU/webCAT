@@ -8,8 +8,8 @@ defmodule WebCATWeb.ObservationController do
   action_fallback(WebCATWeb.FallbackController)
 
   plug WebCATWeb.Plug.Query,
-    sort: ~w(name parent_category_id classroom_id)a,
-    filter: ~w(parent_category_id classroom_id)a,
+    sort: ~w(content type category_id)a,
+    filter: ~w(category_id type)a,
     fields: Observation.__schema__(:fields),
     include: Observation.__schema__(:associations)
 
