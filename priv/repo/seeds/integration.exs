@@ -240,21 +240,21 @@ transaction =
     })
     |> repo.insert()
   end)
-  |> Multi.run(:student_feedback_1, fn repo, transaction ->
+  |> Multi.run(:student_feedback_1, fn _repo, transaction ->
     StudentFeedback.add(
       transaction.rotation_group_1.id,
       transaction.fall_student_1.id,
       transaction.feedback_1.id
     )
   end)
-  |> Multi.run(:student_feedback_2, fn repo, transaction ->
+  |> Multi.run(:student_feedback_2, fn _repo, transaction ->
     StudentFeedback.add(
       transaction.rotation_group_1.id,
       transaction.fall_student_1.id,
       transaction.feedback_2.id
     )
   end)
-  |> Multi.run(:student_feedback_3, fn repo, transaction ->
+  |> Multi.run(:student_feedback_3, fn _repo, transaction ->
     StudentFeedback.add(
       transaction.rotation_group_1.id,
       transaction.fall_student_1.id,

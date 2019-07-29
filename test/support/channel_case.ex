@@ -19,6 +19,8 @@ defmodule WebCATWeb.ChannelCase do
     quote do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
+      alias WebCATWeb.Auth.Guardian, as: Auth
+      alias WebCAT.Factory
 
       # The default endpoint for testing
       @endpoint WebCATWeb.Endpoint

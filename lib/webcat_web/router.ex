@@ -68,6 +68,25 @@ defmodule WebCATWeb.Router do
       StudentFeedbackController,
       :delete
     )
+
+    # Feedback writer - explanations
+    get(
+      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id/explanations",
+      StudentExplanationController,
+      :index
+    )
+
+    post(
+      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id/explanations/:explanation_id",
+      StudentExplanationController,
+      :create
+    )
+
+    delete(
+      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id/explanations/:explanation_id",
+      StudentExplanationController,
+      :delete
+    )
   end
 
   scope "/", WebCATWeb do

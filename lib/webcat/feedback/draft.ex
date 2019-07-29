@@ -59,7 +59,7 @@ defmodule WebCAT.Feedback.Draft do
       |> Enum.reject(&is_nil/1)
 
     # This is being forced because we know if a list of ids are being passed, we want to overwrite.
-    # This is not the recommended behavior of changesets, be warned, but it's a huge inconvenience to preload something
+    # This is not the recommended behavior of changesets, be warned, but it's an inconvenience to preload something
     # we know is just going to be trashed in the same transaction.
     changeset
     |> Map.put(:data, Map.put(changeset.data, :authors, []))

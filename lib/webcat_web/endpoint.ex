@@ -2,6 +2,8 @@ defmodule WebCATWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :webcat
   use Sentry.Phoenix.Endpoint
 
+  socket("/socket", WebCATWeb.UserSocket)
+
   plug(Plug.Static,
     at: "/static",
     from: :webcat,

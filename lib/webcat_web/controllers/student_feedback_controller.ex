@@ -36,6 +36,7 @@ defmodule WebCATWeb.StudentFeedbackController do
       }) do
     permissions do
       has_role(:admin)
+      has_role(:assistant)
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
@@ -60,6 +61,7 @@ defmodule WebCATWeb.StudentFeedbackController do
       }) do
     permissions do
       has_role(:admin)
+      has_role(:assistant)
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},

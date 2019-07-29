@@ -12,7 +12,8 @@ defmodule WebCAT.Factory do
     Grade,
     Observation,
     Explanation,
-    StudentFeedback
+    StudentFeedback,
+    StudentExplanation
   }
 
   alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Section}
@@ -184,6 +185,17 @@ defmodule WebCAT.Factory do
       feedback: Factory.build(:feedback),
       rotation_group: rotation_group,
       user: student
+    }
+  end
+
+  def student_explanation_factory do
+    student_feedback = Factory.insert(:student_feedback)
+
+    %StudentExplanation{
+      explanation: Factory.build(:explanation),
+      feedback: student_feedback.feedback,
+      rotation_group: student_feedback.rotation_group,
+      user: student_feedback.user
     }
   end
 
