@@ -38,6 +38,7 @@ defmodule WebCATWeb.Router do
     resources("/classrooms", ClassroomController, except: ~w(new edit)a)
     resources("/semesters", SemesterController, except: ~w(new edit)a)
     resources("/sections", SectionController, except: ~w(new edit)a)
+    post("/sections/:id/import", SectionController, :import)
     resources("/rotations", RotationController, except: ~w(new edit)a)
     resources("/rotation_groups", RotationGroupController, except: ~w(new edit)a)
 

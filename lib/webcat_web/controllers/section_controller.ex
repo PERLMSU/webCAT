@@ -4,6 +4,7 @@ defmodule WebCATWeb.SectionController do
   alias WebCATWeb.SectionView
   alias WebCAT.Rotations.Section
   alias WebCAT.CRUD
+  alias WebCAT.Import.Students, as: Import
 
   action_fallback(WebCATWeb.FallbackController)
 
@@ -85,6 +86,23 @@ defmodule WebCATWeb.SectionController do
       |> text("")
     else
       {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete section")}
+      {:error, _} = it -> it
+    end
+  end
+
+  def import(conn, _user, %{"id" => id, "file" => %{path: path}}) do
+    permissions do
+      has_role(:admin)
+    end
+
+    with {:auth, :ok} <- {:auth, is_authorized?()},
+         {:ok, _section} <- CRUD.get(Section, id),
+         :ok <- Import.import(id, path) do
+      conn
+      |> put_status(201)
+      |> text("")
+    else
+      {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to import data")}
       {:error, _} = it -> it
     end
   end
