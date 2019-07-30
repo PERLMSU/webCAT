@@ -1,4 +1,4 @@
-module API.Classrooms exposing (ClassroomForm, classrooms, editClassroom, encodeClassroomForm, formFromClassroom)
+module API.Classrooms exposing (ClassroomForm, classrooms, editClassroom, encodeClassroomForm, formFromClassroom, newClassroom)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -43,3 +43,8 @@ encodeClassroomForm form =
 editClassroom : Session -> ClassroomId -> ClassroomForm -> (APIData Classroom -> msg) -> Cmd msg
 editClassroom session id form toMsg =
     API.putRemote (Endpoint.classroom id) (Session.credential session) (jsonBody <| encodeClassroomForm form) classroomDecoder toMsg
+
+
+newClassroom : Session -> ClassroomForm -> (APIData Classroom -> msg) -> Cmd msg
+newClassroom session form toMsg =
+    API.postRemote Endpoint.classrooms (Session.credential session) (jsonBody <| encodeClassroomForm form) classroomDecoder toMsg
