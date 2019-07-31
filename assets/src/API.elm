@@ -1,4 +1,4 @@
-port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, getRemote, logout, onStoreChange, post, postRemote, put, putRemote, storeCred)
+port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, getRemote, logout, onStoreChange, post, postRemote, put, putRemote, storeCred, deleteRemote)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -272,8 +272,6 @@ expectJson toMsg decoder =
 
                         Err err ->
                             Err (BadBody { status = "500", title = "Unknown Server Error", message = Just <| Decode.errorToString err })
-
-
 
 -- ERRORS
 

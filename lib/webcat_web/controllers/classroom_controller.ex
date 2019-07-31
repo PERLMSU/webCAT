@@ -79,10 +79,11 @@ defmodule WebCATWeb.ClassroomController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, _deleted} <- CRUD.delete(Classroom, id) do
+         {:ok, deleted} <- CRUD.delete(Classroom, id) do
       conn
       |> put_status(204)
-      |> text("")
+      |> put_view(ClassroomView)
+      |> render("show.json", classroom: deleted)
     else
       {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete classroom")}
       {:error, _} = it -> it

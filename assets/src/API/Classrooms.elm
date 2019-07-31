@@ -1,9 +1,9 @@
-module API.Classrooms exposing (ClassroomForm, classrooms, editClassroom, encodeClassroomForm, formFromClassroom, newClassroom)
+module API.Classrooms exposing (Message, classrooms, editClassroom, formFromClassroom, newClassroom, deleteClassroom)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
 import Http exposing (jsonBody)
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Session exposing (Session)
 import Time as Time
@@ -22,6 +22,13 @@ classrooms session toMsg =
 type alias ClassroomForm =
     { courseCode : String, name : String, description : String }
 
+type alias Message =
+    { message : String }
+
+messageDecoder : Decoder Message
+messageDecoder =
+    Decode.map Message
+        (Decode.field "message" Decode.string)
 
 formFromClassroom : Classroom -> ClassroomForm
 formFromClassroom classroom =
@@ -29,6 +36,7 @@ formFromClassroom classroom =
     , name = classroom.name
     , description = Maybe.withDefault "" classroom.description
     }
+
 
 
 encodeClassroomForm : ClassroomForm -> Encode.Value
@@ -48,3 +56,7 @@ editClassroom session id form toMsg =
 newClassroom : Session -> ClassroomForm -> (APIData Classroom -> msg) -> Cmd msg
 newClassroom session form toMsg =
     API.postRemote Endpoint.classrooms (Session.credential session) (jsonBody <| encodeClassroomForm form) classroomDecoder toMsg
+
+deleteClassroom : Session -> ClassroomId -> (APIData Classroom -> msg) -> Cmd msg
+deleteClassroom session id toMsg =
+    API.deleteRemote (Endpoint.classroom id) (Session.credential session) classroomDecoder toMsg

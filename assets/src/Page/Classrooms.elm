@@ -1,7 +1,7 @@
 module Page.Classrooms exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import API exposing (APIData, Error(..))
-import API.Classrooms exposing (classrooms, editClassroom, newClassroom)
+import API.Classrooms exposing (Message, classrooms, deleteClassroom, editClassroom, newClassroom)
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Modal as Modal
@@ -26,8 +26,9 @@ type alias Model =
 
 type ModalState
     = Hidden
-    | EditVisible ClassroomId (APIData Classroom)
+    | EditVisible Classroom (APIData Classroom)
     | NewVisible (APIData Classroom)
+    | DeleteVisible Classroom (APIData Classroom)
 
 
 type alias Form =
@@ -48,14 +49,16 @@ type Msg
     | GotClassrooms (APIData (List Classroom))
     | GotClassroomUpdate (APIData Classroom)
     | GotClassroomCreate (APIData Classroom)
+    | GotClassroomDelete (APIData Classroom)
       -- Buttons
     | ClassroomSelected Classroom
     | TableEditClicked Classroom
     | TableDeleteClicked Classroom
     | NewClassroomClicked
       -- Form submits
-    | EditClassroomSubmit ClassroomId
+    | EditClassroomSubmit Classroom
     | NewClassroomSubmit
+    | DeleteClassroomSubmit Classroom
       -- Form events
     | CourseCodeChanged String
     | NameChanged String
@@ -133,11 +136,14 @@ view model =
                     Hidden ->
                         text ""
 
-                    EditVisible id classroom ->
-                        viewModal model (Just id) classroom
+                    EditVisible classroom data ->
+                        viewModal model (Just classroom) data
 
-                    NewVisible classroom ->
-                        viewModal model Nothing classroom
+                    NewVisible data ->
+                        viewModal model Nothing data
+
+                    DeleteVisible classroom data ->
+                        viewDeleteModal model classroom data
         in
         div []
             [ Common.panel
@@ -152,13 +158,13 @@ view model =
     }
 
 
-viewModal : Model -> Maybe ClassroomId -> APIData Classroom -> Html Msg
-viewModal model maybeId remoteClassroom =
+viewModal : Model -> Maybe Classroom -> APIData Classroom -> Html Msg
+viewModal model maybeClassroom remoteClassroom =
     let
         submitAction =
-            case maybeId of
-                Just id ->
-                    EditClassroomSubmit id
+            case maybeClassroom of
+                Just classroom ->
+                    EditClassroomSubmit classroom
 
                 Nothing ->
                     NewClassroomSubmit
@@ -199,6 +205,35 @@ viewModal model maybeId remoteClassroom =
         ]
 
 
+viewDeleteModal : Model -> Classroom -> APIData Classroom -> Html Msg
+viewDeleteModal model classroom remoteClassroom =
+    let
+        content =
+            case remoteClassroom of
+                Failure e ->
+                    case e of
+                        _ ->
+                            Debug.todo "Handle error states of delete modal"
+
+                Loading ->
+                    [ Common.loading ]
+
+                _ ->
+                    [ div [ class "text-gray-400"] [ text <| "Are you sure you want to delete " ++ classroom.courseCode ++ "?" ]
+                    , div [class "text-xl text-danger"] [ text "Deleting this classroom is permanent and will delete ALL associated:" ]
+                    , ul [class "pl-4 mb-4 mt-2 text-gray-400 list-disc"]
+                        [ li [] [ text "Semesters" ]
+                        , li [] [ text "Categories" ]
+                        , li [] [ text "Observations" ]
+                        , li [] [ text "Feedback" ]
+                        ]
+                    , Common.dangerButton "Delete" <| DeleteClassroomSubmit classroom
+                    ]
+    in
+    Modal.view { onClose = ModalClosed, title = "Delete Classroom?" }
+        content
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -228,7 +263,7 @@ update msg model =
             updateForm (\form -> { form | description = val }) model
 
         TableEditClicked classroom ->
-            ( { model | classroomForm = initialForm (Just classroom), modalState = EditVisible classroom.id NotAsked }, Cmd.none )
+            ( { model | classroomForm = initialForm (Just classroom), modalState = EditVisible classroom NotAsked }, Cmd.none )
 
         NewClassroomClicked ->
             ( { model | classroomForm = initialForm Nothing, modalState = NewVisible NotAsked }, Cmd.none )
@@ -236,7 +271,7 @@ update msg model =
         ModalClosed ->
             ( { model | classroomForm = initialForm Nothing, modalState = Hidden }, Cmd.none )
 
-        EditClassroomSubmit id ->
+        EditClassroomSubmit classroom ->
             case validate validator model.classroomForm of
                 Ok validated ->
                     let
@@ -246,8 +281,9 @@ update msg model =
                     ( { model
                         | formErrors = []
                         , classroomForm = { courseCode = "", name = "", description = "" }
+                        , modalState = EditVisible classroom Loading
                       }
-                    , editClassroom model.session id form GotClassroomUpdate
+                    , editClassroom model.session classroom.id form GotClassroomUpdate
                     )
 
                 Err errors ->
@@ -274,6 +310,7 @@ update msg model =
                     ( { model
                         | formErrors = []
                         , classroomForm = { courseCode = "", name = "", description = "" }
+                        , modalState = NewVisible Loading
                       }
                     , newClassroom model.session form GotClassroomCreate
                     )
@@ -286,14 +323,25 @@ update msg model =
                 Success _ ->
                     ( { model | classroomForm = initialForm Nothing, modalState = Hidden, classrooms = Loading }, classrooms model.session GotClassrooms )
 
-                NotAsked ->
-                    ( model, Cmd.none )
-
                 _ ->
                     updateModalState model data
 
-        _ ->
-            ( model, Cmd.none )
+        ClassroomSelected classroom ->
+            ( model, Route.pushUrl (Session.navKey model.session) (Route.Classroom classroom.id) )
+
+        TableDeleteClicked classroom ->
+            ( { model | modalState = DeleteVisible classroom NotAsked }, Cmd.none )
+
+        DeleteClassroomSubmit classroom ->
+            ( { model | modalState = DeleteVisible classroom Loading }, deleteClassroom model.session classroom.id GotClassroomDelete )
+
+        GotClassroomDelete data ->
+            case data of
+                Success _ ->
+                    ( { model | modalState = Hidden, classrooms = Loading }, classrooms model.session GotClassrooms )
+
+                _ ->
+                    updateModalState model data
 
 
 updateClassroomList : Model -> Classroom -> ( Model, Cmd Msg )
@@ -318,16 +366,19 @@ updateClassroomList model classroom =
 
 
 updateModalState : Model -> APIData Classroom -> ( Model, Cmd Msg )
-updateModalState model classroom =
+updateModalState model remoteClassroom =
     case model.modalState of
         Hidden ->
             ( model, Cmd.none )
 
-        EditVisible id _ ->
-            ( { model | modalState = EditVisible id classroom }, Cmd.none )
+        EditVisible classroom _ ->
+            ( { model | modalState = EditVisible classroom remoteClassroom }, Cmd.none )
 
         NewVisible _ ->
-            ( { model | modalState = NewVisible classroom }, Cmd.none )
+            ( { model | modalState = NewVisible remoteClassroom }, Cmd.none )
+
+        DeleteVisible classroom _ ->
+            ( { model | modalState = DeleteVisible classroom remoteClassroom }, Cmd.none )
 
 
 initialForm : Maybe Classroom -> Form

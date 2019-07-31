@@ -25,7 +25,7 @@ view config items =
             tr [] (List.map (\header -> th [ class config.headerClass ] [ text header ]) (config.headers ++ [ "" ]))
 
         columns item =
-            List.map (\i -> td [] [ text i ]) (config.render item)
+            List.map (\i -> td [ onClick (config.onClick item) ] [ text i ]) (config.render item)
 
         buttons item =
             [ div [ class "inline-flex" ]
@@ -35,7 +35,7 @@ view config items =
             ]
 
         row item =
-            tr [ class config.rowClass, onClick (config.onClick item) ] <| columns item ++ buttons item
+            tr [ class config.rowClass ] <| columns item ++ buttons item
 
         rows =
             List.map row items
