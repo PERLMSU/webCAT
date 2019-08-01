@@ -1,4 +1,4 @@
-module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), categoryDecoder, classroomDecoder, commentDecoder, draftDecoder, draftStatusDecoder, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, observationDecoder, observationTypeDecoder, optionalMaybe, roleDecoder, roleEncoder, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, userDecoder)
+module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, RoleId(..), Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), categoryDecoder, classroomDecoder, commentDecoder, draftDecoder, draftStatusDecoder, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, observationDecoder, observationTypeDecoder, optionalMaybe, roleDecoder, roleEncoder, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, unwrapCategoryId, unwrapClassroomId, unwrapClassrooms, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRoleId, unwrapRotationGroupId, unwrapRotationGroups, unwrapRotationId, unwrapRotations, unwrapSectionId, unwrapSections, unwrapSemesterId, unwrapSemesters, unwrapUserId, userDecoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Pipeline exposing (optional, required)
@@ -12,6 +12,11 @@ import Time as Time
 
 type ClassroomId
     = ClassroomId Int
+
+
+unwrapClassroomId : ClassroomId -> Int
+unwrapClassroomId (ClassroomId id) =
+    id
 
 
 type alias Classroom =
@@ -35,6 +40,11 @@ type Classrooms
     = Classrooms (List Classroom)
 
 
+unwrapClassrooms : Classrooms -> List Classroom
+unwrapClassrooms (Classrooms l) =
+    l
+
+
 classroomDecoder : Decoder Classroom
 classroomDecoder =
     Decode.succeed Classroom
@@ -51,6 +61,11 @@ classroomDecoder =
 
 type SemesterId
     = SemesterId Int
+
+
+unwrapSemesterId : SemesterId -> Int
+unwrapSemesterId (SemesterId id) =
+    id
 
 
 type alias Semester =
@@ -78,6 +93,11 @@ type Semesters
     = Semesters (List Semester)
 
 
+unwrapSemesters : Semesters -> List Semester
+unwrapSemesters (Semesters l) =
+    l
+
+
 semesterDecoder : Decoder Semester
 semesterDecoder =
     Decode.succeed Semester
@@ -96,6 +116,11 @@ semesterDecoder =
 
 type SectionId
     = SectionId Int
+
+
+unwrapSectionId : SectionId -> Int
+unwrapSectionId (SectionId id) =
+    id
 
 
 type alias Section =
@@ -121,6 +146,11 @@ type Sections
     = Sections (List Section)
 
 
+unwrapSections : Sections -> List Section
+unwrapSections (Sections l) =
+    l
+
+
 sectionDecoder : Decoder Section
 sectionDecoder =
     Decode.succeed Section
@@ -137,6 +167,11 @@ sectionDecoder =
 
 type RotationId
     = RotationId Int
+
+
+unwrapRotationId : RotationId -> Int
+unwrapRotationId (RotationId id) =
+    id
 
 
 type alias Rotation =
@@ -164,6 +199,11 @@ type Rotations
     = Rotations (List Rotation)
 
 
+unwrapRotations : Rotations -> List Rotation
+unwrapRotations (Rotations l) =
+    l
+
+
 rotationDecoder : Decoder Rotation
 rotationDecoder =
     Decode.succeed Rotation
@@ -182,6 +222,11 @@ rotationDecoder =
 
 type RotationGroupId
     = RotationGroupId Int
+
+
+unwrapRotationGroupId : RotationGroupId -> Int
+unwrapRotationGroupId (RotationGroupId id) =
+    id
 
 
 type alias RotationGroup =
@@ -206,6 +251,11 @@ type RotationGroups
     = RotationGroups (List RotationGroup)
 
 
+unwrapRotationGroups : RotationGroups -> List RotationGroup
+unwrapRotationGroups (RotationGroups l) =
+    l
+
+
 rotationGroupDecoder : Decoder RotationGroup
 rotationGroupDecoder =
     Decode.succeed RotationGroup
@@ -227,8 +277,23 @@ type UserId
     = UserId Int
 
 
+unwrapUserId : UserId -> Int
+unwrapUserId (UserId id) =
+    id
+
+
+type RoleId
+    = RoleId Int
+
+
+unwrapRoleId : RoleId -> Int
+unwrapRoleId (RoleId id) =
+    id
+
+
 type alias Role =
-    { identifier : String
+    { id : RoleId
+    , identifier : String
     , name : String
     , abilities : List String
     , insertedAt : Time.Posix
@@ -239,6 +304,7 @@ type alias Role =
 roleDecoder : Decoder Role
 roleDecoder =
     Decode.succeed Role
+        |> required "id" (map RoleId int)
         |> required "identifier" string
         |> required "name" string
         |> required "abilities" (list string)
@@ -330,6 +396,11 @@ type CategoryId
     = CategoryId Int
 
 
+unwrapCategoryId : CategoryId -> Int
+unwrapCategoryId (CategoryId id) =
+    id
+
+
 type alias Category =
     { id : CategoryId
     , name : String
@@ -377,6 +448,11 @@ categoryDecoder =
 
 type ObservationId
     = ObservationId Int
+
+
+unwrapObservationId : ObservationId -> Int
+unwrapObservationId (ObservationId id) =
+    id
 
 
 type ObservationType
@@ -442,6 +518,11 @@ type FeedbackId
     = FeedbackId Int
 
 
+unwrapFeedbackId : FeedbackId -> Int
+unwrapFeedbackId (FeedbackId id) =
+    id
+
+
 type alias Feedback =
     { id : FeedbackId
     , content : String
@@ -479,6 +560,11 @@ type ExplanationId
     = ExplanationId Int
 
 
+unwrapExplanationId : ExplanationId -> Int
+unwrapExplanationId (ExplanationId id) =
+    id
+
+
 type alias Explanation =
     { id : ExplanationId
     , content : String
@@ -512,6 +598,11 @@ explanationDecoder =
 
 type DraftId
     = DraftId Int
+
+
+unwrapDraftId : DraftId -> Int
+unwrapDraftId (DraftId id) =
+    id
 
 
 type DraftStatus
@@ -589,6 +680,11 @@ type CommentId
     = CommentId Int
 
 
+unwrapCommentId : CommentId -> Int
+unwrapCommentId (CommentId id) =
+    id
+
+
 type alias Comment =
     { id : CommentId
     , content : String
@@ -626,6 +722,11 @@ commentDecoder =
 
 type GradeId
     = GradeId Int
+
+
+unwrapGradeId : GradeId -> Int
+unwrapGradeId (GradeId id) =
+    id
 
 
 type alias Grade =
@@ -667,6 +768,11 @@ type Grades
 
 type EmailId
     = EmailId Int
+
+
+unwrapEmailId : EmailId -> Int
+unwrapEmailId (EmailId id) =
+    id
 
 
 type alias Email =

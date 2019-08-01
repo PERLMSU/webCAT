@@ -11,6 +11,7 @@ import Page.Classrooms as Classrooms
 import Page.Dashboard as Dashboard
 import Page.Login as Login
 import Page.NotFound as NotFound
+import Page.Users as Users
 import Route exposing (LoginToken, Route(..))
 import Session exposing (Session)
 import Task
@@ -49,6 +50,7 @@ type Model
     | NotFound Session
     | Login Login.Model
     | Classrooms Classrooms.Model
+    | Users Users.Model
 
 
 
@@ -61,6 +63,7 @@ type Msg
     | ClickedLink Browser.UrlRequest
     | GotLoginMsg Login.Msg
     | GotClassroomsMsg Classrooms.Msg
+    | GotUsersMsg Users.Msg
     | GotSession Session
 
 
@@ -78,6 +81,9 @@ toSession page =
 
         Classrooms classrooms ->
             Classrooms.toSession classrooms
+
+        Users users ->
+            Users.toSession users
 
 
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -103,7 +109,9 @@ changeRouteTo maybeRoute model =
         Just Route.Classrooms ->
             Classrooms.init session
                 |> updateWith Classrooms GotClassroomsMsg model
-
+        Just Route.Users ->
+            Users.init session
+                |> updateWith Users GotUsersMsg model
         Just _ ->
             ( model, Cmd.none )
 
@@ -137,6 +145,10 @@ update msg model =
             Classrooms.update subMsg classrooms
                 |> updateWith Classrooms GotClassroomsMsg model
 
+        ( GotUsersMsg subMsg, Users users ) ->
+            Users.update subMsg users
+                |> updateWith Users GotUsersMsg model
+
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
             ( model, Cmd.none )
@@ -167,6 +179,8 @@ subscriptions model =
 
         Classrooms classrooms ->
             Sub.map GotClassroomsMsg (Classrooms.subscriptions classrooms)
+
+        Users users -> Sub.map GotUsersMsg (Users.subscriptions users)
 
 
 
@@ -205,6 +219,7 @@ view model =
                 Classrooms classrooms ->
                     viewPage Page.Classrooms GotClassroomsMsg (Classrooms.view classrooms)
 
+                Users users -> viewPage Page.Users GotUsersMsg (Users.view users)
         Nothing ->
             let
                 viewPage toMsg config =
@@ -228,3 +243,5 @@ view model =
 
                 Classrooms _ ->
                     Page.viewPublic NotFound.view
+
+                Users _ -> Page.viewPublic NotFound.view

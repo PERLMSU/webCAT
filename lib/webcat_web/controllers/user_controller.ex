@@ -79,10 +79,11 @@ defmodule WebCATWeb.UserController do
     end
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, _deleted} <- CRUD.delete(User, id) do
+         {:ok, deleted} <- CRUD.delete(User, id) do
       conn
-      |> put_status(204)
-      |> text("")
+      |> put_status(200)
+      |> put_view(UserView)
+      |> render("show.json", user: deleted)
     else
       {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete user")}
       {:error, _} = it -> it

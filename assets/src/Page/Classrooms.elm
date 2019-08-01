@@ -161,20 +161,37 @@ view model =
 viewModal : Model -> Maybe Classroom -> APIData Classroom -> Html Msg
 viewModal model maybeClassroom remoteClassroom =
     let
-        submitAction =
+        
+        (submitAction, title) =
             case maybeClassroom of
                 Just classroom ->
-                    EditClassroomSubmit classroom
+                    (EditClassroomSubmit classroom, "Edit Classroom")
 
                 Nothing ->
-                    NewClassroomSubmit
+                    (NewClassroomSubmit, "New Classroom")
 
         content =
             case remoteClassroom of
                 Failure e ->
-                    case e of
-                        _ ->
-                            Debug.todo "Handle error states in form"
+                    [ div [ class "flex flex-wrap -mx-3 mb-6" ]
+                        [ div [ class "text-danger text-bold" ] [ text <| API.errorBodyToString <| API.getErrorBody e ]
+                        , div [ class "w-full md:w-1/2 px-3 mb-6 md:mb-0" ]
+                            [ Form.label "Course Code" "courseCode"
+                            , Form.textInput "courseCode" CourseCode model.formErrors CourseCodeChanged model.classroomForm.courseCode
+                            ]
+                        , div [ class "w-full md:w-1/2 px-3 mb-6 md:mb-0" ]
+                            [ Form.label "Name" "name"
+                            , Form.textInput "name" Name model.formErrors NameChanged model.classroomForm.name
+                            ]
+                        ]
+                    , div [ class "flex flex-wrap -mx-3 mb-6" ]
+                        [ div [ class "w-full px-3 mb-6 md:mb-0" ]
+                            [ Form.label "Description" "description"
+                            , Form.textInput "description" Description model.formErrors DescriptionChanged model.classroomForm.description
+                            ]
+                        ]
+                    , Common.successButton "Submit" submitAction
+                    ]
 
                 Loading ->
                     [ Common.loading ]
@@ -199,7 +216,7 @@ viewModal model maybeClassroom remoteClassroom =
                     , Common.successButton "Submit" submitAction
                     ]
     in
-    Modal.view { onClose = ModalClosed, title = "Edit Classroom" }
+    Modal.view { onClose = ModalClosed, title = title }
         [ Html.form [ class "w-full max-w-lg mb-8" ]
             content
         ]
@@ -211,17 +228,25 @@ viewDeleteModal model classroom remoteClassroom =
         content =
             case remoteClassroom of
                 Failure e ->
-                    case e of
-                        _ ->
-                            Debug.todo "Handle error states of delete modal"
+                    [ div [ class "text-2xl text-italic text-danger" ] [ text <| API.errorBodyToString <| API.getErrorBody e ]
+                    , div [ class "text-gray-400" ] [ text <| "Are you sure you want to delete " ++ classroom.courseCode ++ "?" ]
+                    , div [ class "text-xl text-danger" ] [ text "Deleting this classroom is permanent and will delete ALL associated:" ]
+                    , ul [ class "pl-4 mb-4 mt-2 text-gray-400 list-disc" ]
+                        [ li [] [ text "Semesters" ]
+                        , li [] [ text "Categories" ]
+                        , li [] [ text "Observations" ]
+                        , li [] [ text "Feedback" ]
+                        ]
+                    , Common.dangerButton "Delete" <| DeleteClassroomSubmit classroom
+                    ]
 
                 Loading ->
                     [ Common.loading ]
 
                 _ ->
-                    [ div [ class "text-gray-400"] [ text <| "Are you sure you want to delete " ++ classroom.courseCode ++ "?" ]
-                    , div [class "text-xl text-danger"] [ text "Deleting this classroom is permanent and will delete ALL associated:" ]
-                    , ul [class "pl-4 mb-4 mt-2 text-gray-400 list-disc"]
+                    [ div [ class "text-gray-400" ] [ text <| "Are you sure you want to delete " ++ classroom.courseCode ++ "?" ]
+                    , div [ class "text-xl text-danger" ] [ text "Deleting this classroom is permanent and will delete ALL associated:" ]
+                    , ul [ class "pl-4 mb-4 mt-2 text-gray-400 list-disc" ]
                         [ li [] [ text "Semesters" ]
                         , li [] [ text "Categories" ]
                         , li [] [ text "Observations" ]
@@ -280,7 +305,6 @@ update msg model =
                     in
                     ( { model
                         | formErrors = []
-                        , classroomForm = { courseCode = "", name = "", description = "" }
                         , modalState = EditVisible classroom Loading
                       }
                     , editClassroom model.session classroom.id form GotClassroomUpdate
@@ -309,7 +333,6 @@ update msg model =
                     in
                     ( { model
                         | formErrors = []
-                        , classroomForm = { courseCode = "", name = "", description = "" }
                         , modalState = NewVisible Loading
                       }
                     , newClassroom model.session form GotClassroomCreate

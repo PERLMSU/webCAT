@@ -20,6 +20,7 @@ type Page
     | Dashboard
     | Login
     | Classrooms
+    | Users
 
 
 {-| Take a page's Html and frames it with a header and footer.
@@ -98,6 +99,9 @@ isActive : Page -> Route -> Bool
 isActive page route =
     case ( page, route ) of
         ( Classrooms, Route.Classrooms ) ->
+            True
+
+        ( Users, Route.Users ) ->
             True
 
         _ ->

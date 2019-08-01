@@ -81,7 +81,7 @@ defmodule WebCATWeb.ClassroomController do
     with {:auth, :ok} <- {:auth, is_authorized?()},
          {:ok, deleted} <- CRUD.delete(Classroom, id) do
       conn
-      |> put_status(204)
+      |> put_status(200)
       |> put_view(ClassroomView)
       |> render("show.json", classroom: deleted)
     else

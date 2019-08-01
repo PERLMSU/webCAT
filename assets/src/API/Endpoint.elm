@@ -1,7 +1,7 @@
 module API.Endpoint exposing (Endpoint, categories, category, classroom, classrooms, feedback, feedbackList, imports, login, observation, observations, password_reset, password_reset_finish, profile, request, rotation, rotation_group, rotation_groups, rotations, section, sections, semester, semesters, user, users)
 
 import Http
-import Types exposing (CategoryId(..), ClassroomId(..), CommentId(..), DraftId(..), ExplanationId(..), FeedbackId(..), GradeId(..), ObservationId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
+import Types exposing (CategoryId, ClassroomId, CommentId, DraftId, ExplanationId, FeedbackId, GradeId, ObservationId, RotationGroupId, RotationId, SectionId, SemesterId, UserId, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRoleId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapUserId)
 import Url.Builder exposing (QueryParameter, string)
 
 
@@ -79,8 +79,8 @@ profile =
 
 
 user : UserId -> Endpoint
-user (UserId id) =
-    url [ "users", String.fromInt id ] []
+user id =
+    url [ "users", String.fromInt <| unwrapUserId id ] []
 
 
 users : Endpoint
@@ -93,8 +93,8 @@ users =
 
 
 classroom : ClassroomId -> Endpoint
-classroom (ClassroomId id) =
-    url [ "classrooms", String.fromInt id ] []
+classroom id =
+    url [ "classrooms", String.fromInt <| unwrapClassroomId id ] []
 
 
 classrooms : Endpoint
@@ -107,8 +107,8 @@ classrooms =
 
 
 semester : SemesterId -> Endpoint
-semester (SemesterId id) =
-    url [ "semesters", String.fromInt id ] []
+semester id =
+    url [ "semesters", String.fromInt <| unwrapSemesterId id ] []
 
 
 semesters : Endpoint
@@ -121,8 +121,8 @@ semesters =
 
 
 section : SectionId -> Endpoint
-section (SectionId id) =
-    url [ "sections", String.fromInt id ] []
+section id =
+    url [ "sections", String.fromInt <| unwrapSectionId id ] []
 
 
 sections : Endpoint
@@ -135,8 +135,8 @@ sections =
 
 
 rotation : RotationId -> Endpoint
-rotation (RotationId id) =
-    url [ "rotations", String.fromInt id ] []
+rotation id =
+    url [ "rotations", String.fromInt <| unwrapRotationId id ] []
 
 
 rotations : Endpoint
@@ -149,8 +149,8 @@ rotations =
 
 
 rotation_group : RotationGroupId -> Endpoint
-rotation_group (RotationGroupId id) =
-    url [ "rotation_groups", String.fromInt id ] []
+rotation_group id =
+    url [ "rotation_groups", String.fromInt <| unwrapRotationGroupId id ] []
 
 
 rotation_groups : Endpoint
@@ -172,8 +172,8 @@ imports =
 
 
 category : CategoryId -> Endpoint
-category (CategoryId id) =
-    url [ "categories", String.fromInt id ] []
+category id =
+    url [ "categories", String.fromInt <| unwrapCategoryId id ] []
 
 
 categories : Endpoint
@@ -186,8 +186,8 @@ categories =
 
 
 observation : ObservationId -> Endpoint
-observation (ObservationId id) =
-    url [ "observations", String.fromInt id ] []
+observation id =
+    url [ "observations", String.fromInt <| unwrapObservationId id ] []
 
 
 observations : Endpoint
@@ -200,8 +200,8 @@ observations =
 
 
 feedback : FeedbackId -> Endpoint
-feedback (FeedbackId id) =
-    url [ "feedback", String.fromInt id ] []
+feedback id =
+    url [ "feedback", String.fromInt <| unwrapFeedbackId id ] []
 
 
 feedbackList : Endpoint
@@ -214,8 +214,8 @@ feedbackList =
 
 
 explanation : ExplanationId -> Endpoint
-explanation (ExplanationId id) =
-    url [ "explanations", String.fromInt id ] []
+explanation id =
+    url [ "explanations", String.fromInt <| unwrapExplanationId id ] []
 
 
 explanations : Endpoint
@@ -228,8 +228,8 @@ explanations =
 
 
 draft : DraftId -> Endpoint
-draft (DraftId id) =
-    url [ "drafts", String.fromInt id ] []
+draft id =
+    url [ "drafts", String.fromInt <| unwrapDraftId id ] []
 
 
 drafts : Endpoint
@@ -242,13 +242,13 @@ drafts =
 
 
 comment : DraftId -> CommentId -> Endpoint
-comment (DraftId draftId) (CommentId commentId) =
-    url [ "drafts", String.fromInt draftId, "comments", String.fromInt commentId ] []
+comment draftId commentId =
+    url [ "drafts", String.fromInt <| unwrapDraftId draftId, "comments", String.fromInt <| unwrapCommentId commentId ] []
 
 
 comments : DraftId -> Endpoint
-comments (DraftId draftId) =
-    url [ "drafts", String.fromInt draftId, "comments" ] []
+comments draftId =
+    url [ "drafts", String.fromInt <| unwrapDraftId draftId, "comments" ] []
 
 
 
@@ -256,13 +256,13 @@ comments (DraftId draftId) =
 
 
 grade : DraftId -> GradeId -> Endpoint
-grade (DraftId draftId) (GradeId gradeId) =
-    url [ "drafts", String.fromInt draftId, "grades", String.fromInt gradeId ] []
+grade draftId gradeId =
+    url [ "drafts", String.fromInt <| unwrapDraftId draftId, "grades", String.fromInt <| unwrapGradeId gradeId ] []
 
 
 grades : DraftId -> Endpoint
-grades (DraftId draftId) =
-    url [ "drafts", String.fromInt draftId, "grades" ] []
+grades draftId =
+    url [ "drafts", String.fromInt <| unwrapDraftId draftId, "grades" ] []
 
 
 
@@ -270,14 +270,14 @@ grades (DraftId draftId) =
 
 
 studentFeedback : RotationGroupId -> Maybe UserId -> Endpoint
-studentFeedback (RotationGroupId id) maybeUserId =
+studentFeedback id maybeUserId =
     let
         queryParams =
             case maybeUserId of
-                Just (UserId userId) ->
-                    [ string "userId" (String.fromInt userId) ]
+                Just userId ->
+                    [ string "userId" (String.fromInt <| unwrapUserId userId) ]
 
                 _ ->
                     []
     in
-    url [ "rotation_groups", String.fromInt id, "feedback" ] queryParams
+    url [ "rotation_groups", String.fromInt <| unwrapRotationGroupId id, "feedback" ] queryParams

@@ -1,4 +1,4 @@
-port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, getRemote, logout, onStoreChange, post, postRemote, put, putRemote, storeCred, deleteRemote)
+port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, getRemote, logout, onStoreChange, post, postRemote, put, putRemote, storeCred, deleteRemote, getErrorBody)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -288,6 +288,22 @@ decodeErrorBody error str =
                 , status = "500"
                 , message = Just <| Decode.errorToString decodeError
                 }
+
+
+getErrorBody : Error -> ErrorBody
+getErrorBody error =
+    case error of
+        BadUrl body -> body
+        Timeout body -> body
+        NetworkError body -> body
+        BadRequest body -> body
+        Unauthorized body -> body
+        Forbidden body -> body
+        NotFound body -> body
+        ServerError body -> body
+        BadBody body -> body
+                           
+
 
 
 errorBodyToString : ErrorBody -> String
