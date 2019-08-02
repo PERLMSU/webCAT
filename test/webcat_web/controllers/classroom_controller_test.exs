@@ -97,12 +97,10 @@ defmodule WebCATWeb.ClassroomControllerTest do
 
       classroom = Factory.insert(:classroom)
 
-      res = conn
+      conn
       |> Auth.sign_in(user)
       |> delete(Routes.classroom_path(conn, :delete, classroom.id))
-      |> json_response(204)
-
-      assert res["id"] == classroom.id
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete classrooms", %{conn: conn} do

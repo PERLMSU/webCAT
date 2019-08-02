@@ -8,31 +8,15 @@ defmodule WebCATWeb.SectionController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(number semester_id)a,
-    filter: ~w(semester_id)a,
-    fields: Section.__schema__(:fields),
-    include: Section.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(SectionView)
-    |> render("list.json", sections: CRUD.list(Section, query))
+    |> render("list.json", sections: CRUD.list(Section, filter: filter(params, ~w(semester_id))))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, section} <- CRUD.get(Section, id, query) do
+    with {:ok, section} <- CRUD.get(Section, id) do
       conn
       |> put_status(200)
       |> put_view(SectionView)

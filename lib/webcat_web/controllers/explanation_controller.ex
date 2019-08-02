@@ -6,32 +6,15 @@ defmodule WebCATWeb.ExplanationController do
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
-
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(content feedback_id)a,
-    filter: ~w(feedback_id)a,
-    fields: Explanation.__schema__(:fields),
-    include: Explanation.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(ExplanationView)
-    |> render("list.json", explanations: CRUD.list(Explanation, query))
+    |> render("list.json", explanations: CRUD.list(Explanation, filter: filter(params, ~w(feedback_id))))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, explanation} <- CRUD.get(Explanation, id, query) do
+    with {:ok, explanation} <- CRUD.get(Explanation, id) do
       conn
       |> put_status(200)
       |> put_view(ExplanationView)

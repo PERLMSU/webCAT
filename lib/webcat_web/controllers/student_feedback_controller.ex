@@ -7,26 +7,11 @@ defmodule WebCATWeb.StudentFeedbackController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w()a,
-    filter: ~w()a,
-    fields: StudentFeedback.__schema__(:fields),
-    include: StudentFeedback.__schema__(:associations)
-
-  def index(conn, _user, %{"rotation_group_id" => rotation_group_id, "student_id" => student_id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.update!(:filter, fn filters ->
-        Keyword.put(filters, :rotation_group_id, rotation_group_id)
-        |> Keyword.put(:user_id, student_id)
-      end)
-      |> Map.to_list()
-
+  def index(conn, _user, %{"rotation_group_id" => _, "student_id" => _} = params) do
     conn
     |> put_status(200)
     |> put_view(StudentFeedbackView)
-    |> render("list.json", student_feedback: CRUD.list(StudentFeedback, query))
+    |> render("list.json", student_feedback: CRUD.list(StudentFeedback, filter: filter(params, ~w(rotation_group_id student_id))))
   end
 
   def create(conn, _user, %{

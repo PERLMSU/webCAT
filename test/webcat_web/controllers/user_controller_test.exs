@@ -96,7 +96,7 @@ defmodule WebCATWeb.UserControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.user_path(conn, :delete, Factory.insert(:user).id))
-      |> text_response(204)
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete other users", %{conn: conn} do

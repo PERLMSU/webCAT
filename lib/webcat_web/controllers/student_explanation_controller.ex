@@ -7,31 +7,25 @@ defmodule WebCATWeb.StudentExplanationController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w()a,
-    filter: ~w()a,
-    fields: StudentExplanation.__schema__(:fields),
-    include: StudentExplanation.__schema__(:associations)
-
-  def index(conn, _user, %{
-        "rotation_group_id" => rotation_group_id,
-        "student_id" => student_id,
-        "feedback_id" => feedback_id
-      }) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.update!(:filter, fn filters ->
-        Keyword.put(filters, :rotation_group_id, rotation_group_id)
-        |> Keyword.put(:user_id, student_id)
-        |> Keyword.put(:feedback_id, feedback_id)
-      end)
-      |> Map.to_list()
-
+  def index(
+        conn,
+        _user,
+        %{
+          "rotation_group_id" => _,
+          "student_id" => _,
+          "feedback_id" => _
+        } = params
+      ) do
     conn
     |> put_status(200)
     |> put_view(StudentExplanationView)
-    |> render("list.json", student_explanations: CRUD.list(StudentExplanation, query))
+    |> render("list.json",
+      student_explanations:
+        CRUD.list(
+          StudentExplanation,
+          filter(params, ~w(rotation_group_id student_id feedback_id))
+        )
+    )
   end
 
   def create(conn, _user, %{

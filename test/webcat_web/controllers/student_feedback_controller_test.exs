@@ -10,7 +10,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.student_feedback_path(conn, :index, data.rotation_group_id, data.user_id))
+        |> get(Routes.student_feedback_path(conn, :index, data.rotation_group_id, data.student_id))
         |> json_response(200)
 
       assert Enum.count(result) >= 1
@@ -37,7 +37,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
             conn,
             :create,
             data.rotation_group_id,
-            data.user_id,
+            data.student_id,
             data.feedback_id
           )
         )
@@ -69,7 +69,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
           conn,
           :delete,
           data.rotation_group_id,
-          data.user_id,
+          data.student_id,
           data.feedback_id
         )
       )

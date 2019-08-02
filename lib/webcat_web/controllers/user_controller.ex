@@ -7,31 +7,15 @@ defmodule WebCATWeb.UserController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(email first_name last_name middle_name nickname active)a,
-    filter: ~w(active)a,
-    fields: User.__schema__(:fields) |> List.delete(:performer_id),
-    include: User.__schema__(:associations) |> Enum.reject(&(&1 in ~w(performer notifications)a))
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(UserView)
-    |> render("list.json", users: CRUD.list(User, query))
+    |> render("list.json", users: CRUD.list(User, filter: filter(params, ~w(active))))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, user} <- CRUD.get(User, id, query) do
+    with {:ok, user} <- CRUD.get(User, id) do
       conn
       |> put_status(200)
       |> put_view(UserView)

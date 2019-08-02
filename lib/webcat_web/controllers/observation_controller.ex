@@ -7,31 +7,15 @@ defmodule WebCATWeb.ObservationController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(content type category_id)a,
-    filter: ~w(category_id type)a,
-    fields: Observation.__schema__(:fields),
-    include: Observation.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(ObservationView)
-    |> render("list.json", observations: CRUD.list(Observation, query))
+    |> render("list.json", observations: CRUD.list(Observation, filter: filter(params, ~w(category_id type))))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, observation} <- CRUD.get(Observation, id, query) do
+    with {:ok, observation} <- CRUD.get(Observation, id) do
       conn
       |> put_status(200)
       |> put_view(ObservationView)

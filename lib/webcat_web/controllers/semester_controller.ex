@@ -7,31 +7,17 @@ defmodule WebCATWeb.SemesterController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(name start_date end_date)a,
-    filter: ~w(classroom_id)a,
-    fields: Semester.__schema__(:fields),
-    include: Semester.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(SemesterView)
-    |> render("list.json", semesters: CRUD.list(Semester, query))
+    |> render("list.json",
+      semesters: CRUD.list(Semester, filter: filter(params, ~w(classroom_id)))
+    )
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, semester} <- CRUD.get(Semester, id, query) do
+    with {:ok, semester} <- CRUD.get(Semester, id) do
       conn
       |> put_status(200)
       |> put_view(SemesterView)

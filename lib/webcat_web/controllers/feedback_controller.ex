@@ -7,31 +7,15 @@ defmodule WebCATWeb.FeedbackController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(content observation_id)a,
-    filter: ~w(observation_id)a,
-    fields: Feedback.__schema__(:fields),
-    include: Feedback.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(FeedbackView)
-    |> render("list.json", feedback: CRUD.list(Feedback, query))
+    |> render("list.json", feedback: CRUD.list(Feedback, filter: filter(params, ~w(observation_id))))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, feedback} <- CRUD.get(Feedback, id, query) do
+    with {:ok, feedback} <- CRUD.get(Feedback, id) do
       conn
       |> put_status(200)
       |> put_view(FeedbackView)

@@ -7,33 +7,17 @@ defmodule WebCATWeb.CommentController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w()a,
-    filter: ~w(draft_id user_id)a,
-    fields: Comment.__schema__(:fields),
-    include: Comment.__schema__(:associations)
-
-  def index(conn, _user, %{"draft_id" => draft_id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.update!(:filter, fn filters -> Keyword.put(filters, :draft_id, draft_id) end)
-      |> Map.to_list()
-
+  def index(conn, _user, %{"draft_id" => _draft_id} = params) do
     conn
     |> put_status(200)
     |> put_view(CommentView)
-    |> render("list.json", comments: CRUD.list(Comment, query))
+    |> render("list.json",
+      comments: CRUD.list(Comment, filter: filter(params, ~w(draft_id user_id)))
+    )
   end
 
-  def show(conn, _user, %{"draft_id" => draft_id, "id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.update!(:filter, fn filters -> Keyword.put(filters, :draft_id, draft_id) end)
-      |> Map.to_list()
-
-    with {:ok, comment} <- CRUD.get(Comment, id, query) do
+  def show(conn, _user, %{"draft_id" => _draft_id, "id" => id} = params) do
+    with {:ok, comment} <- CRUD.get(Comment, id, filter: filter(params, ~w(draft_id user_id))) do
       conn
       |> put_status(200)
       |> put_view(CommentView)

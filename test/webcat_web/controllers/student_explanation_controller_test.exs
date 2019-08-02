@@ -15,7 +15,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
             conn,
             :index,
             data.rotation_group_id,
-            data.user_id,
+            data.student_id,
             data.feedback_id
           )
         )
@@ -45,7 +45,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
             conn,
             :create,
             data.rotation_group_id,
-            data.user_id,
+            data.student_id,
             data.feedback_id,
             data.explanation_id
           )
@@ -78,7 +78,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
           conn,
           :delete,
           data.rotation_group_id,
-          data.user_id,
+          data.student_id,
           data.feedback_id,
           data.explanation_id
         )

@@ -10,7 +10,7 @@ defmodule WebCATWeb.StudentExplanationViewTest do
       rendered =
         StudentExplanationView.render("show.json", student_explanation: student_explanation)
 
-      assert rendered[:user_id] == student_explanation.user_id
+      assert rendered[:student_id] == student_explanation.student_id
       assert rendered[:rotation_group_id] == student_explanation.rotation_group_id
       assert rendered[:feedback_id] == student_explanation.feedback_id
       assert rendered[:explanation_id] == student_explanation.explanation_id

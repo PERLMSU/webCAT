@@ -184,7 +184,7 @@ defmodule WebCAT.Factory do
     %StudentFeedback{
       feedback: Factory.build(:feedback),
       rotation_group: rotation_group,
-      user: student
+      student: student
     }
   end
 
@@ -195,7 +195,7 @@ defmodule WebCAT.Factory do
       explanation: Factory.build(:explanation),
       feedback: student_feedback.feedback,
       rotation_group: student_feedback.rotation_group,
-      user: student_feedback.user
+      student: student_feedback.student
     }
   end
 

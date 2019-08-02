@@ -24,6 +24,7 @@ defmodule WebCATWeb do
       import WebCATWeb.Gettext
       alias WebCATWeb.Router.Helpers, as: Routes
       alias WebCATWeb.Auth.Guardian.Plug, as: Auth
+      import WebCATWeb.QueryHelpers
     end
   end
 

@@ -8,7 +8,7 @@ defmodule WebCATWeb.StudentFeedbackViewTest do
       student_feedback = Factory.insert(:student_feedback)
       rendered = StudentFeedbackView.render("show.json", student_feedback: student_feedback)
 
-      assert rendered[:user_id] == student_feedback.user_id
+      assert rendered[:student_id] == student_feedback.student_id
       assert rendered[:rotation_group_id] == student_feedback.rotation_group_id
       assert rendered[:feedback_id] == student_feedback.feedback_id
     end

@@ -7,31 +7,17 @@ defmodule WebCATWeb.CategoryController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(name parent_category_id classroom_id)a,
-    filter: ~w(parent_category_id classroom_id)a,
-    fields: Category.__schema__(:fields),
-    include: Category.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(CategoryView)
-    |> render("list.json", categories: CRUD.list(Category, query))
+    |> render("list.json",
+      categories: CRUD.list(Category, filter: filter(params, ~w(parent_category_id classroom_id)))
+    )
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, category} <- CRUD.get(Category, id, query) do
+    with {:ok, category} <- CRUD.get(Category, id) do
       conn
       |> put_status(200)
       |> put_view(CategoryView)

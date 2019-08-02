@@ -7,31 +7,15 @@ defmodule WebCATWeb.RotationController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(number start_date end_date section_id)a,
-    filter: ~w(section_id)a,
-    fields: Rotation.__schema__(:fields),
-    include: Rotation.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(RotationView)
-    |> render("list.json", rotations: CRUD.list(Rotation, query))
+    |> render("list.json", rotations: CRUD.list(Rotation, filter: filter(params, ~w(section_id))))
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, rotation} <- CRUD.get(Rotation, id, query) do
+    with {:ok, rotation} <- CRUD.get(Rotation, id) do
       conn
       |> put_status(200)
       |> put_view(RotationView)

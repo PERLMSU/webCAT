@@ -7,31 +7,18 @@ defmodule WebCATWeb.DraftController do
 
   action_fallback(WebCATWeb.FallbackController)
 
-  plug WebCATWeb.Plug.Query,
-    sort: ~w(status user_id reviewer_id rotation_group_id)a,
-    filter: ~w(status user_id reviewer_id rotation_group_id)a,
-    fields: Draft.__schema__(:fields),
-    include: Draft.__schema__(:associations)
-
-  def index(conn, _user, _params) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
+  def index(conn, _user, params) do
     conn
     |> put_status(200)
     |> put_view(DraftView)
-    |> render("list.json", drafts: CRUD.list(Draft, query))
+    |> render("list.json",
+      drafts:
+        CRUD.list(Draft, filter: filter(params, ~w(status user_id reviewer_id rotation_group_id)))
+    )
   end
 
   def show(conn, _user, %{"id" => id}) do
-    query =
-      conn.assigns.parsed_query
-      |> Map.from_struct()
-      |> Map.to_list()
-
-    with {:ok, draft} <- CRUD.get(Draft, id, query) do
+    with {:ok, draft} <- CRUD.get(Draft, id) do
       conn
       |> put_status(200)
       |> put_view(DraftView)

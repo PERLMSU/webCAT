@@ -22,11 +22,11 @@ defmodule WebCATWeb.StudentExplanationView do
     |> Map.drop(~w(__meta__)a)
     |> timestamps_format()
     |> case do
-      %{user: %User{} = user} = map ->
-        Map.put(map, :user, render_one(user, UserView, "user.json"))
+      %{student: %User{} = student} = map ->
+        Map.put(map, :student, render_one(student, UserView, "user.json"))
 
       map ->
-        Map.delete(map, :user)
+        Map.delete(map, :student)
     end
     |> case do
       %{rotation_group: %RotationGroup{} = group} = map ->

@@ -11,7 +11,7 @@ defmodule WebCAT.CRUD do
   def list(schema, options \\ []) do
     schema
     |> where(^fetch_opt(options, :filter, []))
-    |> preload(^fetch_opt(options, :include, []))
+    |> preload(^fetch_opt(options, :include, schema.__schema__(:associations)))
     |> order_by(^fetch_opt(options, :sort, []))
     |> select(^fetch_opt(options, :fields, schema.__schema__(:fields)))
     |> Repo.all()
@@ -23,7 +23,7 @@ defmodule WebCAT.CRUD do
   def get(schema, id, options \\ []) do
     schema
     |> where([s], s.id == ^id)
-    |> preload(^fetch_opt(options, :include, []))
+    |> preload(^fetch_opt(options, :include, schema.__schema__(:associations)))
     |> select(^fetch_opt(options, :fields, schema.__schema__(:fields)))
     |> Repo.one()
     |> case do
