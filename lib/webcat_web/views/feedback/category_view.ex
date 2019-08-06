@@ -41,7 +41,7 @@ defmodule WebCATWeb.CategoryView do
     end
     |> case do
       %{observations: observations} = map when is_list(observations) ->
-        Map.put(map, :observations, render_many(observations, ObservationView, "category.json"))
+        Map.put(map, :observations, render_many(observations, ObservationView, "observation.json"))
 
       map ->
         Map.delete(map, :observations)

@@ -16,7 +16,7 @@ defmodule WebCATWeb.RotationView do
     |> Map.from_struct()
     |> Map.drop(~w(__meta__)a)
     |> Map.update!(:start_date, &Timex.to_unix/1)
-    |> Map.update!(:end_date, &Timex.format!(&1, "{ISOdate}"))
+    |> Map.update!(:end_date, &Timex.to_unix/1)
     |> timestamps_format()
     |> case do
       %{section: %Section{} = section} = map ->

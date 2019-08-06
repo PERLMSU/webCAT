@@ -13,7 +13,7 @@ defmodule WebCATWeb.DraftController do
     |> put_view(DraftView)
     |> render("list.json",
       drafts:
-        CRUD.list(Draft, filter: filter(params, ~w(status user_id reviewer_id rotation_group_id)))
+        CRUD.list(Draft, filter: filter(params, ~w(status student_id rotation_group_id)))
     )
   end
 

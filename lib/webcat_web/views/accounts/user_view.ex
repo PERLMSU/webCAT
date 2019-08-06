@@ -74,7 +74,7 @@ defmodule WebCATWeb.UserView do
         Map.put(
           map,
           :rotation_groups,
-          render_many(rotation_groups, RotationGroupView, "rotation_group.json")
+          render_many(rotation_groups, RotationGroupView, "group.json")
         )
 
       map ->

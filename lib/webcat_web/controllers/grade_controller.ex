@@ -12,12 +12,12 @@ defmodule WebCATWeb.GradeController do
     |> put_status(200)
     |> put_view(GradeView)
     |> render("list.json",
-      grades: CRUD.list(Grade, filter: filter(params, ~w(draft_id category_id)))
+      grades: CRUD.list(Grade, filter: filter(params, ~w(draft_id)))
     )
   end
 
   def show(conn, _user, %{"draft_id" => _draft_id, "id" => id} = params) do
-    with {:ok, grade} <- CRUD.get(Grade, id, filter: filter(params, ~w(draft_id category_id))) do
+    with {:ok, grade} <- CRUD.get(Grade, id, filter: filter(params, ~w(draft_id))) do
       conn
       |> put_status(200)
       |> put_view(GradeView)
