@@ -1,4 +1,4 @@
-port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, errorBodyToString, get, getRemote, logout, onStoreChange, post, postRemote, put, putRemote, storeCred, deleteRemote, getErrorBody)
+port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, deleteRemote, errorBodyToString, get, getErrorBody, getRemote, handleRemoteError, logout, onStoreChange, post, postRemote, put, putRemote, storeCred)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -7,7 +7,7 @@ import Http exposing (Body, Expect)
 import Json.Decode as Decode exposing (Decoder, Value, decodeString, field, nullable, string)
 import Json.Decode.Pipeline as Pipeline exposing (optional, required)
 import Json.Encode as Encode
-import RemoteData exposing (RemoteData)
+import RemoteData exposing (RemoteData(..))
 import Types exposing (User, encodeUser, userDecoder)
 import Url exposing (Url)
 
@@ -45,6 +45,7 @@ credentialDecoder =
         |> required "token" Decode.string
 
 
+
 -- The API can error out
 
 
@@ -66,6 +67,25 @@ type alias ErrorBody =
     , status : String
     , title : String
     }
+
+
+
+{- Logs out the user if we get an unauthorized error -}
+
+
+handleRemoteError : APIData a -> model -> Cmd msg -> ( model, Cmd msg )
+handleRemoteError data model cmd =
+    case data of
+        Failure e ->
+            case e of
+                Unauthorized _ ->
+                    ( model, logout )
+
+                _ ->
+                    ( model, cmd )
+
+        _ ->
+            ( model, cmd )
 
 
 
@@ -210,12 +230,12 @@ postRemote url maybeCred body decoder toMsg =
     post url maybeCred body decoder (RemoteData.fromResult >> toMsg)
 
 
-delete : Endpoint -> Maybe Credential -> Decoder a -> (APIResult a -> msg) -> Cmd msg
-delete url maybeCred decoder toMsg =
+delete : Endpoint -> Maybe Credential -> (APIResult () -> msg) -> Cmd msg
+delete url maybeCred toMsg =
     Endpoint.request
         { method = "DELETE"
         , url = url
-        , expect = expectJson toMsg decoder
+        , expect = expectNothing toMsg
         , headers =
             case maybeCred of
                 Just cred ->
@@ -229,9 +249,9 @@ delete url maybeCred decoder toMsg =
         }
 
 
-deleteRemote : Endpoint -> Maybe Credential -> Decoder a -> (APIData a -> msg) -> Cmd msg
-deleteRemote url maybeCred decoder toMsg =
-    delete url maybeCred decoder (RemoteData.fromResult >> toMsg)
+deleteRemote : Endpoint -> Maybe Credential -> (APIData () -> msg) -> Cmd msg
+deleteRemote url maybeCred toMsg =
+    delete url maybeCred (RemoteData.fromResult >> toMsg)
 
 
 expectJson : (Result Error a -> msg) -> Decoder a -> Expect msg
@@ -273,6 +293,78 @@ expectJson toMsg decoder =
                         Err err ->
                             Err (BadBody { status = "500", title = "Unknown Server Error", message = Just <| Decode.errorToString err })
 
+
+expectNothing : (APIResult () -> msg) -> Expect msg
+expectNothing toMsg =
+    Http.expectStringResponse toMsg <|
+        \response ->
+            case response of
+                Http.BadUrl_ url ->
+                    Err (BadUrl { status = "400", title = "Client Error", message = Just <| "Problem with url: " ++ url })
+
+                Http.Timeout_ ->
+                    Err (Timeout { status = "400", title = "Client Error", message = Just "Timed out" })
+
+                Http.NetworkError_ ->
+                    Err (NetworkError { status = "400", title = "Client Error", message = Just "Network Error" })
+
+                Http.BadStatus_ metadata body ->
+                    case metadata.statusCode of
+                        400 ->
+                            Err (decodeErrorBody BadRequest body)
+
+                        401 ->
+                            Err (decodeErrorBody Unauthorized body)
+
+                        403 ->
+                            Err (decodeErrorBody Forbidden body)
+
+                        404 ->
+                            Err (decodeErrorBody NotFound body)
+
+                        _ ->
+                            Err (decodeErrorBody ServerError body)
+
+                Http.GoodStatus_ _ body ->
+                    Ok ()
+
+
+expectString : (APIResult String -> msg) -> Expect msg
+expectString toMsg =
+    Http.expectStringResponse toMsg <|
+        \response ->
+            case response of
+                Http.BadUrl_ url ->
+                    Err (BadUrl { status = "400", title = "Client Error", message = Just <| "Problem with url: " ++ url })
+
+                Http.Timeout_ ->
+                    Err (Timeout { status = "400", title = "Client Error", message = Just "Timed out" })
+
+                Http.NetworkError_ ->
+                    Err (NetworkError { status = "400", title = "Client Error", message = Just "Network Error" })
+
+                Http.BadStatus_ metadata body ->
+                    case metadata.statusCode of
+                        400 ->
+                            Err (decodeErrorBody BadRequest body)
+
+                        401 ->
+                            Err (decodeErrorBody Unauthorized body)
+
+                        403 ->
+                            Err (decodeErrorBody Forbidden body)
+
+                        404 ->
+                            Err (decodeErrorBody NotFound body)
+
+                        _ ->
+                            Err (decodeErrorBody ServerError body)
+
+                Http.GoodStatus_ _ body ->
+                    Ok body
+
+
+
 -- ERRORS
 
 
@@ -293,17 +385,32 @@ decodeErrorBody error str =
 getErrorBody : Error -> ErrorBody
 getErrorBody error =
     case error of
-        BadUrl body -> body
-        Timeout body -> body
-        NetworkError body -> body
-        BadRequest body -> body
-        Unauthorized body -> body
-        Forbidden body -> body
-        NotFound body -> body
-        ServerError body -> body
-        BadBody body -> body
-                           
+        BadUrl body ->
+            body
 
+        Timeout body ->
+            body
+
+        NetworkError body ->
+            body
+
+        BadRequest body ->
+            body
+
+        Unauthorized body ->
+            body
+
+        Forbidden body ->
+            body
+
+        NotFound body ->
+            body
+
+        ServerError body ->
+            body
+
+        BadBody body ->
+            body
 
 
 errorBodyToString : ErrorBody -> String

@@ -1,7 +1,7 @@
 module Page.Classrooms exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import API exposing (APIData, Error(..))
-import API.Classrooms exposing (Message, classrooms, deleteClassroom, editClassroom, newClassroom)
+import API.Classrooms exposing (ClassroomForm, classrooms, deleteClassroom, editClassroom, formFromClassroom, newClassroom)
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Modal as Modal
@@ -19,7 +19,7 @@ type alias Model =
     { session : Session
     , classrooms : APIData (List Classroom)
     , modalState : ModalState
-    , classroomForm : Form
+    , classroomForm : ClassroomForm
     , formErrors : List ( FormField, String )
     }
 
@@ -29,13 +29,6 @@ type ModalState
     | EditVisible Classroom (APIData Classroom)
     | NewVisible (APIData Classroom)
     | DeleteVisible Classroom (APIData Classroom)
-
-
-type alias Form =
-    { courseCode : String
-    , name : String
-    , description : String
-    }
 
 
 type FormField
@@ -49,7 +42,7 @@ type Msg
     | GotClassrooms (APIData (List Classroom))
     | GotClassroomUpdate (APIData Classroom)
     | GotClassroomCreate (APIData Classroom)
-    | GotClassroomDelete (APIData Classroom)
+    | GotClassroomDelete (APIData ())
       -- Buttons
     | ClassroomSelected Classroom
     | TableEditClicked Classroom
@@ -126,7 +119,7 @@ view model =
                         Common.loading
 
                     Failure e ->
-                        div [] [ text "Error" ]
+                        div [ class "mx-4 my-2 flex" ] [ div [ class "text-danger text-bold" ] [ text <| API.errorBodyToString <| API.getErrorBody e ] ]
 
                     Success classrooms ->
                         div [ class "mx-4 my-2 flex" ] [ Table.view tableConfig classrooms ]
@@ -161,14 +154,13 @@ view model =
 viewModal : Model -> Maybe Classroom -> APIData Classroom -> Html Msg
 viewModal model maybeClassroom remoteClassroom =
     let
-        
-        (submitAction, title) =
+        ( submitAction, title ) =
             case maybeClassroom of
                 Just classroom ->
-                    (EditClassroomSubmit classroom, "Edit Classroom")
+                    ( EditClassroomSubmit classroom, "Edit Classroom" )
 
                 Nothing ->
-                    (NewClassroomSubmit, "New Classroom")
+                    ( NewClassroomSubmit, "New Classroom" )
 
         content =
             case remoteClassroom of
@@ -266,17 +258,7 @@ update msg model =
             init session
 
         GotClassrooms result ->
-            case result of
-                Failure err ->
-                    case err of
-                        Unauthorized _ ->
-                            ( { model | classrooms = result }, API.logout )
-
-                        _ ->
-                            ( { model | classrooms = result }, Cmd.none )
-
-                _ ->
-                    ( { model | classrooms = result }, Cmd.none )
+            API.handleRemoteError result { model | classrooms = result } Cmd.none
 
         CourseCodeChanged val ->
             updateForm (\form -> { form | courseCode = val }) model
@@ -364,7 +346,8 @@ update msg model =
                     ( { model | modalState = Hidden, classrooms = Loading }, classrooms model.session GotClassrooms )
 
                 _ ->
-                    updateModalState model data
+                    -- TODO: Need a better solution for handling delete errors
+                    (model, Cmd.none)
 
 
 updateClassroomList : Model -> Classroom -> ( Model, Cmd Msg )
@@ -404,22 +387,22 @@ updateModalState model remoteClassroom =
             ( { model | modalState = DeleteVisible classroom remoteClassroom }, Cmd.none )
 
 
-initialForm : Maybe Classroom -> Form
+initialForm : Maybe Classroom -> ClassroomForm
 initialForm maybeClassroom =
     case maybeClassroom of
         Nothing ->
-            Form "" "" ""
+            ClassroomForm "" "" ""
 
         Just classroom ->
-            { courseCode = classroom.courseCode, name = classroom.name, description = Maybe.withDefault "" classroom.description }
+            formFromClassroom classroom
 
 
-updateForm : (Form -> Form) -> Model -> ( Model, Cmd Msg )
+updateForm : (ClassroomForm -> ClassroomForm) -> Model -> ( Model, Cmd Msg )
 updateForm transform model =
     ( { model | classroomForm = transform model.classroomForm }, Cmd.none )
 
 
-validator : Validator ( FormField, String ) Form
+validator : Validator ( FormField, String ) ClassroomForm
 validator =
     Validate.all
         [ ifBlank .courseCode ( CourseCode, "Please enter a course code" )

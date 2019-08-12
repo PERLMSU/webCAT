@@ -1,4 +1,4 @@
-module API.Users exposing (UserForm, users, editUser, newUser, deleteUser)
+module API.Users exposing (UserForm, deleteUser, editUser, encodeUserForm, newUser, rotationGroups, users)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -42,10 +42,10 @@ encodeUserForm form =
         , ( "last_name", Encode.string form.lastName )
         , ( "nickname", Encode.string form.nickname )
         , ( "active", Encode.bool form.active )
-        , ( "classrooms", Encode.list (unwrapClassroomId >> Encode.int) form.classrooms)
-        , ( "sections", Encode.list (unwrapSectionId >> Encode.int) form.sections)
-        , ( "rotation_groups", Encode.list (unwrapRotationGroupId >> Encode.int) form.rotationGroups)
-        , ( "roles", Encode.list (unwrapRoleId >> Encode.int) form.roles)
+        , ( "classrooms", Encode.list (unwrapClassroomId >> Encode.int) form.classrooms )
+        , ( "sections", Encode.list (unwrapSectionId >> Encode.int) form.sections )
+        , ( "rotation_groups", Encode.list (unwrapRotationGroupId >> Encode.int) form.rotationGroups )
+        , ( "roles", Encode.list (unwrapRoleId >> Encode.int) form.roles )
         ]
 
 
@@ -58,6 +58,12 @@ newUser : Session -> UserForm -> (APIData User -> msg) -> Cmd msg
 newUser session form toMsg =
     API.postRemote Endpoint.users (Session.credential session) (jsonBody <| encodeUserForm form) userDecoder toMsg
 
-deleteUser : Session -> UserId -> (APIData User -> msg) -> Cmd msg
+
+deleteUser : Session -> UserId -> (APIData () -> msg) -> Cmd msg
 deleteUser session id toMsg =
-    API.deleteRemote (Endpoint.user id) (Session.credential session) userDecoder toMsg
+    API.deleteRemote (Endpoint.user id) (Session.credential session)  toMsg
+
+
+rotationGroups : Session -> UserId -> (APIData (List RotationGroup) -> msg) -> Cmd msg
+rotationGroups session id toMsg =
+    API.getRemote (Endpoint.userRotationGroups id) (Session.credential session) (Decode.list rotationGroupDecoder) toMsg

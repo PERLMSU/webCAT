@@ -6,6 +6,7 @@ defmodule WebCAT.Feedback.Feedback do
     field(:content, :string)
 
     belongs_to(:observation, WebCAT.Feedback.Observation)
+    has_many(:explanations, WebCAT.Feedback.Explanation)
 
     timestamps(type: :utc_datetime)
   end

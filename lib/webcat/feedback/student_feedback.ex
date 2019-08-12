@@ -4,7 +4,7 @@ defmodule WebCAT.Feedback.StudentFeedback do
 
   import Ecto.Query
   alias WebCAT.Repo
-  alias WebCAT.Feedback.{Feedback, Observation}
+  alias WebCAT.Feedback.{Feedback, Observation, Category, StudentExplanation}
   alias WebCAT.Accounts.User
   alias WebCAT.Rotations.RotationGroup
   alias __MODULE__
@@ -39,6 +39,19 @@ defmodule WebCAT.Feedback.StudentFeedback do
     |> where([_, _, _, sf], sf.rotation_group_id == ^rotation_group_id)
     |> where([_, _, _, sf], sf.student_id == ^student_id)
     |> preload([_, f, c], feedback: f, category: c)
+    |> Repo.all()
+  end
+
+  def by_category(rotation_group_id, student_id) do
+    from(c in Category,
+      left_join: o in assoc(c, :observations),
+      left_join: f in assoc(o, :feedback),
+      left_join: e in assoc(f, :explanations),
+      left_join: sf in StudentFeedback, on: sf.feedback_id == f.id,
+      where: sf.rotation_group_id == ^rotation_group_id,
+      where: sf.student_id == ^student_id,
+      preload: [observations: {o, feedback: {f, explanations: e}}]
+    )
     |> Repo.all()
   end
 

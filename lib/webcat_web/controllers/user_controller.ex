@@ -1,7 +1,7 @@
 defmodule WebCATWeb.UserController do
   use WebCATWeb, :authenticated_controller
 
-  alias WebCATWeb.UserView
+  alias WebCATWeb.{UserView, RotationGroupView}
   alias WebCAT.Accounts.User
   alias WebCAT.CRUD
 
@@ -71,6 +71,15 @@ defmodule WebCATWeb.UserController do
     else
       {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to delete user")}
       {:error, _} = it -> it
+    end
+  end
+
+  def rotation_groups(conn, _user, %{"id" => id}) do
+    with rotation_groups <- User.rotation_groups(id) do
+      conn
+      |> put_status(200)
+      |> put_view(RotationGroupView)
+      |> render("list.json", rotation_groups: rotation_groups)
     end
   end
 end

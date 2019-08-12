@@ -1,4 +1,4 @@
-module Components.Common exposing (Style(..), dangerButton, icon, iconButton, infoButton, loading, primaryButton, successButton, warningButton, panel)
+module Components.Common exposing (Style(..), dangerButton, header, icon, iconButton, infoButton, loading, panel, primaryButton, successButton, warningButton)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -116,5 +116,12 @@ loading : Html msg
 loading =
     div [ class "text-gray-400 text-center py-6" ] [ i [ class "fa-2x fas fa-spinner fa-pulse" ] [] ]
 
+
 panel : List (Html msg) -> Html msg
-panel content = div [ class "bg-light-slate rounded-sm shadow-md mx-24 my-12 py-2" ] content
+panel content =
+    div [ class "bg-light-slate rounded-sm shadow-md mx-24 my-12 py-2" ] content
+
+
+header : String -> Html msg
+header content =
+    h1 [ class "text-4xl text-gray-400 font-display" ] [ text content ]

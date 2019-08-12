@@ -3,7 +3,18 @@ alias Ecto.Changeset
 alias WebCAT.Repo
 alias WebCAT.Accounts.{User, Notification, PasswordCredential}
 alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
-alias WebCAT.Feedback.{Category, Observation, Feedback, Draft, Comment, StudentFeedback}
+
+alias WebCAT.Feedback.{
+  Category,
+  Observation,
+  Feedback,
+  Draft,
+  Comment,
+  Explanation,
+  StudentFeedback,
+  StudentExplanation
+}
+
 alias Terminator.{Role, Performer}
 
 admin_changeset =
@@ -240,6 +251,30 @@ transaction =
     })
     |> repo.insert()
   end)
+  |> Multi.run(:explanation_1, fn repo, transaction ->
+    %Explanation{}
+    |> Explanation.changeset(%{
+      content: "Example explanation 1",
+      feedback_id: transaction.feedback_1.id
+    })
+    |> repo.insert()
+  end)
+  |> Multi.run(:explanation_2, fn repo, transaction ->
+    %Explanation{}
+    |> Explanation.changeset(%{
+      content: "Example explanation 2",
+      feedback_id: transaction.feedback_1.id
+    })
+    |> repo.insert()
+  end)
+  |> Multi.run(:explanation_3, fn repo, transaction ->
+    %Explanation{}
+    |> Explanation.changeset(%{
+      content: "Example explanation 3",
+      feedback_id: transaction.feedback_2.id
+    })
+    |> repo.insert()
+  end)
   |> Multi.run(:student_feedback_1, fn _repo, transaction ->
     StudentFeedback.add(
       transaction.rotation_group_1.id,
@@ -259,6 +294,14 @@ transaction =
       transaction.rotation_group_1.id,
       transaction.fall_student_1.id,
       transaction.feedback_3.id
+    )
+  end)
+   |> Multi.run(:student_explanation_1, fn _repo, transaction ->
+    StudentExplanation.add(
+      transaction.rotation_group_1.id,
+      transaction.fall_student_1.id,
+      transaction.feedback_1.id,
+      transaction.explanation_2.id
     )
   end)
   |> Multi.run(:draft_1, fn repo, transaction ->

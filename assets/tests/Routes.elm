@@ -4,7 +4,7 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Route as Route exposing (LoginToken(..), PasswordResetToken(..), Route(..))
 import Test exposing (..)
-import Types exposing (ClassroomId(..), DraftId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
+import Types exposing (CategoryId(..), ClassroomId(..), DraftId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
 import Url
 
 
@@ -72,6 +72,8 @@ suite =
                         -- Import
                         , Import
                         , Feedback
+                        , EditFeedback (RotationGroupId 1) (UserId 1) (Just (CategoryId 1))
+                        , EditFeedback (RotationGroupId 1) (UserId 1) Nothing
                         , Drafts
                         , Draft <| DraftId 1
                         , NewDraft (RotationGroupId 1) (UserId 1)

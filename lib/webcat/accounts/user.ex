@@ -7,6 +7,7 @@ defmodule WebCAT.Accounts.User do
   import Ecto.Changeset
   alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
   alias Terminator.{Performer, Role}
+  alias WebCAT.Accounts.User
   alias WebCAT.Repo
 
   schema "users" do
@@ -111,20 +112,17 @@ defmodule WebCAT.Accounts.User do
 
   defp put_classrooms(changeset, _), do: changeset
 
+
   @doc """
-  Partition a list of users into a map keyed by their role.
-  Keys are strings.
+  Get all of the rotation groups that the user is in
   """
-  def by_role(users) when is_list(users) do
-    Enum.reduce(users, %{}, fn user, acc ->
-      user.performer.roles
-      |> Enum.map(&Map.get(&1, :identifier))
-      |> Enum.reject(&is_nil/1)
-      |> Enum.reduce(acc, fn role, nested_acc ->
-        Map.update(nested_acc, role, [user], fn value ->
-          [user | value]
-        end)
-      end)
-    end)
+  def rotation_groups(user_id) do
+    from(rg in RotationGroup,
+      left_join: u in assoc(rg, :users),
+      left_join: u2 in assoc(rg, :users),
+      where: u.id == ^user_id,
+      left_join: r in assoc(u2, :roles),
+      preload:  [:rotation, users: {u2, roles: r}])
+    |> Repo.all()
   end
 end

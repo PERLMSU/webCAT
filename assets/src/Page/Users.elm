@@ -51,7 +51,7 @@ type Msg
     | GotUsers (APIData (List User))
     | GotUserUpdate (APIData User)
     | GotUserCreate (APIData User)
-    | GotUserDelete (APIData User)
+    | GotUserDelete (APIData ())
       -- Buttons
     | UserSelected User
     | TableEditClicked User
@@ -131,7 +131,7 @@ view model =
                         Common.loading
 
                     Failure e ->
-                        div [] [ text "Error" ]
+                        div [ class "mx-4 my-2" ] [ div [ class "text-danger text-bold" ] [ text <| API.errorBodyToString <| API.getErrorBody e ] ]
 
                     Success users ->
                         div [ class "mx-4 my-2 flex" ] [ Table.view tableConfig users ]
@@ -166,13 +166,13 @@ view model =
 viewModal : Model -> Maybe User -> APIData User -> Html Msg
 viewModal model maybeUser remoteUser =
     let
-        (submitAction, title) =
+        ( submitAction, title ) =
             case maybeUser of
                 Just user ->
-                    (EditUserSubmit user, "Edit User")
+                    ( EditUserSubmit user, "Edit User" )
 
                 Nothing ->
-                    (NewUserSubmit, "New User")
+                    ( NewUserSubmit, "New User" )
 
         content =
             case remoteUser of
@@ -373,7 +373,8 @@ update msg model =
                     ( { model | modalState = Hidden, users = Loading }, users model.session GotUsers )
 
                 _ ->
-                    updateModalState model data
+                    -- TODO: Need a better way to handle modal state
+                    ( model, Cmd.none )
 
 
 updateUserList : Model -> User -> ( Model, Cmd Msg )

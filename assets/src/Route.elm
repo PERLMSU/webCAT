@@ -3,7 +3,7 @@ module Route exposing (LoginToken(..), PasswordResetToken(..), Route(..), fromUr
 import Browser.Navigation as Nav
 import Html exposing (Attribute)
 import Html.Attributes as Attr
-import Types exposing (ClassroomId(..), DraftId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
+import Types exposing (CategoryId(..), ClassroomId(..), DraftId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
 import Url exposing (Url)
 import Url.Builder as Builder exposing (absolute)
 import Url.Parser as Parser exposing ((</>), (<?>), Parser, int, map, oneOf, s, string, top)
@@ -58,6 +58,7 @@ type Route
     | Import
       -- Feedback System
     | Feedback
+    | EditFeedback RotationGroupId UserId (Maybe CategoryId)
       -- Draft inbox
     | Drafts
     | Draft DraftId
@@ -188,7 +189,11 @@ parser =
                 , Parser.map Import (s "import")
 
                 -- Feedback
-                , Parser.map Feedback (s "feedback")
+                , s "feedback"
+                    </> oneOf
+                            [ Parser.map Feedback top
+                            , Parser.map EditFeedback (s "group" </> Parser.map RotationGroupId int </> s "student" </> Parser.map UserId int <?> idQueryParser CategoryId "categoryId")
+                            ]
 
                 -- Inbox
                 , s "drafts"
@@ -316,6 +321,9 @@ routeToString route =
 
         Feedback ->
             appAbsolute [ "feedback" ] []
+
+        EditFeedback (RotationGroupId groupId) (UserId studentId) maybeCategoryId ->
+            appAbsolute [ "feedback", "group", String.fromInt groupId, "student", String.fromInt studentId ] (Maybe.withDefault [] (Maybe.map (\(CategoryId id) -> [ Builder.int "categoryId" id ]) maybeCategoryId))
 
         Profile ->
             appAbsolute [ "profile" ] []

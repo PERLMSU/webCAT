@@ -21,6 +21,10 @@ type Page
     | Login
     | Classrooms
     | Users
+    | Feedback
+    | EditFeedback
+    | Drafts
+    | Profile
 
 
 {-| Take a page's Html and frames it with a header and footer.
@@ -45,7 +49,7 @@ viewPublic { title, content } =
 
 viewGrid : Html msg -> Html msg -> Html msg -> Html msg
 viewGrid menu content footer =
-    div [ id "main-container", class "w-screen h-screen" ]
+    div [ id "main-container", class "w-screen min-h-screen" ]
         [ div [ id "sidebar", class "bg-light-slate" ] [ div [ class "" ] [ menu ] ]
         , div [ id "content", class "bg-slate" ] [ div [ class "container p-1" ] [ content ] ]
         , div [ id "footer", class "bg-slate border border-light-slate" ] [ div [ class "container p-1 mx-auto" ] [ footer ] ]
@@ -102,6 +106,18 @@ isActive page route =
             True
 
         ( Users, Route.Users ) ->
+            True
+
+        ( Feedback, Route.Feedback ) ->
+            True
+
+        ( Drafts, Route.Drafts ) ->
+            True
+
+        ( Profile, Route.Profile ) ->
+            True
+
+        ( EditFeedback, Route.EditFeedback _ _ _ ) ->
             True
 
         _ ->

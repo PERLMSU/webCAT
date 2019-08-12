@@ -2,22 +2,28 @@ defmodule WebCATWeb.CategoryController do
   use WebCATWeb, :authenticated_controller
 
   alias WebCATWeb.CategoryView
-  alias WebCAT.Feedback.Category
+  alias WebCAT.Feedback.{Category, Categories}
   alias WebCAT.CRUD
 
   action_fallback(WebCATWeb.FallbackController)
 
   def index(conn, _user, params) do
+    categories =
+      case params do
+        %{"parent_category_id" => id} -> Categories.list(id)
+        _ -> CRUD.list(Category)
+      end
+
     conn
     |> put_status(200)
     |> put_view(CategoryView)
     |> render("list.json",
-      categories: CRUD.list(Category, filter: filter(params, ~w(parent_category_id classroom_id)))
+      categories: categories
     )
   end
 
   def show(conn, _user, %{"id" => id}) do
-    with {:ok, category} <- CRUD.get(Category, id) do
+    with {:ok, category} <- Categories.get(id) do
       conn
       |> put_status(200)
       |> put_view(CategoryView)

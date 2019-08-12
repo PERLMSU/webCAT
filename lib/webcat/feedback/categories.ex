@@ -12,34 +12,27 @@ defmodule WebCAT.Feedback.Categories do
     |> Repo.all()
   end
 
-  def list(classroom_id) do
-    from(category in Category,
-      where: category.classroom_id == ^classroom_id,
-      left_join: sub_categories in assoc(category, :sub_categories),
-      left_join: parent_category in assoc(category, :parent_category),
-      preload: [sub_categories: sub_categories, parent_category: parent_category]
+  def list(parent_category_id) do
+    from(cat in Category,
+      where: cat.parent_category_id== ^parent_category_id,
+      left_join: sub_cat in assoc(cat, :sub_categories),
+      left_join: obs in assoc(cat, :observations),
+      left_join: feed in assoc(obs, :feedback),
+      left_join: expl in assoc(feed, :explanations),
+      order_by: [desc: cat.name],
+      preload: [sub_categories: sub_cat, observations: {obs, feedback: {feed, explanations: expl}}]
     )
     |> Repo.all()
   end
 
   def get(id) when is_binary(id) or is_integer(id) do
-    from(category in Category,
-      where: category.id == ^id,
-      left_join: parent_category in assoc(category, :parent_category),
-      left_join: sub_categories in assoc(category, :sub_categories),
-      left_join: sub_parents in assoc(sub_categories, :parent_category),
-      left_join: sub_sub_categories in assoc(sub_categories, :sub_categories),
-      left_join: classroom in assoc(category, :classroom),
-      left_join: class_categories in assoc(classroom, :categories),
-      left_join: observations in assoc(category, :observations),
-      left_join: observation_category in assoc(observations, :category),
-      preload: [
-        parent_category: parent_category,
-        sub_categories:
-          {sub_categories, sub_categories: sub_sub_categories, parent_category: sub_parents},
-        classroom: {classroom, categories: class_categories},
-        observations: {observations, category: observation_category}
-      ]
+    from(cat in Category,
+      where: cat.id == ^id,
+      left_join: sub_cat in assoc(cat, :sub_categories),
+      left_join: obs in assoc(cat, :observations),
+      left_join: feed in assoc(obs, :feedback),
+      left_join: expl in assoc(feed, :explanations),
+      preload: [sub_categories: sub_cat, observations: {obs, feedback: {feed, explanations: expl}}]
     )
     |> Repo.one()
     |> case do

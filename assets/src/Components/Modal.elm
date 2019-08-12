@@ -7,16 +7,17 @@ import Html.Events exposing (..)
 
 type alias Config msg =
     { onClose : msg
-    , title: String
+    , title : String
     }
 
 
 viewTitle : Config msg -> Html msg
 viewTitle config =
-    div [class "flex justify-between items-center pb-3 text-gray-400"]
-        [ p [class "text-2xl font-bold"] [text config.title]
+    div [ class "flex justify-between items-center pb-3 text-gray-400" ]
+        [ p [ class "text-2xl font-bold" ] [ text config.title ]
         , div [ class "cursor-pointer z-50", onClick config.onClose ] [ i [ class "fas fa-times" ] [] ]
         ]
+
 
 view : Config msg -> List (Html msg) -> Html msg
 view config content =

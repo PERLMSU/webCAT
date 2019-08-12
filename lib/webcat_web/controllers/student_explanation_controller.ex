@@ -13,7 +13,6 @@ defmodule WebCATWeb.StudentExplanationController do
         %{
           "rotation_group_id" => _,
           "student_id" => _,
-          "feedback_id" => _
         } = params
       ) do
     conn
@@ -23,7 +22,7 @@ defmodule WebCATWeb.StudentExplanationController do
       student_explanations:
         CRUD.list(
           StudentExplanation,
-          filter(params, ~w(rotation_group_id student_id feedback_id))
+          filter(params, ~w(rotation_group_id student_id))
         )
     )
   end

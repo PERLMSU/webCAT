@@ -33,6 +33,7 @@ defmodule WebCATWeb.Router do
     # Accounts
     resources("/user", ProfileController, singleton: true, only: ~w(show update)a)
     resources("/users", UserController, except: ~w(new edit)a)
+    get("/users/:id/rotation_groups", UserController, :rotation_groups)
 
     # Classrooms
     resources("/classrooms", ClassroomController, except: ~w(new edit)a)
@@ -41,6 +42,9 @@ defmodule WebCATWeb.Router do
     post("/sections/:id/import", SectionController, :import)
     resources("/rotations", RotationController, except: ~w(new edit)a)
     resources("/rotation_groups", RotationGroupController, except: ~w(new edit)a)
+    get("/rotation_groups/:id/students", RotationGroupController, :students)
+    get("/rotation_groups/:id/classroom", RotationGroupController, :classroom)
+    get("/rotation_groups/:id/classroom/categories", RotationGroupController, :classroom_categories)
 
     # Feedback
     resources("/categories", CategoryController, except: ~w(new edit)a)
@@ -58,6 +62,12 @@ defmodule WebCATWeb.Router do
       :index
     )
 
+    get(
+      "/rotation_groups/:rotation_group_id/feedback/:student_id/by_category",
+      StudentFeedbackController,
+      :by_category
+    )
+
     post(
       "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id",
       StudentFeedbackController,
@@ -72,7 +82,7 @@ defmodule WebCATWeb.Router do
 
     # Feedback writer - explanations
     get(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id/explanations",
+      "/rotation_groups/:rotation_group_id/feedback/:student_id/explanations",
       StudentExplanationController,
       :index
     )

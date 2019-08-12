@@ -1,4 +1,4 @@
-module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, RoleId(..), Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, User, UserId(..), Users(..), categoryDecoder, classroomDecoder, commentDecoder, draftDecoder, draftStatusDecoder, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, observationDecoder, observationTypeDecoder, optionalMaybe, roleDecoder, roleEncoder, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, unwrapCategoryId, unwrapClassroomId, unwrapClassrooms, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRoleId, unwrapRotationGroupId, unwrapRotationGroups, unwrapRotationId, unwrapRotations, unwrapSectionId, unwrapSections, unwrapSemesterId, unwrapSemesters, unwrapUserId, userDecoder)
+module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, RoleId(..), Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, StudentExplanation, User, UserId(..), Users(..), categoryDecoder, classroomDecoder, commentDecoder, draftDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, observationDecoder, observationTypeDecoder, optionalMaybe, roleDecoder, roleEncoder, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, unwrapCategories, unwrapCategoryId, unwrapClassroomId, unwrapClassrooms, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, studentFeedbackDecoder, studentExplanationDecoder, unwrapExplanations, unwrapFeedback, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapObservations, unwrapRoleId, unwrapRotationGroupId, unwrapRotationGroups, unwrapRotationId, unwrapRotations, unwrapSectionId, unwrapSections, unwrapSemesterId, unwrapSemesters, unwrapUserId, unwrapUsers, userDecoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Pipeline exposing (optional, required)
@@ -348,6 +348,11 @@ type Users
     = Users (List User)
 
 
+unwrapUsers : Users -> List User
+unwrapUsers (Users l) =
+    l
+
+
 userDecoder : Decoder User
 userDecoder =
     Decode.succeed User
@@ -430,6 +435,11 @@ type Categories
     = Categories (List Category)
 
 
+unwrapCategories : Categories -> List Category
+unwrapCategories (Categories l) =
+    l
+
+
 categoryDecoder : Decoder Category
 categoryDecoder =
     Decode.succeed Category
@@ -502,6 +512,11 @@ type Observations
     = Observations (List Observation)
 
 
+unwrapObservations : Observations -> List Observation
+unwrapObservations (Observations l) =
+    l
+
+
 observationDecoder : Decoder Observation
 observationDecoder =
     Decode.succeed Observation
@@ -544,6 +559,11 @@ type FeedbackList
     = FeedbackList (List Feedback)
 
 
+unwrapFeedback : FeedbackList -> List Feedback
+unwrapFeedback (FeedbackList l) =
+    l
+
+
 feedbackDecoder : Decoder Feedback
 feedbackDecoder =
     Decode.succeed Feedback
@@ -583,6 +603,11 @@ type alias Explanation =
 
 type Explanations
     = Explanations (List Explanation)
+
+
+unwrapExplanations : Explanations -> List Explanation
+unwrapExplanations (Explanations l) =
+    l
 
 
 explanationDecoder : Decoder Explanation
@@ -637,6 +662,25 @@ draftStatusDecoder =
                     else_ ->
                         Decode.fail <| "Unknown draft status: " ++ else_
             )
+
+
+draftStatusToString : DraftStatus -> String
+draftStatusToString status =
+    case status of
+        Unreviewed ->
+            "unreviewed"
+
+        Reviewing ->
+            "reviewing"
+
+        NeedsRevision ->
+            "needs_revision"
+
+        Approved ->
+            "approved"
+
+        Emailed ->
+            "emailed"
 
 
 type alias Draft =
@@ -799,24 +843,49 @@ emailDecoder =
         |> required "draft_id" (map DraftId int)
         |> optionalMaybe "draft" (nullable draftDecoder)
         |> required "inserted_at" (map Time.millisToPosix int)
-        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 type alias StudentFeedback =
-    { userId : UserId
+    { studentId : UserId
     , rotationGroupId : RotationGroupId
     , feedbackId : FeedbackId
-
-    -- Related data
-    , user : Maybe User
-    , rotationGroup : Maybe RotationGroup
-    , feedback : Maybe Feedback
 
     -- Timestamp data
     , insertedAt : Time.Posix
     , updatedAt : Time.Posix
     }
 
+studentFeedbackDecoder : Decoder StudentFeedback
+studentFeedbackDecoder =
+    Decode.succeed StudentFeedback
+        |> required "student_id" (map UserId int)
+        |> required "rotation_group_id" (map RotationGroupId int)
+        |> required "feedback_id" (map FeedbackId int)
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
+
+
+type alias StudentExplanation =
+    { studentId : UserId
+    , rotationGroupId : RotationGroupId
+    , feedbackId : FeedbackId
+    , explanationId : ExplanationId
+
+    -- Timestamp data
+    , insertedAt : Time.Posix
+    , updatedAt : Time.Posix
+    }
+
+studentExplanationDecoder : Decoder StudentExplanation
+studentExplanationDecoder =
+    Decode.succeed StudentExplanation
+        |> required "student_id" (map UserId int)
+        |> required "rotation_group_id" (map RotationGroupId int)
+        |> required "feedback_id" (map FeedbackId int)
+        |> required "explanation_id" (map ExplanationId int)
+        |> required "inserted_at" (map Time.millisToPosix int)
+        |> required "updated_at" (map Time.millisToPosix int)
 
 
 -- Utility

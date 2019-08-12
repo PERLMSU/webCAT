@@ -1,7 +1,7 @@
 defmodule WebCATWeb.StudentFeedbackController do
   use WebCATWeb, :authenticated_controller
 
-  alias WebCATWeb.StudentFeedbackView
+  alias WebCATWeb.{StudentFeedbackView, CategoryView}
   alias WebCAT.Feedback.StudentFeedback
   alias WebCAT.CRUD
 
@@ -12,6 +12,13 @@ defmodule WebCATWeb.StudentFeedbackController do
     |> put_status(200)
     |> put_view(StudentFeedbackView)
     |> render("list.json", student_feedback: CRUD.list(StudentFeedback, filter: filter(params, ~w(rotation_group_id student_id))))
+  end
+
+  def by_category(conn, _user, %{"rotation_group_id" => rotation_group_id, "student_id" => student_id}) do
+    conn
+    |> put_status(200)
+    |> put_view(CategoryView)
+    |> render("list.json", categories: StudentFeedback.by_category(rotation_group_id, student_id))
   end
 
   def create(conn, _user, %{

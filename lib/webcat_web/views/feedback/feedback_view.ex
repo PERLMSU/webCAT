@@ -27,5 +27,12 @@ defmodule WebCATWeb.FeedbackView do
       map ->
         Map.delete(map, :observation)
     end
+    |> case do
+      %{explanations: explanations} = map when is_list(explanations) ->
+        Map.put(map, :explanations, render_many(explanations, WebCATWeb.ExplanationView, "explanation.json"))
+
+      map ->
+        Map.delete(map, :explanations)
+    end
   end
 end

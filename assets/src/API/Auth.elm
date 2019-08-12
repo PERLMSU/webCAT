@@ -1,6 +1,6 @@
 module API.Auth exposing (login)
 
-import API exposing (Credential, credentialDecoder, postRemote, APIData)
+import API exposing (APIData, Credential, credentialDecoder, postRemote)
 import API.Endpoint as Endpoint
 import Http exposing (jsonBody)
 import Json.Decode as D exposing (Decoder, string)
