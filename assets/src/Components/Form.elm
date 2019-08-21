@@ -1,4 +1,4 @@
-module Components.Form exposing (label, passwordInput, textInput)
+module Components.Form exposing (label, passwordInput, textInput, numberInput)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -23,6 +23,18 @@ passwordInput name field errors toMsg contents =
     input_
         { type_ = "password"
         , placeholder = "************"
+        , name = name
+        , field = field
+        , onInput = toMsg
+        , errors = errors
+        , contents = contents
+        }
+
+numberInput : String -> field -> List ( field, String ) -> (String -> msg) -> String -> Html msg
+numberInput name field errors toMsg contents =
+    input_
+        { type_ = "number"
+        , placeholder = ""
         , name = name
         , field = field
         , onInput = toMsg

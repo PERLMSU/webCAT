@@ -213,7 +213,7 @@ viewFeedback data =
                 ]
 
         viewObservation observation =
-            li [ class "ml-4" ]
+            li [ class "ml-4 pl-2 border-l" ]
                 [ text observation.content
                 , ul [] <| List.map viewFeedbackItem (Maybe.withDefault [] <| Maybe.map unwrapFeedback observation.feedback)
                 ]

@@ -178,8 +178,16 @@ update msg model =
 
                         _ ->
                             Cmd.none
+
+                updatedModel =
+                    case result of
+                        Success draft ->
+                            { model | draft = result, draftForm = initForm <| Just draft }
+
+                        _ ->
+                            { model | draft = result }
             in
-            API.handleRemoteError result { model | draft = result } cmd
+            API.handleRemoteError result updatedModel cmd
 
         GotDraftUpdate result ->
             API.handleRemoteError result { model | draft = result } Cmd.none
@@ -226,24 +234,24 @@ viewFeedback : APIData (List Category) -> Html Msg
 viewFeedback data =
     let
         viewExplanation explanation =
-            li [ class "ml-4" ]
+            li [ class "ml-4 my-1" ]
                 [ text explanation.content
                 ]
 
         viewFeedbackItem feedback =
-            li [ class "ml-4" ]
+            li [ class "ml-4 my-1" ]
                 [ text feedback.content
                 , ul [] <| List.map viewExplanation (Maybe.withDefault [] <| Maybe.map unwrapExplanations feedback.explanations)
                 ]
 
         viewObservation observation =
-            li [ class "ml-4" ]
+            li [ class "ml-4 my-1 pl-2 border-l" ]
                 [ text observation.content
                 , ul [] <| List.map viewFeedbackItem (Maybe.withDefault [] <| Maybe.map unwrapFeedback observation.feedback)
                 ]
 
         viewCategory category =
-            li [ class "text-gray-400" ]
+            li [ class "my-1 text-gray-400" ]
                 [ text category.name
                 , ul [] <| List.map viewObservation (Maybe.withDefault [] <| Maybe.map unwrapObservations category.observations)
                 ]
@@ -328,7 +336,7 @@ view model =
 
                     Failure e ->
                         MDEditor.render editorConf "Problem loading draft"
-                , Common.primaryButton "Submit" SubmitDraftForm
+                , div [ class "mx-4 mb-2" ] [ Common.primaryButton "Submit" SubmitDraftForm ]
                 ]
             , let
                 panel inner =

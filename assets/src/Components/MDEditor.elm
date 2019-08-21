@@ -13,7 +13,7 @@ type alias Config msg =
 
 render : Config msg -> String -> Html msg
 render config content =
-    div []
-        [ textarea [ onInput config.onInput, placeholder config.placeholder ]
+    div [class "mx-4 my-2"]
+        [ textarea [ class "bg-transparent p-2 border rounded shadow leading-tight focus:outline-none w-full", onInput config.onInput, placeholder config.placeholder ]
             [ text content ]
         ]

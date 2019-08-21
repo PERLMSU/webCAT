@@ -62,7 +62,7 @@ defmodule WebCAT.Feedback.Draft do
     # This is not the recommended behavior of changesets, be warned, but it's an inconvenience to preload something
     # we know is just going to be trashed in the same transaction.
     changeset
-    |> Map.put(:data, Map.put(changeset.data, :authors, []))
+    #|> Map.put(:data, Map.put(changeset.data, :authors, []))
     |> put_assoc(:authors, Repo.all(from(u in User, where: u.id in ^ids)))
   end
 
