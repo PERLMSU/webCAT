@@ -15,8 +15,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
             conn,
             :index,
             data.rotation_group_id,
-            data.student_id,
-            data.feedback_id
+            data.student_id
           )
         )
         |> json_response(200)
@@ -26,7 +25,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
 
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
-      |> get(Routes.student_explanation_path(conn, :index, 1, 2, 3))
+      |> get(Routes.student_explanation_path(conn, :index, 1, 2))
       |> json_response(401)
     end
   end

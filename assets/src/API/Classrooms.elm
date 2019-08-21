@@ -1,4 +1,4 @@
-module API.Classrooms exposing (ClassroomForm, classrooms, deleteClassroom, editClassroom, formFromClassroom, newClassroom)
+module API.Classrooms exposing (ClassroomForm, classrooms, deleteClassroom, editClassroom, formFromClassroom, newClassroom, rotationGroup)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -52,4 +52,10 @@ newClassroom session form toMsg =
 
 deleteClassroom : Session -> ClassroomId -> (APIData () -> msg) -> Cmd msg
 deleteClassroom session id toMsg =
-    API.deleteRemote (Endpoint.classroom id) (Session.credential session)  toMsg
+    API.deleteRemote (Endpoint.classroom id) (Session.credential session) toMsg
+
+
+
+rotationGroup : Session -> RotationGroupId -> (APIData RotationGroup -> msg) -> Cmd msg
+rotationGroup session id toMsg =
+    API.getRemote (Endpoint.rotationGroup id) (Session.credential session) rotationGroupDecoder toMsg

@@ -1,4 +1,4 @@
-module API.Feedback exposing (CategoryForm, addStudentExplanation, addStudentFeedback, categories, category, deleteCategory, deleteStudentExplanation, deleteStudentFeedback, editCategory, encodeCategoryForm, encodeMaybe, feedbackByCategory, formFromCategory, newCategory, observations, rotationGroupClassroomCategories, studentExplanations, studentFeedback)
+module API.Feedback exposing (CategoryForm, addStudentExplanation, addStudentFeedback, categories, category, deleteCategory, deleteStudentExplanation, deleteStudentFeedback, editCategory, encodeCategoryForm, encodeMaybe, feedbackByCategory, formFromCategory, grades, newCategory, observations, rotationGroupClassroomCategories, studentExplanations, studentFeedback)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -118,3 +118,8 @@ feedbackByCategory session groupId userId toMsg =
 rotationGroupClassroomCategories : Session -> RotationGroupId -> (APIData (List Category) -> msg) -> Cmd msg
 rotationGroupClassroomCategories session groupId toMsg =
     API.getRemote (Endpoint.rotationGroupClassroomCategories groupId) (Session.credential session) (Decode.list categoryDecoder) toMsg
+
+
+grades : Session -> DraftId -> (APIData (List Grade) -> msg) -> Cmd msg
+grades session draftId toMsg =
+    API.getRemote (Endpoint.grades draftId) (Session.credential session) (Decode.list gradeDecoder) toMsg

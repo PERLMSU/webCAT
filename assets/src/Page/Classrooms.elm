@@ -347,7 +347,7 @@ update msg model =
 
                 _ ->
                     -- TODO: Need a better solution for handling delete errors
-                    (model, Cmd.none)
+                    ( model, Cmd.none )
 
 
 updateClassroomList : Model -> Classroom -> ( Model, Cmd Msg )

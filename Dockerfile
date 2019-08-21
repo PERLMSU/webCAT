@@ -17,7 +17,7 @@ RUN mix local.hex --force && \
 
 # Build assets and release
 RUN cd ./assets && \
-    yarn && \
+    yarn --ignore-optional --verbose && \
     yarn run build
 
 # Build release

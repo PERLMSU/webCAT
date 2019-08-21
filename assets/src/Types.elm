@@ -1,4 +1,4 @@
-module Types exposing (Categories(..), Category, CategoryId(..), Classroom, ClassroomId(..), Classrooms(..), Comment, CommentId(..), Comments(..), Draft, DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Explanations(..), Feedback, FeedbackId(..), FeedbackList(..), Grade, GradeId(..), Grades(..), Observation, ObservationId(..), ObservationType(..), Observations(..), ParentCategory(..), Role, RoleId(..), Rotation, RotationGroup, RotationGroupId(..), RotationGroups(..), RotationId(..), Rotations(..), Section, SectionId(..), Sections(..), Semester, SemesterId(..), Semesters(..), StudentFeedback, StudentExplanation, User, UserId(..), Users(..), categoryDecoder, classroomDecoder, commentDecoder, draftDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, observationDecoder, observationTypeDecoder, optionalMaybe, roleDecoder, roleEncoder, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, unwrapCategories, unwrapCategoryId, unwrapClassroomId, unwrapClassrooms, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, studentFeedbackDecoder, studentExplanationDecoder, unwrapExplanations, unwrapFeedback, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapObservations, unwrapRoleId, unwrapRotationGroupId, unwrapRotationGroups, unwrapRotationId, unwrapRotations, unwrapSectionId, unwrapSections, unwrapSemesterId, unwrapSemesters, unwrapUserId, unwrapUsers, userDecoder)
+module Types exposing (..)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Pipeline exposing (optional, required)
@@ -689,12 +689,15 @@ type alias Draft =
     , status : DraftStatus
 
     -- Foreign keys
-    , userId : UserId
+    , studentId : UserId
+    , reviewerId : Maybe UserId
     , rotationGroupId : RotationGroupId
 
     -- Related data
-    , user : Maybe User
+    , student : Maybe User
+    , reviewer : Maybe User
     , rotationGroup : Maybe RotationGroup
+    , authors : Maybe Users
     , comments : Maybe Comments
     , grades : Maybe Grades
 
@@ -710,12 +713,15 @@ draftDecoder =
         |> required "id" (map DraftId int)
         |> required "content" string
         |> required "status" draftStatusDecoder
-        |> required "userId" (map UserId int)
-        |> required "rotation_groupId" (map RotationGroupId int)
-        |> optionalMaybe "user" (nullable (lazy (\_ -> userDecoder)))
+        |> required "student_id" (map UserId int)
+        |> optionalMaybe "reviewer_id" (nullable <| map UserId int)
+        |> required "rotation_group_id" (map RotationGroupId int)
+        |> optionalMaybe "student" (nullable <| lazy <| \_ -> userDecoder)
+        |> optionalMaybe "reviewer" (nullable <| lazy <| \_ -> userDecoder)
         |> optionalMaybe "rotation_group" (nullable (lazy (\_ -> rotationGroupDecoder)))
-        |> optionalMaybe "comments" (nullable (map Comments (list (lazy (\_ -> commentDecoder)))))
-        |> optionalMaybe "grades" (nullable (map Grades (list (lazy (\_ -> gradeDecoder)))))
+        |> optionalMaybe "authors" (nullable <| map Users <| list <| lazy <| \_ -> userDecoder)
+        |> optionalMaybe "comments" (nullable <| map Comments <| list <| lazy <| \_ -> commentDecoder)
+        |> optionalMaybe "grades" (nullable <| map Grades <| list <| lazy <| \_ -> gradeDecoder)
         |> required "inserted_at" (map Time.millisToPosix int)
         |> required "updated_at" (map Time.millisToPosix int)
 
@@ -756,8 +762,8 @@ commentDecoder =
     Decode.succeed Comment
         |> required "id" (map CommentId int)
         |> required "content" string
-        |> required "draftId" (map DraftId int)
-        |> required "userId" (map UserId int)
+        |> required "draft_id" (map DraftId int)
+        |> required "user_id" (map UserId int)
         |> optionalMaybe "draft" (nullable (lazy (\_ -> draftDecoder)))
         |> optionalMaybe "user" (nullable (lazy (\_ -> userDecoder)))
         |> required "inserted_at" (map Time.millisToPosix int)
@@ -798,8 +804,8 @@ gradeDecoder =
         |> required "id" (map GradeId int)
         |> required "score" int
         |> optionalMaybe "note" (nullable string)
-        |> required "categoryId" (map CategoryId int)
-        |> required "draftId" (map DraftId int)
+        |> required "category_id" (map CategoryId int)
+        |> required "draft_id" (map DraftId int)
         |> optionalMaybe "category" (nullable (lazy (\_ -> categoryDecoder)))
         |> optionalMaybe "draft" (nullable (lazy (\_ -> draftDecoder)))
         |> required "inserted_at" (map Time.millisToPosix int)
@@ -856,6 +862,7 @@ type alias StudentFeedback =
     , updatedAt : Time.Posix
     }
 
+
 studentFeedbackDecoder : Decoder StudentFeedback
 studentFeedbackDecoder =
     Decode.succeed StudentFeedback
@@ -877,6 +884,7 @@ type alias StudentExplanation =
     , updatedAt : Time.Posix
     }
 
+
 studentExplanationDecoder : Decoder StudentExplanation
 studentExplanationDecoder =
     Decode.succeed StudentExplanation
@@ -886,6 +894,7 @@ studentExplanationDecoder =
         |> required "explanation_id" (map ExplanationId int)
         |> required "inserted_at" (map Time.millisToPosix int)
         |> required "updated_at" (map Time.millisToPosix int)
+
 
 
 -- Utility

@@ -24,6 +24,8 @@ type Page
     | Feedback
     | EditFeedback
     | Drafts
+    | Draft
+    | ComposeDraft
     | Profile
 
 
@@ -61,10 +63,9 @@ viewMenu page user =
     let
         userItem =
             div [ class "flex items-center m-2" ]
-                [ img [ class "flex-shrink-0 h-10 w-10 rounded-full mx-1", src "https://avatars3.githubusercontent.com/u/2858049?s=460&v=4" ] []
+                [ img [ class "flex-shrink-0 h-10 w-10 rounded-full mx-1", src "https://i2.wp.com/www.ahfirstaid.org/wp-content/uploads/2014/07/avatar-placeholder.png?fit=204%2C204" ] []
                 , div [ class "text-left w-32" ]
-                    [ div [ class "mx-2 text-lg text-blue-200 font-display truncate" ] [ text "PHY 183 - Studio Physics" ]
-                    , div [ class "mx-2 text-xs text-blue-100 font-display truncate" ] [ text (user.firstName ++ " " ++ user.lastName) ]
+                    [ div [ class "mx-2 text-lg text-blue-100 font-display truncate" ] [ text (user.firstName ++ " " ++ user.lastName) ]                        
                     ]
                 ]
 
@@ -92,11 +93,7 @@ viewMenu page user =
 
 viewFooter : Html msg
 viewFooter =
-    footer [ class "flex justify-center py-1" ]
-        [ p [ class "text-center text-gray-600 mx-2" ] [ text "Version 0.4.0-dev" ]
-        , p [ class "text-center text-gray-600 mx-2" ] [ text "|" ]
-        , p [ class "text-center text-gray-600 mx-2" ] [ text "Built on 2019-6-27 at 1:52pm EDT" ]
-        ]
+    footer [ class "flex justify-center py-1" ] <| List.map (p [ class "text-center text-gray-600 mx-2" ] << List.singleton << text) [ "Version 1.0.0-dev", "|", "Built on 2019-8-20 at 4:34am EDT" ]
 
 
 isActive : Page -> Route -> Bool

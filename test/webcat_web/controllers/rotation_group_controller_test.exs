@@ -110,7 +110,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.rotation_group_path(conn, :delete, Factory.insert(:rotation_group).id))
-      |> text_response(204)
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do

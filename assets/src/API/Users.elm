@@ -1,4 +1,4 @@
-module API.Users exposing (UserForm, deleteUser, editUser, encodeUserForm, newUser, rotationGroups, users)
+module API.Users exposing (UserForm, deleteUser, editUser, encodeUserForm, newUser, rotationGroups, user, users)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -12,6 +12,11 @@ import Types exposing (..)
 
 
 -- Users
+
+
+user : Session -> UserId -> (APIData User -> msg) -> Cmd msg
+user session id toMsg =
+    API.getRemote (Endpoint.user id) (Session.credential session) userDecoder toMsg
 
 
 users : Session -> (APIData (List User) -> msg) -> Cmd msg
@@ -61,7 +66,7 @@ newUser session form toMsg =
 
 deleteUser : Session -> UserId -> (APIData () -> msg) -> Cmd msg
 deleteUser session id toMsg =
-    API.deleteRemote (Endpoint.user id) (Session.credential session)  toMsg
+    API.deleteRemote (Endpoint.user id) (Session.credential session) toMsg
 
 
 rotationGroups : Session -> UserId -> (APIData (List RotationGroup) -> msg) -> Cmd msg

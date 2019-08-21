@@ -2,7 +2,7 @@ module API.Endpoint exposing (..)
 
 import Http
 import Maybe.Extra exposing (values)
-import Types exposing (CategoryId, ClassroomId, CommentId, DraftId, DraftStatus, ExplanationId, FeedbackId, GradeId, ObservationId, RotationGroupId, RotationId, SectionId, SemesterId, UserId, draftStatusToString, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRoleId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapUserId)
+import Types exposing (..)
 import Url.Builder exposing (QueryParameter, int, string)
 
 
@@ -159,13 +159,13 @@ rotations maybeSectionId =
 -- Rotation groups
 
 
-rotation_group : RotationGroupId -> Endpoint
-rotation_group id =
+rotationGroup : RotationGroupId -> Endpoint
+rotationGroup id =
     url [ "rotation_groups", String.fromInt <| unwrapRotationGroupId id ] []
 
 
-rotation_groups : Maybe RotationId -> Endpoint
-rotation_groups maybeRotationId =
+rotationGroups : Maybe RotationId -> Endpoint
+rotationGroups maybeRotationId =
     url [ "rotation_groups" ] <| Maybe.Extra.toList <| Maybe.map (unwrapRotationId >> int "rotation_id") maybeRotationId
 
 
@@ -313,7 +313,6 @@ studentFeedbackItem id userId feedbackId =
     url [ "rotation_groups", String.fromInt <| unwrapRotationGroupId id, "feedback", String.fromInt <| unwrapUserId userId, String.fromInt <| unwrapFeedbackId feedbackId ] []
 
 
-
 studentExplanations : RotationGroupId -> UserId -> Endpoint
 studentExplanations id userId =
     url [ "rotation_groups", String.fromInt <| unwrapRotationGroupId id, "feedback", String.fromInt <| unwrapUserId userId, "explanations" ] []
@@ -322,8 +321,6 @@ studentExplanations id userId =
 studentExplanation : RotationGroupId -> UserId -> FeedbackId -> ExplanationId -> Endpoint
 studentExplanation id userId feedbackId explanationId =
     url [ "rotation_groups", String.fromInt <| unwrapRotationGroupId id, "feedback", String.fromInt <| unwrapUserId userId, String.fromInt <| unwrapFeedbackId feedbackId, "explanations", String.fromInt <| unwrapExplanationId explanationId ] []
-
-
 
 
 studentFeedbackByCategory : RotationGroupId -> UserId -> Endpoint

@@ -27,6 +27,7 @@ module.exports = (env, options) => ({
     },
     entry: {
         app: './js/app.js',
+        draft: './js/draft.js'
     },
     output: {
         filename: '[name].js',

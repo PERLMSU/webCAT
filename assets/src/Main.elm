@@ -3,12 +3,15 @@ module Main exposing (main)
 import API as API exposing (Credential, credentialDecoder)
 import Browser exposing (Document)
 import Browser.Navigation as Nav
+import Either exposing (..)
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Page
 import Page.Blank as Blank
 import Page.Classrooms as Classrooms
+import Page.ComposeDraft as ComposeDraft
 import Page.Dashboard as Dashboard
+import Page.Draft as Draft
 import Page.Drafts as Drafts
 import Page.EditFeedback as EditFeedback
 import Page.Feedback as Feedback
@@ -58,6 +61,8 @@ type Model
     | Feedback Feedback.Model
     | EditFeedback EditFeedback.Model
     | Drafts Drafts.Model
+    | Draft Draft.Model
+    | ComposeDraft ComposeDraft.Model
     | Profile Profile.Model
 
 
@@ -75,6 +80,8 @@ type Msg
     | GotFeedbackMsg Feedback.Msg
     | GotEditFeedbackMsg EditFeedback.Msg
     | GotDraftsMsg Drafts.Msg
+    | GotDraftMsg Draft.Msg
+    | GotComposeDraftMsg ComposeDraft.Msg
     | GotProfileMsg Profile.Msg
     | GotSession Session
 
@@ -105,6 +112,12 @@ toSession page =
 
         Drafts drafts ->
             Drafts.toSession drafts
+
+        Draft draft ->
+            Draft.toSession draft
+
+        ComposeDraft draft ->
+            ComposeDraft.toSession draft
 
         Profile profile ->
             Profile.toSession profile
@@ -149,6 +162,18 @@ changeRouteTo maybeRoute model =
         Just Route.Drafts ->
             Drafts.init session
                 |> updateWith Drafts GotDraftsMsg model
+
+        Just (Route.Draft draftId) ->
+            Draft.init draftId session
+                |> updateWith Draft GotDraftMsg model
+
+        Just (Route.NewDraft groupId userId) ->
+            ComposeDraft.init (Right <| ( groupId, userId )) session
+                |> updateWith ComposeDraft GotComposeDraftMsg model
+
+        Just (Route.EditDraft draftId) ->
+            ComposeDraft.init (Left draftId) session
+                |> updateWith ComposeDraft GotComposeDraftMsg model
 
         Just Route.Profile ->
             Profile.init session
@@ -199,6 +224,22 @@ update msg model =
             EditFeedback.update subMsg feedback
                 |> updateWith EditFeedback GotEditFeedbackMsg model
 
+        ( GotDraftsMsg subMsg, Drafts drafts ) ->
+            Drafts.update subMsg drafts
+                |> updateWith Drafts GotDraftsMsg model
+
+        ( GotDraftMsg subMsg, Draft draft ) ->
+            Draft.update subMsg draft
+                |> updateWith Draft GotDraftMsg model
+
+        ( GotComposeDraftMsg subMsg, ComposeDraft draft ) ->
+            ComposeDraft.update subMsg draft
+                |> updateWith ComposeDraft GotComposeDraftMsg model
+
+        ( GotProfileMsg subMsg, Profile profile ) ->
+            Profile.update subMsg profile
+                |> updateWith Profile GotProfileMsg model
+
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
             ( model, Cmd.none )
@@ -238,6 +279,12 @@ subscriptions model =
 
         Drafts drafts ->
             Sub.map GotDraftsMsg (Drafts.subscriptions drafts)
+
+        Draft draft ->
+            Sub.map GotDraftMsg (Draft.subscriptions draft)
+
+        ComposeDraft draft ->
+            Sub.map GotComposeDraftMsg (ComposeDraft.subscriptions draft)
 
         Profile profile ->
             Sub.map GotProfileMsg (Profile.subscriptions profile)
@@ -291,6 +338,12 @@ view model =
                 Drafts drafts ->
                     viewPage Page.Drafts GotDraftsMsg (Drafts.view drafts)
 
+                Draft draft ->
+                    viewPage Page.Draft GotDraftMsg (Draft.view draft)
+
+                ComposeDraft draft ->
+                    viewPage Page.ComposeDraft GotComposeDraftMsg (ComposeDraft.view draft)
+
                 Profile profile ->
                     viewPage Page.Profile GotProfileMsg (Profile.view profile)
 
@@ -309,29 +362,8 @@ view model =
                     }
             in
             case model of
-                Redirect _ ->
-                    Page.viewPublic Blank.view
-
-                NotFound _ ->
-                    Page.viewPublic NotFound.view
-
                 Login login ->
                     viewPage GotLoginMsg (Login.view login)
 
-                Classrooms _ ->
-                    Page.viewPublic NotFound.view
-
-                Feedback _ ->
-                    Page.viewPublic NotFound.view
-
-                EditFeedback _ ->
-                    Page.viewPublic NotFound.view
-
-                Drafts _ ->
-                    Page.viewPublic NotFound.view
-
-                Profile _ ->
-                    Page.viewPublic NotFound.view
-
-                Users _ ->
+                _ ->
                     Page.viewPublic NotFound.view

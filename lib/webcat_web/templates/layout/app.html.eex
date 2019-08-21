@@ -10,8 +10,10 @@
     <link rel="stylesheet" integrity='<%= Routes.static_integrity(@conn, "/css/app.css") %>' href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
     <link rel="stylesheet" integrity='<%= Routes.static_integrity(@conn, "/css/fa.min.css") %>' href="<%= Routes.static_path(@conn, "/css/fa.min.css") %>" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
     <script integrity='<%= Routes.static_integrity(@conn, "/js/app.js") %>' src='<%= Routes.static_path(@conn, "/js/app.js") %>' defer="defer"></script>
+    <script integrity='<%= Routes.static_integrity(@conn, "/js/draft.js") %>' src='<%= Routes.static_path(@conn, "/js/draft.js") %>' defer="defer"></script>
 </head>
 
 <body>
