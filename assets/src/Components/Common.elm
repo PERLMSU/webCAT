@@ -1,4 +1,4 @@
-module Components.Common exposing (Style(..), dangerButton, header, icon, iconButton, infoButton, loading, panel, primaryButton, successButton, warningButton)
+module Components.Common exposing (Style(..), dangerButton, subheader, header, icon, iconButton, infoButton, loading, panel, primaryButton, successButton, warningButton)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -125,3 +125,7 @@ panel content =
 header : String -> Html msg
 header content =
     h1 [ class "text-4xl text-gray-400 font-display" ] [ text content ]
+
+subheader : String -> Html msg
+subheader content =
+    h2 [ class "text-xl text-gray-400 font-display" ] [ text content ]

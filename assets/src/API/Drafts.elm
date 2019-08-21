@@ -1,4 +1,4 @@
-module API.Drafts exposing (DraftForm, deleteDraft, draft, draftToForm, drafts, editDraft, encodeDraftForm, newDraft)
+module API.Drafts exposing (DraftForm, deleteDraft, draft, draftToForm, drafts, editDraft, encodeDraftForm, newDraft,grades)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -72,3 +72,10 @@ newDraft session form toMsg =
 deleteDraft : Session -> DraftId -> (APIData () -> msg) -> Cmd msg
 deleteDraft session id toMsg =
     API.deleteRemote (Endpoint.draft id) (Session.credential session) toMsg
+
+
+
+grades : Session -> DraftId -> (APIData (List Grade) -> msg) -> Cmd msg
+grades session draftId toMsg =
+    API.getRemote (Endpoint.grades draftId) (Session.credential session) (Decode.list gradeDecoder) toMsg
+

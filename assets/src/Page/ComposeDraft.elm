@@ -47,6 +47,7 @@ type Msg
     | GotGrades (APIData (List Grade))
     | GotEditorInput String
     | SubmitDraftForm
+    | GradeUpdated Grade String
 
 
 type FormField
@@ -206,6 +207,9 @@ update msg model =
         GotGrades result ->
             API.handleRemoteError result { model | grades = result } Cmd.none
 
+        GradeUpdated _ _ ->
+            ( model, Cmd.none )
+
         GotGradeCategories result ->
             API.handleRemoteError result { model | gradeCategories = result } Cmd.none
 
@@ -336,7 +340,7 @@ view model =
 
                     Failure e ->
                         MDEditor.render editorConf "Problem loading draft"
-                , div [ class "mx-4 mb-2" ] [ Common.primaryButton "Submit" SubmitDraftForm ]
+                , div [ class "mx-4 mb-2" ] [ Common.successButton "Submit" SubmitDraftForm ]
                 ]
             , let
                 panel inner =
@@ -349,7 +353,8 @@ view model =
               in
               case ( model.grades, model.gradeCategories ) of
                 ( Success grades, Success gradeCategories ) ->
-                    panel <| renderGrades gradeCategories grades
+                    --panel <| renderGrades gradeCategories grades
+                    text ""
 
                 ( Failure e, _ ) ->
                     panel <| div [ class "text-danger text-bold" ] [ text <| API.errorBodyToString <| API.getErrorBody e ]

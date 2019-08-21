@@ -203,52 +203,56 @@ viewCategories model categories =
 
         viewExplanation explanation =
             li []
-                [ input
-                    [ type_ "checkbox"
-                    , onCheck <| ExplanationChecked explanation.feedbackId explanation.id
-                    , checked <| hasExplanation model explanation.id
+                [ div [ class "py-1 flex flex-row content-center" ]
+                    [ input
+                        [ type_ "checkbox"
+                        , class "self-center leading-tight mr-2"
+                        , onCheck <| ExplanationChecked explanation.feedbackId explanation.id
+                        , checked <| hasExplanation model explanation.id
 
-                    -- Only enable if the parent feedback item is checked
-                    , disabled <| not <| hasFeedbackItem model explanation.feedbackId
+                        -- Only enable if the parent feedback item is checked
+                        , disabled <| not <| hasFeedbackItem model explanation.feedbackId
+                        ]
+                        []
+                    , span [] [ text explanation.content ]
                     ]
-                    []
-                , text explanation.content
                 ]
 
         viewFeedback feedback =
             li []
-                [ div []
+                [ div [ class "py-1 flex flex-row content-center" ]
                     [ input
                         [ type_ "checkbox"
+                        , class "self-center leading-tight mr-2"
                         , onCheck <| FeedbackChecked feedback.id
                         , checked <| hasFeedbackItem model feedback.id
                         ]
                         []
-                    , text feedback.content
+                    , span [] [ text feedback.content ]
                     ]
                 , ul [ class "ml-4" ] <| List.map viewExplanation <| unwrapMaybeDefault unwrapExplanations feedback.explanations
                 ]
 
         viewObservation observation =
-            li []
+            li [ class "text-l text-gray-500" ]
                 [ text observation.content
                 , ul [ class "ml-4" ] <| List.map viewFeedback <| unwrapMaybeDefault unwrapFeedback observation.feedback
                 ]
 
         viewSubcategory category =
-            li [] [ button [ onClick (SubCategorySelected category.id) ] [ text category.name ] ]
+            li [ class "text-l text-gray-500" ] [ button [ onClick (SubCategorySelected category.id) ] [ text category.name ] ]
 
         viewCategory category =
             Common.panel
                 [ div [ class "mx-4 my-2 flex" ]
                     [ Common.header category.name ]
-                , h3 [] [ text "sub categories" ]
-                , ul [] <| List.map viewSubcategory <| unwrapMaybeDefault unwrapCategories category.subCategories
-                , h3 [] [ text "observations" ]
-                , ul [] <| List.map viewObservation <| unwrapMaybeDefault unwrapObservations category.observations
+                , h3 [ class "text-xl text-gray-400 ml-4" ] [ text "Sub-categories" ]
+                , ul [ class "mx-4" ] <| List.map viewSubcategory <| List.sortBy .name <| unwrapMaybeDefault unwrapCategories category.subCategories
+                , h3 [ class "text-xl text-gray-400 ml-4" ] [ text "Observations" ]
+                , ul [ class "mx-4" ] <| List.map viewObservation <| List.sortBy .content <| unwrapMaybeDefault unwrapObservations category.observations
                 ]
     in
-    div [] <| List.map viewCategory categories
+    div [] <| List.map viewCategory <| List.sortBy .name categories
 
 
 view : Model -> { title : String, content : Html Msg }
