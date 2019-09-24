@@ -1,22 +1,22 @@
 defmodule WebCATWeb.RotationViewTest do
-  use WebCAT.DataCase
+  use WebCATWeb.ConnCase
 
   alias WebCATWeb.RotationView
 
   describe "render/2" do
-    test "it renders a rotation properly" do
+    test "it renders a rotation properly", %{conn: conn} do
       rotation = Factory.insert(:rotation)
-      rendered = RotationView.render("show.json", rotation: rotation)
+      rendered = RotationView.show(rotation, conn, %{})[:data]
 
-      assert rendered[:id] == rotation.id
-      assert rendered[:number] == rotation.number
-      assert rendered[:description] == rotation.description
-      assert rendered[:section_id] == rotation.section_id
+      assert rendered[:id] == to_string(rotation.id)
+      assert rendered[:attributes][:number] == rotation.number
+      assert rendered[:attributes][:description] == rotation.description
+      assert rendered[:attributes][:section_id] == rotation.section_id
     end
 
-    test "it renders a list of rotations properly" do
+    test "it renders a list of rotations properly", %{conn: conn} do
       rotations = Factory.insert_list(3, :rotation)
-      rendered_list = RotationView.render("list.json", rotations: rotations)
+      rendered_list = RotationView.index(rotations, conn, %{})
       assert Enum.count(rendered_list) == 3
     end
   end

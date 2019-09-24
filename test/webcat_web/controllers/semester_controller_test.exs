@@ -35,7 +35,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         |> get(Routes.semester_path(conn, :show, id))
         |> json_response(200)
 
-      assert res["id"] == id
+      assert res["data"]["id"] == to_string(id)
     end
   end
 
@@ -51,7 +51,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         |> post(Routes.semester_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["name"] == data["name"]
     end
 
     test "doesn't allow normal users to create", %{conn: conn} do
@@ -76,7 +76,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         |> put(Routes.semester_path(conn, :update, Factory.insert(:semester).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["name"] == update["name"]
     end
 
     test "doesn't allow normal users to update", %{conn: conn} do
@@ -95,10 +95,20 @@ defmodule WebCATWeb.SemesterControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
+      data = Factory.insert(:semester)
+
+      res =
+        conn
+        |> Auth.sign_in(user)
+        |> delete(Routes.semester_path(conn, :delete, data.id))
+        |> json_response(200)
+
+      assert res["data"]["attributes"]["name"] == data.name
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.semester_path(conn, :delete, Factory.insert(:semester).id))
-      |> text_response(204)
+      |> get(Routes.semester_path(conn, :show, data.id))
+      |> json_response(404)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do

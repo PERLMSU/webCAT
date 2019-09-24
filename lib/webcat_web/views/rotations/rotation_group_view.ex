@@ -1,38 +1,11 @@
 defmodule WebCATWeb.RotationGroupView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "rotation", collection: "rotations"
 
-  alias WebCAT.Rotations.{RotationGroup, Rotation}
+  def fields, do: ~w(number description inserted_at updated_at)a ++ ~w(rotation_id)a
 
-  def render("list.json", %{rotation_groups: groups}) do
-    render_many(groups, __MODULE__, "group.json")
-  end
+  def relationships, do: [rotation: WebCATWeb.RotationView, users: WebCATWeb.UserView]
 
-  def render("show.json", %{rotation_group: group}) do
-    render_one(group, __MODULE__, "group.json")
-  end
-
-  def render("group.json", %{rotation_group: %RotationGroup{} = group}) do
-    group
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> timestamps_format()
-    |> case do
-      %{rotation: %Rotation{} = rotation} = map ->
-        Map.put(
-          map,
-          :rotation,
-          render_one(rotation, WebCATWeb.RotationView, "rotation.json")
-        )
-
-      map ->
-        Map.delete(map, :rotation)
-    end
-    |> case do
-      %{users: users} = map when is_list(users) ->
-        Map.put(map, :users, render_many(users, WebCATWeb.UserView, "user.json"))
-
-      map ->
-        Map.delete(map, :users)
-    end
-  end
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

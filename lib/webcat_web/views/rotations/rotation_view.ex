@@ -1,51 +1,13 @@
 defmodule WebCATWeb.RotationView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "rotation", collection: "rotations"
 
-  alias WebCAT.Rotations.{Rotation, Section}
+  def fields, do: ~w(number description start_date end_date inserted_at updated_at)a ++ ~w(section_id)a
 
-  def render("list.json", %{rotations: rotations}) do
-    render_many(rotations, __MODULE__, "rotation.json")
-  end
+  def relationships, do: [section: WebCATWeb.SectionView, rotation_groups: WebCATWeb.RotationGroupView]
 
-  def render("show.json", %{rotation: rotation}) do
-    render_one(rotation, __MODULE__, "rotation.json")
-  end
-
-  def render("rotation.json", %{rotation: %Rotation{} = rotation}) do
-    rotation
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> Map.update!(:start_date, &Timex.to_unix/1)
-    |> Map.update!(:end_date, &Timex.to_unix/1)
-    |> timestamps_format()
-    |> case do
-      %{section: %Section{} = section} = map ->
-        Map.put(
-          map,
-          :section,
-          render_one(section, WebCATWeb.SectionView, "section.json")
-        )
-
-      map ->
-        Map.delete(map, :section)
-    end
-    |> case do
-      %{rotation_groups: groups} = map when is_list(groups) ->
-        Map.put(
-          map,
-          :rotation_groups,
-          render_many(groups, WebCATWeb.RotationGroupView, "group.json")
-        )
-
-      map ->
-        Map.delete(map, :rotation_groups)
-    end
-    |> case do
-      %{users: users} = map when is_list(users) ->
-        Map.put(map, :users, render_many(users, WebCATWeb.UserView, "user.json"))
-
-      map ->
-        Map.delete(map, :users)
-    end
-  end
+  def start_date(data, _), do: Timex.to_unix(data.start_date)
+  def end_date(data, _), do: Timex.to_unix(data.end_date)
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

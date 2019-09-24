@@ -5,8 +5,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      rotation = Factory.insert(:rotation)
-      Factory.insert_list(3, :rotation_group, rotation: rotation)
+      Factory.insert_list(3, :rotation_group)
 
       result =
         conn
@@ -36,7 +35,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> get(Routes.rotation_group_path(conn, :show, id))
         |> json_response(200)
 
-      assert res["id"] == id
+      assert res["data"]["id"] == to_string(id)
     end
   end
 
@@ -52,7 +51,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         |> post(Routes.rotation_group_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["number"] == data["number"]
     end
 
     test "doesn't allow normal users to create", %{conn: conn} do
@@ -85,7 +84,7 @@ defmodule WebCATWeb.RotationGroupControllerTest do
         )
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["number"] == update["number"]
     end
 
     test "doesn't allow normal users to update", %{conn: conn} do
@@ -106,11 +105,20 @@ defmodule WebCATWeb.RotationGroupControllerTest do
   describe "delete/3" do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
+      data = Factory.insert(:rotation_group)
+
+      res =
+        conn
+        |> Auth.sign_in(user)
+        |> delete(Routes.rotation_group_path(conn, :delete, data.id))
+        |> json_response(200)
+
+      assert res["data"]["attributes"]["number"] == data.number
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.rotation_group_path(conn, :delete, Factory.insert(:rotation_group).id))
-      |> json_response(200)
+      |> get(Routes.rotation_group_path(conn, :show, data.id))
+      |> json_response(404)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do

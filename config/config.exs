@@ -44,6 +44,17 @@ config :sentry,
   included_environments: [:prod],
   environment_name: Mix.env()
 
+config :jsonapi,
+  namespace: "/api",
+  field_transformation: :underscore,
+  remove_links: false,
+  json_library: Jason,
+  paginator: nil
+
+config :mime, :types, %{
+  "application/vnd.api+json" => ["json"]
+}
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

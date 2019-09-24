@@ -67,6 +67,6 @@ defmodule WebCAT.CRUD do
 
   defp fetch_opt(opt, key, default) do
     val = Keyword.get(opt, key, [])
-    if val == [], do: default, else: val
+    if val == [] or val == nil, do: default, else: val
   end
 end

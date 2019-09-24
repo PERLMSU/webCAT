@@ -10,7 +10,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :index))
+        |> get(Routes.classroom_path(conn, :index, fields: %{classroom: "course_code"}))
         |> json_response(200)
 
       assert Enum.count(result) >= 3
@@ -27,15 +27,15 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      classroom_id = Factory.insert(:classroom).id
+      id = Factory.insert(:classroom).id
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :show, classroom_id))
+        |> get(Routes.classroom_path(conn, :show, id))
         |> json_response(200)
 
-      assert res["id"] == classroom_id
+      assert res["data"]["id"] == to_string(id)
     end
   end
 
@@ -51,7 +51,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> post(Routes.classroom_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["name"] == data["name"]
     end
 
     test "doesn't allow normal users to create classrooms", %{conn: conn} do
@@ -76,7 +76,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
         |> put(Routes.classroom_path(conn, :update, Factory.insert(:classroom).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["name"] == update["name"]
     end
 
     test "doesn't allow normal users to update classrooms", %{conn: conn} do
@@ -95,12 +95,20 @@ defmodule WebCATWeb.ClassroomControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      classroom = Factory.insert(:classroom)
+      data = Factory.insert(:classroom)
+
+      res =
+        conn
+        |> Auth.sign_in(user)
+        |> delete(Routes.classroom_path(conn, :delete, data.id))
+        |> json_response(200)
+
+      assert res["data"]["attributes"]["name"] == data.name
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.classroom_path(conn, :delete, classroom.id))
-      |> json_response(200)
+      |> get(Routes.classroom_path(conn, :show, data.id))
+      |> json_response(404)
     end
 
     test "doesn't allow normal users to delete classrooms", %{conn: conn} do

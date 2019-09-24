@@ -98,10 +98,20 @@ defmodule WebCATWeb.RotationControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
+      data = Factory.insert(:rotation)
+
+      res =
+        conn
+        |> Auth.sign_in(user)
+        |> delete(Routes.rotation_path(conn, :delete, data.id))
+        |> json_response(200)
+
+      assert res["data"]["attributes"]["number"] == data.number
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.rotation_path(conn, :delete, Factory.insert(:rotation).id))
-      |> text_response(204)
+      |> get(Routes.rotation_path(conn, :show, data.id))
+      |> json_response(404)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do

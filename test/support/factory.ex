@@ -1,4 +1,4 @@
-defmodule WebCAT.Factory do
+pacemacs seefmodule WebCAT.Factory do
   use ExMachina.Ecto, repo: WebCAT.Repo
 
   alias WebCAT.Accounts.{Notification, PasswordCredential, PasswordReset, TokenCredential, User}
@@ -71,6 +71,7 @@ defmodule WebCAT.Factory do
   def admin_factory do
     user = build(:user)
     role = Repo.get_by(Role, identifier: "admin")
+
     Performer.grant(user, role)
     user
   end
@@ -84,7 +85,7 @@ defmodule WebCAT.Factory do
 
   def assistant_factory do
     user = build(:user)
-    role = Repo.get_by(Role, identifier: "assistant")
+    role = Repo.get_by(Role, identifier: "learning_assistant")
     Performer.grant(user, role)
     user
   end
@@ -100,7 +101,7 @@ defmodule WebCAT.Factory do
       name: sequence("category"),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       classroom: classroom,
-      sub_categories: Factory.build_list(3, :sub_category, classroom: classroom)
+      sub_categories: Factory.build_list(1, :sub_category, classroom: classroom)
     }
   end
 
@@ -127,7 +128,7 @@ defmodule WebCAT.Factory do
     %Draft{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
       status: sequence(:status, ~w(unreviewed reviewing needs_revision approved emailed)),
-      authors: Factory.build_list(2, :assistant),
+      authors: Factory.build_list(1, :assistant),
       student: student,
       reviewer: Factory.insert(:admin),
       rotation_group: rotation_group
@@ -213,7 +214,7 @@ defmodule WebCAT.Factory do
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       number: sequence(:number, & &1),
       rotation: Factory.build(:rotation),
-      users: [Factory.insert(:assistant)] ++ Factory.insert_list(2, :student)
+      users: [Factory.insert(:assistant)] ++ Factory.insert_list(1, :student)
     }
   end
 
@@ -232,7 +233,7 @@ defmodule WebCAT.Factory do
       start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: -3)),
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 9)),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
-      users: Factory.insert_list(3, :assistant),
+      users: Factory.insert_list(1, :assistant),
       classroom: Factory.build(:classroom),
       name: sequence(:name, ~w(Fall Spring))
     }
@@ -243,7 +244,7 @@ defmodule WebCAT.Factory do
       number: sequence(:number, &Integer.to_string/1),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       semester: Factory.build(:semester),
-      users: [Factory.insert(:assistant)] ++ Factory.insert_list(2, :student)
+      users: [Factory.insert(:assistant)] ++ Factory.insert_list(1, :student)
     }
   end
 end

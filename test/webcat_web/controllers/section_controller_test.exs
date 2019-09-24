@@ -5,8 +5,7 @@ defmodule WebCATWeb.SectionControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      semester = Factory.insert(:semester)
-      Factory.insert_list(3, :section, semester: semester)
+      Factory.insert_list(3, :section)
 
       result =
         conn
@@ -36,7 +35,7 @@ defmodule WebCATWeb.SectionControllerTest do
         |> get(Routes.section_path(conn, :show, id))
         |> json_response(200)
 
-      assert res["id"] == id
+      assert res["data"]["id"] == to_string(id)
     end
   end
 
@@ -52,7 +51,7 @@ defmodule WebCATWeb.SectionControllerTest do
         |> post(Routes.section_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["number"] == data["number"]
     end
 
     test "doesn't allow normal users to create", %{conn: conn} do
@@ -77,7 +76,7 @@ defmodule WebCATWeb.SectionControllerTest do
         |> put(Routes.section_path(conn, :update, Factory.insert(:section).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["number"] == update["number"]
     end
 
     test "doesn't allow normal users to update", %{conn: conn} do
@@ -96,10 +95,20 @@ defmodule WebCATWeb.SectionControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
+      data = Factory.insert(:section)
+
+      res =
+        conn
+        |> Auth.sign_in(user)
+        |> delete(Routes.section_path(conn, :delete, data.id))
+        |> json_response(200)
+
+      assert res["data"]["attributes"]["number"] == data.number
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.section_path(conn, :delete, Factory.insert(:section).id))
-      |> text_response(204)
+      |> get(Routes.section_path(conn, :show, data.id))
+      |> json_response(404)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do

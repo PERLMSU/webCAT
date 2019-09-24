@@ -45,6 +45,7 @@ defmodule WebCAT.Mixfile do
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.13.2"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:jsonapi, github: "bbuscarino/jsonapi", ref: "5b90ff8e9f9191d00e0b50c1c194cf4e439846f0"},
       # Database
       {:ecto_sql, "~> 3.0"},
       {:postgrex, "~> 0.14.1"},

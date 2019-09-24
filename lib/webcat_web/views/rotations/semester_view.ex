@@ -1,51 +1,13 @@
 defmodule WebCATWeb.SemesterView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "semester", collection: "semesters"
 
-  alias WebCAT.Rotations.{Classroom, Semester}
+  def fields, do: ~w(name description start_date end_date inserted_at updated_at)a ++ ~w(classroom_id)a
 
-  def render("list.json", %{semesters: semesters}) do
-    render_many(semesters, __MODULE__, "semester.json")
-  end
+  def relationships, do: [classroom: WebCATWeb.ClassroomView, sections: WebCATWeb.SectionView, users: WebCATWeb.UserView]
 
-  def render("show.json", %{semester: semester}) do
-    render_one(semester, __MODULE__, "semester.json")
-  end
-
-  def render("semester.json", %{semester: %Semester{} = semester}) do
-    semester
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> Map.update!(:start_date, &Timex.to_unix/1)
-    |> Map.update!(:end_date, &Timex.to_unix/1)
-    |> timestamps_format()
-    |> case do
-      %{classroom: %Classroom{} = classroom} = map ->
-        Map.put(
-          map,
-          :classroom,
-          render_one(classroom, WebCATWeb.ClassroomView, "classroom.json")
-        )
-
-      map ->
-        Map.delete(map, :classroom)
-    end
-    |> case do
-      %{sections: sections} = map when is_list(sections) ->
-        Map.put(
-          map,
-          :sections,
-          render_many(sections, WebCATWeb.SectionView, "section.json")
-        )
-
-      map ->
-        Map.delete(map, :sections)
-    end
-    |> case do
-      %{users: users} = map when is_list(users) ->
-        Map.put(map, :users, render_many(users, WebCATWeb.UserView, "user.json"))
-
-      map ->
-        Map.delete(map, :users)
-    end
-  end
+  def start_date(data, _), do: Timex.to_unix(data.start_date)
+  def end_date(data, _), do: Timex.to_unix(data.end_date)
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

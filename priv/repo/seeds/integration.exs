@@ -50,7 +50,7 @@ transaction =
   end)
   |> Multi.insert(:assistant, assistant_changeset)
   |> Multi.run(:assistant_role, fn repo, %{assistant: user} ->
-    Performer.grant(user.performer, repo.get_by!(Role, identifier: "assistant"))
+    Performer.grant(user.performer, repo.get_by!(Role, identifier: "learning_assistant"))
 
     {:ok, nil}
   end)
