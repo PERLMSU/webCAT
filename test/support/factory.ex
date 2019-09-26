@@ -1,4 +1,4 @@
-pacemacs seefmodule WebCAT.Factory do
+defmodule WebCAT.Factory do
   use ExMachina.Ecto, repo: WebCAT.Repo
 
   alias WebCAT.Accounts.{Notification, PasswordCredential, PasswordReset, TokenCredential, User}
@@ -25,7 +25,7 @@ pacemacs seefmodule WebCAT.Factory do
     %Notification{
       content: Enum.join(Faker.Lorem.sentences(2..3), "\n"),
       seen: false,
-      draft: Factory.build(:draft),
+      draft: Factory.build(:student_draft),
       user: Factory.build(:user)
     }
   end
@@ -116,29 +116,38 @@ pacemacs seefmodule WebCAT.Factory do
   def comment_factory do
     %Comment{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
-      draft: Factory.build(:draft),
+      draft: Factory.build(:student_draft),
       user: Factory.build(:user)
     }
   end
 
-  def draft_factory do
-    student = Factory.insert(:student)
-    rotation_group = Factory.build(:rotation_group, users: [student])
+  def group_draft_factory do
+    rotation_group = Factory.build(:rotation_group)
 
     %Draft{
       content: Enum.join(Faker.Lorem.sentences(), "\n"),
+      notes: Enum.join(Faker.Lorem.sentences(), "\n"),
       status: sequence(:status, ~w(unreviewed reviewing needs_revision approved emailed)),
-      authors: Factory.build_list(1, :assistant),
+      rotation_group: rotation_group,
+    }
+  end
+
+  def student_draft_factory do
+    student = Factory.insert(:student)
+
+    %Draft{
+      content: Enum.join(Faker.Lorem.sentences(), "\n"),
+      notes: Enum.join(Faker.Lorem.sentences(), "\n"),
+      status: sequence(:status, ~w(unreviewed reviewing needs_revision approved emailed)),
       student: student,
-      reviewer: Factory.insert(:admin),
-      rotation_group: rotation_group
+      parent_draft: Factory.insert(:group_draft)
     }
   end
 
   def email_factory do
     %Email{
       status: "delivered",
-      draft: Factory.build(:draft)
+      draft: Factory.build(:student_draft)
     }
   end
 
@@ -160,7 +169,7 @@ pacemacs seefmodule WebCAT.Factory do
     %Grade{
       score: Enum.random(0..100),
       note: Enum.join(Faker.Lorem.sentences(), "\n"),
-      draft: Factory.build(:draft),
+      draft: Factory.build(:student_draft),
       category: Factory.build(:category)
     }
   end
@@ -174,18 +183,10 @@ pacemacs seefmodule WebCAT.Factory do
   end
 
   def student_feedback_factory do
-    student = Factory.insert(:student)
-
-    rotation_group =
-      Factory.build(:rotation_group)
-      |> Map.update!(:users, fn users ->
-        [student | users]
-      end)
-
     %StudentFeedback{
+      id: sequence(:sf_id, & &1),
       feedback: Factory.build(:feedback),
-      rotation_group: rotation_group,
-      student: student
+      draft: Factory.build(:student_draft)
     }
   end
 
@@ -193,10 +194,10 @@ pacemacs seefmodule WebCAT.Factory do
     student_feedback = Factory.insert(:student_feedback)
 
     %StudentExplanation{
+      id: sequence(:se_id, & &1),
       explanation: Factory.build(:explanation),
       feedback: student_feedback.feedback,
-      rotation_group: student_feedback.rotation_group,
-      student: student_feedback.student
+      draft: student_feedback.draft
     }
   end
 

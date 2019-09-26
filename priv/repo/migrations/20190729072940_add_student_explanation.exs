@@ -3,6 +3,7 @@ defmodule WebCAT.Repo.Migrations.AddStudentExplanation do
   import WebCAT.Repo.Helpers
 
   def change do
+    
     create table(:student_explanations, primary_key: false) do
       add_req(:explanation_id, references(:explanations, on_delete: :delete_all),
         primary_key: true

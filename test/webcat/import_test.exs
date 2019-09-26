@@ -2,7 +2,6 @@ defmodule WebCAT.ImportTest do
   @moduledoc false
   use WebCAT.DataCase, async: true
 
-  alias WebCAT.Accounts.User
   alias WebCAT.Import.Students
   alias WebCAT.CRUD
   alias WebCAT.Rotations.Section

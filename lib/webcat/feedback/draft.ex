@@ -8,20 +8,21 @@ defmodule WebCAT.Feedback.Draft do
   schema "drafts" do
     field(:content, :string)
     field(:status, :string, default: "unreviewed")
+    field(:notes, :string)
 
-    many_to_many(:authors, User, join_through: "draft_authors", on_replace: :delete)
-    belongs_to(:reviewer, User)
+    belongs_to(:parent_draft, __MODULE__)
     belongs_to(:student, User)
     belongs_to(:rotation_group, WebCAT.Rotations.RotationGroup)
 
     has_many(:comments, WebCAT.Feedback.Comment)
     has_many(:grades, WebCAT.Feedback.Grade)
+    has_many(:child_drafts, __MODULE__)
 
     timestamps(type: :utc_datetime)
   end
 
-  @required ~w(content status student_id rotation_group_id)a
-  @optional ~w(reviewer_id)a
+  @required ~w(content status)a
+  @optional ~w(notes student_id rotation_group_id parent_draft_id)a
 
   @doc """
   Create a changeset for a draft
@@ -32,39 +33,24 @@ defmodule WebCAT.Feedback.Draft do
     |> cast_assoc(:grades)
     |> validate_required(@required)
     |> validate_inclusion(:status, ~w(unreviewed reviewing needs_revision approved emailed))
-    |> foreign_key_constraint(:reviewer_id)
     |> foreign_key_constraint(:student_id, name: "drafts_student_group_fkey")
     |> foreign_key_constraint(:rotation_group_id, name: "drafts_student_group_fkey")
-    |> put_authors(Map.get(attrs, "authors"))
+    |> check_draft_type()
   end
 
-  defp put_authors(%{valid?: true} = changeset, users) when is_list(users) do
-    ids =
-      users
-      |> Enum.map(fn user ->
-        case user do
-          %{id: id} ->
-            id
+  defp check_draft_type(%{valid?: true} = changeset) do
+    has_parent_draft = not is_nil(get_field(changeset, :parent_draft_id))
+    has_student = not is_nil(get_field(changeset, :student_id))
+    has_group = not is_nil(get_field(changeset, :rotation_group_id))
 
-          id when is_integer(id) ->
-            id
-
-          id when is_binary(id) ->
-            String.to_integer(id)
-
-          _ ->
-            nil
-        end
-      end)
-      |> Enum.reject(&is_nil/1)
-
-    # This is being forced because we know if a list of ids are being passed, we want to overwrite.
-    # This is not the recommended behavior of changesets, be warned, but it's an inconvenience to preload something
-    # we know is just going to be trashed in the same transaction.
-    changeset
-    #|> Map.put(:data, Map.put(changeset.data, :authors, []))
-    |> put_assoc(:authors, Repo.all(from(u in User, where: u.id in ^ids)))
+    cond do
+      has_parent_draft and has_group -> add_error(changeset, :rotation_group_id, "must be blank when draft has a parent")
+      has_parent_draft and not has_student -> add_error(changeset, :student_id, "cannot be blank when draft has a parent")
+      not has_parent_draft and not has_group -> add_error(changeset, :rotation_group_id, "cannot be blank when the draft is top-level")
+      not has_parent_draft and has_student -> add_error(changeset, :student_id, "must be blank when top-level draft")
+      true -> changeset
+    end
   end
 
-  defp put_authors(changeset, _), do: changeset
+  defp check_draft_type(changeset), do: changeset
 end
