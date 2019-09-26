@@ -36,7 +36,6 @@ defmodule WebCATWeb.Router do
     # Accounts
     resources("/user", ProfileController, singleton: true, only: ~w(show update)a)
     resources("/users", UserController, except: ~w(new edit)a)
-    get("/users/:id/relationships/rotation_groups", UserController, :rotation_groups)
 
     # Classrooms
     resources("/classrooms", ClassroomController, except: ~w(new edit)a)
@@ -45,14 +44,6 @@ defmodule WebCATWeb.Router do
     post("/sections/:id/import", SectionController, :import)
     resources("/rotations", RotationController, except: ~w(new edit)a)
     resources("/rotation_groups", RotationGroupController, except: ~w(new edit)a)
-    get("/rotation_groups/:id/relationships/students", RotationGroupController, :students)
-    get("/rotation_groups/:id/relationships/classroom", RotationGroupController, :classroom)
-
-    get(
-      "/rotation_groups/:id/classroom/categories",
-      RotationGroupController,
-      :classroom_categories
-    )
 
     # Feedback
     resources("/categories", CategoryController, except: ~w(new edit)a)
@@ -60,52 +51,11 @@ defmodule WebCATWeb.Router do
     resources("/feedback", FeedbackController, except: ~w(new edit)a)
     resources("/explanations", ExplanationController, except: ~w(new edit)a)
     resources("/drafts", DraftController, except: ~w(new edit)a)
-    resources("/drafts/:draft_id/comments", CommentController, except: ~w(new edit)a)
-    resources("/drafts/:draft_id/grades", GradeController, except: ~w(new edit)a)
+    resources("/comments", CommentController, except: ~w(new edit)a)
+    resources("/grades", GradeController, except: ~w(new edit)a)
 
-    # Feedback writer
-    get(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id",
-      StudentFeedbackController,
-      :index
-    )
-
-    get(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id/by_category",
-      StudentFeedbackController,
-      :by_category
-    )
-
-    post(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id",
-      StudentFeedbackController,
-      :create
-    )
-
-    delete(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id",
-      StudentFeedbackController,
-      :delete
-    )
-
-    # Feedback writer - explanations
-    get(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id/explanations",
-      StudentExplanationController,
-      :index
-    )
-
-    post(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id/explanations/:explanation_id",
-      StudentExplanationController,
-      :create
-    )
-
-    delete(
-      "/rotation_groups/:rotation_group_id/feedback/:student_id/:feedback_id/explanations/:explanation_id",
-      StudentExplanationController,
-      :delete
-    )
+    resources("/student_feedback", StudentFeedbackController, except: ~w(new edit)a)
+    resources("/student_explanations", StudentExplanationController, except: ~w(new edit)a)
   end
 
   scope "/", WebCATWeb do
