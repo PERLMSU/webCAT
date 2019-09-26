@@ -1,45 +1,11 @@
 defmodule WebCATWeb.NotificationView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "notification", collection: "notifications"
 
-  alias WebCAT.Accounts.{Notification, User}
-  alias WebCAT.Feedback.Draft
+  def fields, do: ~w(content seen inserted_at updated_at)a ++ ~w(user_id draft_id)a
 
-  alias WebCATWeb.{DraftView, UserView}
+  def relationships, do: [user: WebCATWeb.UserView, draft: WebCATWeb.DraftView]
 
-  def render("list.json", %{notifications: notifications}) do
-    render_many(notifications, __MODULE__, "notification.json")
-  end
-
-  def render("show.json", %{notification: notification}) do
-    render_one(notification, __MODULE__, "notification.json")
-  end
-
-  def render("notification.json", %{notification: %Notification{} = notification}) do
-    notification
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> timestamps_format()
-    |> case do
-      %{draft: %Draft{} = draft} = map ->
-        Map.put(
-          map,
-          :draft,
-          render_one(draft, DraftView, "draft.json")
-        )
-
-      map ->
-        Map.delete(map, :draft)
-    end
-    |> case do
-      %{user: %User{} = user} = map ->
-        Map.put(
-          map,
-          :user,
-          render_one(user, UserView, "user.json")
-        )
-
-      map ->
-        Map.delete(map, :user)
-    end
-  end
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

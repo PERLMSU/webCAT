@@ -1,35 +1,13 @@
 defmodule WebCATWeb.GradeView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "grade", collection: "grades"
 
-  alias WebCAT.Feedback.{Category, Grade, Draft}
   alias WebCATWeb.{CategoryView, DraftView}
 
-  def render("list.json", %{grades: grades}) do
-    render_many(grades, __MODULE__, "grade.json")
-  end
+  def fields, do: ~w(score note inserted_at updated_at)a ++ ~w(draft_id category_id)a
 
-  def render("show.json", %{grade: grade}) do
-    render_one(grade, __MODULE__, "grade.json")
-  end
+  def relationships, do: [draft: DraftView, category: CategoryView]
 
-  def render("grade.json", %{grade: %Grade{} = grade}) do
-    grade
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> timestamps_format()
-    |> case do
-      %{draft: %Draft{} = draft} = map ->
-        Map.put(map, :draft, render_one(draft, DraftView, "draft.json"))
-
-      map ->
-        Map.delete(map, :draft)
-    end
-    |> case do
-      %{category: %Category{} = category} = map ->
-        Map.put(map, :category, render_one(category, CategoryView, "category.json"))
-
-      map ->
-        Map.delete(map, :category)
-    end
-  end
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

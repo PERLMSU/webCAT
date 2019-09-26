@@ -1,31 +1,13 @@
 defmodule WebCATWeb.ExplanationView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "explanation", collection: "explanations"
 
-  alias WebCAT.Feedback.{Feedback, Explanation}
+  alias WebCATWeb.FeedbackView
 
-  def render("list.json", %{explanations: explanations}) do
-    render_many(explanations, __MODULE__, "explanation.json")
-  end
+  def fields, do: ~w(content inserted_at updated_at)a ++ ~w(feedback_id)a
 
-  def render("show.json", %{explanation: explanation}) do
-    render_one(explanation, __MODULE__, "explanation.json")
-  end
+  def relationships, do: [feedback: FeedbackView]
 
-  def render("explanation.json", %{explanation: %Explanation{} = explanation}) do
-    explanation
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> timestamps_format()
-    |> case do
-      %{feedback: %Feedback{} = feedback} = map ->
-        Map.put(
-          map,
-          :feedback,
-          render_one(feedback, WebCATWeb.FeedbackView, "feedback.json")
-        )
-
-      map ->
-        Map.delete(map, :feedback)
-    end
-  end
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

@@ -1,44 +1,19 @@
 defmodule WebCATWeb.StudentFeedbackView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "student_feedback", collection: "student_feedback"
 
-  alias WebCAT.Feedback.{StudentFeedback, Feedback}
-  alias WebCAT.Rotations.RotationGroup
-  alias WebCAT.Accounts.User
-  alias WebCATWeb.{UserView, RotationGroupView, FeedbackView}
+  alias WebCATWeb.{DraftView, FeedbackView}
 
-  def render("list.json", %{student_feedback: student_feedback}) do
-    render_many(student_feedback, __MODULE__, "student_feedback.json")
-  end
+  def fields,
+    do:
+  ~w(inserted_at updated_at)a ++ ~w(draft_id feedback_id)a
 
-  def render("show.json", %{student_feedback: student_feedback}) do
-    render_one(student_feedback, __MODULE__, "student_feedback.json")
-  end
+  def relationships,
+    do: [
+    draft: DraftView,
+    feedback: FeedbackView
+  ]
 
-  def render("student_feedback.json", %{student_feedback: %StudentFeedback{} = student_feedback}) do
-    student_feedback
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> timestamps_format()
-    |> case do
-      %{student: %User{} = student} = map ->
-        Map.put(map, :student, render_one(student, UserView, "user.json"))
-
-      map ->
-        Map.delete(map, :student)
-    end
-    |> case do
-      %{rotation_group: %RotationGroup{} = group} = map ->
-        Map.put(map, :rotation_group, render_one(group, RotationGroupView, "group.json"))
-
-      map ->
-        Map.delete(map, :rotation_group)
-    end
-    |> case do
-      %{feedback: %Feedback{} = feedback} = map ->
-        Map.put(map, :feedback, render_one(feedback, FeedbackView, "feedback.json"))
-
-      map ->
-        Map.delete(map, :feedback)
-    end
-  end
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

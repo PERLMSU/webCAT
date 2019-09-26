@@ -1,20 +1,11 @@
 defmodule WebCATWeb.RoleView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "role", collection: "roles"
 
-  alias Terminator.Role
+  def fields, do: ~w(identifier name inserted_at updated_at)a
 
-  def render("list.json", %{roles: roles}) do
-    render_many(roles, __MODULE__, "role.json")
-  end
+  def relationships, do: []
 
-  def render("show.json", %{role: role}) do
-    render_one(role, __MODULE__, "role.json")
-  end
-
-  def render("role.json", %{role: %Role{} = role}) do
-    role
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__ performers)a)
-    |> timestamps_format()
-  end
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end

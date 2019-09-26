@@ -1,38 +1,13 @@
 defmodule WebCATWeb.ObservationView do
   use WebCATWeb, :view
+  use JSONAPI.View, type: "observation", collection: "observations"
 
-  alias WebCAT.Feedback.{Category, Observation}
+  alias WebCATWeb.{CategoryView, FeedbackView}
 
-  def render("list.json", %{observations: observations}) do
-    render_many(observations, __MODULE__, "observation.json")
-  end
+  def fields, do: ~w(content type inserted_at updated_at)a ++ ~w(category_id)a
 
-  def render("show.json", %{observation: observation}) do
-    render_one(observation, __MODULE__, "observation.json")
-  end
+  def relationships, do: [category: CategoryView, feedback: FeedbackView]
 
-  def render("observation.json", %{observation: %Observation{} = observation}) do
-    observation
-    |> Map.from_struct()
-    |> Map.drop(~w(__meta__)a)
-    |> timestamps_format()
-    |> case do
-      %{category: %Category{} = category} = map ->
-        Map.put(
-          map,
-          :category,
-          render_one(category, WebCATWeb.CategoryView, "category.json")
-        )
-
-      map ->
-        Map.delete(map, :category)
-    end
-    |> case do
-      %{feedback: feedback} = map when is_list(feedback) ->
-        Map.put(map, :feedback, render_many(feedback, WebCATWeb.FeedbackView, "feedback.json"))
-
-      map ->
-        Map.delete(map, :feedback)
-    end
-  end
+  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
+  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
 end
