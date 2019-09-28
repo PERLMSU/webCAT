@@ -16,7 +16,7 @@ defmodule WebCAT.Feedback.Draft do
 
     has_many(:comments, WebCAT.Feedback.Comment)
     has_many(:grades, WebCAT.Feedback.Grade)
-    has_many(:child_drafts, __MODULE__)
+    has_many(:child_drafts, __MODULE__, foreign_key: :parent_draft_id)
 
     timestamps(type: :utc_datetime)
   end
