@@ -5,27 +5,21 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      data = Factory.insert_list(3, :student_explanation) |> Enum.at(0)
+      explanation = Factory.insert(:explanation)
+      Factory.insert_list(3, :student_explanation, explanation: explanation)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(
-          Routes.student_explanation_path(
-            conn,
-            :index,
-            data.rotation_group_id,
-            data.student_id
-          )
-        )
+        |> get(Routes.student_explanation_path(conn, :index, explanation_id: explanation.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 1
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
-      |> get(Routes.student_explanation_path(conn, :index, 1, 2))
+      |> get(Routes.student_explanation_path(conn, :index))
       |> json_response(401)
     end
   end
@@ -39,27 +33,24 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
       res =
         conn
         |> Auth.sign_in(user)
-        |> post(
-          Routes.student_explanation_path(
-            conn,
-            :create,
-            data.rotation_group_id,
-            data.student_id,
-            data.feedback_id,
-            data.explanation_id
-          )
-        )
+        |> post( Routes.student_explanation_path(conn, :create, data))
         |> json_response(201)
 
-      assert res["feedback_id"] == data.feedback_id
+      attributes = res["data"]["attributes"]
+
+      assert attributes["feedback_id"] == data.feedback_id
+      assert attributes["explanation_id"] == data.explanation_id
+      assert attributes["draft_id"] == data.draft_id
     end
 
     test "doesn't allow normal users to create student_explanation", %{conn: conn} do
       {:ok, user} = login_user()
 
+      data = Factory.params_with_assocs(:student_explanation)
+
       conn
       |> Auth.sign_in(user)
-      |> post(Routes.student_explanation_path(conn, :create, 1, 2, 3, 4))
+      |> post(Routes.student_explanation_path(conn, :create, data))
       |> json_response(403)
     end
   end
@@ -68,29 +59,23 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.params_with_assocs(:student_explanation)
+      data = Factory.insert(:student_explanation)
 
       conn
       |> Auth.sign_in(user)
       |> delete(
-        Routes.student_explanation_path(
-          conn,
-          :delete,
-          data.rotation_group_id,
-          data.student_id,
-          data.feedback_id,
-          data.explanation_id
-        )
-      )
-      |> text_response(204)
+        Routes.student_explanation_path(conn, :delete, data.id))
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete student_explanation", %{conn: conn} do
       {:ok, user} = login_user()
 
+      data = Factory.insert(:student_explanation)
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.student_explanation_path(conn, :delete, 1, 2, 3, 4))
+      |> delete(Routes.student_explanation_path(conn, :delete, data.id))
       |> json_response(403)
     end
   end

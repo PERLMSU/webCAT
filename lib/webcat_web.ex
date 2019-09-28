@@ -63,6 +63,7 @@ defmodule WebCATWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import WebCATWeb.Router.Helpers
     end
   end
 

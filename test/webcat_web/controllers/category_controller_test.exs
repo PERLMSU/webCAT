@@ -27,15 +27,22 @@ defmodule WebCATWeb.CategoryControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      category_id = Factory.insert(:category).id
+      category = Factory.insert(:category)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.category_path(conn, :show, category_id))
+        |> get(Routes.category_path(conn, :show, category.id))
         |> json_response(200)
 
-      assert res["id"] == category_id
+      data = res["data"]
+      attributes = data["attributes"]
+
+      assert data["id"] == to_string(category.id)
+      assert attributes["name"] == category.name
+      assert attributes["description"] == category.description
+      assert attributes["parent_category_id"] == category.parent_category_id
+      assert attributes["classroom_id"] == category.classroom_id
     end
   end
 
@@ -43,15 +50,15 @@ defmodule WebCATWeb.CategoryControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.string_params_for(:category)
+      category = Factory.string_params_for(:category)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.category_path(conn, :create), data)
+        |> post(Routes.category_path(conn, :create), category)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["name"] == category["name"]
     end
 
     test "doesn't allow normal users to create categories", %{conn: conn} do
@@ -78,7 +85,7 @@ defmodule WebCATWeb.CategoryControllerTest do
         |> put(Routes.category_path(conn, :update, Factory.insert(:category).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["name"] == update["name"]
     end
 
     test "doesn't allow normal users to update categories", %{conn: conn} do
@@ -100,7 +107,7 @@ defmodule WebCATWeb.CategoryControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.category_path(conn, :delete, Factory.insert(:category).id))
-      |> text_response(204)
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete categories", %{conn: conn} do

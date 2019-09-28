@@ -5,15 +5,16 @@ defmodule WebCATWeb.ObservationControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      Factory.insert_list(3, :observation)
+      category = Factory.insert(:category)
+      Factory.insert_list(3, :observation, category: category)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.observation_path(conn, :index))
+        |> get(Routes.observation_path(conn, :index, category_id: category.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
@@ -27,15 +28,15 @@ defmodule WebCATWeb.ObservationControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      observation_id = Factory.insert(:observation).id
+      observation= Factory.insert(:observation)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.observation_path(conn, :show, observation_id))
+        |> get(Routes.observation_path(conn, :show, observation.id))
         |> json_response(200)
 
-      assert res["id"] == observation_id
+      assert res["data"]["id"] == to_string(observation.id)
     end
   end
 
@@ -51,7 +52,7 @@ defmodule WebCATWeb.ObservationControllerTest do
         |> post(Routes.observation_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["content"] == data["content"]
     end
 
     test "doesn't allow normal users to create observations", %{conn: conn} do
@@ -78,7 +79,7 @@ defmodule WebCATWeb.ObservationControllerTest do
         |> put(Routes.observation_path(conn, :update, Factory.insert(:observation).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["content"] == update["content"]
     end
 
     test "doesn't allow normal users to update observations", %{conn: conn} do
@@ -100,7 +101,7 @@ defmodule WebCATWeb.ObservationControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.observation_path(conn, :delete, Factory.insert(:observation).id))
-      |> text_response(204)
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete observations", %{conn: conn} do

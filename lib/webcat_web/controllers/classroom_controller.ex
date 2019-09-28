@@ -8,5 +8,4 @@ defmodule WebCATWeb.ClassroomController do
     type: "classroom",
     filter: ~w(course_code),
     sort: ~w(course_code name inserted_at updated_at)
-
 end

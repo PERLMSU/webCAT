@@ -8,12 +8,10 @@ defmodule WebCATWeb.ProfileController do
   action_fallback(WebCAT.FallbackController)
 
   def show(conn, user, _params) do
-    with {:ok, fetched} <- CRUD.get(User, user.id) do
       conn
       |> put_status(200)
       |> put_view(UserView)
-      |> render("show.json", user: fetched)
-    end
+      |> render("show.json", %{data: user})
   end
 
   def update(conn, user, params) do
@@ -21,7 +19,7 @@ defmodule WebCATWeb.ProfileController do
       conn
       |> put_status(200)
       |> put_view(UserView)
-      |> render("show.json", user: updated)
+      |> render("show.json", %{data: updated})
     end
   end
 end

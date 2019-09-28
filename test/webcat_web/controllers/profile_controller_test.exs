@@ -11,7 +11,7 @@ defmodule WebCATWeb.ProfileControllerTest do
         |> get(Routes.profile_path(conn, :show))
         |> json_response(200)
 
-      assert result["id"] == user.id
+      assert result["data"]["id"] == to_string(user.id)
     end
   end
 
@@ -27,8 +27,8 @@ defmodule WebCATWeb.ProfileControllerTest do
         |> put(Routes.profile_path(conn, :update), update)
         |> json_response(200)
 
-      assert result["email"] == update["email"]
-      assert result["email"] != user.email
+      assert result["data"]["attributes"]["email"] == update["email"]
+      assert result["data"]["attributes"]["email"] != user.email
     end
   end
 

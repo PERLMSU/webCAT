@@ -25,15 +25,21 @@ defmodule WebCATWeb.UserControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      user_id = Factory.insert(:user).id
-
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.user_path(conn, :show, user_id))
+        |> get(Routes.user_path(conn, :show, user.id))
         |> json_response(200)
 
-      assert res["id"] == user_id
+      data = res["data"]
+      attributes = data["attributes"]
+
+      assert data["id"] == to_string(user.id)
+      assert attributes["email"] == user.email
+      assert attributes["first_name"] == user.first_name
+      assert attributes["last_name"] == user.last_name
+      assert attributes["middle_name"] == user.middle_name
+      assert attributes["active"] == user.active
     end
   end
 
@@ -49,7 +55,7 @@ defmodule WebCATWeb.UserControllerTest do
         |> post(Routes.user_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["email"] == data["email"]
+      assert res["data"]["attributes"]["email"] == data["email"]
     end
 
     test "doesn't allow normal users to create other users", %{conn: conn} do
@@ -74,7 +80,7 @@ defmodule WebCATWeb.UserControllerTest do
         |> put(Routes.user_path(conn, :update, Factory.insert(:user).id), update)
         |> json_response(200)
 
-      assert res["email"] == update["email"]
+      assert res["data"]["attributes"]["email"] == update["email"]
     end
 
     test "doesn't allow normal users to update other users", %{conn: conn} do

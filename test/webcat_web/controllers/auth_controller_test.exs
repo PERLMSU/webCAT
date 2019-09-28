@@ -11,7 +11,7 @@ defmodule WebCATWeb.AuthControllerTest do
         |> json_response(201)
 
       assert String.length(result["token"]) > 0
-      assert result["user"]["email"] == user.email
+      assert result["user"]["data"]["attributes"]["email"] == user.email
     end
 
     test "errors correctly when wrong parameters supplied", %{conn: conn} do

@@ -5,15 +5,16 @@ defmodule WebCATWeb.RotationGroupControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      Factory.insert_list(3, :rotation_group)
+      rotation = Factory.insert(:rotation)
+      Factory.insert_list(3, :rotation_group, rotation: rotation)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_group_path(conn, :index))
+        |> get(Routes.rotation_group_path(conn, :index, rotation_id: rotation.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
@@ -27,15 +28,16 @@ defmodule WebCATWeb.RotationGroupControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      id = Factory.insert(:rotation_group).id
+      rotation_group = Factory.insert(:rotation_group)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_group_path(conn, :show, id))
+        |> get(Routes.rotation_group_path(conn, :show, rotation_group.id))
         |> json_response(200)
 
-      assert res["data"]["id"] == to_string(id)
+      assert res["data"]["id"] == to_string(rotation_group.id)
+      assert res["data"]["attributes"]["number"] == rotation_group.number
     end
   end
 

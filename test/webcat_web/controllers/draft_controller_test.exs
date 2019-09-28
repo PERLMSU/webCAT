@@ -5,15 +5,16 @@ defmodule WebCATWeb.DraftControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      Factory.insert_list(3, :draft)
+      parent = Factory.insert(:group_draft)
+      Factory.insert_list(3, :student_draft, parent_draft: parent)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.draft_path(conn, :index))
+        |> get(Routes.draft_path(conn, :index, parent_draft_id: parent.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
@@ -27,15 +28,15 @@ defmodule WebCATWeb.DraftControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      draft_id = Factory.insert(:draft).id
+      draft = Factory.insert(:student_draft)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.draft_path(conn, :show, draft_id))
+        |> get(Routes.draft_path(conn, :show, draft.id))
         |> json_response(200)
 
-      assert res["id"] == draft_id
+      assert res["data"]["id"] == to_string(draft.id)
     end
   end
 
@@ -43,7 +44,7 @@ defmodule WebCATWeb.DraftControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.string_params_with_assocs(:draft)
+      data = Factory.string_params_with_assocs(:student_draft)
 
       res =
         conn
@@ -51,7 +52,7 @@ defmodule WebCATWeb.DraftControllerTest do
         |> post(Routes.draft_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["content"] == data["content"]
     end
 
     test "doesn't allow normal users to create drafts", %{conn: conn} do
@@ -59,7 +60,7 @@ defmodule WebCATWeb.DraftControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> post(Routes.draft_path(conn, :create), Factory.string_params_for(:draft))
+      |> post(Routes.draft_path(conn, :create), Factory.string_params_for(:student_draft))
       |> json_response(403)
     end
   end
@@ -68,25 +69,25 @@ defmodule WebCATWeb.DraftControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      update = Factory.string_params_with_assocs(:draft)
+      update = Factory.string_params_with_assocs(:student_draft)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.draft_path(conn, :update, Factory.insert(:draft).id), update)
+        |> put(Routes.draft_path(conn, :update, Factory.insert(:student_draft).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["content"] == update["content"]
     end
 
     test "doesn't allow normal users to update drafts", %{conn: conn} do
       {:ok, user} = login_user()
 
-      update = Factory.string_params_for(:draft)
+      update = Factory.string_params_for(:student_draft)
 
       conn
       |> Auth.sign_in(user)
-      |> put(Routes.draft_path(conn, :update, Factory.insert(:draft).id), update)
+      |> put(Routes.draft_path(conn, :update, Factory.insert(:student_draft).id), update)
       |> json_response(403)
     end
   end
@@ -97,8 +98,8 @@ defmodule WebCATWeb.DraftControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.draft_path(conn, :delete, Factory.insert(:draft).id))
-      |> text_response(204)
+      |> delete(Routes.draft_path(conn, :delete, Factory.insert(:student_draft).id))
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete drafts", %{conn: conn} do
@@ -106,7 +107,7 @@ defmodule WebCATWeb.DraftControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.draft_path(conn, :delete, Factory.insert(:draft).id))
+      |> delete(Routes.draft_path(conn, :delete, Factory.insert(:student_draft).id))
       |> json_response(403)
     end
   end

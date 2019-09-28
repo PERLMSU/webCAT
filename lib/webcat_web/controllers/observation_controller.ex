@@ -1,84 +1,11 @@
 defmodule WebCATWeb.ObservationController do
-  use WebCATWeb, :authenticated_controller
-
   alias WebCATWeb.ObservationView
   alias WebCAT.Feedback.Observation
-  alias WebCAT.CRUD
 
-  action_fallback(WebCATWeb.FallbackController)
-
-  def index(conn, _user, params) do
-    conn
-    |> put_status(200)
-    |> put_view(ObservationView)
-    |> render("list.json", observations: CRUD.list(Observation, filter: filter(params, ~w(category_id type))))
-  end
-
-  def show(conn, _user, %{"id" => id}) do
-    with {:ok, observation} <- CRUD.get(Observation, id) do
-      conn
-      |> put_status(200)
-      |> put_view(ObservationView)
-      |> render("show.json", observation: observation)
-    end
-  end
-
-  def create(conn, _user, params) do
-    permissions do
-      has_role(:admin)
-    end
-
-    with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, observation} <- CRUD.create(Observation, params) do
-      conn
-      |> put_status(201)
-      |> put_view(ObservationView)
-      |> render("show.json", observation: observation)
-    else
-      {:auth, _} ->
-        {:error, :forbidden, dgettext("errors", "Not authorized to create observation")}
-
-      {:error, _} = it ->
-        it
-    end
-  end
-
-  def update(conn, _user, %{"id" => id} = params) do
-    permissions do
-      has_role(:admin)
-    end
-
-    with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, updated} <- CRUD.update(Observation, id, params) do
-      conn
-      |> put_status(200)
-      |> put_view(ObservationView)
-      |> render("show.json", observation: updated)
-    else
-      {:auth, _} ->
-        {:error, :forbidden, dgettext("errors", "Not authorized to update observation")}
-
-      {:error, _} = it ->
-        it
-    end
-  end
-
-  def delete(conn, _user, %{"id" => id}) do
-    permissions do
-      has_role(:admin)
-    end
-
-    with {:auth, :ok} <- {:auth, is_authorized?()},
-         {:ok, _deleted} <- CRUD.delete(Observation, id) do
-      conn
-      |> put_status(204)
-      |> text("")
-    else
-      {:auth, _} ->
-        {:error, :forbidden, dgettext("errors", "Not authorized to delete observation")}
-
-      {:error, _} = it ->
-        it
-    end
-  end
+  use WebCATWeb.ResourceController,
+    schema: Observation,
+    view: ObservationView,
+    type: "observation",
+    filter: ~w(type category_id),
+    sort: ~w(content type category_id inserted_at updated_at)
 end

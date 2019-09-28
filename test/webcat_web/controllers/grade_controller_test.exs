@@ -5,21 +5,21 @@ defmodule WebCATWeb.GradeControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      draft = Factory.insert(:draft)
+      draft = Factory.insert(:student_draft)
       Factory.insert_list(3, :grade, draft: draft)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.grade_path(conn, :index, draft.id))
+        |> get(Routes.grade_path(conn, :index, draft_id: draft.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
-      |> get(Routes.grade_path(conn, :index, Factory.insert(:draft).id))
+      |> get(Routes.grade_path(conn, :index))
       |> json_response(401)
     end
   end
@@ -33,10 +33,10 @@ defmodule WebCATWeb.GradeControllerTest do
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.grade_path(conn, :show, grade.draft_id, grade.id))
+        |> get(Routes.grade_path(conn, :show, grade.id))
         |> json_response(200)
 
-      assert res["id"] == grade.id
+      assert res["data"]["id"] == to_string(grade.id)
     end
   end
 
@@ -49,10 +49,10 @@ defmodule WebCATWeb.GradeControllerTest do
       res =
         conn
         |> Auth.sign_in(user)
-        |> post(Routes.grade_path(conn, :create, data["draft_id"]), data)
+        |> post(Routes.grade_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["score"] == data["score"]
     end
 
     test "doesn't allow normal users to create grades", %{conn: conn} do
@@ -62,7 +62,7 @@ defmodule WebCATWeb.GradeControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> post(Routes.grade_path(conn, :create, data["draft_id"]), data)
+      |> post(Routes.grade_path(conn, :create), data)
       |> json_response(403)
     end
   end
@@ -77,10 +77,10 @@ defmodule WebCATWeb.GradeControllerTest do
       res =
         conn
         |> Auth.sign_in(user)
-        |> put(Routes.grade_path(conn, :update, data.draft_id, data.id), update)
+        |> put(Routes.grade_path(conn, :update, data.id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["score"] == update["score"]
     end
 
     test "doesn't allow normal users to update grades", %{conn: conn} do
@@ -91,7 +91,7 @@ defmodule WebCATWeb.GradeControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> put(Routes.grade_path(conn, :update, data.draft_id, data.id), update)
+      |> put(Routes.grade_path(conn, :update, data.id), update)
       |> json_response(403)
     end
   end
@@ -104,8 +104,8 @@ defmodule WebCATWeb.GradeControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.grade_path(conn, :delete, data.draft_id, data.id))
-      |> text_response(204)
+      |> delete(Routes.grade_path(conn, :delete, data.id))
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete grades", %{conn: conn} do
@@ -115,7 +115,7 @@ defmodule WebCATWeb.GradeControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.grade_path(conn, :delete, data.draft_id, data.id))
+      |> delete(Routes.grade_path(conn, :delete, data.id))
       |> json_response(403)
     end
   end

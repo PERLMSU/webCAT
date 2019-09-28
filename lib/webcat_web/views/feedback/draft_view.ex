@@ -13,7 +13,8 @@ defmodule WebCATWeb.DraftView do
       student: UserView,
       rotation_group: RotationGroupView,
       comments: CommentView,
-      grades: GradeView
+      grades: GradeView,
+      child_drafts: __MODULE__
     ]
   end
 

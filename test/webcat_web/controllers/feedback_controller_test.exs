@@ -5,15 +5,16 @@ defmodule WebCATWeb.FeedbackControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      Factory.insert_list(3, :feedback)
+      observation = Factory.insert(:observation)
+      Factory.insert_list(3, :feedback, observation: observation)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.feedback_path(conn, :index))
+        |> get(Routes.feedback_path(conn, :index, observation_id: observation.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
@@ -27,15 +28,15 @@ defmodule WebCATWeb.FeedbackControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      feedback_id = Factory.insert(:feedback).id
+      feedback = Factory.insert(:feedback)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.feedback_path(conn, :show, feedback_id))
+        |> get(Routes.feedback_path(conn, :show, feedback.id))
         |> json_response(200)
 
-      assert res["id"] == feedback_id
+      assert res["data"]["id"] == to_string(feedback.id)
     end
   end
 
@@ -51,7 +52,7 @@ defmodule WebCATWeb.FeedbackControllerTest do
         |> post(Routes.feedback_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["content"] == data["content"]
     end
 
     test "doesn't allow normal users to create feedback", %{conn: conn} do
@@ -78,7 +79,7 @@ defmodule WebCATWeb.FeedbackControllerTest do
         |> put(Routes.feedback_path(conn, :update, Factory.insert(:feedback).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["content"] == update["content"]
     end
 
     test "doesn't allow normal users to update feedback", %{conn: conn} do
@@ -100,7 +101,7 @@ defmodule WebCATWeb.FeedbackControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.feedback_path(conn, :delete, Factory.insert(:feedback).id))
-      |> text_response(204)
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete feedback", %{conn: conn} do

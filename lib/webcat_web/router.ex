@@ -4,12 +4,12 @@ defmodule WebCATWeb.Router do
   use Sentry.Plug
 
   pipeline :browser do
-    plug(:accepts, ["html"])
+    plug(:accepts, ~w(html))
     plug(:put_secure_browser_headers)
   end
 
   pipeline :api do
-    plug(:accepts, ["json"])
+    plug(:accepts, ~w(json))
     plug(:put_secure_browser_headers)
     plug(JSONAPI.ContentTypeNegotiation)
     plug(JSONAPI.ResponseContentType)
@@ -35,27 +35,26 @@ defmodule WebCATWeb.Router do
 
     # Accounts
     resources("/user", ProfileController, singleton: true, only: ~w(show update)a)
-    resources("/users", UserController, except: ~w(new edit)a)
+    api_resource("/users", UserController)
 
     # Classrooms
-    resources("/classrooms", ClassroomController, except: ~w(new edit)a)
-    resources("/semesters", SemesterController, except: ~w(new edit)a)
-    resources("/sections", SectionController, except: ~w(new edit)a)
+    api_resource("/classrooms", ClassroomController)
+    api_resource("/semesters", SemesterController)
+    api_resource("/sections", SectionController)
     post("/sections/:id/import", SectionController, :import)
-    resources("/rotations", RotationController, except: ~w(new edit)a)
-    resources("/rotation_groups", RotationGroupController, except: ~w(new edit)a)
+    api_resource("/rotations", RotationController)
+    api_resource("/rotation_groups", RotationGroupController)
 
     # Feedback
-    resources("/categories", CategoryController, except: ~w(new edit)a)
-    resources("/observations", ObservationController, except: ~w(new edit)a)
-    resources("/feedback", FeedbackController, except: ~w(new edit)a)
-    resources("/explanations", ExplanationController, except: ~w(new edit)a)
-    resources("/drafts", DraftController, except: ~w(new edit)a)
-    resources("/comments", CommentController, except: ~w(new edit)a)
-    resources("/grades", GradeController, except: ~w(new edit)a)
-
-    resources("/student_feedback", StudentFeedbackController, except: ~w(new edit)a)
-    resources("/student_explanations", StudentExplanationController, except: ~w(new edit)a)
+    api_resource("/categories", CategoryController)
+    api_resource("/observations", ObservationController)
+    api_resource("/feedback", FeedbackController)
+    api_resource("/explanations", ExplanationController)
+    api_resource("/drafts", DraftController)
+    api_resource("/comments", CommentController)
+    api_resource("/grades", GradeController)
+    api_resource("/student_feedback", StudentFeedbackController)
+    api_resource("/student_explanations", StudentExplanationController)
   end
 
   scope "/", WebCATWeb do

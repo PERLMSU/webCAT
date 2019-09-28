@@ -11,10 +11,10 @@ defmodule WebCATWeb.RotationControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_path(conn, :index))
+        |> get(Routes.rotation_path(conn, :index, section_id: section.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
@@ -28,15 +28,16 @@ defmodule WebCATWeb.RotationControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      id = Factory.insert(:rotation).id
+      rotation = Factory.insert(:rotation)
 
       res =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_path(conn, :show, id))
+        |> get(Routes.rotation_path(conn, :show, rotation.id))
         |> json_response(200)
 
-      assert res["id"] == id
+      assert res["data"]["id"] == to_string(rotation.id)
+      assert res["data"]["attributes"]["number"] == rotation.number
     end
   end
 
@@ -52,7 +53,7 @@ defmodule WebCATWeb.RotationControllerTest do
         |> post(Routes.rotation_path(conn, :create), data)
         |> json_response(201)
 
-      assert res["name"] == data["name"]
+      assert res["data"]["attributes"]["number"] == data["number"]
     end
 
     test "doesn't allow normal users to create", %{conn: conn} do
@@ -79,7 +80,7 @@ defmodule WebCATWeb.RotationControllerTest do
         |> put(Routes.rotation_path(conn, :update, Factory.insert(:rotation).id), update)
         |> json_response(200)
 
-      assert res["name"] == update["name"]
+      assert res["data"]["attributes"]["number"] == update["number"]
     end
 
     test "doesn't allow normal users to update", %{conn: conn} do

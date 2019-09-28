@@ -4,21 +4,21 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
   describe "index/3" do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
-
-      data = Factory.insert_list(3, :student_feedback) |> Enum.at(0)
+      feedback = Factory.insert(:feedback)
+      Factory.insert_list(3, :student_feedback, feedback: feedback)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.student_feedback_path(conn, :index, data.rotation_group_id, data.student_id))
+        |> get(Routes.student_feedback_path(conn, :index, feedback_id: feedback.id))
         |> json_response(200)
 
-      assert Enum.count(result) >= 1
+      assert Enum.count(result) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
-      |> get(Routes.student_feedback_path(conn, :index, 1, 2))
+      |> get(Routes.student_feedback_path(conn, :index))
       |> json_response(401)
     end
   end
@@ -32,26 +32,23 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
       res =
         conn
         |> Auth.sign_in(user)
-        |> post(
-          Routes.student_feedback_path(
-            conn,
-            :create,
-            data.rotation_group_id,
-            data.student_id,
-            data.feedback_id
-          )
-        )
+        |> post(Routes.student_feedback_path(conn, :create, data))
         |> json_response(201)
 
-      assert res["feedback_id"] == data.feedback_id
+      attributes = res["data"]["attributes"]
+
+      assert attributes["feedback_id"] == data.feedback_id
+      assert attributes["draft_id"] == data.draft_id
     end
 
     test "doesn't allow normal users to create student_feedback", %{conn: conn} do
       {:ok, user} = login_user()
 
+      data = Factory.params_with_assocs(:student_feedback)
+
       conn
       |> Auth.sign_in(user)
-      |> post(Routes.student_feedback_path(conn, :create, 1, 2, 3))
+      |> post(Routes.student_feedback_path(conn, :create, data))
       |> json_response(403)
     end
   end
@@ -60,28 +57,22 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
-      data = Factory.params_with_assocs(:student_feedback)
+      data = Factory.insert(:student_feedback)
 
       conn
       |> Auth.sign_in(user)
-      |> delete(
-        Routes.student_feedback_path(
-          conn,
-          :delete,
-          data.rotation_group_id,
-          data.student_id,
-          data.feedback_id
-        )
-      )
-      |> text_response(204)
+      |> delete(Routes.student_feedback_path(conn, :delete, data.id))
+      |> json_response(200)
     end
 
     test "doesn't allow normal users to delete student_feedback", %{conn: conn} do
       {:ok, user} = login_user()
 
+      data = Factory.insert(:student_feedback)
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.student_feedback_path(conn, :delete, 1, 2, 3))
+      |> delete(Routes.student_feedback_path(conn, :delete, data.id))
       |> json_response(403)
     end
   end

@@ -9,7 +9,14 @@ defmodule WebCATWeb.ResourceController do
     {view, opts} = Keyword.pop(opts, :view)
     {type, opts} = Keyword.pop(opts, :type)
     {filter, opts} = Keyword.pop(opts, :filter)
-    {sort, _opts} = Keyword.pop(opts, :sort)
+    {sort, opts} = Keyword.pop(opts, :sort)
+    {roles, _opts} = Keyword.pop(opts, :roles, ~w(admin)a)
+
+    permissions = Enum.map(roles, fn role ->
+      quote do
+        has_role(unquote(role))
+      end
+    end)
 
     quote do
       use WebCATWeb, :authenticated_controller
@@ -53,7 +60,7 @@ defmodule WebCATWeb.ResourceController do
 
       def create(conn, _user, params) do
         permissions do
-          has_role(:admin)
+          unquote(permissions)
         end
 
         with {:auth, :ok} <- {:auth, is_authorized?()},
@@ -73,7 +80,7 @@ defmodule WebCATWeb.ResourceController do
 
       def update(conn, _user, %{"id" => id} = params) do
         permissions do
-          has_role(:admin)
+          unquote(permissions)
         end
 
         with {:auth, :ok} <- {:auth, is_authorized?()},
@@ -93,7 +100,7 @@ defmodule WebCATWeb.ResourceController do
 
       def delete(conn, _user, %{"id" => id}) do
         permissions do
-          has_role(:admin)
+          unquote(permissions)
         end
 
         with {:auth, :ok} <- {:auth, is_authorized?()},

@@ -13,7 +13,7 @@ defmodule WebCATWeb.AuthController do
          {:token, {:ok, token, _}} <- {:token, WebCATWeb.Auth.Guardian.encode_and_sign(user)} do
       conn
       |> put_status(201)
-      |> json(%{token: token, user: UserView.render("show.json", user: user)})
+      |> json(%{token: token, user: UserView.show(user, conn, %{})})
     else
       {:params, _} ->
         {:error, :bad_request, dgettext("errors", "Login details not supplied")}
@@ -48,7 +48,7 @@ defmodule WebCATWeb.AuthController do
       conn
       |> put_status(200)
       |> put_view(WebCATWeb.UserView)
-      |> render("user.json", user: user)
+      |> render("show.json", %{data: user})
     else
       {:params, _} ->
         {:error, :bad_request, dgettext("errors", "Reset details not correctly supplied.")}
