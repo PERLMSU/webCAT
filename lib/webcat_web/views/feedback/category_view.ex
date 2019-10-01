@@ -6,7 +6,7 @@ defmodule WebCATWeb.CategoryView do
 
   def relationships,
     do: [
-      classroom: WebCATWeb.ClassroomView,
+      classrooms: WebCATWeb.ClassroomView,
       parent_category: __MODULE__,
       sub_categories: __MODULE__,
       observations: WebCATWeb.ObservationView

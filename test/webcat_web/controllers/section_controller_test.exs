@@ -11,7 +11,7 @@ defmodule WebCATWeb.SectionControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.section_path(conn, :index))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) >= 3
     end
@@ -19,7 +19,7 @@ defmodule WebCATWeb.SectionControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.section_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -33,7 +33,7 @@ defmodule WebCATWeb.SectionControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.section_path(conn, :show, id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["id"] == to_string(id)
     end
@@ -49,7 +49,7 @@ defmodule WebCATWeb.SectionControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post(Routes.section_path(conn, :create), data)
-        |> json_response(201)
+        |> json_response(:created)
 
       assert res["data"]["attributes"]["number"] == data["number"]
     end
@@ -60,7 +60,7 @@ defmodule WebCATWeb.SectionControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.section_path(conn, :create), Factory.string_params_for(:section))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -74,7 +74,7 @@ defmodule WebCATWeb.SectionControllerTest do
         conn
         |> Auth.sign_in(user)
         |> put(Routes.section_path(conn, :update, Factory.insert(:section).id), update)
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["attributes"]["number"] == update["number"]
     end
@@ -87,7 +87,7 @@ defmodule WebCATWeb.SectionControllerTest do
       conn
       |> Auth.sign_in(user)
       |> put(Routes.section_path(conn, :update, Factory.insert(:section).id), update)
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -97,18 +97,15 @@ defmodule WebCATWeb.SectionControllerTest do
 
       data = Factory.insert(:section)
 
-      res =
-        conn
-        |> Auth.sign_in(user)
-        |> delete(Routes.section_path(conn, :delete, data.id))
-        |> json_response(200)
-
-      assert res["data"]["attributes"]["number"] == data.number
+      conn
+      |> Auth.sign_in(user)
+      |> delete(Routes.section_path(conn, :delete, data.id))
+      |> response(:no_content)
 
       conn
       |> Auth.sign_in(user)
       |> get(Routes.section_path(conn, :show, data.id))
-      |> json_response(404)
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do
@@ -117,7 +114,46 @@ defmodule WebCATWeb.SectionControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.section_path(conn, :delete, Factory.insert(:section).id))
-      |> json_response(403)
+      |> json_response(:forbidden)
+    end
+  end
+
+  describe "import/3" do
+    test "responds nromally to a well formed request", %{conn: conn} do
+      {:ok, user} = login_admin()
+
+      data = Factory.insert(:section)
+
+      upload = %Plug.Upload{
+        path: Path.join(__DIR__, "../../support/import.xlsx"),
+        filename: "import.xlsx"
+      }
+      assert File.exists?(upload.path)
+
+      res =
+        conn
+        |> Auth.sign_in(user)
+        |> post(Routes.section_path(conn, :import, data.id), %{file: upload})
+        |> json_response(:created)
+
+      assert Enum.count(res["data"]) == 2
+    end
+
+    test "doesn't allow normal users to import", %{conn: conn} do
+      {:ok, user} = login_user()
+
+      data = Factory.insert(:section)
+
+      upload = %Plug.Upload{
+        path: Path.join(__DIR__, "../../support/import.xlsx"),
+        filename: "import.xlsx"
+      }
+      assert File.exists?(upload.path)
+
+      conn
+      |> Auth.sign_in(user)
+      |> post(Routes.section_path(conn, :import, data.id), %{file: upload})
+      |> json_response(:forbidden)
     end
   end
 

@@ -6,6 +6,6 @@ defmodule WebCATWeb.CategoryController do
     schema: Category,
     view: CategoryView,
     type: "category",
-    filter: ~w(parent_category_id classroom_id),
-    sort: ~w(name description parent_category_id classroom_id inserted_at updated_at)
+    filter: ~w(parent_category_id),
+    sort: ~w(name description parent_category_id inserted_at updated_at)
 end

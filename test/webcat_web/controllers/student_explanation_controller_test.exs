@@ -12,7 +12,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.student_explanation_path(conn, :index, explanation_id: explanation.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) == 3
     end
@@ -20,7 +20,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.student_explanation_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -34,7 +34,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post( Routes.student_explanation_path(conn, :create, data))
-        |> json_response(201)
+        |> json_response(:created)
 
       attributes = res["data"]["attributes"]
 
@@ -51,7 +51,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.student_explanation_path(conn, :create, data))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -63,9 +63,13 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
 
       conn
       |> Auth.sign_in(user)
-      |> delete(
-        Routes.student_explanation_path(conn, :delete, data.id))
-      |> json_response(200)
+      |> delete(Routes.student_explanation_path(conn, :delete, data.id))
+      |> response(:no_content)
+
+      conn
+      |> Auth.sign_in(user)
+      |> get(Routes.student_explanation_path(conn, :show, data.id))
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete student_explanation", %{conn: conn} do
@@ -76,7 +80,7 @@ defmodule WebCATWeb.StudentExplanationControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.student_explanation_path(conn, :delete, data.id))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 

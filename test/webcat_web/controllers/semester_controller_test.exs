@@ -11,7 +11,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.semester_path(conn, :index))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) >= 3
     end
@@ -19,7 +19,7 @@ defmodule WebCATWeb.SemesterControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.semester_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -33,7 +33,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.semester_path(conn, :show, id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["id"] == to_string(id)
     end
@@ -49,7 +49,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post(Routes.semester_path(conn, :create), data)
-        |> json_response(201)
+        |> json_response(:created)
 
       assert res["data"]["attributes"]["name"] == data["name"]
     end
@@ -60,7 +60,7 @@ defmodule WebCATWeb.SemesterControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.semester_path(conn, :create), Factory.string_params_for(:semester))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -74,7 +74,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         conn
         |> Auth.sign_in(user)
         |> put(Routes.semester_path(conn, :update, Factory.insert(:semester).id), update)
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["attributes"]["name"] == update["name"]
     end
@@ -87,7 +87,7 @@ defmodule WebCATWeb.SemesterControllerTest do
       conn
       |> Auth.sign_in(user)
       |> put(Routes.semester_path(conn, :update, Factory.insert(:semester).id), update)
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -97,18 +97,15 @@ defmodule WebCATWeb.SemesterControllerTest do
 
       data = Factory.insert(:semester)
 
-      res =
-        conn
-        |> Auth.sign_in(user)
-        |> delete(Routes.semester_path(conn, :delete, data.id))
-        |> json_response(200)
-
-      assert res["data"]["attributes"]["name"] == data.name
+      conn
+      |> Auth.sign_in(user)
+      |> delete(Routes.semester_path(conn, :delete, data.id))
+      |> response(:no_content)
 
       conn
       |> Auth.sign_in(user)
       |> get(Routes.semester_path(conn, :show, data.id))
-      |> json_response(404)
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do
@@ -117,7 +114,7 @@ defmodule WebCATWeb.SemesterControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.semester_path(conn, :delete, Factory.insert(:semester).id))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 

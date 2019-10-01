@@ -12,7 +12,7 @@ defmodule WebCATWeb.RotationControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.rotation_path(conn, :index, section_id: section.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) == 3
     end
@@ -20,7 +20,7 @@ defmodule WebCATWeb.RotationControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.rotation_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -34,7 +34,7 @@ defmodule WebCATWeb.RotationControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.rotation_path(conn, :show, rotation.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["id"] == to_string(rotation.id)
       assert res["data"]["attributes"]["number"] == rotation.number
@@ -51,7 +51,7 @@ defmodule WebCATWeb.RotationControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post(Routes.rotation_path(conn, :create), data)
-        |> json_response(201)
+        |> json_response(:created)
 
       assert res["data"]["attributes"]["number"] == data["number"]
     end
@@ -62,7 +62,7 @@ defmodule WebCATWeb.RotationControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.rotation_path(conn, :create), Factory.string_params_for(:rotation))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -78,7 +78,7 @@ defmodule WebCATWeb.RotationControllerTest do
         conn
         |> Auth.sign_in(user)
         |> put(Routes.rotation_path(conn, :update, Factory.insert(:rotation).id), update)
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["attributes"]["number"] == update["number"]
     end
@@ -91,7 +91,7 @@ defmodule WebCATWeb.RotationControllerTest do
       conn
       |> Auth.sign_in(user)
       |> put(Routes.rotation_path(conn, :update, Factory.insert(:rotation).id), update)
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -101,18 +101,15 @@ defmodule WebCATWeb.RotationControllerTest do
 
       data = Factory.insert(:rotation)
 
-      res =
-        conn
-        |> Auth.sign_in(user)
-        |> delete(Routes.rotation_path(conn, :delete, data.id))
-        |> json_response(200)
-
-      assert res["data"]["attributes"]["number"] == data.number
+      conn
+      |> Auth.sign_in(user)
+      |> delete(Routes.rotation_path(conn, :delete, data.id))
+      |> response(:no_content)
 
       conn
       |> Auth.sign_in(user)
       |> get(Routes.rotation_path(conn, :show, data.id))
-      |> json_response(404)
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete", %{conn: conn} do
@@ -121,7 +118,7 @@ defmodule WebCATWeb.RotationControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.rotation_path(conn, :delete, Factory.insert(:rotation).id))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 

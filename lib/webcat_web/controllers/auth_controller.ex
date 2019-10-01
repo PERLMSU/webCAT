@@ -30,7 +30,7 @@ defmodule WebCATWeb.AuthController do
     with {:params, %{"email" => email}} <- {:params, params},
          {:email, {:ok, reset}} <- {:email, PasswordResets.start_reset(email)} do
       conn
-      |> put_status(201)
+      |> put_status(:created)
       |> put_view(WebCATWeb.AuthView)
       |> render("token.json", token: reset.token)
     else
@@ -46,7 +46,7 @@ defmodule WebCATWeb.AuthController do
     with {:params, %{"token" => token, "new_password" => new_password}} <- {:params, params},
          {:reset, {:ok, user}} <- {:reset, PasswordResets.finish_reset(token, new_password)} do
       conn
-      |> put_status(200)
+      |> put_status(:ok)
       |> put_view(WebCATWeb.UserView)
       |> render("show.json", %{data: user})
     else

@@ -12,7 +12,7 @@ defmodule WebCATWeb.GradeControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.grade_path(conn, :index, draft_id: draft.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) == 3
     end
@@ -20,7 +20,7 @@ defmodule WebCATWeb.GradeControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.grade_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -34,7 +34,7 @@ defmodule WebCATWeb.GradeControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.grade_path(conn, :show, grade.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["id"] == to_string(grade.id)
     end
@@ -50,7 +50,7 @@ defmodule WebCATWeb.GradeControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post(Routes.grade_path(conn, :create), data)
-        |> json_response(201)
+        |> json_response(:created)
 
       assert res["data"]["attributes"]["score"] == data["score"]
     end
@@ -63,7 +63,7 @@ defmodule WebCATWeb.GradeControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.grade_path(conn, :create), data)
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -78,7 +78,7 @@ defmodule WebCATWeb.GradeControllerTest do
         conn
         |> Auth.sign_in(user)
         |> put(Routes.grade_path(conn, :update, data.id), update)
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["attributes"]["score"] == update["score"]
     end
@@ -92,7 +92,7 @@ defmodule WebCATWeb.GradeControllerTest do
       conn
       |> Auth.sign_in(user)
       |> put(Routes.grade_path(conn, :update, data.id), update)
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -105,7 +105,12 @@ defmodule WebCATWeb.GradeControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.grade_path(conn, :delete, data.id))
-      |> json_response(200)
+      |> response(:no_content)
+
+      conn
+      |> Auth.sign_in(user)
+      |> get(Routes.grade_path(conn, :show, data.id))
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete grades", %{conn: conn} do
@@ -116,7 +121,7 @@ defmodule WebCATWeb.GradeControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.grade_path(conn, :delete, data.id))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 

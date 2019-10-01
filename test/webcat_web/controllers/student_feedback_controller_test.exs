@@ -11,7 +11,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.student_feedback_path(conn, :index, feedback_id: feedback.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) == 3
     end
@@ -19,7 +19,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.student_feedback_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -33,7 +33,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post(Routes.student_feedback_path(conn, :create, data))
-        |> json_response(201)
+        |> json_response(:created)
 
       attributes = res["data"]["attributes"]
 
@@ -49,7 +49,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.student_feedback_path(conn, :create, data))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -62,7 +62,12 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.student_feedback_path(conn, :delete, data.id))
-      |> json_response(200)
+      |> response(:no_content)
+
+      conn
+      |> Auth.sign_in(user)
+      |> get(Routes.student_feedback_path(conn, :delete, data.id))
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete student_feedback", %{conn: conn} do
@@ -73,7 +78,7 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.student_feedback_path(conn, :delete, data.id))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 

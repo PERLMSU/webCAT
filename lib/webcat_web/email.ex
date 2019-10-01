@@ -35,7 +35,7 @@ defmodule WebCATWeb.Email do
     date = Timex.format!(Timex.now(), "{M}/{D}/{YYYY}")
 
     new_email()
-    |> to(draft.user.email)
+    |> to(draft.student.email)
     |> from("no-reply@webcat.io")
     |> subject("Weekly Feedback - #{date}")
     |> render("draft.html", draft: draft, date: date)

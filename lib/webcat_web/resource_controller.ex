@@ -52,7 +52,7 @@ defmodule WebCATWeb.ResourceController do
 
         with {:ok, data} <- CRUD.get(unquote(schema), id, query) do
           conn
-          |> put_status(200)
+          |> put_status(:ok)
           |> put_view(unquote(view))
           |> render("show.json", %{data: data})
         end
@@ -66,7 +66,7 @@ defmodule WebCATWeb.ResourceController do
         with {:auth, :ok} <- {:auth, is_authorized?()},
              {:ok, data} <- CRUD.create(unquote(schema), params) do
           conn
-          |> put_status(201)
+          |> put_status(:created)
           |> put_view(unquote(view))
           |> render("show.json", %{data: data})
         else
@@ -86,7 +86,7 @@ defmodule WebCATWeb.ResourceController do
         with {:auth, :ok} <- {:auth, is_authorized?()},
              {:ok, updated} <- CRUD.update(unquote(schema), id, params) do
           conn
-          |> put_status(200)
+          |> put_status(:ok)
           |> put_view(unquote(view))
           |> render("show.json", %{data: updated})
         else
@@ -104,11 +104,8 @@ defmodule WebCATWeb.ResourceController do
         end
 
         with {:auth, :ok} <- {:auth, is_authorized?()},
-             {:ok, deleted} <- CRUD.delete(unquote(schema), id) do
-          conn
-          |> put_status(200)
-          |> put_view(unquote(view))
-          |> render("show.json", %{data: deleted})
+             {:ok, _deleted} <- CRUD.delete(unquote(schema), id) do
+          send_resp(conn, :no_content, "")
         else
           {:auth, _} ->
             {:error, :forbidden, dgettext("errors", unquote("Not authorized to delete #{type}"))}

@@ -42,6 +42,15 @@ defmodule WebCAT.Repo.Migrations.NewDraftSystem do
       timestamps(type: :timestamptz)
     end
 
+    alter table(:categories) do
+      remove(:classroom_id, references(:classrooms), default: 1)
+    end
+
+    create table(:classroom_categories, primary_key: false) do
+      add_req(:category_id, references(:categories, on_delete: :delete_all), primary_key: true)
+      add_req(:classroom_id, references(:classrooms, on_delete: :delete_all), primary_key: true)
+    end
+
     execute(
       """
       ALTER TABLE student_explanations ADD CONSTRAINT fk_student_feedback FOREIGN KEY (draft_id, feedback_id) REFERENCES student_feedback (draft_id, feedback_id) ON DELETE CASCADE;

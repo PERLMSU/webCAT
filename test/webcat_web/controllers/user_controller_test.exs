@@ -9,7 +9,7 @@ defmodule WebCATWeb.UserControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.user_path(conn, :index))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) >= 1
     end
@@ -17,7 +17,7 @@ defmodule WebCATWeb.UserControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.user_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -29,7 +29,7 @@ defmodule WebCATWeb.UserControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.user_path(conn, :show, user.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       data = res["data"]
       attributes = data["attributes"]
@@ -53,7 +53,7 @@ defmodule WebCATWeb.UserControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post(Routes.user_path(conn, :create), data)
-        |> json_response(201)
+        |> json_response(:created)
 
       assert res["data"]["attributes"]["email"] == data["email"]
     end
@@ -64,7 +64,7 @@ defmodule WebCATWeb.UserControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.user_path(conn, :create), Factory.string_params_for(:user))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -78,7 +78,7 @@ defmodule WebCATWeb.UserControllerTest do
         conn
         |> Auth.sign_in(user)
         |> put(Routes.user_path(conn, :update, Factory.insert(:user).id), update)
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["attributes"]["email"] == update["email"]
     end
@@ -91,7 +91,7 @@ defmodule WebCATWeb.UserControllerTest do
       conn
       |> Auth.sign_in(user)
       |> put(Routes.user_path(conn, :update, Factory.insert(:user).id), update)
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -99,10 +99,17 @@ defmodule WebCATWeb.UserControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
+      data = Factory.insert(:user)
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.user_path(conn, :delete, Factory.insert(:user).id))
-      |> json_response(200)
+      |> delete(Routes.user_path(conn, :delete, data.id))
+      |> response(:no_content)
+
+      conn
+      |> Auth.sign_in(user)
+      |> get(Routes.user_path(conn, :show, data.id))
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete other users", %{conn: conn} do
@@ -111,7 +118,7 @@ defmodule WebCATWeb.UserControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.user_path(conn, :delete, Factory.insert(:user).id))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 

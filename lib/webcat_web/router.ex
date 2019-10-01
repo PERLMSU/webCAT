@@ -51,6 +51,7 @@ defmodule WebCATWeb.Router do
     api_resource("/feedback", FeedbackController)
     api_resource("/explanations", ExplanationController)
     api_resource("/drafts", DraftController)
+    post("/drafts/:id/send_email", DraftController, :send_email)
     api_resource("/comments", CommentController)
     api_resource("/grades", GradeController)
     api_resource("/student_feedback", StudentFeedbackController)

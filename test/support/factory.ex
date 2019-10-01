@@ -95,21 +95,17 @@ defmodule WebCAT.Factory do
   end
 
   def category_factory do
-    classroom = Factory.insert(:classroom)
-
     %Category{
       name: sequence("category"),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
-      classroom: classroom,
-      sub_categories: Factory.build_list(1, :sub_category, classroom: classroom)
+      sub_categories: Factory.build_list(1, :sub_category)
     }
   end
 
   def sub_category_factory do
     %Category{
       name: sequence("sub_category"),
-      description: Enum.join(Faker.Lorem.sentences(), "\n"),
-      classroom: Factory.build(:classroom)
+      description: Enum.join(Faker.Lorem.sentences(), "\n")
     }
   end
 
@@ -206,7 +202,8 @@ defmodule WebCAT.Factory do
       course_code: sequence("PHY "),
       name: sequence("Physics for Scientists and Engineers "),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
-      users: [Factory.insert(:admin)] ++ Factory.insert_list(1, :assistant)
+      users: [Factory.insert(:admin)] ++ Factory.insert_list(1, :assistant),
+      categories: Factory.insert_list(2, :category)
     }
   end
 

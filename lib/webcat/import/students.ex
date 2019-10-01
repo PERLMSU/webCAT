@@ -10,8 +10,8 @@ defmodule WebCAT.Import.Students do
   def import(section_id, path) do
     # Extract the first sheet in the file
     with {:extract, {:ok, table_id}} <- {:extract, Xlsxir.multi_extract(path, 0)},
-         {:process, :ok } <- {:process, process_rows(section_id, Xlsxir.get_list(table_id))} do
-      :ok
+         {:process, {:ok, students} } <- {:process, process_rows(section_id, Xlsxir.get_list(table_id))} do
+      {:ok, students}
     else
       {:extract, _} -> {:error, "Problem extracting data from the spreadsheet"}
       {:process, _} -> {:error, "Problem importing data."}
@@ -49,7 +49,7 @@ defmodule WebCAT.Import.Students do
     end)
 
     case Repo.transaction(import_transaction) do
-      {:ok, _} -> :ok
+      {:ok, students} -> {:ok, Map.values(students)}
       {:error, _} -> :error
     end
   end

@@ -1,5 +1,5 @@
 defmodule WebCATWeb.SectionController do
-  alias WebCATWeb.SectionView
+  alias WebCATWeb.{SectionView, UserView}
   alias WebCAT.Rotations.Section
   alias WebCAT.Import.Students, as: Import
 
@@ -19,10 +19,11 @@ defmodule WebCATWeb.SectionController do
 
     with {:auth, :ok} <- {:auth, is_authorized?()},
          {:ok, _section} <- CRUD.get(Section, id),
-         :ok <- Import.import(id, path) do
+         {:ok, imported} <- Import.import(id, path) do
       conn
       |> put_status(201)
-      |> text("")
+      |> put_view(UserView)
+      |> render("index.json", %{data: imported})
     else
       {:auth, _} -> {:error, :forbidden, dgettext("errors", "Not authorized to import data")}
       {:error, _} = it -> it

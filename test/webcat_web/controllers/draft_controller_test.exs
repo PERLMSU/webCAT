@@ -12,7 +12,7 @@ defmodule WebCATWeb.DraftControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.draft_path(conn, :index, parent_draft_id: parent.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert Enum.count(result) == 3
     end
@@ -20,7 +20,7 @@ defmodule WebCATWeb.DraftControllerTest do
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn
       |> get(Routes.draft_path(conn, :index))
-      |> json_response(401)
+      |> json_response(:unauthorized)
     end
   end
 
@@ -34,7 +34,7 @@ defmodule WebCATWeb.DraftControllerTest do
         conn
         |> Auth.sign_in(user)
         |> get(Routes.draft_path(conn, :show, draft.id))
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["id"] == to_string(draft.id)
     end
@@ -50,7 +50,7 @@ defmodule WebCATWeb.DraftControllerTest do
         conn
         |> Auth.sign_in(user)
         |> post(Routes.draft_path(conn, :create), data)
-        |> json_response(201)
+        |> json_response(:created)
 
       assert res["data"]["attributes"]["content"] == data["content"]
     end
@@ -61,7 +61,7 @@ defmodule WebCATWeb.DraftControllerTest do
       conn
       |> Auth.sign_in(user)
       |> post(Routes.draft_path(conn, :create), Factory.string_params_for(:student_draft))
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -75,7 +75,7 @@ defmodule WebCATWeb.DraftControllerTest do
         conn
         |> Auth.sign_in(user)
         |> put(Routes.draft_path(conn, :update, Factory.insert(:student_draft).id), update)
-        |> json_response(200)
+        |> json_response(:ok)
 
       assert res["data"]["attributes"]["content"] == update["content"]
     end
@@ -88,7 +88,7 @@ defmodule WebCATWeb.DraftControllerTest do
       conn
       |> Auth.sign_in(user)
       |> put(Routes.draft_path(conn, :update, Factory.insert(:student_draft).id), update)
-      |> json_response(403)
+      |> json_response(:forbidden)
     end
   end
 
@@ -96,10 +96,17 @@ defmodule WebCATWeb.DraftControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
 
+      data = Factory.insert(:student_draft)
+
       conn
       |> Auth.sign_in(user)
-      |> delete(Routes.draft_path(conn, :delete, Factory.insert(:student_draft).id))
-      |> json_response(200)
+      |> delete(Routes.draft_path(conn, :delete, data.id))
+      |> response(:no_content)
+
+      conn
+      |> Auth.sign_in(user)
+      |> get(Routes.draft_path(conn, :delete, data.id))
+      |> json_response(:not_found)
     end
 
     test "doesn't allow normal users to delete drafts", %{conn: conn} do
@@ -108,7 +115,22 @@ defmodule WebCATWeb.DraftControllerTest do
       conn
       |> Auth.sign_in(user)
       |> delete(Routes.draft_path(conn, :delete, Factory.insert(:student_draft).id))
-      |> json_response(403)
+      |> json_response(:forbidden)
+    end
+  end
+
+  describe "send_email/3" do
+    test "does what it's supposed to do", %{conn: conn} do
+      {:ok, user} = login_admin()
+
+      data = Factory.insert(:student_draft)
+
+      res = conn
+      |> Auth.sign_in(user)
+      |> post(Routes.draft_path(conn, :send_email, data.parent_draft_id))
+      |> json_response(:ok)
+
+      assert Enum.count(res["data"]) == 1
     end
   end
 
