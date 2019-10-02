@@ -2,15 +2,15 @@ defmodule WebCATWeb.ErrorViewTest do
   use WebCAT.DataCase
 
   alias WebCATWeb.ErrorView
-  alias WebCAT.Rotations.Semester
+  alias WebCAT.Rotations.Rotation
 
   describe "render/2" do
     test "400.json" do
       params = Factory.string_params_for(:rotation_group)
-      changeset = Semester.changeset(%Semester{}, params)
+      changeset = Rotation.changeset(%Rotation{}, params)
       rendered = ErrorView.render("400.json", changeset: changeset)
 
-      assert Enum.count(rendered[:errors][:classroom_id]) == 1
+      assert Enum.count(rendered[:errors][:section_id]) == 1
 
       rendered = ErrorView.render("400.json")
       assert rendered[:error][:status] == "400"

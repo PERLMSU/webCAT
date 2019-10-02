@@ -10,7 +10,7 @@ defmodule WebCAT.Rotations.Classroom do
     field(:name, :string)
     field(:description, :string)
 
-    has_many(:semesters, WebCAT.Rotations.Semester)
+    has_many(:sections, WebCAT.Rotations.Section)
     many_to_many(:users, User, join_through: "classroom_users", on_replace: :delete)
 
     many_to_many(:categories, WebCAT.Feedback.Category,

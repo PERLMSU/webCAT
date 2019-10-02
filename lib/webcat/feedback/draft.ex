@@ -18,6 +18,11 @@ defmodule WebCAT.Feedback.Draft do
     has_many(:grades, WebCAT.Feedback.Grade)
     has_many(:child_drafts, __MODULE__, foreign_key: :parent_draft_id)
 
+    # Relationships based on joins
+    has_one(:classroom, through: ~w(rotation_group rotation section classroom)a)
+    has_many(:group_categories, through: ~w(rotation_group rotation section classroom categories)a)
+    has_many(:student_categories, through: ~w(parent_draft rotation_group rotation section classroom categories)a)
+
     timestamps(type: :utc_datetime)
   end
 

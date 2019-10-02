@@ -10,13 +10,14 @@ defmodule WebCAT.Rotations.Section do
     field(:description, :string)
 
     belongs_to(:semester, WebCAT.Rotations.Semester)
+    belongs_to(:classroom, WebCAT.Rotations.Classroom)
     has_many(:rotations, WebCAT.Rotations.Rotation)
     many_to_many(:users, User, join_through: "section_users", on_replace: :delete)
 
     timestamps(type: :utc_datetime)
   end
 
-  @required ~w(number semester_id)a
+  @required ~w(number semester_id classroom_id)a
   @optional ~w(description)a
 
   def changeset(section, attrs \\ %{}) do

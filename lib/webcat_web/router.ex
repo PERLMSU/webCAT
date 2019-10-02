@@ -11,7 +11,7 @@ defmodule WebCATWeb.Router do
   pipeline :api do
     plug(:accepts, ~w(json))
     plug(:put_secure_browser_headers)
-    plug(JSONAPI.ContentTypeNegotiation)
+    # plug(JSONAPI.ContentTypeNegotiation)
     plug(JSONAPI.ResponseContentType)
     plug(JSONAPI.UnderscoreParameters)
   end

@@ -80,8 +80,7 @@ transaction =
     |> Semester.changeset(%{
       start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: -3)),
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 9)),
-      name: "Fall",
-      classroom_id: classroom.id
+      name: "Fall"
     })
     |> repo.insert()
   end)
@@ -90,8 +89,7 @@ transaction =
     |> Semester.changeset(%{
       start_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 10)),
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 19)),
-      name: "Spring",
-      classroom_id: classroom.id
+      name: "Spring"
     })
     |> repo.insert()
   end)
@@ -101,7 +99,8 @@ transaction =
       number: "001",
       description:
         "Example section 001 for Fall Semester #{transaction.fall_semester.start_date.year}",
-      semester_id: transaction.fall_semester.id
+      semester_id: transaction.fall_semester.id,
+      classroom_id: transaction.classroom.id,
     })
     |> repo.insert()
   end)
@@ -111,7 +110,8 @@ transaction =
       number: "002",
       description:
         "Example section 002 for Fall Semester #{transaction.fall_semester.start_date.year}",
-      semester_id: transaction.fall_semester.id
+      semester_id: transaction.fall_semester.id,
+      classroom_id: transaction.classroom.id
     })
     |> repo.insert()
   end)
@@ -275,47 +275,23 @@ transaction =
     })
     |> repo.insert()
   end)
-  |> Multi.run(:student_feedback_1, fn _repo, transaction ->
-    StudentFeedback.add(
-      transaction.rotation_group_1.id,
-      transaction.fall_student_1.id,
-      transaction.feedback_1.id
-    )
-  end)
-  |> Multi.run(:student_feedback_2, fn _repo, transaction ->
-    StudentFeedback.add(
-      transaction.rotation_group_1.id,
-      transaction.fall_student_1.id,
-      transaction.feedback_2.id
-    )
-  end)
-  |> Multi.run(:student_feedback_3, fn _repo, transaction ->
-    StudentFeedback.add(
-      transaction.rotation_group_1.id,
-      transaction.fall_student_1.id,
-      transaction.feedback_3.id
-    )
-  end)
-   |> Multi.run(:student_explanation_1, fn _repo, transaction ->
-    StudentExplanation.add(
-      transaction.rotation_group_1.id,
-      transaction.fall_student_1.id,
-      transaction.feedback_1.id,
-      transaction.explanation_2.id
-    )
-  end)
-  |> Multi.run(:draft_1, fn repo, transaction ->
+  |> Multi.run(:group_draft_1, fn repo, transaction ->
     %Draft{}
     |> Draft.changeset(%{
-      content: "Example draft",
+      content: "Example group draft",
       status: "approved",
-      reviewer_id: transaction.admin.id,
-      student_id: transaction.fall_student_1.id,
       rotation_group_id: transaction.rotation_group_1.id
     })
-    |> Changeset.put_assoc(:authors, [
-      transaction.assistant
-    ])
+    |> repo.insert()
+  end)
+  |> Multi.run(:student_draft_1, fn repo, transaction ->
+    %Draft{}
+    |> Draft.changeset(%{
+      content: "Example student draft",
+      status: "approved",
+      student_id: transaction.fall_student_1.id,
+      parent_draft_id: transaction.group_draft_1.id
+    })
     |> repo.insert()
   end)
   |> Multi.run(:comment_1, fn repo, transaction ->
@@ -323,7 +299,7 @@ transaction =
     |> Comment.changeset(%{
       content: "Looks good! Approving.",
       user_id: transaction.admin.id,
-      draft_id: transaction.draft_1.id
+      draft_id: transaction.student_draft_1.id
     })
     |> repo.insert()
   end)
@@ -332,7 +308,7 @@ transaction =
     |> Comment.changeset(%{
       content: "Thanks! 👍",
       user_id: transaction.assistant.id,
-      draft_id: transaction.draft_1.id
+      draft_id: transaction.student_draft_1.id
     })
     |> repo.insert()
   end)
@@ -340,17 +316,41 @@ transaction =
     %Notification{}
     |> Notification.changeset(%{
       content: "There's a new draft for you to review!",
-      draft_id: transaction.draft_1.id,
+      draft_id: transaction.student_draft_1.id,
       user_id: transaction.admin.id
     })
     |> repo.insert()
   end)
-  |> Multi.run(:assistant_notification, fn repo, transaction ->
-    %Notification{}
-    |> Notification.changeset(%{
-      content: "Your draft has been approved!",
-      draft_id: transaction.draft_1.id,
-      user_id: transaction.assistant.id
+  |> Multi.run(:student_feedback_1, fn repo, transaction ->
+    %StudentFeedback{}
+    |> StudentFeedback.changeset(%{
+      draft_id: transaction.student_draft_1.id,
+      feedback_id: transaction.feedback_1.id
+    })
+    |> repo.insert()
+  end)
+  |> Multi.run(:student_feedback_2, fn repo, transaction ->
+    %StudentFeedback{}
+    |> StudentFeedback.changeset(%{
+      draft_id: transaction.student_draft_1.id,
+      feedback_id: transaction.feedback_2.id
+    })
+    |> repo.insert()
+  end)
+  |> Multi.run(:student_feedback_3, fn repo, transaction ->
+    %StudentFeedback{}
+    |> StudentFeedback.changeset(%{
+      draft_id: transaction.student_draft_1.id,
+      feedback_id: transaction.feedback_3.id
+    })
+    |> repo.insert()
+  end)
+  |> Multi.run(:student_explanation_1, fn repo, transaction ->
+    %StudentExplanation{}
+    |> StudentExplanation.changeset(%{
+      draft_id: transaction.student_draft_1.id,
+      feedback_id: transaction.explanation_1.feedback_id,
+      explanation_id: transaction.explanation_1.id
     })
     |> repo.insert()
   end)

@@ -8,8 +8,8 @@ defmodule WebCATWeb.SectionController do
     schema: Section,
     view: SectionView,
     type: "section",
-    filter: ~w(number semester_id),
-    sort: ~w(number semester_id inserted_at updated_at)
+    filter: ~w(number semester_id classroom_id),
+    sort: ~w(number semester_id classroom_id inserted_at updated_at)
 
 
   def import(conn, _user, %{"id" => id, "file" => %{path: path}}) do

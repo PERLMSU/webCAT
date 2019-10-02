@@ -28,7 +28,7 @@ defmodule WebCATWeb.DraftControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      draft = Factory.insert(:student_draft)
+      draft = Factory.insert(:group_draft)
 
       res =
         conn

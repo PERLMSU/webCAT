@@ -232,7 +232,6 @@ defmodule WebCAT.Factory do
       end_date: Timex.to_date(Timex.shift(Timex.now(), weeks: 9)),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       users: Factory.insert_list(1, :assistant),
-      classroom: Factory.build(:classroom),
       name: sequence(:name, ~w(Fall Spring))
     }
   end
@@ -242,6 +241,7 @@ defmodule WebCAT.Factory do
       number: sequence(:number, &Integer.to_string/1),
       description: Enum.join(Faker.Lorem.sentences(), "\n"),
       semester: Factory.build(:semester),
+      classroom: Factory.build(:classroom),
       users: [Factory.insert(:assistant)] ++ Factory.insert_list(1, :student)
     }
   end

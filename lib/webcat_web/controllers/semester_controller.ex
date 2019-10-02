@@ -6,6 +6,6 @@ defmodule WebCATWeb.SemesterController do
     schema: Semester,
     view: SemesterView,
     type: "semester",
-    filter: ~w(name classroom_id),
+    filter: ~w(name),
     sort: ~w(name start_date end_date inserted_at updated_at)
 end

@@ -12,26 +12,6 @@ defmodule WebCAT.Accounts.Users do
   alias WebCAT.CRUD
 
   @doc """
-  Get default classroom for user
-  """
-  def get_classroom(%User{} = user, params) when is_map(params) do
-    with %{"classroom_id" => id} <- params,
-         {:ok, c} <- CRUD.get(Classroom, id) do
-      c
-    else
-      _ ->
-        user
-        |> Repo.preload(:classrooms)
-        |> Map.fetch!(:classrooms)
-        |> List.first()
-        |> case do
-          %Classroom{} = classroom -> classroom
-          _ -> nil
-        end
-    end
-  end
-
-  @doc """
   Get a user by their email if they have one associated
   """
   @spec by_email(String.t()) :: {:ok, User.t()} | {:error, String.t()}
@@ -123,7 +103,7 @@ defmodule WebCAT.Accounts.Users do
     |> check_password(password)
     |> case do
       {:ok, credential} ->
-        {:ok, credential.user}
+        CRUD.get(User, credential.user_id, include: ~w(roles classrooms sections rotation_groups)a)
 
       {:error, _} = it ->
         it

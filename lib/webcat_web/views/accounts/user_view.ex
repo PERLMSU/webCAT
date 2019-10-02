@@ -21,7 +21,7 @@ defmodule WebCATWeb.UserView do
       sections: WebCATWeb.SectionView,
       rotations: WebCATWeb.RotationView,
       rotation_groups: WebCATWeb.RotationGroupView,
-      roles: WebCATWeb.RoleView
+      roles: {WebCATWeb.RoleView, :include}
     ]
   end
 

@@ -17,6 +17,8 @@ defmodule WebCAT.Rotations.RotationGroup do
       on_replace: :delete
     )
 
+    has_one(:classroom, through: ~w(rotation section classroom)a)
+
     timestamps(type: :utc_datetime)
   end
 

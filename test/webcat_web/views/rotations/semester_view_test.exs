@@ -16,7 +16,6 @@ defmodule WebCATWeb.SemesterViewTest do
       assert attributes[:description] == semester.description
       assert attributes[:start_date] == Timex.to_unix(semester.start_date)
       assert attributes[:end_date] == Timex.to_unix(semester.end_date)
-      assert attributes[:classroom_id] == semester.classroom_id
       assert attributes[:inserted_at] == Timex.to_unix(semester.inserted_at)
       assert attributes[:updated_at] == Timex.to_unix(semester.updated_at)
     end

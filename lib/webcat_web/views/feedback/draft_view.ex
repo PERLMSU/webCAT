@@ -1,7 +1,7 @@
 defmodule WebCATWeb.DraftView do
   use WebCATWeb, :view
   use JSONAPI.View, type: "draft", collection: "drafts"
-  alias WebCATWeb.{UserView, RotationGroupView, CommentView, GradeView}
+  alias WebCATWeb.{UserView, RotationGroupView, CommentView, GradeView, ClassroomView, CategoryView}
 
   def fields,
     do:
@@ -14,7 +14,10 @@ defmodule WebCATWeb.DraftView do
       rotation_group: RotationGroupView,
       comments: CommentView,
       grades: GradeView,
-      child_drafts: __MODULE__
+      child_drafts: __MODULE__,
+      classroom: ClassroomView,
+      group_categories: CategoryView,
+      student_categories: CategoryView,
     ]
   end
 

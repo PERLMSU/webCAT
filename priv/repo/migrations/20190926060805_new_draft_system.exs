@@ -8,7 +8,7 @@ defmodule WebCAT.Repo.Migrations.NewDraftSystem do
       add(:parent_draft_id, references(:drafts))
 
       modify(:rotation_group_id, references(:rotation_groups), null: true)
-      modify(:student_id, references(:users), null: true)
+      modify(:student_id, references(:users, on_delete: :nilify_all), null: true)
 
       # Remove reviewer in favor of just doing review requests
       remove(:reviewer_id, references(:users), default: nil)

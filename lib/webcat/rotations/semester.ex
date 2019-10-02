@@ -12,14 +12,13 @@ defmodule WebCAT.Rotations.Semester do
     field(:start_date, :date)
     field(:end_date, :date)
 
-    belongs_to(:classroom, WebCAT.Rotations.Classroom)
     has_many(:sections, WebCAT.Rotations.Section)
     many_to_many(:users, User, join_through: "semester_users", on_replace: :delete)
 
     timestamps(type: :utc_datetime)
   end
 
-  @required ~w(name start_date end_date classroom_id)a
+  @required ~w(name start_date end_date)a
   @optional ~w(description)a
 
   @doc """
@@ -30,7 +29,6 @@ defmodule WebCAT.Rotations.Semester do
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
     |> validate_dates_after(:start_date, :end_date)
-    |> foreign_key_constraint(:classroom_id)
     |> put_users(Map.get(attrs, "users"))
   end
 
