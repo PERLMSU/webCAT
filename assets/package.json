@@ -3,46 +3,31 @@
     "license": "ISC",
     "sideEffects": false,
     "scripts": {
-        "build:dev": "webpack --mode development",
-        "build": "webpack --mode production",
-        "start": "yarn run watch",
-        "watch": "webpack --mode development --watch-stdin",
+        "build:dev": "NODE_ENV=development parcel build index.html static/* -d ../priv/static/ --no-minify --public-url ../static/",
+        "build": "parcel build index.html static/* --no-source-maps -d ../priv/static/ --public-url ../static/",
+        "start": "parcel index.html static/*",
+        "watch": "parcel watch index.html static/* -d ../priv/static/ --public-url ../static/",
         "elm": "elm make src/Main.elm --output=/dev/null",
         "format": "elm-format src/ tests/ --yes --elm-version 0.19",
-        "test": "elm-format --validate . && elm-test"
+        "test:full": "elm-format --validate . && elm-test",
+        "test": "elm-test"
     },
     "dependencies": {
         "@fortawesome/fontawesome-pro": "5.4.1",
-        "phoenix": "file:../deps/phoenix",
-        "tailwindcss": "1.0.4"
+        "bootstrap": "^4.3.1",
+        "phoenix": "file:../deps/phoenix"
     },
     "devDependencies": {
-        "@babel/core": "7.4.4",
-        "@babel/plugin-transform-modules-commonjs": "7.4.4",
-        "@babel/preset-env": "7.4.4",
-        "autoprefixer": "9.4.9",
-        "babel-loader": "8.0.6",
-        "copy-webpack-plugin": "5.0.3",
-        "css-loader": "3.0.0",
-        "cssnano": "4.1.10",
+        "@babel/core": "^7.0.0-0",
+        "@babel/plugin-transform-modules-commonjs": "^7.6.0",
+        "@babel/preset-env": "^7.6.2",
+        "autoprefixer": "^9.6.1",
         "elm": "0.19.0-no-deps",
-        "elm-hot": "1.0.1",
+        "elm-hot": "^1.1.2",
         "elm-test": "0.19.0-rev6",
-        "elm-webpack-loader": "^6.0.0",
-        "extract-text-webpack-plugin": "4.0.0-beta.0",
-        "file-loader": "4.0.0",
-        "mini-css-extract-plugin": "0.7.0",
-        "node-elm-compiler": "5.0.3",
-        "node-sass": "4.12.0",
-        "optimize-css-assets-webpack-plugin": "5.0.1",
-        "postcss-loader": "3.0.0",
-        "sass": "1.20.1",
-        "sass-loader": "7.1.0",
-        "terser-webpack-plugin": "1.3.0",
-        "uglify-js": "3.5.9",
-        "url-loader": "2.0.0",
-        "webpack": "4.34.0",
-        "webpack-cli": "3.3.4"
+        "parcel-bundler": "^1.12.3",
+        "parcel-plugin-subresource-integrity": "^0.3.1",
+        "sass": "^1.23.0"
     },
     "optionalDependencies": {
         "elm-format": "0.8.1"

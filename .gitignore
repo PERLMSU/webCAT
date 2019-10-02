@@ -43,7 +43,7 @@ Temporary Items
 # Generated on crash by the VM
 erl_crash.dump
 
-assets/node_modules
+node_modules
 cover
 .idea
 .python-version
@@ -64,3 +64,5 @@ webcat.iml
 
 # Release archives
 /rel/artifacts
+
+.cache
