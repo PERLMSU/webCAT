@@ -14,9 +14,9 @@ userFuzzer =
         |> andMap surnameFuzzer
         |> andMap (maybe nameFuzzer)
         |> andMap bool
-        |> andMap nothing
-        |> andMap nothing
-        |> andMap nothing
-        |> andMap nothing
+        |> andMap (list string)
+        |> andMap (list <| map ClassroomId int)
+        |> andMap (list <| map SectionId int)
+        |> andMap (list <| map RotationGroupId int)
         |> andMap posixFuzzer
         |> andMap posixFuzzer

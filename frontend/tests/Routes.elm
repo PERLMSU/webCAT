@@ -69,16 +69,12 @@ suite =
                         , NewUser
                         , EditUser <| UserId 1
 
-                        -- Import
-                        , Import
-                        , Feedback
-                        , EditFeedback (RotationGroupId 1) (UserId 1) (Just (CategoryId 1))
-                        , EditFeedback (RotationGroupId 1) (UserId 1) Nothing
-                        , Drafts
+                        -- Feedback
+                        , DraftClassrooms
+                        , DraftRotations (SectionId 1)
+                        , EditFeedback (DraftId 1) (Just (CategoryId 1))
+                        , EditFeedback (DraftId 1) Nothing
                         , Draft <| DraftId 1
-                        , NewDraft (RotationGroupId 1) (UserId 1)
-                        , EditDraft <|
-                            DraftId 1
 
                         -- Profile
                         , Profile

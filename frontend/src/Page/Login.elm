@@ -107,9 +107,13 @@ update msg model =
                     ( { model | credential = res }, Cmd.none )
 
         GotSession session ->
+            let
+                _ =
+                    Debug.log "Session" session
+            in
             case Session.credential session of
                 Nothing ->
-                    ( { model | session = session }, Cmd.none )
+                    ( { model | session = session, credential = NotAsked }, Cmd.none )
 
                 Just _ ->
                     ( { model | session = session }, Route.replaceUrl (Session.navKey session) Route.Classrooms )

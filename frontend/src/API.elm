@@ -8,7 +8,7 @@ import Json.Decode as Decode exposing (Decoder, Value, decodeString, field, null
 import Json.Decode.Pipeline as Pipeline exposing (optional, required)
 import Json.Encode as Encode
 import RemoteData exposing (RemoteData(..))
-import Types exposing (User, encodeUser, userDecoder)
+import Types exposing (User, encodeUser, userDecoder, credUserDecoder)
 import Url exposing (Url)
 
 
@@ -27,7 +27,6 @@ type alias APIData a =
 type alias APIResult a =
     Result Error a
 
-
 credentialUser : Credential -> User
 credentialUser (Credential user _) =
     user
@@ -37,14 +36,11 @@ credentialHeader : Credential -> Http.Header
 credentialHeader (Credential _ token) =
     Http.header "Authorization" ("Bearer " ++ token)
 
-
 credentialDecoder : Decoder Credential
 credentialDecoder =
     Decode.succeed Credential
-        |> required "user" userDecoder
+        |> required "user" (Decode.field "data" userDecoder)
         |> required "token" Decode.string
-
-
 
 -- The API can error out
 
@@ -93,11 +89,16 @@ handleRemoteError data model cmd =
 
 
 port onStoreChange : (Value -> msg) -> Sub msg
+storeCredDecoder : Decoder Credential
+storeCredDecoder =
+            Decode.succeed Credential
+            |> required "user" credUserDecoder
+            |> required "token" Decode.string
 
 
 credChanges : (Maybe Credential -> msg) -> Sub msg
 credChanges toMsg =
-    onStoreChange (\value -> toMsg (Decode.decodeValue Decode.string value |> Result.andThen (\str -> Decode.decodeString credentialDecoder str) |> Result.toMaybe))
+    onStoreChange (\value -> toMsg (Decode.decodeValue Decode.string value |> Result.andThen (\str -> Decode.decodeString storeCredDecoder str) |> Result.toMaybe))
 
 
 storeCred : Credential -> Cmd msg
@@ -139,7 +140,7 @@ application config =
             let
                 maybeCred =
                     Decode.decodeValue Decode.string flags
-                        |> Result.andThen (Decode.decodeString credentialDecoder)
+                        |> Result.andThen (Decode.decodeString storeCredDecoder)
                         |> Result.toMaybe
             in
             config.init maybeCred url navKey
@@ -254,8 +255,8 @@ deleteRemote url maybeCred toMsg =
     delete url maybeCred (RemoteData.fromResult >> toMsg)
 
 
-expectJson : (Result Error a -> msg) -> Decoder a -> Expect msg
-expectJson toMsg decoder =
+expect : (APIResult String -> APIResult a) -> (APIResult a -> msg) -> Expect msg
+expect toSuccess toMsg =
     Http.expectStringResponse toMsg <|
         \response ->
             case response of
@@ -286,82 +287,31 @@ expectJson toMsg decoder =
                             Err (decodeErrorBody ServerError body)
 
                 Http.GoodStatus_ _ body ->
-                    case decodeString decoder body of
-                        Ok value ->
-                            Ok value
-
-                        Err err ->
-                            Err (BadBody { status = "500", title = "Unknown Server Error", message = Just <| Decode.errorToString err })
-
-
-expectNothing : (APIResult () -> msg) -> Expect msg
-expectNothing toMsg =
-    Http.expectStringResponse toMsg <|
-        \response ->
-            case response of
-                Http.BadUrl_ url ->
-                    Err (BadUrl { status = "400", title = "Client Error", message = Just <| "Problem with url: " ++ url })
-
-                Http.Timeout_ ->
-                    Err (Timeout { status = "400", title = "Client Error", message = Just "Timed out" })
-
-                Http.NetworkError_ ->
-                    Err (NetworkError { status = "400", title = "Client Error", message = Just "Network Error" })
-
-                Http.BadStatus_ metadata body ->
-                    case metadata.statusCode of
-                        400 ->
-                            Err (decodeErrorBody BadRequest body)
-
-                        401 ->
-                            Err (decodeErrorBody Unauthorized body)
-
-                        403 ->
-                            Err (decodeErrorBody Forbidden body)
-
-                        404 ->
-                            Err (decodeErrorBody NotFound body)
-
-                        _ ->
-                            Err (decodeErrorBody ServerError body)
-
-                Http.GoodStatus_ _ body ->
-                    Ok ()
+                    toSuccess (Ok body)
 
 
 expectString : (APIResult String -> msg) -> Expect msg
 expectString toMsg =
-    Http.expectStringResponse toMsg <|
-        \response ->
-            case response of
-                Http.BadUrl_ url ->
-                    Err (BadUrl { status = "400", title = "Client Error", message = Just <| "Problem with url: " ++ url })
+    expect identity toMsg
 
-                Http.Timeout_ ->
-                    Err (Timeout { status = "400", title = "Client Error", message = Just "Timed out" })
 
-                Http.NetworkError_ ->
-                    Err (NetworkError { status = "400", title = "Client Error", message = Just "Network Error" })
+expectJson : (APIResult a -> msg) -> Decoder a -> Expect msg
+expectJson toMsg decoder =
+    let
+        toSuccess body =
+            case decodeString decoder body of
+                Ok value ->
+                    Ok value
 
-                Http.BadStatus_ metadata body ->
-                    case metadata.statusCode of
-                        400 ->
-                            Err (decodeErrorBody BadRequest body)
+                Err err ->
+                    Err (BadBody { status = "500", title = "Unknown Server Error", message = Just <| Decode.errorToString err })
+    in
+    expect (Result.andThen toSuccess) toMsg
 
-                        401 ->
-                            Err (decodeErrorBody Unauthorized body)
 
-                        403 ->
-                            Err (decodeErrorBody Forbidden body)
-
-                        404 ->
-                            Err (decodeErrorBody NotFound body)
-
-                        _ ->
-                            Err (decodeErrorBody ServerError body)
-
-                Http.GoodStatus_ _ body ->
-                    Ok body
+expectNothing : (APIResult () -> msg) -> Expect msg
+expectNothing toMsg =
+    expect (Result.map <| always ()) toMsg
 
 
 

@@ -1,7 +1,7 @@
 module Page.Classrooms exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import API exposing (APIData, Error(..))
-import API.Classrooms exposing (ClassroomForm, classrooms, deleteClassroom, editClassroom, formFromClassroom, newClassroom)
+import API.Classrooms exposing (ClassroomForm, listClassrooms, deleteClassroom, updateClassroom, formFromClassroom, createClassroom)
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Modal as Modal
@@ -69,7 +69,7 @@ init session =
           , classroomForm = initialForm Nothing
           , formErrors = []
           }
-        , classrooms session GotClassrooms
+        , listClassrooms session GotClassrooms
         )
 
     else
@@ -289,7 +289,7 @@ update msg model =
                         | formErrors = []
                         , modalState = EditVisible classroom Loading
                       }
-                    , editClassroom model.session classroom.id form GotClassroomUpdate
+                    , updateClassroom model.session classroom.id form GotClassroomUpdate
                     )
 
                 Err errors ->
@@ -317,7 +317,7 @@ update msg model =
                         | formErrors = []
                         , modalState = NewVisible Loading
                       }
-                    , newClassroom model.session form GotClassroomCreate
+                    , createClassroom model.session form GotClassroomCreate
                     )
 
                 Err errors ->
@@ -326,7 +326,7 @@ update msg model =
         GotClassroomCreate data ->
             case data of
                 Success _ ->
-                    ( { model | classroomForm = initialForm Nothing, modalState = Hidden, classrooms = Loading }, classrooms model.session GotClassrooms )
+                    ( { model | classroomForm = initialForm Nothing, modalState = Hidden, classrooms = Loading }, listClassrooms model.session GotClassrooms )
 
                 _ ->
                     updateModalState model data
@@ -343,7 +343,7 @@ update msg model =
         GotClassroomDelete data ->
             case data of
                 Success _ ->
-                    ( { model | modalState = Hidden, classrooms = Loading }, classrooms model.session GotClassrooms )
+                    ( { model | modalState = Hidden, classrooms = Loading }, listClassrooms model.session GotClassrooms )
 
                 _ ->
                     -- TODO: Need a better solution for handling delete errors

@@ -54,16 +54,11 @@ type Route
     | User UserId
     | NewUser
     | EditUser UserId
-      -- Import
-    | Import
       -- Feedback System
-    | Feedback
-    | EditFeedback RotationGroupId UserId (Maybe CategoryId)
-      -- Draft inbox
-    | Drafts
+    | DraftClassrooms
+    | DraftRotations SectionId
     | Draft DraftId
-    | NewDraft RotationGroupId UserId
-    | EditDraft DraftId
+    | EditFeedback DraftId (Maybe CategoryId)
       -- Profile
     | Profile
       -- Utility
@@ -185,23 +180,14 @@ parser =
                             , Parser.map EditUser (Parser.map UserId int </> s "edit")
                             ]
 
-                -- Import
-                , Parser.map Import (s "import")
-
-                -- Feedback
-                , s "feedback"
-                    </> oneOf
-                            [ Parser.map Feedback top
-                            , Parser.map EditFeedback (s "group" </> Parser.map RotationGroupId int </> s "student" </> Parser.map UserId int <?> idQueryParser CategoryId "categoryId")
-                            ]
 
                 -- Inbox
                 , s "drafts"
                     </> oneOf
-                            [ Parser.map Drafts top
+                            [ Parser.map DraftClassrooms top
+                            , Parser.map DraftRotations (s "sections" </> Parser.map SectionId int)
                             , Parser.map Draft (Parser.map DraftId int)
-                            , Parser.map NewDraft (s "new" </> Parser.map RotationGroupId int </> Parser.map UserId int)
-                            , Parser.map EditDraft (Parser.map DraftId int </> s "edit")
+                            , Parser.map EditFeedback (Parser.map DraftId int </> s "feedback" <?> idQueryParser CategoryId "categoryId")
                             ]
                 , Parser.map Profile (s "profile")
                 ]
@@ -303,27 +289,19 @@ routeToString route =
         EditUser (UserId id) ->
             appAbsolute [ "users", String.fromInt id, "edit" ] []
 
-        -- Users
-        Drafts ->
+        -- Drafts
+        DraftClassrooms ->
             appAbsolute [ "drafts" ] []
+
+        DraftRotations (SectionId id) ->
+            appAbsolute ["drafts", "sections", String.fromInt id] []
 
         Draft (DraftId id) ->
             appAbsolute [ "drafts", String.fromInt id ] []
 
-        NewDraft (RotationGroupId groupId) (UserId userId) ->
-            appAbsolute [ "drafts", "new", String.fromInt groupId, String.fromInt userId ] []
 
-        EditDraft (DraftId id) ->
-            appAbsolute [ "drafts", String.fromInt id, "edit" ] []
-
-        Import ->
-            appAbsolute [ "import" ] []
-
-        Feedback ->
-            appAbsolute [ "feedback" ] []
-
-        EditFeedback (RotationGroupId groupId) (UserId studentId) maybeCategoryId ->
-            appAbsolute [ "feedback", "group", String.fromInt groupId, "student", String.fromInt studentId ] (Maybe.withDefault [] (Maybe.map (\(CategoryId id) -> [ Builder.int "categoryId" id ]) maybeCategoryId))
-
+        EditFeedback (DraftId draftId) maybeCategoryId ->
+            appAbsolute [ "drafts", String.fromInt draftId, "feedback"] (Maybe.withDefault [] (Maybe.map (\(CategoryId id) -> [ Builder.int "categoryId" id ]) maybeCategoryId))
+        -- Profile
         Profile ->
             appAbsolute [ "profile" ] []

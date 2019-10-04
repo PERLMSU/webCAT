@@ -427,10 +427,10 @@ initialForm maybeUser =
             , nickname = Maybe.withDefault "" user.nickname
             , lastName = user.lastName
             , active = user.active
-            , classrooms = List.map .id <| Maybe.withDefault [] <| Maybe.map Types.unwrapClassrooms user.classrooms
-            , sections = List.map .id <| Maybe.withDefault [] <| Maybe.map Types.unwrapSections user.sections
-            , rotationGroups = List.map .id <| Maybe.withDefault [] <| Maybe.map Types.unwrapRotationGroups user.rotationGroups
-            , roles = List.map .id <| Maybe.withDefault [] user.roles
+            , classrooms = user.classrooms
+            , sections = user.sections
+            , rotationGroups = user.rotationGroups
+            , roles = user.roles
             }
 
 

@@ -12,6 +12,6 @@ defmodule WebCATWeb.IndexController do
   def index(conn, _params) do
     conn
     |> put_resp_header("content-type", "text/html; charset=utf-8")
-    |> Plug.Conn.send_file(200, Path.expand("../../../priv/static/index.html", __DIR__))
+    |> Plug.Conn.send_file(200, Application.app_dir(:webcat, "priv/static/index.html"))
   end
 end

@@ -9,12 +9,10 @@ import Json.Decode as Decode exposing (Value)
 import Page
 import Page.Blank as Blank
 import Page.Classrooms as Classrooms
-import Page.ComposeDraft as ComposeDraft
 import Page.Dashboard as Dashboard
 import Page.Draft as Draft
-import Page.Drafts as Drafts
+import Page.DraftClassrooms as DraftClassrooms
 import Page.EditFeedback as EditFeedback
-import Page.Feedback as Feedback
 import Page.Login as Login
 import Page.NotFound as NotFound
 import Page.Profile as Profile
@@ -58,11 +56,9 @@ type Model
     | Login Login.Model
     | Classrooms Classrooms.Model
     | Users Users.Model
-    | Feedback Feedback.Model
+    | DraftClassrooms DraftClassrooms.Model
     | EditFeedback EditFeedback.Model
-    | Drafts Drafts.Model
     | Draft Draft.Model
-    | ComposeDraft ComposeDraft.Model
     | Profile Profile.Model
 
 
@@ -77,11 +73,9 @@ type Msg
     | GotLoginMsg Login.Msg
     | GotClassroomsMsg Classrooms.Msg
     | GotUsersMsg Users.Msg
-    | GotFeedbackMsg Feedback.Msg
+    | GotDraftClassroomsMsg DraftClassrooms.Msg
     | GotEditFeedbackMsg EditFeedback.Msg
-    | GotDraftsMsg Drafts.Msg
     | GotDraftMsg Draft.Msg
-    | GotComposeDraftMsg ComposeDraft.Msg
     | GotProfileMsg Profile.Msg
     | GotSession Session
 
@@ -104,20 +98,14 @@ toSession page =
         Users users ->
             Users.toSession users
 
-        Feedback feedback ->
-            Feedback.toSession feedback
+        DraftClassrooms classrooms ->
+            DraftClassrooms.toSession classrooms
 
         EditFeedback feedback ->
             EditFeedback.toSession feedback
 
-        Drafts drafts ->
-            Drafts.toSession drafts
-
         Draft draft ->
             Draft.toSession draft
-
-        ComposeDraft draft ->
-            ComposeDraft.toSession draft
 
         Profile profile ->
             Profile.toSession profile
@@ -151,29 +139,17 @@ changeRouteTo maybeRoute model =
             Users.init session
                 |> updateWith Users GotUsersMsg model
 
-        Just Route.Feedback ->
-            Feedback.init session
-                |> updateWith Feedback GotFeedbackMsg model
+        Just Route.DraftClassrooms ->
+            DraftClassrooms.init session
+                |> updateWith DraftClassrooms GotDraftClassroomsMsg model
 
-        Just (Route.EditFeedback groupId studentId maybeCategoryId) ->
-            EditFeedback.init session groupId studentId maybeCategoryId
+        Just (Route.EditFeedback draftId maybeCategoryId) ->
+            EditFeedback.init session draftId maybeCategoryId
                 |> updateWith EditFeedback GotEditFeedbackMsg model
-
-        Just Route.Drafts ->
-            Drafts.init session
-                |> updateWith Drafts GotDraftsMsg model
 
         Just (Route.Draft draftId) ->
             Draft.init draftId session
                 |> updateWith Draft GotDraftMsg model
-
-        Just (Route.NewDraft groupId userId) ->
-            ComposeDraft.init (Right <| ( groupId, userId )) session
-                |> updateWith ComposeDraft GotComposeDraftMsg model
-
-        Just (Route.EditDraft draftId) ->
-            ComposeDraft.init (Left draftId) session
-                |> updateWith ComposeDraft GotComposeDraftMsg model
 
         Just Route.Profile ->
             Profile.init session
@@ -216,25 +192,17 @@ update msg model =
             Users.update subMsg users
                 |> updateWith Users GotUsersMsg model
 
-        ( GotFeedbackMsg subMsg, Feedback feedback ) ->
-            Feedback.update subMsg feedback
-                |> updateWith Feedback GotFeedbackMsg model
+        ( GotDraftClassroomsMsg subMsg, DraftClassrooms classrooms ) ->
+            DraftClassrooms.update subMsg classrooms
+                |> updateWith DraftClassrooms GotDraftClassroomsMsg model
 
         ( GotEditFeedbackMsg subMsg, EditFeedback feedback ) ->
             EditFeedback.update subMsg feedback
                 |> updateWith EditFeedback GotEditFeedbackMsg model
 
-        ( GotDraftsMsg subMsg, Drafts drafts ) ->
-            Drafts.update subMsg drafts
-                |> updateWith Drafts GotDraftsMsg model
-
         ( GotDraftMsg subMsg, Draft draft ) ->
             Draft.update subMsg draft
                 |> updateWith Draft GotDraftMsg model
-
-        ( GotComposeDraftMsg subMsg, ComposeDraft draft ) ->
-            ComposeDraft.update subMsg draft
-                |> updateWith ComposeDraft GotComposeDraftMsg model
 
         ( GotProfileMsg subMsg, Profile profile ) ->
             Profile.update subMsg profile
@@ -271,20 +239,14 @@ subscriptions model =
         Classrooms classrooms ->
             Sub.map GotClassroomsMsg (Classrooms.subscriptions classrooms)
 
-        Feedback feedback ->
-            Sub.map GotFeedbackMsg (Feedback.subscriptions feedback)
+        DraftClassrooms classrooms ->
+            Sub.map GotDraftClassroomsMsg (DraftClassrooms.subscriptions classrooms)
 
         EditFeedback feedback ->
             Sub.map GotEditFeedbackMsg (EditFeedback.subscriptions feedback)
 
-        Drafts drafts ->
-            Sub.map GotDraftsMsg (Drafts.subscriptions drafts)
-
         Draft draft ->
             Sub.map GotDraftMsg (Draft.subscriptions draft)
-
-        ComposeDraft draft ->
-            Sub.map GotComposeDraftMsg (ComposeDraft.subscriptions draft)
 
         Profile profile ->
             Sub.map GotProfileMsg (Profile.subscriptions profile)
@@ -329,20 +291,14 @@ view model =
                 Classrooms classrooms ->
                     viewPage Page.Classrooms GotClassroomsMsg (Classrooms.view classrooms)
 
-                Feedback feedback ->
-                    viewPage Page.Feedback GotFeedbackMsg (Feedback.view feedback)
+                DraftClassrooms classrooms ->
+                    viewPage Page.DraftClassrooms GotDraftClassroomsMsg (DraftClassrooms.view classrooms)
 
                 EditFeedback feedback ->
                     viewPage Page.EditFeedback GotEditFeedbackMsg (EditFeedback.view feedback)
 
-                Drafts drafts ->
-                    viewPage Page.Drafts GotDraftsMsg (Drafts.view drafts)
-
                 Draft draft ->
                     viewPage Page.Draft GotDraftMsg (Draft.view draft)
-
-                ComposeDraft draft ->
-                    viewPage Page.ComposeDraft GotComposeDraftMsg (ComposeDraft.view draft)
 
                 Profile profile ->
                     viewPage Page.Profile GotProfileMsg (Profile.view profile)

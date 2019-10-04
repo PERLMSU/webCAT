@@ -15,7 +15,7 @@ suite =
     describe "Types"
         [ fuzz userFuzzer "Can encode and decode data into the same structure" <|
             \user ->
-                case (Decode.decodeValue Types.userDecoder <| Types.encodeUser user) |> Result.toMaybe of
+                case (Decode.decodeValue Types.credUserDecoder <| Types.encodeUser user) |> Result.toMaybe of
                     Just decoded ->
                         Expect.equal user decoded
 

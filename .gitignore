@@ -44,12 +44,9 @@ Temporary Items
 erl_crash.dump
 
 node_modules
-cover
 .idea
-.python-version
-webcat.iml
-/assets/yarn-error.log
-/assets/elm-stuff
+yarn-error.log
+elm-stuff
 .elm/
 
 # pyenv Python version

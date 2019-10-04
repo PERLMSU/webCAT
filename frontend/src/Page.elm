@@ -21,11 +21,10 @@ type Page
     | Login
     | Classrooms
     | Users
-    | Feedback
-    | EditFeedback
-    | Drafts
+    | DraftClassrooms
+    | DraftRotations
     | Draft
-    | ComposeDraft
+    | EditFeedback
     | Profile
 
 
@@ -82,8 +81,7 @@ viewMenu page user =
         , div [ class "my-2" ]
             [ menuItem "Classrooms" "university" Route.Classrooms
             , menuItem "Users" "users" Route.Users
-            , menuItem "Feedback" "pen" Route.Feedback
-            , menuItem "Inbox" "inbox" Route.Drafts
+            , menuItem "Feedback" "pen" Route.DraftClassrooms
             ]
         , div [ class "my-2" ]
             [ menuItem "Logout" "sign-out-alt" Route.Logout
@@ -105,16 +103,7 @@ isActive page route =
         ( Users, Route.Users ) ->
             True
 
-        ( Feedback, Route.Feedback ) ->
-            True
-
-        ( Drafts, Route.Drafts ) ->
-            True
-
-        ( Profile, Route.Profile ) ->
-            True
-
-        ( EditFeedback, Route.EditFeedback _ _ _ ) ->
+        ( DraftClassrooms, Route.DraftClassrooms ) ->
             True
 
         _ ->

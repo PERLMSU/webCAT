@@ -10,5 +10,4 @@ defmodule WebCATWeb.EmailView do
 
   def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
   def updated_at(data, _), do: Timex.to_unix(data.updated_at)
-
 end

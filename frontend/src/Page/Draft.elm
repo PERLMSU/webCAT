@@ -18,14 +18,14 @@ import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
 
 type alias Model =
     { session : Session
-    , draft : APIData Draft
+    , draft : APIData GroupDraft 
     , draftId : DraftId
     }
 
 
 type Msg
     = GotSession Session
-    | GotDraft (APIData Draft)
+    | GotDraft (APIData GroupDraft)
 
 
 init : DraftId -> Session -> ( Model, Cmd Msg )
@@ -35,7 +35,7 @@ init draftId session =
           , draft = Loading
           , draftId = draftId
           }
-        , draft session draftId GotDraft
+        , groupDraft session draftId GotDraft
         )
 
     else

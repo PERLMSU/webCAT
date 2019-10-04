@@ -1,5 +1,6 @@
-module Alert exposing (Alert(..), dismiss, render)
+module Alert exposing (Alert(..), dismiss, fromAPIError, render)
 
+import API
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -16,6 +17,15 @@ type Alert
 dismiss : Alert -> List Alert -> List Alert
 dismiss alert alerts =
     remove alert alerts
+
+
+fromAPIError : API.Error -> Alert
+fromAPIError error =
+    let
+        { title, message } =
+            API.getErrorBody error
+    in
+    Danger title <| Maybe.withDefault "" message
 
 
 render : (Alert -> msg) -> Alert -> Html msg
@@ -72,13 +82,13 @@ render toMsg alert =
                     [ "border-info" ]
 
                 Success _ _ ->
-                    [ "border-success"]
+                    [ "border-success" ]
 
                 Warning _ _ ->
-                    [ "border-warning"]
+                    [ "border-warning" ]
 
                 Danger _ _ ->
-                    [ "border-danger"]
+                    [ "border-danger" ]
     in
     div [ attribute "role" "alert", class "animated fadeInDown fast" ]
         [ div [ classList <| classes <| [ "font-display font-bold rounded-t px-4 py-2 relative" ] ++ titleClasses ]
