@@ -15,7 +15,10 @@
     "dependencies": {
         "@fortawesome/fontawesome-pro": "5.4.1",
         "bootstrap": "^4.3.1",
-        "phoenix": "file:../deps/phoenix"
+        "jquery": "^3.4.1",
+        "phoenix": "file:../deps/phoenix",
+        "selectize": "^0.12.6",
+        "simplemde": "^1.11.2"
     },
     "devDependencies": {
         "@babel/core": "^7.0.0-0",
@@ -26,6 +29,7 @@
         "elm-hot": "^1.1.2",
         "elm-test": "0.19.0-rev6",
         "parcel-bundler": "^1.12.3",
+        "parcel-plugin-purgecss": "^2.1.2",
         "parcel-plugin-subresource-integrity": "^0.3.1",
         "sass": "^1.23.0"
     },

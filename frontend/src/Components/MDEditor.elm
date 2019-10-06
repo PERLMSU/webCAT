@@ -1,19 +1,22 @@
-module Components.MDEditor exposing (Config, render)
+module Components.Editor exposing (Model, render)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html)
+import Html.Attributes as Attributes
+import Html.Events as Events
+import Json.Decode as Decode
+import Json.Encode as Encode
 
 
-type alias Config msg =
+type alias Model msg =
     { onInput : String -> msg
-    , placeholder : String
+    , content : String
     }
 
 
-render : Config msg -> String -> Html msg
-render config content =
-    div [class "mx-4 my-2"]
-        [ textarea [ class "bg-transparent p-2 border rounded shadow leading-tight focus:outline-none w-full", onInput config.onInput, placeholder config.placeholder ]
-            [ text content ]
+render : Model msg -> Html msg
+render model =
+    Html.node "markdown-editor"
+        [ Attributes.property "content" <| Encode.string model.content
+        , Events.on "contentChanged" <| Decode.map model.onInput <| Decode.at [ "target", "content" ] <| Decode.string
         ]
+        []
