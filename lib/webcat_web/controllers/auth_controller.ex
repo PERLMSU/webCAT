@@ -8,21 +8,37 @@ defmodule WebCATWeb.AuthController do
   action_fallback(WebCATWeb.FallbackController)
 
   def login(conn, params) do
-    with {:params, %{"email" => email, "password" => password}} <- {:params, params},
-         {:login, {:ok, user}} <- {:login, Users.login(email, password)},
-         {:token, {:ok, token, _}} <- {:token, WebCATWeb.Auth.Guardian.encode_and_sign(user)} do
-      conn
-      |> put_status(201)
-      |> json(%{token: token, user: UserView.show(user, conn, %{})})
-    else
-      {:params, _} ->
+    case params do
+      %{"email" => email, "password" => password} ->
+        with {:login, {:ok, user}} <- {:login, Users.login(email, password)},
+             {:token, {:ok, token, _}} <- {:token, WebCATWeb.Auth.Guardian.encode_and_sign(user)} do
+          conn
+          |> put_status(201)
+          |> json(%{token: token, user: UserView.show(user, conn, %{})})
+        else
+          {:login, {:error, _}} ->
+            {:error, :not_found, dgettext("errors", "Email or password incorrect")}
+
+          {:token, _} ->
+            {:error, :server_error, dgettext("errors", "Problem generating authentication token")}
+        end
+
+      %{"token" => token} ->
+        with {:login, {:ok, user}} <- {:login, Users.login(token)},
+             {:token, {:ok, token, _}} <- {:token, WebCATWeb.Auth.Guardian.encode_and_sign(user)} do
+          conn
+          |> put_status(201)
+          |> json(%{token: token, user: UserView.show(user, conn, %{})})
+        else
+          {:login, {:error, _}} ->
+            {:error, :not_found, dgettext("errors", "Login token not found or expired")}
+
+          {:token, _} ->
+            {:error, :server_error, dgettext("errors", "Problem generating authentication token")}
+        end
+
+      _ ->
         {:error, :bad_request, dgettext("errors", "Login details not supplied")}
-
-      {:login, {:error, _}} ->
-        {:error, :not_found, dgettext("errors", "Email or password incorrect")}
-
-      {:token, _} ->
-        {:error, :server_error, dgettext("errors", "Problem generating authentication token")}
     end
   end
 

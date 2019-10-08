@@ -2,7 +2,7 @@ defmodule WebCATWeb.AuthControllerTest do
   use WebCATWeb.ConnCase
 
   describe "login/2" do
-    test "responds normally to a well formed login request", %{conn: conn} do
+    test "responds normally to a well formed email/password login request", %{conn: conn} do
       {:ok, user} = login_user()
 
       result =
@@ -12,6 +12,24 @@ defmodule WebCATWeb.AuthControllerTest do
 
       assert String.length(result["token"]) > 0
       assert result["user"]["data"]["attributes"]["email"] == user.email
+    end
+
+    test "responds normally to a well formed token login request", %{conn: conn} do
+      {:ok, user} = login_user()
+
+      token = Factory.insert(:token_credential, user: user)
+
+      result =
+        conn
+        |> post(Routes.auth_path(conn, :login, token: token.token))
+        |> json_response(201)
+
+      assert String.length(result["token"]) > 0
+      assert result["user"]["data"]["attributes"]["email"] == user.email
+
+      conn
+      |> post(Routes.auth_path(conn, :login, token: token.token))
+      |> json_response(404)
     end
 
     test "errors correctly when wrong parameters supplied", %{conn: conn} do
@@ -82,6 +100,14 @@ defmodule WebCATWeb.AuthControllerTest do
         new_password: "new_password"
       })
       |> json_response(200)
+
+      # Cannot do it twice
+      conn
+      |> post(Routes.auth_path(conn, :finish_password_reset), %{
+        token: token,
+        new_password: "new_password_2"
+      })
+      |> json_response(404)
     end
 
     test "fails with faulty params", %{conn: conn} do

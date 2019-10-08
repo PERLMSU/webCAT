@@ -78,8 +78,9 @@ defmodule WebCAT.Accounts.Users do
     |> Repo.one()
     |> case do
       %TokenCredential{} = credential ->
+        Repo.delete(credential)
+
         if Timex.after?(Timex.now(), credential.expire) do
-          Repo.delete(credential)
           {:error, "Token not found or expired"}
         else
           {:ok, credential.user}
@@ -130,46 +131,4 @@ defmodule WebCAT.Accounts.Users do
     end
   end
 
-  def list() do
-    from(user in User,
-      left_join: performer in assoc(user, :performer),
-      left_join: roles in assoc(performer, :roles),
-      preload: [
-        performer: {performer, roles: roles}
-      ]
-    )
-    |> Repo.all()
-  end
-
-  def get(id) do
-    from(user in User,
-      left_join: performer in assoc(user, :performer),
-      left_join: roles in assoc(performer, :roles),
-      left_join: classrooms in assoc(user, :classrooms),
-      left_join: sections in assoc(user, :sections),
-      left_join: rotation_groups in assoc(user, :rotation_groups),
-      left_join: rotations in assoc(rotation_groups, :rotation),
-      where: user.id == ^id,
-      preload: [
-        roles: roles,
-        performer: {performer, roles: roles},
-        classrooms: classrooms,
-        sections: sections,
-        rotation_groups: {rotation_groups, rotation: rotations}
-      ]
-    )
-    |> Repo.one()
-    |> case do
-      nil -> {:error, :not_found}
-      user -> {:ok, user}
-    end
-  end
-
-  def has_role?(%User{} = user, role) do
-    user
-    |> Repo.preload(performer: [:roles])
-    |> Map.fetch!(:performer)
-    |> Map.fetch!(:roles)
-    |> Enum.find_value(false, fn r -> Map.get(r, :identifier) == role end)
-  end
 end

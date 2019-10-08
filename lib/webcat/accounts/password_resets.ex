@@ -42,9 +42,10 @@ defmodule WebCAT.Accounts.PasswordResets do
   def get(token) when is_binary(token) do
     case Repo.get_by(PasswordReset, token: token) do
       %PasswordReset{} = reset ->
-        # Delete if reset older than 24 hours
+        Repo.delete(reset)
+
+        # Don't allow reset if older than expiration
         if Timex.after?(Timex.now(), reset.expire) do
-          Repo.delete(reset)
           {:error, :not_found}
         else
           {:ok, reset}
@@ -75,8 +76,11 @@ defmodule WebCAT.Accounts.PasswordResets do
             |> Multi.delete(:reset, reset)
             |> Repo.transaction()
             |> case do
-              {:ok, result} -> {:ok, Repo.get(User, result.credential.user_id)}
-              {:error, _, changeset, %{}} -> {:error, changeset}
+              {:ok, result} ->
+                {:ok, Repo.get(User, result.credential.user_id)}
+
+              {:error, _, changeset, %{}} ->
+                {:error, changeset}
             end
         end
 
