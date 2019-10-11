@@ -13,30 +13,9 @@ defmodule WebCAT.Accounts.PasswordCredentialTest do
 
     test "handles password changes appropriately" do
       cred = Factory.insert(:password_credential)
-
-      assert PasswordCredential.changeset(cred, %{
-               "current_password" => "password",
-               "new_password" => "password1",
-               "confirm_new_password" => "password1"
-             }).valid?
-
-      refute PasswordCredential.changeset(cred, %{
-               "current_password" => "password2",
-               "new_password" => "password1",
-               "confirm_new_password" => "password1"
-             }).valid?
-
-      refute PasswordCredential.changeset(cred, %{
-               "current_password" => "password",
-               "new_password" => "password1",
-               "confirm_new_password" => "password12"
-             }).valid?
-
-      refute PasswordCredential.changeset(cred, %{
-               "current_password" => "password123",
-               "new_password" => "password1",
-               "confirm_new_password" => "password12"
-             }).valid?
+      changeset = PasswordCredential.changeset(cred, %{"password" => "password"})
+      assert changeset.valid?
+      assert changeset.changes.password != "password"
     end
   end
 end

@@ -47,7 +47,7 @@ defmodule WebCAT.Accounts.User do
   @doc """
   Build a changeset for a user
   """
-  def changeset(user, attrs \\ %{}) do
+  def changeset(user, attrs \\ %{}, action \\ :create) do
     user
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)

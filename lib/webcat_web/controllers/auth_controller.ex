@@ -45,10 +45,7 @@ defmodule WebCATWeb.AuthController do
   def start_password_reset(conn, params) do
     with {:params, %{"email" => email}} <- {:params, params},
          {:email, {:ok, reset}} <- {:email, PasswordResets.start_reset(email)} do
-      conn
-      |> put_status(:created)
-      |> put_view(WebCATWeb.AuthView)
-      |> render("token.json", token: reset.token)
+      send_resp(conn, :no_content, "")
     else
       {:params, _} ->
         {:error, :bad_request, dgettext("errors", "Reset details not correctly supplied")}
@@ -60,17 +57,20 @@ defmodule WebCATWeb.AuthController do
 
   def finish_password_reset(conn, params) do
     with {:params, %{"token" => token, "new_password" => new_password}} <- {:params, params},
-         {:reset, {:ok, user}} <- {:reset, PasswordResets.finish_reset(token, new_password)} do
+         {:reset, {:ok, user}} <- {:reset, PasswordResets.finish_reset(token, new_password)},
+         {:token, {:ok, token, _}} <- {:token, WebCATWeb.Auth.Guardian.encode_and_sign(user)} do
       conn
       |> put_status(:ok)
-      |> put_view(WebCATWeb.UserView)
-      |> render("show.json", %{data: user})
+      |> json(%{token: token, user: UserView.show(user, conn, %{})})
     else
       {:params, _} ->
         {:error, :bad_request, dgettext("errors", "Reset details not correctly supplied.")}
 
       {:reset, _} ->
         {:error, :not_found, dgettext("errors", "Reset token not found")}
+
+      {:token, _} ->
+        {:error, :server_error, dgettext("errors", "Problem generating authentication token")}
     end
   end
 end

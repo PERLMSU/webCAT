@@ -8,7 +8,7 @@
         <mj-divider border-color="#345193"></mj-divider>
 
         <mj-text font-size="20px" color="#395FB8" font-family="helvetica">Welcome to WebCAT!</mj-text>
-        <mj-text font-size="20px" color="#395FB8" font-family="helvetica">Please click here to confirm your email address.</mj-text>
+        <mj-text font-size="20px" color="#395FB8" font-family="helvetica">Please click here to confirm your email address and set your password.</mj-text>
         <mj-button href="" font-family="Helvetica" background-color="#345193" color="white">
           Confirm your email address
         </mj-button>

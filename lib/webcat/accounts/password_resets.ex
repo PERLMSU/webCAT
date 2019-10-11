@@ -66,13 +66,21 @@ defmodule WebCAT.Accounts.PasswordResets do
       %PasswordReset{} = reset ->
         case Repo.get_by(PasswordCredential, user_id: reset.user_id) do
           nil ->
-            nil
+            Multi.new()
+            |> Multi.insert(:credential, PasswordCredential.changeset(%PasswordCredential{}, %{password: new_password}))
+            |> Multi.delete(:reset, reset)
+            |> Repo.transaction()
+            |> case do
+                 {:ok, result} ->
+                   {:ok, Repo.get(User, result.credential.user_id)}
+
+                 {:error, _, changeset, %{}} ->
+                   {:error, changeset}
+               end
 
           credential ->
-            changeset = PasswordCredential.changeset(credential, %{password: new_password})
-
             Multi.new()
-            |> Multi.update(:credential, changeset)
+            |> Multi.update(:credential, PasswordCredential.changeset(credential, %{password: new_password}))
             |> Multi.delete(:reset, reset)
             |> Repo.transaction()
             |> case do
