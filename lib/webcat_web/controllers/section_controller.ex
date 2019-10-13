@@ -12,12 +12,8 @@ defmodule WebCATWeb.SectionController do
     sort: ~w(number semester_id classroom_id inserted_at updated_at)
 
 
-  def import(conn, _user, %{"id" => id, "file" => %{path: path}}) do
-    permissions do
-      has_role(:admin)
-    end
-
-    with {:auth, :ok} <- {:auth, is_authorized?()},
+  def import(conn, user, %{"id" => id, "file" => %{path: path}}) do
+    with {:auth, true} <- {:auth, user.role in ~w(admin)},
          {:ok, _section} <- CRUD.get(Section, id),
          {:ok, imported} <- Import.import(id, path) do
       conn

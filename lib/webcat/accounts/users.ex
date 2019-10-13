@@ -104,22 +104,11 @@ defmodule WebCAT.Accounts.Users do
     |> check_password(password)
     |> case do
       {:ok, credential} ->
-        CRUD.get(User, credential.user_id, include: ~w(roles classrooms sections rotation_groups)a)
+        CRUD.get(User, credential.user_id, include: ~w(classrooms sections rotation_groups)a)
 
       {:error, _} = it ->
         it
     end
-  end
-
-  @doc """
-  Get all users with a specific role
-  """
-  def with_role(role) do
-    User
-    |> join(:left, [u], p in assoc(u, :performer))
-    |> join(:left, [_, p], r in assoc(p, :roles))
-    |> where([_, _, role], role.identifier == ^role)
-    |> preload([_, p, r], performer: {p, roles: r})
   end
 
   defp check_password(nil, _), do: {:error, "Incorrect email or password"}

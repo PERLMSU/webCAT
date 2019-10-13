@@ -15,14 +15,13 @@ alias WebCAT.Feedback.{
   StudentExplanation
 }
 
-alias Terminator.{Role, Performer}
-
 admin_changeset =
   User.changeset(%User{}, %{
     first_name: "Admin",
     last_name: "Account",
     email: "wcat_admin@msu.edu",
-    active: true
+    active: true,
+    role: "admin"
   })
 
 assistant_changeset =
@@ -30,7 +29,8 @@ assistant_changeset =
     first_name: "Assistant",
     last_name: "Account",
     email: "wcat_assistant@msu.edu",
-    active: true
+    active: true,
+    role: "learning_assistant"
   })
 
 classroom_changeset =
@@ -43,17 +43,7 @@ classroom_changeset =
 transaction =
   Multi.new()
   |> Multi.insert(:admin, admin_changeset)
-  |> Multi.run(:admin_role, fn repo, %{admin: user} ->
-    Performer.grant(user.performer, repo.get_by!(Role, identifier: "admin"))
-
-    {:ok, nil}
-  end)
   |> Multi.insert(:assistant, assistant_changeset)
-  |> Multi.run(:assistant_role, fn repo, %{assistant: user} ->
-    Performer.grant(user.performer, repo.get_by!(Role, identifier: "learning_assistant"))
-
-    {:ok, nil}
-  end)
   |> Multi.run(:admin_credentials, fn repo, %{admin: user} ->
     %PasswordCredential{}
     |> PasswordCredential.changeset(%{
@@ -148,7 +138,8 @@ transaction =
     |> User.changeset(%{
       email: "john.doe@msu.edu",
       first_name: "John",
-      last_name: "Doe"
+      last_name: "Doe",
+      role: "student"
     })
     |> repo.insert()
   end)
@@ -157,15 +148,10 @@ transaction =
     |> User.changeset(%{
       email: "jane.doe@msu.edu",
       first_name: "Jane",
-      last_name: "Doe"
+      last_name: "Doe",
+      role: "student"
     })
     |> repo.insert()
-  end)
-  |> Multi.run(:student_roles, fn repo, transaction ->
-    student_role = repo.get_by!(Role, identifier: "student")
-    Performer.grant(transaction.fall_student_1.performer, student_role)
-    Performer.grant(transaction.fall_student_2.performer, student_role)
-    {:ok, nil}
   end)
   |> Multi.run(:rotation_group_1, fn repo, transaction ->
     %RotationGroup{}

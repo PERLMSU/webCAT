@@ -11,14 +11,7 @@ defmodule WebCATWeb.ResourceController do
     {filter, opts} = Keyword.pop(opts, :filter)
     {sort, opts} = Keyword.pop(opts, :sort)
     {actions, opts} = Keyword.pop(opts, :actions, ~w(index show create update delete)a)
-    {roles, _opts} = Keyword.pop(opts, :roles, ~w(admin)a)
-
-    permissions =
-      Enum.map(roles, fn role ->
-        quote do
-          has_role(unquote(role))
-        end
-      end)
+    {roles, _opts} = Keyword.pop(opts, :roles, ~w(admin))
 
     quote do
       use WebCATWeb, :authenticated_controller
@@ -67,12 +60,8 @@ defmodule WebCATWeb.ResourceController do
       end
 
       if :create in @actions do
-        def create(conn, _user, params) do
-          permissions do
-            unquote(permissions)
-          end
-
-          with {:auth, :ok} <- {:auth, is_authorized?()},
+        def create(conn, user, params) do
+          with {:auth, true} <- {:auth, user.role in unquote(roles)},
                {:ok, data} <- CRUD.create(unquote(schema), params) do
             conn
             |> put_status(:created)
@@ -90,12 +79,8 @@ defmodule WebCATWeb.ResourceController do
       end
 
       if :update in @actions do
-        def update(conn, _user, %{"id" => id} = params) do
-          permissions do
-            unquote(permissions)
-          end
-
-          with {:auth, :ok} <- {:auth, is_authorized?()},
+        def update(conn, user, %{"id" => id} = params) do
+          with {:auth, true} <- {:auth, user.role in unquote(roles)},
                {:ok, updated} <- CRUD.update(unquote(schema), id, params) do
             conn
             |> put_status(:ok)
@@ -113,12 +98,8 @@ defmodule WebCATWeb.ResourceController do
       end
 
       if :delete in @actions do
-        def delete(conn, _user, %{"id" => id}) do
-          permissions do
-            unquote(permissions)
-          end
-
-          with {:auth, :ok} <- {:auth, is_authorized?()},
+        def delete(conn, user, %{"id" => id}) do
+          with {:auth, true} <- {:auth, user.role in unquote(roles)},
                {:ok, _deleted} <- CRUD.delete(unquote(schema), id) do
             send_resp(conn, :no_content, "")
           else

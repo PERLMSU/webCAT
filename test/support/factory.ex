@@ -19,7 +19,6 @@ defmodule WebCAT.Factory do
   alias WebCAT.Rotations.{Classroom, RotationGroup, Rotation, Semester, Section}
   alias WebCAT.Factory
   alias WebCAT.Repo
-  alias Terminator.{Performer, Role}
 
   def notification_factory do
     %Notification{
@@ -54,44 +53,27 @@ defmodule WebCAT.Factory do
   end
 
   def user_factory do
-    performer = Factory.insert(:performer)
-
     %User{
       email: sequence(:email, &"email-#{&1}@msu.edu"),
       first_name: sequence(:first_name, ~w(John Jane)),
       last_name: "Doe",
       middle_name: sequence(:middle_name, ~w(James Renee)),
       nickname: sequence(:nickname, ~w(John Jane)),
-      performer: performer,
-      performer_id: performer.id,
-      active: true
+      active: true,
+      role: "student"
     }
   end
 
-  def admin_factory do
-    user = build(:user)
-    role = Repo.get_by(Role, identifier: "admin")
-
-    Performer.grant(user, role)
-    user
+  def student_factory do
+    build(:user, role: "student")
   end
 
-  def student_factory do
-    user = build(:user)
-    role = Repo.get_by(Role, identifier: "student")
-    Performer.grant(user, role)
-    user
+  def admin_factory do
+    build(:user, role: "admin")
   end
 
   def assistant_factory do
-    user = build(:user)
-    role = Repo.get_by(Role, identifier: "learning_assistant")
-    Performer.grant(user, role)
-    user
-  end
-
-  def performer_factory do
-    %Performer{}
+    build(:user, role: "learning_assistant")
   end
 
   def category_factory do

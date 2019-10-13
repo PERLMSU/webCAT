@@ -36,13 +36,8 @@ defmodule WebCAT.Import.Students do
 
     import_transaction = Enum.reduce(maps, Multi.new(), fn student, multi ->
       Multi.run(multi, student["email"], fn repo, _transaction ->
-        performer = repo.insert!(%Performer{})
-        role = repo.get_by(Role, identifier: "student")
-        Performer.grant(performer, role)
-
         %User{}
-        |> User.changeset(student)
-        |> put_assoc(:performer, performer)
+        |> User.changeset(Map.put(student, "role", "student"))
         |> put_assoc(:sections, [repo.get_by(Section, id: section_id)])
         |> repo.insert()
       end)

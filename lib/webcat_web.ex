@@ -31,12 +31,10 @@ defmodule WebCATWeb do
   def authenticated_controller do
     quote do
       use WebCATWeb, :controller
-      use Terminator
 
       # Override Phoenix.Controller.action/2 callback
       def action(conn, _) do
         user = WebCATWeb.Auth.Guardian.Plug.current_resource(conn)
-        load_and_authorize_performer(user)
 
         apply(__MODULE__, action_name(conn), [conn, user, conn.params])
       end

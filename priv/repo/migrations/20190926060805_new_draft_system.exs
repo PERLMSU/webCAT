@@ -59,5 +59,19 @@ defmodule WebCAT.Repo.Migrations.NewDraftSystem do
       ALTER TABLE student_explanations DROP CONSTRAINT fk_student_feedback;
       """
     )
+
+    enum("role", ~w(admin faculty teaching_assistant learning_assistant student))
+
+    alter table(:users) do
+      remove(:performer_id, references(Terminator.Performer.table()), default: 1)
+
+      add_req(:role, :role)
+    end
+
+    drop table(:terminator_performers_roles)
+    drop table(:terminator_performers_entities)
+    drop table(Terminator.Performer.table())
+    drop table(:terminator_roles)
+    drop table(:terminator_abilities)
   end
 end

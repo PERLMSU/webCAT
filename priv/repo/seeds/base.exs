@@ -9,7 +9,8 @@ admin_changeset =
     first_name: "Admin",
     last_name: "Account",
     email: "wcat_admin@msu.edu",
-    active: true
+    active: true,
+    role: "admin"
   })
 
 admin_password =
@@ -38,23 +39,6 @@ admin_password =
       _ ->
         {:ok, nil}
     end
-  end)
-  |> Multi.run(:granted, fn repo, transaction ->
-    admin =
-      transaction.admin
-      |> repo.preload(performer: ~w(roles)a)
-
-    is_admin =
-      admin.performer.roles
-      |> Enum.find(false, fn role ->
-        role.identifier == "admin"
-      end)
-
-    unless is_admin do
-      Performer.grant(admin.performer, repo.get_by(Role, identifier: "admin"))
-    end
-
-    {:ok, nil}
   end)
   |> Repo.transaction()
 

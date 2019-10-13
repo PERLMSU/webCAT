@@ -11,12 +11,8 @@ defmodule WebCATWeb.DraftController do
     filter: ~w(status parent_draft_id student_id rotation_group_id),
     sort: ~w(status parent_draft_id student_id rotation_group_id inserted_at updated_at)
 
-  def send_email(conn, _user, %{"id" => id}) do
-    permissions do
-      has_role(:admin)
-    end
-
-    with {:auth, :ok} <- {:auth, is_authorized?()},
+  def send_email(conn, user, %{"id" => id}) do
+    with {:auth, true} <- {:auth, user.role in ~w(admin)},
          {:ok, draft} <-
            CRUD.get(Draft, id, include: [:grades, child_drafts: ~w(student grades)a]) do
       emails =

@@ -6,7 +6,6 @@ defmodule WebCAT.Accounts.User do
   import Ecto.Query
   import Ecto.Changeset
   alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
-  alias Terminator.{Performer, Role}
   alias WebCAT.Accounts.User
   alias WebCAT.Repo
 
@@ -17,14 +16,13 @@ defmodule WebCAT.Accounts.User do
     field(:middle_name, :string)
     field(:nickname, :string)
     field(:active, :boolean, default: true)
+    field(:role, :string)
 
-    belongs_to(:performer, Terminator.Performer)
 
     many_to_many(:classrooms, Classroom, join_through: "classroom_users", on_replace: :delete)
     many_to_many(:semesters, Semester, join_through: "semester_users", on_replace: :delete)
     many_to_many(:sections, Section, join_through: "section_users", on_replace: :delete)
     many_to_many(:rotations, Rotation, join_through: "rotation_users", on_replace: :delete)
-
     many_to_many(:rotation_groups, RotationGroup,
       join_through: "rotation_group_users",
       on_replace: :delete
@@ -32,57 +30,23 @@ defmodule WebCAT.Accounts.User do
 
     has_many(:notifications, WebCAT.Accounts.Notification)
 
-    # For student feedback
-    # field(:feedback, {:array, :map}, virtual: true)
-
-    # For role assignment TODO: Needs better solution
-    has_many(:roles, through: ~w(performer roles)a)
-
     timestamps(type: :utc_datetime)
   end
 
-  @required ~w(email first_name last_name)a
-  @optional ~w(middle_name nickname active performer_id)a
+  @required ~w(email first_name last_name role)a
+  @optional ~w(middle_name nickname active)a
 
   @doc """
   Build a changeset for a user
   """
-  def changeset(user, attrs \\ %{}, action \\ :create) do
+  def changeset(user, attrs \\ %{}) do
     user
     |> cast(attrs, @required ++ @optional)
     |> validate_required(@required)
     |> unique_constraint(:email)
-    |> put_performer()
-    |> put_roles(Map.get(attrs, "roles"))
+    |> validate_inclusion(:role, ~w(admin faculty teaching_assistant learning_assistant student))
     |> put_classrooms(Map.get(attrs, "classrooms"))
   end
-
-  defp put_performer(%{valid?: true} = changeset) do
-    case get_field(changeset, :performer_id) do
-      nil -> put_assoc(changeset, :performer, Repo.insert!(%Terminator.Performer{}))
-      _ -> changeset
-    end
-  end
-
-  defp put_performer(changeset), do: changeset
-
-  defp put_roles(%{valid?: true} = changeset, roles) when is_list(roles) do
-    case get_field(changeset, :performer) do
-      nil ->
-        changeset
-
-      performer ->
-        performer
-        |> Repo.preload(~w(roles)a)
-        |> Performer.changeset()
-        |> put_assoc(:roles, Repo.all(from(r in Role, where: r.id in ^roles)))
-        |> Repo.update()
-
-        changeset
-    end
-  end
-
-  defp put_roles(changeset, _), do: changeset
 
   defp put_classrooms(%{valid?: true} = changeset, classrooms) when is_list(classrooms) do
     ids =
@@ -111,18 +75,4 @@ defmodule WebCAT.Accounts.User do
   end
 
   defp put_classrooms(changeset, _), do: changeset
-
-
-  @doc """
-  Get all of the rotation groups that the user is in
-  """
-  def rotation_groups(user_id) do
-    from(rg in RotationGroup,
-      left_join: u in assoc(rg, :users),
-      left_join: u2 in assoc(rg, :users),
-      where: u.id == ^user_id,
-      left_join: r in assoc(u2, :roles),
-      preload:  [:rotation, users: {u2, roles: r}])
-    |> Repo.all()
-  end
 end
