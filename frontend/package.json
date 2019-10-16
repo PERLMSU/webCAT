@@ -3,10 +3,10 @@
     "license": "ISC",
     "sideEffects": false,
     "scripts": {
-        "build:dev": "NODE_ENV=development parcel build index.html static/* -d ../priv/static/ --no-minify --public-url ../static/",
-        "build": "parcel build index.html static/* --no-source-maps -d ../priv/static/ --public-url ../static/",
+        "build:dev": "NODE_ENV=development parcel build index.html static/**/* -d ../priv/static/ --no-minify --public-url ../static/",
+        "build": "parcel build index.html static/**/* --no-source-maps -d ../priv/static/ --public-url ../static/",
         "start": "parcel index.html static/*",
-        "watch": "parcel watch index.html static/* -d ../priv/static/ --public-url ../static/",
+        "watch": "parcel watch index.html static/**/* -d ../priv/static --public-url ../static/",
         "elm": "elm make src/Main.elm --output=/dev/null",
         "format": "elm-format src/ tests/ --yes --elm-version 0.19",
         "test:full": "elm-format --validate . && elm-test",
