@@ -1,4 +1,4 @@
-module Types exposing (Category, CategoryId(..), Classroom, ClassroomId(..), Comment, CommentId(..), DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Feedback, FeedbackId(..), Grade, GradeId(..), GroupDraft, Observation, ObservationId(..), ObservationType(..), Role, RoleId(..), Rotation, RotationGroup, RotationGroupId(..), RotationId(..), Section, SectionId(..), Semester, SemesterId(..), Semesters(..), StudentDraft, StudentExplanation, StudentExplanationId(..), StudentFeedback, StudentFeedbackId(..), User, UserId(..), categoryDecoder, classroomDecoder, commentDecoder, credUserDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, groupDraftDecoder, multiDecoder, observationDecoder, observationTypeDecoder, optionalAttribute, optionalMaybe, relationship, requiredAttribute, requiredRelationship, requiredType, roleDecoder, roleEncoder, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, singleDecoder, studentDraftDecoder, studentExplanationDecoder, studentFeedbackDecoder, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRoleId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapStudentExplanationId, unwrapStudentFeedbackId, unwrapUserId, userDecoder)
+module Types exposing (Category, CategoryId(..), Classroom, ClassroomId(..), Comment, CommentId(..), DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Feedback, FeedbackId(..), Grade, GradeId(..), GroupDraft, Observation, ObservationId(..), ObservationType(..), Role(..), Rotation, RotationGroup, RotationGroupId(..), RotationId(..), Section, SectionId(..), Semester, SemesterId(..), Semesters(..), StudentDraft, StudentExplanation, StudentExplanationId(..), StudentFeedback, StudentFeedbackId(..), User, UserId(..), categoryDecoder, classroomDecoder, commentDecoder, credUserDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, groupDraftDecoder, multiDecoder, observationDecoder, observationTypeDecoder, optionalAttribute, optionalMaybe, relationship, requiredAttribute, requiredRelationship, requiredType, roleDecoder, roleToString, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, singleDecoder, studentDraftDecoder, studentExplanationDecoder, studentFeedbackDecoder, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapStudentExplanationId, unwrapStudentFeedbackId, unwrapUserId, userDecoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Extra exposing (parseInt)
@@ -236,45 +236,52 @@ unwrapUserId (UserId id) =
     id
 
 
-type RoleId
-    = RoleId Int
 
-
-unwrapRoleId : RoleId -> Int
-unwrapRoleId (RoleId id) =
-    id
-
-
-type alias Role =
-    { id : RoleId
-    , identifier : String
-    , name : String
-    , abilities : List String
-    , insertedAt : Time.Posix
-    , updatedAt : Time.Posix
-    }
-
+type  Role = Admin | Faculty | TeachingAssistant | LearningAssistant | Student
 
 roleDecoder : Decoder Role
 roleDecoder =
-    Decode.succeed Role
-        |> required "id" (map RoleId parseInt)
-        |> requiredAttribute "identifier" string
-        |> requiredAttribute "name" string
-        |> requiredAttribute "abilities" (list string)
-        |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
-        |> requiredAttribute "updated_at" (map Time.millisToPosix int)
+    Decode.string
+        |> Decode.andThen
+            (\str ->
+                case str of
+                    "admin" ->
+                        Decode.succeed Admin
+
+                    "faculty" ->
+                        Decode.succeed Faculty
+
+                    "teaching_assistant" ->
+                        Decode.succeed TeachingAssistant
+
+                    "learning_assistant" ->
+                        Decode.succeed LearningAssistant
+
+                    "student" ->
+                        Decode.succeed Student
+
+                    else_ ->
+                        Decode.fail <| "Unknown role: " ++ else_
+            )
 
 
-roleEncoder : Role -> Value
-roleEncoder role =
-    Encode.object
-        [ ( "identifier", Encode.string role.identifier )
-        , ( "name", Encode.string role.name )
-        , ( "abilities", Encode.list Encode.string role.abilities )
-        , ( "inserted_at", encodePosix role.insertedAt )
-        , ( "updated_at", encodePosix role.updatedAt )
-        ]
+roleToString : Role -> String
+roleToString role =
+    case role of
+        Admin ->
+            "admin"
+
+        Faculty ->
+            "faculty"
+
+        TeachingAssistant ->
+            "teaching_assistant"
+
+        LearningAssistant ->
+            "learning_assistant"
+
+        Student ->
+            "student"
 
 
 type alias User =
@@ -287,7 +294,7 @@ type alias User =
     , active : Bool
 
     -- Related data
-    , roles : List String
+    , role : Role
     , classrooms : List ClassroomId
     , sections : List SectionId
     , rotationGroups : List RotationGroupId
@@ -308,7 +315,7 @@ userDecoder =
         |> requiredAttribute "last_name" string
         |> optionalAttribute "nickname" (nullable string)
         |> requiredAttribute "active" bool
-        |> requiredAttribute "roles" (list string)
+        |> requiredAttribute "role" (roleDecoder)
         |> relationship "classrooms" (list <| field "id" <| map ClassroomId parseInt) []
         |> relationship "sections" (list <| field "id" <| map SectionId parseInt) []
         |> relationship "rotation_groups" (list <| field "id" <| map RotationGroupId parseInt) []
@@ -326,7 +333,7 @@ credUserDecoder =
         |> required "last_name" string
         |> optionalMaybe "nickname" (nullable string)
         |> required "active" bool
-        |> required "roles" (list string)
+        |> required "role" (roleDecoder)
         |> required "classrooms" (list <| map ClassroomId int)
         |> required "sections" (list <| map SectionId int)
         |> required "rotation_groups" (list <| map RotationGroupId int)
@@ -348,7 +355,7 @@ encodeUser user =
         , ( "last_name", Encode.string user.lastName )
         , ( "nickname", encodeMaybe Encode.string user.nickname )
         , ( "active", Encode.bool user.active )
-        , ( "roles", Encode.list Encode.string user.roles )
+        , ( "role", (roleToString >> Encode.string) user.role )
         , ( "classrooms", Encode.list (unwrapClassroomId >> Encode.int) user.classrooms )
         , ( "sections", Encode.list (unwrapSectionId >> Encode.int) user.sections )
         , ( "rotation_groups", Encode.list (unwrapRotationGroupId >> Encode.int) user.rotationGroups )
@@ -377,11 +384,11 @@ type alias Category =
 
     -- Foreign keys
     , parentCategoryId : Maybe CategoryId
-    , classroomId : ClassroomId
 
     -- Related data
     , subCategories : List CategoryId
     , observations : List ObservationId
+    , classrooms : List ClassroomId
 
     -- Timestamp data
     , insertedAt : Time.Posix
@@ -396,9 +403,9 @@ categoryDecoder =
         |> requiredAttribute "name" string
         |> optionalAttribute "description" (nullable string)
         |> optionalAttribute "parent_category_id" (nullable (map CategoryId parseInt))
-        |> requiredAttribute "classroom_id" (map ClassroomId parseInt)
         |> relationship "sub_categories" (list <| field "id" <| map CategoryId parseInt) []
         |> relationship "observations" (list <| field "id" <| map ObservationId parseInt) []
+        |> relationship "classrooms" (list <| field "id" <| map ClassroomId parseInt) []
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 

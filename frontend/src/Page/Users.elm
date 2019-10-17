@@ -11,7 +11,7 @@ import Html.Attributes exposing (..)
 import RemoteData exposing (RemoteData(..))
 import Route
 import Session as Session exposing (Session)
-import Types exposing (User, UserId)
+import Types exposing (..)
 import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
 
 
@@ -91,7 +91,7 @@ init session =
           , userForm = initialForm Nothing
           , formErrors = []
           }
-        , Route.replaceUrl (Session.navKey session) (Route.Login Nothing)
+        , Route.replaceUrl (Session.navKey session) Route.Login
         )
 
 
@@ -108,9 +108,6 @@ tableConfig =
     in
     { render = render
     , headers = [ "Email", "First Name", "Last Name" ]
-    , tableClass = "w-full table-auto"
-    , headerClass = "text-left text-gray-400"
-    , rowClass = "border-t-1 border-gray-500 text-gray-400 cursor-pointer hover:bg-slate py-1"
     , onClick = UserSelected
     , onEdit = TableEditClicked
     , onDelete = TableDeleteClicked
@@ -418,7 +415,17 @@ initialForm : Maybe User -> UserForm
 initialForm maybeUser =
     case maybeUser of
         Nothing ->
-            UserForm "" "" "" "" "" True [] [] [] []
+            { email = ""
+            , firstName = ""
+            , middleName = ""
+            , nickname = ""
+            , lastName = ""
+            , active = True
+            , classrooms = []
+            , sections = []
+            , rotationGroups = []
+            , role = Student
+            }
 
         Just user ->
             { email = user.email
@@ -430,7 +437,7 @@ initialForm maybeUser =
             , classrooms = user.classrooms
             , sections = user.sections
             , rotationGroups = user.rotationGroups
-            , roles = user.roles
+            , role = user.role
             }
 
 

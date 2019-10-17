@@ -1,59 +1,56 @@
-module Route exposing (LoginToken(..), PasswordResetToken(..), Route(..), fromUrl, href, pushUrl, replaceUrl, routeToString)
+module Route exposing (Route(..), fromUrl, href, pushUrl, replaceUrl, routeToString)
 
 import Browser.Navigation as Nav
 import Html exposing (Attribute)
 import Html.Attributes as Attr
-import Types exposing (CategoryId(..), ClassroomId(..), DraftId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
+import Maybe.Extra exposing (..)
+import Types exposing (..)
 import Url exposing (Url)
 import Url.Builder as Builder exposing (absolute)
 import Url.Parser as Parser exposing ((</>), (<?>), Parser, int, map, oneOf, s, string, top)
 import Url.Parser.Query as Query
 
 
-type PasswordResetToken
-    = PasswordResetToken String
-
-
-type LoginToken
-    = LoginToken String
+type alias PasswordResetToken =
+    String
 
 
 type Route
-    = Dashboard (Maybe ClassroomId)
+    = Dashboard
       -- Login routes
-    | Login (Maybe LoginToken)
+    | Login
     | Logout
-    | ForgotPassword (Maybe PasswordResetToken)
+    | ResetPassword (Maybe PasswordResetToken)
       -- Classroom control panel
     | Classrooms
     | Classroom ClassroomId
-    | NewClassroom
-    | EditClassroom ClassroomId
       -- Semester control panel
-    | Semesters (Maybe ClassroomId)
+    | Semesters
     | Semester SemesterId
-    | NewSemester (Maybe ClassroomId)
-    | EditSemester SemesterId
       -- Section control panel
-    | Sections (Maybe SemesterId)
+    | Sections (Maybe ClassroomId) (Maybe SemesterId)
     | Section SectionId
-    | NewSection (Maybe SemesterId)
-    | EditSection SectionId
       -- Rotation control panel
     | Rotations (Maybe SectionId)
     | Rotation RotationId
-    | NewRotation (Maybe SectionId)
-    | EditRotation RotationId
       -- Rotation Group control panel
     | RotationGroups (Maybe RotationId)
     | RotationGroup RotationGroupId
-    | NewRotationGroup (Maybe RotationId)
-    | EditRotationGroup RotationGroupId
+      -- Categories
+    | Categories (Maybe CategoryId)
+    | Category CategoryId
+      -- Observations
+    | Observations (Maybe CategoryId)
+    | Observation ObservationId
+      -- Feedback
+    | Feedback (Maybe ObservationId)
+    | FeedbackItem FeedbackId
+      -- Explanations
+    | Explanations (Maybe FeedbackId)
+    | Explanation ExplanationId
       -- User control panel
     | Users
     | User UserId
-    | NewUser
-    | EditUser UserId
       -- Feedback System
     | DraftClassrooms
     | DraftRotations SectionId
@@ -129,57 +126,64 @@ parser =
     s applicationRoot
         </> oneOf
                 [ Parser.map Root top
-                , Parser.map Dashboard (s "dashboard" <?> idQueryParser ClassroomId "classroomId")
+                , Parser.map Dashboard (s "dashboard")
 
                 -- Login
-                , Parser.map Login (s "login" <?> tokenQueryParser LoginToken "loginToken")
+                , Parser.map Login (s "login")
                 , Parser.map Logout (s "logout")
-                , Parser.map ForgotPassword (s "forgotPassword" <?> tokenQueryParser PasswordResetToken "resetToken")
+                , Parser.map ResetPassword (s "forgotPassword" <?> Query.string "token")
 
                 -- Classroom control panel
                 , s "classrooms"
                     </> oneOf
                             [ Parser.map Classrooms top
                             , Parser.map Classroom (Parser.map ClassroomId int)
-                            , Parser.map NewClassroom (s "new")
-                            , Parser.map EditClassroom (Parser.map ClassroomId int </> s "edit")
                             ]
                 , s "semesters"
                     </> oneOf
-                            [ Parser.map Semesters (top <?> idQueryParser ClassroomId "classroomId")
+                            [ Parser.map Semesters top
                             , Parser.map Semester (Parser.map SemesterId int)
-                            , Parser.map NewSemester (s "new" <?> idQueryParser ClassroomId "classroomId")
-                            , Parser.map EditSemester (Parser.map SemesterId int </> s "edit")
                             ]
                 , s "sections"
                     </> oneOf
-                            [ Parser.map Sections (top <?> idQueryParser SemesterId "semesterId")
+                            [ Parser.map Sections (top <?> idQueryParser ClassroomId "classroomId" <?> idQueryParser SemesterId "semesterId")
                             , Parser.map Section (Parser.map SectionId int)
-                            , Parser.map NewSection (s "new" <?> idQueryParser SemesterId "semesterId")
-                            , Parser.map EditSection (Parser.map SectionId int </> s "edit")
                             ]
                 , s "rotations"
                     </> oneOf
                             [ Parser.map Rotations (top <?> idQueryParser SectionId "sectionId")
                             , Parser.map Rotation (Parser.map RotationId int)
-                            , Parser.map NewRotation (s "new" <?> idQueryParser SectionId "sectionId")
-                            , Parser.map EditRotation (Parser.map RotationId int </> s "edit")
                             ]
                 , s "rotationGroups"
                     </> oneOf
                             [ Parser.map RotationGroups (top <?> idQueryParser RotationId "rotationId")
                             , Parser.map RotationGroup (Parser.map RotationGroupId int)
-                            , Parser.map NewRotationGroup (s "new" <?> idQueryParser RotationId "rotationId")
-                            , Parser.map EditRotationGroup (Parser.map RotationGroupId int </> s "edit")
+                            ]
+                , s "categories"
+                    </> oneOf
+                            [ Parser.map Categories (top <?> idQueryParser CategoryId "parentCategoryId")
+                            , Parser.map Category (Parser.map CategoryId int)
+                            ]
+                , s "observations"
+                    </> oneOf
+                            [ Parser.map Observations (top <?> idQueryParser CategoryId "categoryId")
+                            , Parser.map Observation (Parser.map ObservationId int)
+                            ]
+                , s "feedback"
+                    </> oneOf
+                            [ Parser.map Feedback (top <?> idQueryParser ObservationId "observationId")
+                            , Parser.map FeedbackItem (Parser.map FeedbackId int)
+                            ]
+                , s "explanations"
+                    </> oneOf
+                            [ Parser.map Explanations (top <?> idQueryParser FeedbackId "feedbackId")
+                            , Parser.map Explanation (Parser.map ExplanationId int)
                             ]
                 , s "users"
                     </> oneOf
                             [ Parser.map Users top
                             , Parser.map User (Parser.map UserId int)
-                            , Parser.map NewUser (s "new")
-                            , Parser.map EditUser (Parser.map UserId int </> s "edit")
                             ]
-
 
                 -- Inbox
                 , s "drafts"
@@ -199,17 +203,17 @@ routeToString route =
         Root ->
             appAbsolute [] []
 
-        Dashboard maybeId ->
-            appAbsolute [ "dashboard" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
+        Dashboard ->
+            appAbsolute [ "dashboard" ] []
 
-        Login maybeToken ->
-            appAbsolute [ "login" ] (Maybe.withDefault [] (Maybe.map (\(LoginToken token) -> [ Builder.string "loginToken" token ]) maybeToken))
+        Login ->
+            appAbsolute [ "login" ] []
 
         Logout ->
             appAbsolute [ "logout" ] []
 
-        ForgotPassword maybeToken ->
-            appAbsolute [ "forgotPassword" ] (Maybe.withDefault [] (Maybe.map (\(PasswordResetToken token) -> [ Builder.string "resetToken" token ]) maybeToken))
+        ResetPassword maybeToken ->
+            appAbsolute [ "forgotPassword" ] <| toList (Maybe.map (Builder.string "token") maybeToken)
 
         -- Classrooms
         Classrooms ->
@@ -218,63 +222,61 @@ routeToString route =
         Classroom (ClassroomId id) ->
             appAbsolute [ "classrooms", String.fromInt id ] []
 
-        NewClassroom ->
-            appAbsolute [ "classrooms", "new" ] []
-
-        EditClassroom (ClassroomId id) ->
-            appAbsolute [ "classrooms", String.fromInt id, "edit" ] []
-
         -- Semesters
-        Semesters maybeId ->
-            appAbsolute [ "semesters" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
+        Semesters ->
+            appAbsolute [ "semesters" ] []
 
         Semester (SemesterId id) ->
             appAbsolute [ "semesters", String.fromInt id ] []
 
-        NewSemester maybeId ->
-            appAbsolute [ "semesters", "new" ] (Maybe.withDefault [] (Maybe.map (\(ClassroomId id) -> [ Builder.int "classroomId" id ]) maybeId))
-
-        EditSemester (SemesterId id) ->
-            appAbsolute [ "semesters", String.fromInt id, "edit" ] []
-
         -- Sections
-        Sections maybeId ->
-            appAbsolute [ "sections" ] (Maybe.withDefault [] (Maybe.map (\(SemesterId id) -> [ Builder.int "semesterId" id ]) maybeId))
+        Sections maybeClassroomId maybeSemesterId ->
+            appAbsolute [ "sections" ] <| values [ Maybe.map (unwrapClassroomId >> Builder.int "classroomId") maybeClassroomId, Maybe.map (unwrapSemesterId >> Builder.int "semesterId") maybeSemesterId ]
 
         Section (SectionId id) ->
             appAbsolute [ "sections", String.fromInt id ] []
 
-        NewSection maybeId ->
-            appAbsolute [ "sections", "new" ] (Maybe.withDefault [] (Maybe.map (\(SemesterId id) -> [ Builder.int "semesterId" id ]) maybeId))
-
-        EditSection (SectionId id) ->
-            appAbsolute [ "sections", String.fromInt id, "edit" ] []
-
         -- Rotations
         Rotations maybeId ->
-            appAbsolute [ "rotations" ] (Maybe.withDefault [] (Maybe.map (\(SectionId id) -> [ Builder.int "sectionId" id ]) maybeId))
+            appAbsolute [ "rotations" ] <| toList (Maybe.map (unwrapSectionId >> Builder.int "sectionId") maybeId)
 
         Rotation (RotationId id) ->
             appAbsolute [ "rotations", String.fromInt id ] []
 
-        NewRotation maybeId ->
-            appAbsolute [ "rotations", "new" ] (Maybe.withDefault [] (Maybe.map (\(SectionId id) -> [ Builder.int "sectionId" id ]) maybeId))
-
-        EditRotation (RotationId id) ->
-            appAbsolute [ "rotations", String.fromInt id, "edit" ] []
-
         -- Rotation Groups
         RotationGroups maybeId ->
-            appAbsolute [ "rotationGroups" ] (Maybe.withDefault [] (Maybe.map (\(RotationId id) -> [ Builder.int "rotationId" id ]) maybeId))
+            appAbsolute [ "rotationGroups" ] <| toList (Maybe.map (unwrapRotationId >> Builder.int "rotationId") maybeId)
 
         RotationGroup (RotationGroupId id) ->
             appAbsolute [ "rotationGroups", String.fromInt id ] []
 
-        NewRotationGroup maybeId ->
-            appAbsolute [ "rotationGroups", "new" ] (Maybe.withDefault [] (Maybe.map (\(RotationId id) -> [ Builder.int "rotationId" id ]) maybeId))
+        -- Categories
+        Categories maybeId ->
+            appAbsolute [ "categories" ] <| toList (Maybe.map (unwrapCategoryId >> Builder.int "parentCategoryId") maybeId)
 
-        EditRotationGroup (RotationGroupId id) ->
-            appAbsolute [ "rotationGroups", String.fromInt id, "edit" ] []
+        Category (CategoryId id) ->
+            appAbsolute [ "categories", String.fromInt id ] []
+
+        -- Observations 
+        Observations maybeId ->
+            appAbsolute [ "observations" ] <| toList (Maybe.map (unwrapCategoryId >> Builder.int "categoryId") maybeId)
+
+        Observation (ObservationId id) ->
+            appAbsolute [ "observations", String.fromInt id ] []
+
+        -- Feedback
+        Feedback maybeId ->
+            appAbsolute [ "feedback" ] <| toList (Maybe.map (unwrapObservationId >> Builder.int "observationId") maybeId)
+
+        FeedbackItem (FeedbackId id) ->
+            appAbsolute [ "feedback", String.fromInt id ] []
+
+        -- Feedback
+        Explanations maybeId ->
+            appAbsolute [ "explanations" ] <| toList (Maybe.map (unwrapFeedbackId >> Builder.int "feedbackId") maybeId)
+
+        Explanation (ExplanationId id) ->
+            appAbsolute [ "explanations", String.fromInt id ] []
 
         -- Users
         Users ->
@@ -283,25 +285,19 @@ routeToString route =
         User (UserId id) ->
             appAbsolute [ "users", String.fromInt id ] []
 
-        NewUser ->
-            appAbsolute [ "users", "new" ] []
-
-        EditUser (UserId id) ->
-            appAbsolute [ "users", String.fromInt id, "edit" ] []
-
         -- Drafts
         DraftClassrooms ->
             appAbsolute [ "drafts" ] []
 
         DraftRotations (SectionId id) ->
-            appAbsolute ["drafts", "sections", String.fromInt id] []
+            appAbsolute [ "drafts", "sections", String.fromInt id ] []
 
         Draft (DraftId id) ->
             appAbsolute [ "drafts", String.fromInt id ] []
 
-
         EditFeedback (DraftId draftId) maybeCategoryId ->
-            appAbsolute [ "drafts", String.fromInt draftId, "feedback"] (Maybe.withDefault [] (Maybe.map (\(CategoryId id) -> [ Builder.int "categoryId" id ]) maybeCategoryId))
+            appAbsolute [ "drafts", String.fromInt draftId, "feedback" ] (Maybe.withDefault [] (Maybe.map (\(CategoryId id) -> [ Builder.int "categoryId" id ]) maybeCategoryId))
+
         -- Profile
         Profile ->
             appAbsolute [ "profile" ] []

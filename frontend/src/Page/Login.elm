@@ -2,14 +2,23 @@ module Page.Login exposing (Model, Msg(..), init, subscriptions, toSession, upda
 
 import API exposing (APIData, Credential, Error(..), ErrorBody)
 import API.Auth as Auth
+import Bootstrap.Alert as Alert
+import Bootstrap.Button as Button
+import Bootstrap.Form as Form
+import Bootstrap.Form.Checkbox as Checkbox
+import Bootstrap.Form.Fieldset as Fieldset
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.Radio as Radio
+import Bootstrap.Form.Select as Select
+import Bootstrap.Form.Textarea as Textarea
 import Browser
 import Browser.Navigation as Nav
 import Components.Common as Common exposing (Style(..))
-import Components.Form as Form
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import List.Extra exposing (find)
 import Process as Process
 import RemoteData exposing (RemoteData(..))
 import Route
@@ -27,6 +36,7 @@ type alias Model =
     , credential : APIData Credential
     , formErrors : List ( Field, String )
     , form : Form
+    , alertVisibility : Alert.Visibility
     }
 
 
@@ -40,21 +50,14 @@ init : Session -> ( Model, Cmd Msg )
 init session =
     let
         model =
-            { session = session
-            , credential = NotAsked
-            , formErrors = []
-            , form =
-                { email = ""
-                , password = ""
-                }
-            }
+            { session = session, credential = NotAsked, formErrors = [], form = { email = "", password = "" }, alertVisibility = Alert.closed }
     in
     case Session.credential session of
         Nothing ->
             ( model, Cmd.none )
 
         Just _ ->
-            ( model, Route.replaceUrl (Session.navKey session) Route.Classrooms )
+            ( model, Route.replaceUrl (Session.navKey session) Route.Dashboard )
 
 
 
@@ -64,10 +67,12 @@ init session =
 type Msg
     = EmailChanged String
     | PasswordChanged String
-    | SignIn
-    | ForgotPassword
-    | Response (APIData Credential)
+    | SignInClicked
+    | ForgotPasswordClicked
+    | GotLoginResponse (APIData Credential)
     | GotSession Session
+      -- Alerts
+    | AlertMsg Alert.Visibility
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -79,7 +84,7 @@ update msg model =
         PasswordChanged pass ->
             updateForm (\form -> { form | password = pass }) model
 
-        SignIn ->
+        SignInClicked ->
             case validate validator model.form of
                 Ok validated ->
                     let
@@ -87,7 +92,7 @@ update msg model =
                             Validate.fromValid validated
                     in
                     ( { model | formErrors = [], credential = Loading }
-                    , Auth.login form.email form.password Response
+                    , Auth.login form.email form.password GotLoginResponse
                     )
 
                 Err errors ->
@@ -95,28 +100,30 @@ update msg model =
                     , Cmd.none
                     )
 
-        ForgotPassword ->
-            Debug.todo "forgot password"
+        ForgotPasswordClicked ->
+            ( model, Route.pushUrl (Session.navKey model.session) (Route.ResetPassword Nothing) )
 
-        Response res ->
+        GotLoginResponse res ->
             case res of
                 Success cred ->
                     ( { model | credential = res }, API.storeCred cred )
+
+                Failure _ ->
+                    ( { model | credential = res, alertVisibility = Alert.shown }, Cmd.none )
 
                 _ ->
                     ( { model | credential = res }, Cmd.none )
 
         GotSession session ->
-            let
-                _ =
-                    Debug.log "Session" session
-            in
             case Session.credential session of
                 Nothing ->
                     ( { model | session = session, credential = NotAsked }, Cmd.none )
 
                 Just _ ->
-                    ( { model | session = session }, Route.replaceUrl (Session.navKey session) Route.Classrooms )
+                    ( { model | session = session }, Route.replaceUrl (Session.navKey session) Route.Dashboard )
+
+        AlertMsg visibility ->
+            ( { model | alertVisibility = visibility }, Cmd.none )
 
 
 updateForm : (Form -> Form) -> Model -> ( Model, Cmd Msg )
@@ -132,42 +139,75 @@ view : Model -> { title : String, content : Html Msg }
 view model =
     { title = "WebCAT - Login"
     , content =
-        case model.credential of
-            Success _ ->
-                div [ class "flex justify-center bg-slate py-32" ]
-                    [ div [ class "w-full h-screen max-w-xs" ]
-                        [ Html.form [ class "bg-light-slate shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
-                            [ div [ class "text-center py-6" ] [ Common.icon Successful "checkbox" ]
-                            ]
-                        ]
-                    ]
+        let
+            feedback field =
+                case find (\( f, m ) -> f == field) model.formErrors of
+                    Just ( _, message ) ->
+                        Form.invalidFeedback [] [ text message ]
 
-            Loading ->
-                div [ class "flex justify-center bg-slate py-32" ]
-                    [ div [ class "w-full h-screen max-w-xs" ]
-                        [ Html.form [ class "bg-light-slate shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
-                            [ Common.loading
-                            ]
-                        ]
-                    ]
+                    Nothing ->
+                        text ""
 
-            _ ->
-                div [ class "flex justify-center bg-slate py-32" ]
-                    [ div [ class "w-full h-screen max-w-xs" ]
-                        [ Html.form [ class "bg-light-slate shadow-md rounded px-8 pt-6 pb-8 mb-4" ]
-                            [ Form.label "Email" "email"
-                            , Form.textInput "email" Email model.formErrors EmailChanged model.form.email
-                            , Form.label "Password" "password"
-                            , Form.passwordInput "password" Password model.formErrors PasswordChanged model.form.password
-                            , div [ class "flex items-center justify-between" ]
-                                [ Common.successButton "Sign In" SignIn
+            email =
+                if not <| List.any (\( f, m ) -> f == Email) model.formErrors then
+                    Input.email [ Input.id "email", Input.onInput EmailChanged, Input.placeholder "Email Address", Input.value model.form.email ]
 
-                                --, primaryButton ForgotPassword "Forgot Password"
-                                ]
+                else
+                    Input.email [ Input.id "email", Input.danger, Input.onInput EmailChanged, Input.placeholder "Email Address", Input.value model.form.email ]
+
+            password =
+                if not <| List.any (\( f, m ) -> f == Password) model.formErrors then
+                    Input.password [ Input.id "password", Input.onInput PasswordChanged, Input.placeholder "Password", Input.value model.form.password ]
+
+                else
+                    Input.password [ Input.id "password", Input.danger, Input.onInput PasswordChanged, Input.placeholder "Password", Input.value model.form.password ]
+
+            alert =
+                case model.credential of
+                    Failure err ->
+                        let
+                            body =
+                                API.getErrorBody err
+                        in
+                        dangerAlert body.title (Maybe.withDefault "" body.message) model.alertVisibility
+
+                    _ ->
+                        text ""
+
+            inner =
+                case model.credential of
+                    Success _ ->
+                        div [ class "text-center py-6" ] [ Common.icon Successful "checkbox" ]
+
+                    Loading ->
+                        Common.loading
+
+                    _ ->
+                        Form.form [ class "form-signin" ]
+                            [ img [ class "mb-4", src "../static/images/physics.svg", width 100, height 100 ] []
+                            , h1 [ class "h3 mb-3 font-weight-normal" ] [ text "Please Sign In" ]
+                            , Form.label [ for "email", class "sr-only" ] [ text "Email Address" ]
+                            , email
+                            , feedback Email
+                            , Form.label [ for "password", class "sr-only" ] [ text "Password" ]
+                            , password
+                            , feedback Password
+                            , Button.button [ Button.primary, Button.large, Button.block, Button.onClick SignInClicked ] [ text "Log In" ]
+                            , Button.button [ Button.secondary, Button.large, Button.block, Button.onClick ForgotPasswordClicked ] [ text "Reset Password" ]
                             ]
-                        ]
-                    ]
+        in
+        div []
+            [ alert
+            , div [ class "text-center login-container" ]
+                [ inner
+                ]
+            ]
     }
+
+
+dangerAlert : String -> String -> Alert.Visibility -> Html Msg
+dangerAlert title message visibility =
+    Alert.config |> Alert.danger |> Alert.dismissableWithAnimation AlertMsg |> Alert.children [ Alert.h4 [] [ text title ], Alert.h6 [] [ text message ] ] |> Alert.view visibility
 
 
 
@@ -176,7 +216,9 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Session.changes GotSession (Session.navKey model.session)
+    Sub.batch
+        [ Session.changes GotSession (Session.navKey model.session)
+        ]
 
 
 

@@ -5,7 +5,7 @@ defmodule WebCATWeb.UserView do
   alias WebCAT.Accounts.User
 
   def fields,
-    do: ~w(email first_name last_name middle_name nickname active inserted_at updated_at)a
+    do: ~w(email first_name last_name middle_name nickname active role inserted_at updated_at)a
 
   def relationships do
     [

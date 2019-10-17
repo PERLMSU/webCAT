@@ -49,11 +49,9 @@ init session =
                 user =
                     API.credentialUser cred
 
-                isAdmin =
-                    List.member "admin" user.roles
+                isAdmin = user.role == Admin
 
-                isAssistant =
-                    List.member "assistant" user.roles
+                isAssistant = user.role == LearningAssistant
             in
             if isAdmin then
                 ( model, Cmd.batch <| [ semesters session GotSemesters, listClassrooms session GotClassrooms ] )
@@ -62,7 +60,7 @@ init session =
                 ( model, Cmd.batch <| semesters session GotSemesters :: List.map (\id -> getRotationGroup session id GotRotationGroup) user.rotationGroups )
 
             else
-                ( model, Route.replaceUrl (Session.navKey session) (Route.Login Nothing) )
+                ( model, Route.replaceUrl (Session.navKey session) (Route.Login ) )
 
         Nothing ->
             ( { session = session
@@ -71,7 +69,7 @@ init session =
               , semesters = NotAsked
               , sections = NotAsked
               }
-            , Route.replaceUrl (Session.navKey session) (Route.Login Nothing)
+            , Route.replaceUrl (Session.navKey session) (Route.Login )
             )
 
 

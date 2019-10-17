@@ -79,7 +79,7 @@ init session =
           , classroomForm = initialForm Nothing
           , formErrors = []
           }
-        , Route.replaceUrl (Session.navKey session) (Route.Login Nothing)
+        , Route.replaceUrl (Session.navKey session) Route.Login
         )
 
 
@@ -96,9 +96,6 @@ tableConfig =
     in
     { render = render
     , headers = [ "Course Code", "Name", "Description" ]
-    , tableClass = "w-full table-auto"
-    , headerClass = "text-left text-gray-400"
-    , rowClass = "border-t-1 border-gray-500 text-gray-400 cursor-pointer hover:bg-slate py-1"
     , onClick = ClassroomSelected
     , onEdit = TableEditClicked
     , onDelete = TableDeleteClicked

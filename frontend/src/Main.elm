@@ -16,8 +16,9 @@ import Page.EditFeedback as EditFeedback
 import Page.Login as Login
 import Page.NotFound as NotFound
 import Page.Profile as Profile
+import Page.ResetPassword as ResetPassword
 import Page.Users as Users
-import Route exposing (LoginToken, Route(..))
+import Route exposing (Route(..))
 import Session exposing (Session)
 import Task
 import Time
@@ -54,11 +55,13 @@ type Model
     = Redirect Session
     | NotFound Session
     | Login Login.Model
+    | ResetPassword ResetPassword.Model
     | Classrooms Classrooms.Model
     | Users Users.Model
     | DraftClassrooms DraftClassrooms.Model
     | EditFeedback EditFeedback.Model
     | Draft Draft.Model
+    | Dashboard Dashboard.Model
     | Profile Profile.Model
 
 
@@ -71,11 +74,13 @@ type Msg
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
     | GotLoginMsg Login.Msg
+    | GotResetPasswordMsg ResetPassword.Msg
     | GotClassroomsMsg Classrooms.Msg
     | GotUsersMsg Users.Msg
     | GotDraftClassroomsMsg DraftClassrooms.Msg
     | GotEditFeedbackMsg EditFeedback.Msg
     | GotDraftMsg Draft.Msg
+    | GotDashboardMsg Dashboard.Msg
     | GotProfileMsg Profile.Msg
     | GotSession Session
 
@@ -91,6 +96,9 @@ toSession page =
 
         Login login ->
             Login.toSession login
+
+        ResetPassword reset ->
+            ResetPassword.toSession reset
 
         Classrooms classrooms ->
             Classrooms.toSession classrooms
@@ -110,6 +118,9 @@ toSession page =
         Profile profile ->
             Profile.toSession profile
 
+        Dashboard dashboard ->
+            Dashboard.toSession dashboard
+
 
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute model =
@@ -124,9 +135,13 @@ changeRouteTo maybeRoute model =
         Just Route.Root ->
             ( model, Route.replaceUrl (Session.navKey session) Route.Classrooms )
 
-        Just (Route.Login maybeToken) ->
+        Just Route.Login ->
             Login.init session
                 |> updateWith Login GotLoginMsg model
+
+        Just (Route.ResetPassword maybeToken) ->
+            ResetPassword.init session maybeToken
+                |> updateWith ResetPassword GotResetPasswordMsg model
 
         Just Route.Logout ->
             ( model, API.logout )
@@ -134,6 +149,10 @@ changeRouteTo maybeRoute model =
         Just Route.Classrooms ->
             Classrooms.init session
                 |> updateWith Classrooms GotClassroomsMsg model
+
+        Just Route.Dashboard ->
+            Dashboard.init session
+                |> updateWith Dashboard GotDashboardMsg model
 
         Just Route.Users ->
             Users.init session
@@ -184,9 +203,17 @@ update msg model =
             Login.update subMsg login
                 |> updateWith Login GotLoginMsg model
 
+        ( GotResetPasswordMsg subMsg, ResetPassword reset ) ->
+            ResetPassword.update subMsg reset
+                |> updateWith ResetPassword GotResetPasswordMsg model
+
         ( GotClassroomsMsg subMsg, Classrooms classrooms ) ->
             Classrooms.update subMsg classrooms
                 |> updateWith Classrooms GotClassroomsMsg model
+
+        ( GotDashboardMsg subMsg, Dashboard dashboard ) ->
+            Dashboard.update subMsg dashboard
+                |> updateWith Dashboard GotDashboardMsg model
 
         ( GotUsersMsg subMsg, Users users ) ->
             Users.update subMsg users
@@ -236,6 +263,9 @@ subscriptions model =
         Login login ->
             Sub.map GotLoginMsg (Login.subscriptions login)
 
+        ResetPassword reset ->
+            Sub.map GotResetPasswordMsg (ResetPassword.subscriptions reset)
+
         Classrooms classrooms ->
             Sub.map GotClassroomsMsg (Classrooms.subscriptions classrooms)
 
@@ -250,6 +280,9 @@ subscriptions model =
 
         Profile profile ->
             Sub.map GotProfileMsg (Profile.subscriptions profile)
+
+        Dashboard dashboard ->
+            Sub.map GotDashboardMsg (Dashboard.subscriptions dashboard)
 
         Users users ->
             Sub.map GotUsersMsg (Users.subscriptions users)
@@ -288,6 +321,12 @@ view model =
                 Login _ ->
                     Page.viewPublic NotFound.view
 
+                ResetPassword _ ->
+                    Page.viewPublic NotFound.view
+
+                Dashboard dashboard ->
+                    viewPage Page.Dashboard GotDashboardMsg (Dashboard.view dashboard)
+
                 Classrooms classrooms ->
                     viewPage Page.Classrooms GotClassroomsMsg (Classrooms.view classrooms)
 
@@ -320,6 +359,9 @@ view model =
             case model of
                 Login login ->
                     viewPage GotLoginMsg (Login.view login)
+
+                ResetPassword reset ->
+                    viewPage GotResetPasswordMsg (ResetPassword.view reset)
 
                 _ ->
                     Page.viewPublic NotFound.view

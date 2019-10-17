@@ -1,5 +1,6 @@
-module Components.Common exposing (Style(..), dangerButton, subheader, header, icon, iconButton, infoButton, loading, panel, primaryButton, successButton, warningButton)
+module Components.Common exposing (Style(..), dangerButton, header, icon, iconButton, infoButton, loading, panel, primaryButton, subheader, successButton, warningButton)
 
+import Bootstrap.Button as Button
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -7,10 +8,11 @@ import Html.Events exposing (..)
 
 type Style
     = Primary
-    | Info
+    | Secondary
     | Successful
-    | Warning
     | Danger
+    | Warning
+    | Info
 
 
 icon : Style -> String -> Html msg
@@ -20,6 +22,9 @@ icon style icon_ =
             case style of
                 Primary ->
                     "text-primary"
+
+                Secondary ->
+                    "text-secondary"
 
                 Info ->
                     "text-info"
@@ -44,21 +49,24 @@ iconButton style icon_ toMsg =
         textColor =
             case style of
                 Primary ->
-                    "text-primary"
+                    Button.outlinePrimary
+
+                Secondary ->
+                    Button.outlineSecondary
 
                 Info ->
-                    "text-info"
+                    Button.outlineInfo
 
                 Successful ->
-                    "text-success"
+                    Button.outlineSuccess
 
                 Warning ->
-                    "text-warning"
+                    Button.outlineWarning
 
                 Danger ->
-                    "text-danger"
+                    Button.outlineDanger
     in
-    button [ class ("text-gray-400 font-bold py-2 px-4 rounded inline-flex items-center " ++ textColor), onClick toMsg ]
+    Button.button [ textColor, Button.onClick toMsg ]
         [ i [ class ("far fa-" ++ icon_) ] [] ]
 
 
@@ -95,6 +103,9 @@ styledButton style content toMsg =
                 Primary ->
                     "text-primary border-primary"
 
+                Secondary ->
+                    "text-secondary border-secondary"
+
                 Info ->
                     "text-info border-info"
 
@@ -125,6 +136,7 @@ panel content =
 header : String -> Html msg
 header content =
     h1 [ class "text-4xl text-gray-400 font-display" ] [ text content ]
+
 
 subheader : String -> Html msg
 subheader content =

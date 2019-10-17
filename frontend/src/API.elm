@@ -1,4 +1,4 @@
-port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, deleteRemote, errorBodyToString, get, getErrorBody, getRemote, handleRemoteError, logout, onStoreChange, post, postRemote, put, putRemote, storeCred)
+port module API exposing (APIData, APIResult, Credential, Error(..), ErrorBody, application, credChanges, credentialDecoder, credentialHeader, credentialUser, delete, deleteRemote, errorBodyToString, get, getErrorBody, getRemote, handleRemoteError, logout, onStoreChange, post, postRemote, postRemoteNoContent, put, putRemote, storeCred)
 
 import API.Endpoint as Endpoint exposing (Endpoint)
 import Browser
@@ -8,7 +8,7 @@ import Json.Decode as Decode exposing (Decoder, Value, decodeString, field, null
 import Json.Decode.Pipeline as Pipeline exposing (optional, required)
 import Json.Encode as Encode
 import RemoteData exposing (RemoteData(..))
-import Types exposing (User, encodeUser, userDecoder, credUserDecoder)
+import Types exposing (User, credUserDecoder, encodeUser, userDecoder)
 import Url exposing (Url)
 
 
@@ -27,6 +27,7 @@ type alias APIData a =
 type alias APIResult a =
     Result Error a
 
+
 credentialUser : Credential -> User
 credentialUser (Credential user _) =
     user
@@ -36,11 +37,14 @@ credentialHeader : Credential -> Http.Header
 credentialHeader (Credential _ token) =
     Http.header "Authorization" ("Bearer " ++ token)
 
+
 credentialDecoder : Decoder Credential
 credentialDecoder =
     Decode.succeed Credential
         |> required "user" (Decode.field "data" userDecoder)
         |> required "token" Decode.string
+
+
 
 -- The API can error out
 
@@ -89,11 +93,13 @@ handleRemoteError data model cmd =
 
 
 port onStoreChange : (Value -> msg) -> Sub msg
+
+
 storeCredDecoder : Decoder Credential
 storeCredDecoder =
-            Decode.succeed Credential
-            |> required "user" credUserDecoder
-            |> required "token" Decode.string
+    Decode.succeed Credential
+        |> required "user" credUserDecoder
+        |> required "token" Decode.string
 
 
 credChanges : (Maybe Credential -> msg) -> Sub msg
@@ -229,6 +235,25 @@ post url maybeCred body decoder toMsg =
 postRemote : Endpoint -> Maybe Credential -> Body -> Decoder a -> (APIData a -> msg) -> Cmd msg
 postRemote url maybeCred body decoder toMsg =
     post url maybeCred body decoder (RemoteData.fromResult >> toMsg)
+
+
+postRemoteNoContent : Endpoint -> Maybe Credential -> Body -> (APIData () -> msg) -> Cmd msg
+postRemoteNoContent url maybeCred body toMsg =
+    Endpoint.request
+        { method = "POST"
+        , url = url
+        , expect = expectNothing (RemoteData.fromResult >> toMsg)
+        , headers =
+            case maybeCred of
+                Just cred ->
+                    [ credentialHeader cred ]
+
+                Nothing ->
+                    []
+        , body = body
+        , timeout = Nothing
+        , tracker = Nothing
+        }
 
 
 delete : Endpoint -> Maybe Credential -> (APIResult () -> msg) -> Cmd msg

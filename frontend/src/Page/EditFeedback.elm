@@ -87,7 +87,7 @@ init session draftId maybeCategoryId =
           , studentFeedback = NotAsked
           , studentExplanations = NotAsked
           }
-        , Route.replaceUrl (Session.navKey session) (Route.Login Nothing)
+        , Route.replaceUrl (Session.navKey session) (Route.Login )
         )
 
 

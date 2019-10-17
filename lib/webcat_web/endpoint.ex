@@ -4,11 +4,8 @@ defmodule WebCATWeb.Endpoint do
 
   socket("/socket", WebCATWeb.UserSocket)
 
-  plug(Plug.Static,
-    at: "/static",
-    from: :webcat,
-    gzip: false
-  )
+  plug(Plug.Static, at: "/static", from: {:webcat, "priv/static"}, gzip: true)
+  plug(WebCATWeb.MediaStatic)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

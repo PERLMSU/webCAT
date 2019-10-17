@@ -34,7 +34,7 @@ type alias UserForm =
     , classrooms : List ClassroomId
     , sections : List SectionId
     , rotationGroups : List RotationGroupId
-    , roles : List String
+    , role : Role
     }
 
 
@@ -50,7 +50,7 @@ encodeUserForm form =
         , ( "classrooms", Encode.list (unwrapClassroomId >> Encode.int) form.classrooms )
         , ( "sections", Encode.list (unwrapSectionId >> Encode.int) form.sections )
         , ( "rotation_groups", Encode.list (unwrapRotationGroupId >> Encode.int) form.rotationGroups )
-        , ( "roles", Encode.list Encode.string form.roles)
+        , ( "roles", (roleToString >> Encode.string) form.role)
         ]
 
 

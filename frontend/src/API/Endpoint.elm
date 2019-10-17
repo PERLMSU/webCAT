@@ -1,5 +1,7 @@
-module API.Endpoint exposing (Endpoint, categories, category, classroom, classrooms, comment, comments, draft, drafts, explanation, explanations, feedback, feedbackItem, grade, grades, login, observation, observations, password_reset, password_reset_finish, profile, request, rotation, rotationGroup, rotationGroups, rotations, section, sectionImport, sections, semester, semesters, studentExplanation, studentExplanations, studentFeedback, studentFeedbackItem, unwrap, url, user, users)
+module API.Endpoint exposing (Endpoint, categories, category, classroom, classrooms, comment, comments, draft, drafts, explanation, explanations, feedback, feedbackItem, grade, grades, href, login, observation, observations, password_reset, password_reset_finish, profile, request, rotation, rotationGroup, rotationGroups, rotations, section, sectionImport, sections, semester, semesters, src, studentExplanation, studentExplanations, studentFeedback, studentFeedbackItem, unwrap, url, user, users, profilePicture, userProfilePicture)
 
+import Html exposing (Attribute)
+import Html.Attributes as Attributes
 import Http
 import Maybe.Extra exposing (toList, values)
 import Types exposing (..)
@@ -46,18 +48,38 @@ unwrap (Endpoint str) =
     str
 
 
+href : Endpoint -> Attribute msg
+href =
+    unwrap >> Attributes.href
+
+
+src : Endpoint -> Attribute msg
+src =
+    unwrap >> Attributes.src
+
+
 url : List String -> List QueryParameter -> Endpoint
 url paths queryParams =
     Endpoint <| Url.Builder.absolute ("api" :: paths) queryParams
+
+
+mediaUrl : List String -> List QueryParameter -> Endpoint
+mediaUrl paths queryParams =
+    Endpoint <| Url.Builder.absolute ("media" :: paths) queryParams
 
 
 
 -- ENDPOINTS
 
 
-login : Endpoint
-login =
-    url [ "auth", "login" ] []
+profilePicture : UserId -> Endpoint
+profilePicture userId =
+    mediaUrl [ "profiles", String.fromInt <| unwrapUserId userId ] []
+
+
+login : Maybe String -> Endpoint
+login token =
+    url [ "auth", "login" ] <| Maybe.Extra.toList <| Maybe.map (string "token") token
 
 
 password_reset : Endpoint
@@ -81,12 +103,17 @@ profile =
 
 user : UserId -> Endpoint
 user id =
-    url [ "users", String.fromInt <| unwrapUserId id ] []
+    url [ "users", (unwrapUserId >> String.fromInt) id ] []
 
 
 users : Endpoint
 users =
     url [ "users" ] []
+
+
+userProfilePicture : UserId -> Endpoint
+userProfilePicture id =
+    url [ "users", (unwrapUserId >> String.fromInt) id, "profile_picture" ] []
 
 
 
@@ -95,7 +122,7 @@ users =
 
 classroom : ClassroomId -> Endpoint
 classroom id =
-    url [ "classrooms", String.fromInt <| unwrapClassroomId id ] []
+    url [ "classrooms", (unwrapClassroomId >> String.fromInt) id ] []
 
 
 classrooms : Endpoint

@@ -43,7 +43,7 @@ init draftId session =
           , draft = NotAsked
           , draftId = draftId
           }
-        , Route.replaceUrl (Session.navKey session) (Route.Login Nothing)
+        , Route.replaceUrl (Session.navKey session) (Route.Login )
         )
 
 

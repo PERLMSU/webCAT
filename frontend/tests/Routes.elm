@@ -2,9 +2,9 @@ module Routes exposing (suite)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
-import Route as Route exposing (LoginToken(..), PasswordResetToken(..), Route(..))
+import Route as Route exposing (Route(..))
 import Test exposing (..)
-import Types exposing (CategoryId(..), ClassroomId(..), DraftId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
+import Types exposing (CategoryId(..), ClassroomId(..), DraftId(..), ExplanationId(..), FeedbackId(..), ObservationId(..), RotationGroupId(..), RotationId(..), SectionId(..), SemesterId(..), UserId(..))
 import Url
 
 
@@ -15,64 +15,67 @@ suite =
             \_ ->
                 let
                     routes =
-                        [ Dashboard Nothing
-                        , Dashboard <| Just <| ClassroomId 1
+                        [ Dashboard
 
                         -- Authentication
-                        , Login Nothing
-                        , Login <| Just <| LoginToken "abc"
+                        , Login
                         , Logout
-                        , ForgotPassword Nothing
-                        , ForgotPassword <| Just <| PasswordResetToken "abc"
+                        , ResetPassword Nothing
+                        , ResetPassword <| Just "token"
 
                         -- Classrooms
                         , Classrooms
                         , Classroom <| ClassroomId 1
-                        , NewClassroom
-                        , EditClassroom <| ClassroomId 1
 
                         -- Semesters
-                        , Semesters Nothing
-                        , Semesters <| Just <| ClassroomId 1
+                        , Semesters
                         , Semester <| SemesterId 1
-                        , NewSemester Nothing
-                        , NewSemester <| Just <| ClassroomId 1
-                        , EditSemester <| SemesterId 1
 
                         -- Sections
-                        , Sections Nothing
-                        , Sections <| Just <| SemesterId 1
+                        , Sections Nothing Nothing
+                        , Sections Nothing (Just <| SemesterId 1)
+                        , Sections (Just <| ClassroomId 1) Nothing
+                        , Sections (Just <| ClassroomId 1) (Just <| SemesterId 1)
                         , Section <| SectionId 1
-                        , NewSection Nothing
-                        , NewSection <| Just <| SemesterId 1
-                        , EditSection <| SectionId 1
 
                         -- Rotations
                         , Rotations Nothing
                         , Rotations <| Just <| SectionId 1
                         , Rotation <| RotationId 1
-                        , NewRotation Nothing
-                        , NewRotation <| Just <| SectionId 1
-                        , EditRotation <| RotationId 1
 
                         -- Rotation Groups
                         , RotationGroups Nothing
                         , RotationGroups <| Just <| RotationId 1
                         , RotationGroup <| RotationGroupId 1
-                        , NewRotationGroup Nothing
-                        , NewRotationGroup <| Just <| RotationId 1
-                        , EditRotationGroup <| RotationGroupId 1
+
+                        -- Categories
+                        , Categories Nothing
+                        , Categories <| Just <| CategoryId 1
+                        , Category <| CategoryId 1
+
+                        -- Observations
+                        , Observations Nothing
+                        , Observations <| Just <| CategoryId 1
+                        , Observation <| ObservationId 1
+
+                        -- Feedback
+                        , Feedback Nothing
+                        , Feedback <| Just <| ObservationId 1
+                        , FeedbackItem <| FeedbackId 1
+
+                        -- Explanations
+                        , Explanations Nothing
+                        , Explanations <| Just <| FeedbackId 1
+                        , Explanation <| ExplanationId 1
 
                         -- Users
                         , Users
                         , User <| UserId 1
-                        , NewUser
-                        , EditUser <| UserId 1
 
                         -- Feedback
                         , DraftClassrooms
                         , DraftRotations (SectionId 1)
-                        , EditFeedback (DraftId 1) (Just (CategoryId 1))
+                        , EditFeedback (DraftId 1) (Just <| CategoryId 1)
                         , EditFeedback (DraftId 1) Nothing
                         , Draft <| DraftId 1
 

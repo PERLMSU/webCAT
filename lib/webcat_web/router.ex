@@ -36,6 +36,7 @@ defmodule WebCATWeb.Router do
     # Accounts
     resources("/user", ProfileController, singleton: true, only: ~w(show update)a)
     api_resource("/users", UserController)
+    post("/users/:id/profile_picture", UserController, :profile_picture)
 
     # Classrooms
     api_resource("/classrooms", ClassroomController)

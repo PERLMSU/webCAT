@@ -68,6 +68,9 @@ semesters : Session -> (APIData (List Semester) -> msg) -> Cmd msg
 semesters session toMsg =
     API.getRemote Endpoint.semesters (Session.credential session) (multiDecoder semesterDecoder) toMsg
 
+type alias SemesterForm =
+    { name : String, description : String, startDate: Time.Posix, endDate: Time.Posix }
+
 
 -- Sections
 sections : Session -> Maybe ClassroomId -> Maybe SemesterId -> (APIData (List Section) -> msg) -> Cmd msg

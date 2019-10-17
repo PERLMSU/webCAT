@@ -1,7 +1,7 @@
 module TypeFuzzers exposing (userFuzzer)
 
 import Fuzz exposing (Fuzzer, andMap, bool, int, list, map, maybe, string)
-import FuzzUtils exposing (emailFuzzer, nameFuzzer, nothing, posixFuzzer, surnameFuzzer)
+import FuzzUtils exposing (emailFuzzer, fuzzFromList, nameFuzzer, nothing, posixFuzzer, surnameFuzzer)
 import Types exposing (..)
 
 
@@ -14,7 +14,7 @@ userFuzzer =
         |> andMap surnameFuzzer
         |> andMap (maybe nameFuzzer)
         |> andMap bool
-        |> andMap (list string)
+        |> andMap (fuzzFromList [ Admin, Faculty, TeachingAssistant, LearningAssistant, Student ])
         |> andMap (list <| map ClassroomId int)
         |> andMap (list <| map SectionId int)
         |> andMap (list <| map RotationGroupId int)

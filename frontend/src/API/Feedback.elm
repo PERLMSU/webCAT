@@ -35,7 +35,6 @@ type alias CategoryForm =
 
     -- Related data
     , parentCategoryId : Maybe CategoryId
-    , classroomId : ClassroomId
     }
 
 
@@ -46,7 +45,6 @@ formFromCategory data =
 
     -- Related data
     , parentCategoryId = data.parentCategoryId
-    , classroomId = data.classroomId
     }
 
 
@@ -56,7 +54,6 @@ encodeCategoryForm form =
         [ ( "name", Encode.string form.name )
         , ( "description", Encode.string form.description )
         , ( "parent_category_id", encodeMaybe (unwrapCategoryId >> Encode.int) form.parentCategoryId )
-        , ( "classroom_id", (unwrapClassroomId >> Encode.int) form.classroomId )
         ]
 
 
