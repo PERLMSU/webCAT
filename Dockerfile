@@ -12,13 +12,13 @@ COPY . .
 #Install dependencies
 RUN mix local.hex --force && \
     mix local.rebar --force && \
-    mix deps.get --only prod 
+    mix deps.get --only prod
 
 
 # Build assets and release
-RUN cd ./assets && \
+RUN cd ./frontend && \
     yarn --ignore-optional --verbose && \
-    yarn run build
+    yarn build
 
 # Build release
 RUN MIX_ENV=prod mix phx.digest && \

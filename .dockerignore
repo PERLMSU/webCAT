@@ -5,9 +5,10 @@ _build
 .elixir_ls
 deps
 test
-assets/node_modules
 cover
 rel/artifacts
 priv/static
-assets/.elm
-assets/elm-stuff
+priv/media
+frontend/node_modules
+frontend/.elm
+frontend/elm-stuff
