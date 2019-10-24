@@ -14,10 +14,10 @@ defmodule WebCATWeb.SemesterViewTest do
       assert data[:id] == to_string(semester.id)
       assert attributes[:name] == semester.name
       assert attributes[:description] == semester.description
-      assert attributes[:start_date] == Timex.to_unix(semester.start_date)
-      assert attributes[:end_date] == Timex.to_unix(semester.end_date)
-      assert attributes[:inserted_at] == Timex.to_unix(semester.inserted_at)
-      assert attributes[:updated_at] == Timex.to_unix(semester.updated_at)
+      assert attributes[:start_date] == Timex.to_unix(semester.start_date) * 1000
+      assert attributes[:end_date] == Timex.to_unix(semester.end_date) * 1000
+      assert attributes[:inserted_at] == Timex.to_unix(semester.inserted_at) * 1000
+      assert attributes[:updated_at] == Timex.to_unix(semester.updated_at) * 1000
     end
 
     test "it renders a list of semesters properly", %{conn: conn} do

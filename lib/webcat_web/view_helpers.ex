@@ -1,14 +1,9 @@
 defmodule WebCATWeb.ViewHelpers do
-  def timestamps_format(map) when is_map(map) do
-    map
-    |> update_if_exists(:inserted_at, &to_unix/1)
-    |> update_if_exists(:updated_at, &to_unix/1)
-  end
-
-  defp to_unix(datetime) do
+  def to_unix_millis(datetime) do
     case datetime do
-      %DateTime{} -> DateTime.to_unix(datetime)
-      %NaiveDateTime{} -> DateTime.from_naive!(datetime, "Etc/UTC") |> DateTime.to_unix()
+      %Date{} -> Timex.to_unix(datetime) * 1000
+      %DateTime{} -> Timex.to_unix(datetime) * 1000
+      %NaiveDateTime{} -> DateTime.from_naive!(datetime, "Etc/UTC") |> Timex.to_unix() |> Kernel.* 1000
     end
   end
 

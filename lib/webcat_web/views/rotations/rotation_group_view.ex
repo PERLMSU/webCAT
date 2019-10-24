@@ -6,6 +6,6 @@ defmodule WebCATWeb.RotationGroupView do
 
   def relationships, do: [rotation: WebCATWeb.RotationView, users: WebCATWeb.UserView, classroom: WebCATWeb.ClassroomView]
 
-  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
-  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
+  def inserted_at(data, _), do: to_unix_millis(data.inserted_at)
+  def updated_at(data, _), do: to_unix_millis(data.updated_at)
 end

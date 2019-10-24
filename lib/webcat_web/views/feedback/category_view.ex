@@ -2,7 +2,7 @@ defmodule WebCATWeb.CategoryView do
   use WebCATWeb, :view
   use JSONAPI.View, type: "category", collection: "categories"
 
-  def fields, do: ~w(name description inserted_at updated_at)a ++ ~w(parent_category_id classroom_id)a
+  def fields, do: ~w(name description inserted_at updated_at)a ++ ~w(parent_category_id)a
 
   def relationships,
     do: [
@@ -12,6 +12,6 @@ defmodule WebCATWeb.CategoryView do
       observations: WebCATWeb.ObservationView
     ]
 
-  def inserted_at(data, _), do: Timex.to_unix(data.inserted_at)
-  def updated_at(data, _), do: Timex.to_unix(data.updated_at)
+  def inserted_at(data, _), do: to_unix_millis(data.inserted_at)
+  def updated_at(data, _), do: to_unix_millis(data.updated_at)
 end
