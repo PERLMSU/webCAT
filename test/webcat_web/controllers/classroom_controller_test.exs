@@ -10,10 +10,10 @@ defmodule WebCATWeb.ClassroomControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.classroom_path(conn, :index, fields: %{classroom: "course_code"}))
+        |> get(Routes.classroom_path(conn, :index))
         |> json_response(:ok)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result["data"]) >= 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

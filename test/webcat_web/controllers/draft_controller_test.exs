@@ -11,10 +11,18 @@ defmodule WebCATWeb.DraftControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.draft_path(conn, :index, parent_draft_id: parent.id))
+        |> get(Routes.draft_path(conn, :index, filter: %{parent_draft_id: parent.id}))
         |> json_response(:ok)
 
-      assert Enum.count(result) == 3
+      assert Enum.count(result["data"]) == 3
+
+      result =
+        conn
+        |> Auth.sign_in(user)
+        |> get(Routes.draft_path(conn, :index, filter: %{rotation_group_id: parent.rotation_group_id}))
+        |> json_response(:ok)
+
+      assert Enum.count(result["data"]) == 1
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

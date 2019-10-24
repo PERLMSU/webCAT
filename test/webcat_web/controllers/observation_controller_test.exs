@@ -11,10 +11,10 @@ defmodule WebCATWeb.ObservationControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.observation_path(conn, :index, category_id: category.id))
+        |> get(Routes.observation_path(conn, :index, filter: %{category_id: category.id}))
         |> json_response(:ok)
 
-      assert Enum.count(result) == 3
+      assert Enum.count(result["data"]) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

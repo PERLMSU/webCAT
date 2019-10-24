@@ -11,7 +11,7 @@ defmodule WebCATWeb.UserControllerTest do
         |> get(Routes.user_path(conn, :index))
         |> json_response(:ok)
 
-      assert Enum.count(result) >= 1
+      assert Enum.count(result["data"]) == 1
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

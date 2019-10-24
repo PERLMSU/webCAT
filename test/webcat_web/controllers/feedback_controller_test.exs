@@ -11,10 +11,10 @@ defmodule WebCATWeb.FeedbackControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.feedback_path(conn, :index, observation_id: observation.id))
+        |> get(Routes.feedback_path(conn, :index, filter: %{observation_id: observation.id}))
         |> json_response(:ok)
 
-      assert Enum.count(result) == 3
+      assert Enum.count(result["data"]) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

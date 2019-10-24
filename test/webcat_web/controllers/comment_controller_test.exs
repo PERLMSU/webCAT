@@ -11,10 +11,10 @@ defmodule WebCATWeb.CommentControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.comment_path(conn, :index, draft_id: draft.id))
+        |> get(Routes.comment_path(conn, :index, filter: %{draft_id: draft.id}))
         |> json_response(:ok)
 
-      assert Enum.count(result) == 3
+      assert Enum.count(result["data"]) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

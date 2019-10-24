@@ -5,15 +5,16 @@ defmodule WebCATWeb.SectionControllerTest do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_user()
 
-      Factory.insert_list(3, :section)
+      classroom = Factory.insert(:classroom)
+      Factory.insert_list(3, :section, classroom: classroom)
 
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.section_path(conn, :index))
+        |> get(Routes.section_path(conn, :index, filter: %{classroom_id: classroom.id}))
         |> json_response(:ok)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result["data"]) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

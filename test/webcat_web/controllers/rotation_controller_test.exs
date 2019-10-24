@@ -11,10 +11,10 @@ defmodule WebCATWeb.RotationControllerTest do
       result =
         conn
         |> Auth.sign_in(user)
-        |> get(Routes.rotation_path(conn, :index, section_id: section.id))
+        |> get(Routes.rotation_path(conn, :index, filter: %{section_id: section.id}))
         |> json_response(:ok)
 
-      assert Enum.count(result) == 3
+      assert Enum.count(result["data"]) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do

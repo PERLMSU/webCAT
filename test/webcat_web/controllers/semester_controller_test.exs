@@ -13,7 +13,7 @@ defmodule WebCATWeb.SemesterControllerTest do
         |> get(Routes.semester_path(conn, :index))
         |> json_response(:ok)
 
-      assert Enum.count(result) >= 3
+      assert Enum.count(result["data"]) == 3
     end
 
     test "fails when a user isn't authenticated", %{conn: conn} do
