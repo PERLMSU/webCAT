@@ -1,4 +1,4 @@
-module Components.Common exposing (Style(..), dangerButton, header, icon, iconButton, infoButton, loading, panel, primaryButton, subheader, successButton, warningButton)
+module Components.Common exposing (Style(..), icon, iconButton, loading)
 
 import Bootstrap.Button as Button
 import Html exposing (..)
@@ -69,75 +69,8 @@ iconButton style icon_ toMsg =
     Button.button [ textColor, Button.onClick toMsg ]
         [ i [ class ("far fa-" ++ icon_) ] [] ]
 
-
-primaryButton : String -> msg -> Html msg
-primaryButton =
-    styledButton Primary
-
-
-infoButton : String -> msg -> Html msg
-infoButton =
-    styledButton Info
-
-
-successButton : String -> msg -> Html msg
-successButton =
-    styledButton Successful
-
-
-warningButton : String -> msg -> Html msg
-warningButton =
-    styledButton Warning
-
-
-dangerButton : String -> msg -> Html msg
-dangerButton =
-    styledButton Danger
-
-
-styledButton : Style -> String -> msg -> Html msg
-styledButton style content toMsg =
-    let
-        styleClass =
-            case style of
-                Primary ->
-                    "text-primary border-primary"
-
-                Secondary ->
-                    "text-secondary border-secondary"
-
-                Info ->
-                    "text-info border-info"
-
-                Successful ->
-                    "text-success border-success"
-
-                Warning ->
-                    "text-warning border-warning"
-
-                Danger ->
-                    "text-danger border-danger"
-    in
-    button [ class ("shadow bg-transparent border text-white py-2 px-4 rounded font-display " ++ styleClass), type_ "button", onClick toMsg ] [ text content ]
-
-
 {-| View a loading spinner. Only one style for now.
 -}
 loading : Html msg
 loading =
-    div [ class "text-gray-400 text-center py-6" ] [ i [ class "fa-2x fas fa-spinner fa-pulse" ] [] ]
-
-
-panel : List (Html msg) -> Html msg
-panel content =
-    div [ class "bg-light-slate rounded-sm shadow-md mx-24 my-12 py-2" ] content
-
-
-header : String -> Html msg
-header content =
-    h1 [ class "text-4xl text-gray-400 font-display" ] [ text content ]
-
-
-subheader : String -> Html msg
-subheader content =
-    h2 [ class "text-xl text-gray-400 font-display" ] [ text content ]
+    div [ class "text-center d-block" ] [ i [ class "fa-3x fal fa-atom fa-spin" ] [] ]

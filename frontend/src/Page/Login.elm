@@ -150,17 +150,17 @@ view model =
 
             email =
                 if not <| List.any (\( f, m ) -> f == Email) model.formErrors then
-                    Input.email [ Input.id "email", Input.onInput EmailChanged, Input.placeholder "Email Address", Input.value model.form.email ]
+                    Input.email [ Input.attrs [ class "border"], Input.id "email", Input.onInput EmailChanged, Input.placeholder "Email Address", Input.value model.form.email ]
 
                 else
-                    Input.email [ Input.id "email", Input.danger, Input.onInput EmailChanged, Input.placeholder "Email Address", Input.value model.form.email ]
+                    Input.email [ Input.attrs [class "border"], Input.id "email", Input.danger, Input.onInput EmailChanged, Input.placeholder "Email Address", Input.value model.form.email ]
 
             password =
                 if not <| List.any (\( f, m ) -> f == Password) model.formErrors then
-                    Input.password [ Input.id "password", Input.onInput PasswordChanged, Input.placeholder "Password", Input.value model.form.password ]
+                    Input.password [ Input.attrs [class "border"],Input.id "password", Input.onInput PasswordChanged, Input.placeholder "Password", Input.value model.form.password ]
 
                 else
-                    Input.password [ Input.id "password", Input.danger, Input.onInput PasswordChanged, Input.placeholder "Password", Input.value model.form.password ]
+                    Input.password [ Input.attrs [class "border"],Input.id "password", Input.danger, Input.onInput PasswordChanged, Input.placeholder "Password", Input.value model.form.password ]
 
             alert =
                 case model.credential of
@@ -185,7 +185,7 @@ view model =
                     _ ->
                         Form.form [ class "form-signin" ]
                             [ img [ class "mb-4", src "../static/images/physics.svg", width 100, height 100 ] []
-                            , h1 [ class "h3 mb-3 font-weight-normal" ] [ text "Please Sign In" ]
+                            , h1 [ class "h3 mb-3 text-secondary font-weight-normal" ] [ text "Please Sign In" ]
                             , Form.label [ for "email", class "sr-only" ] [ text "Email Address" ]
                             , email
                             , feedback Email

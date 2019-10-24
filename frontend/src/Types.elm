@@ -1,4 +1,4 @@
-module Types exposing (Category, CategoryId(..), Classroom, ClassroomId(..), Comment, CommentId(..), DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Feedback, FeedbackId(..), Grade, GradeId(..), GroupDraft, Observation, ObservationId(..), ObservationType(..), Role(..), Rotation, RotationGroup, RotationGroupId(..), RotationId(..), Section, SectionId(..), Semester, SemesterId(..), Semesters(..), StudentDraft, StudentExplanation, StudentExplanationId(..), StudentFeedback, StudentFeedbackId(..), User, UserId(..), categoryDecoder, classroomDecoder, commentDecoder, credUserDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, groupDraftDecoder, multiDecoder, observationDecoder, observationTypeDecoder, optionalAttribute, optionalMaybe, relationship, requiredAttribute, requiredRelationship, requiredType, roleDecoder, roleToString, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, singleDecoder, studentDraftDecoder, studentExplanationDecoder, studentFeedbackDecoder, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapStudentExplanationId, unwrapStudentFeedbackId, unwrapUserId, userDecoder)
+module Types exposing (..)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Extra exposing (parseInt)
@@ -176,7 +176,7 @@ rotationDecoder =
         |> optionalAttribute "description" (nullable string)
         |> requiredAttribute "start_date" (map Time.millisToPosix int)
         |> requiredAttribute "end_date" (map Time.millisToPosix int)
-        |> requiredAttribute "section_id" (map SectionId parseInt)
+        |> requiredAttribute "section_id" (map SectionId int)
         |> relationship "rotation_groups" (list <| field "id" <| map RotationGroupId parseInt) []
         |> relationship "users" (list <| field "id" <| map UserId parseInt) []
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
@@ -216,7 +216,7 @@ rotationGroupDecoder =
         |> required "id" (map RotationGroupId parseInt)
         |> requiredAttribute "number" int
         |> optionalAttribute "description" (nullable string)
-        |> requiredAttribute "rotation_id" (map RotationId parseInt)
+        |> requiredAttribute "rotation_id" (map RotationId int)
         |> relationship "users" (list <| field "id" <| map UserId parseInt) []
         |> requiredRelationship "classroom" (field "id" <| map ClassroomId parseInt)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
@@ -402,7 +402,7 @@ categoryDecoder =
         |> required "id" (map CategoryId parseInt)
         |> requiredAttribute "name" string
         |> optionalAttribute "description" (nullable string)
-        |> optionalAttribute "parent_category_id" (nullable (map CategoryId parseInt))
+        |> optionalAttribute "parent_category_id" (nullable (map CategoryId int))
         |> relationship "sub_categories" (list <| field "id" <| map CategoryId parseInt) []
         |> relationship "observations" (list <| field "id" <| map ObservationId parseInt) []
         |> relationship "classrooms" (list <| field "id" <| map ClassroomId parseInt) []
@@ -444,6 +444,11 @@ observationTypeDecoder =
                         Decode.fail <| "Unknown observation type: " ++ else_
             )
 
+observationTypeToString : ObservationType -> String
+observationTypeToString type_ = case type_ of
+                                    Positive -> "positive"
+                                    Neutral -> "neutral"
+                                    Negative -> "negative"
 
 type alias Observation =
     { id : ObservationId
@@ -468,7 +473,7 @@ observationDecoder =
         |> required "id" (map ObservationId parseInt)
         |> requiredAttribute "content" string
         |> requiredAttribute "type" observationTypeDecoder
-        |> requiredAttribute "category_id" (map CategoryId parseInt)
+        |> requiredAttribute "category_id" (map CategoryId int)
         |> relationship "feedback" (list <| field "id" <| map FeedbackId parseInt) []
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
@@ -504,7 +509,7 @@ feedbackDecoder =
     Decode.succeed Feedback
         |> required "id" (map FeedbackId parseInt)
         |> requiredAttribute "content" string
-        |> requiredAttribute "observation_id" (map ObservationId parseInt)
+        |> requiredAttribute "observation_id" (map ObservationId int)
         |> relationship "explanations" (list <| field "id" <| map ExplanationId parseInt) []
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
@@ -537,7 +542,7 @@ explanationDecoder =
     Decode.succeed Explanation
         |> required "id" (map ExplanationId parseInt)
         |> requiredAttribute "content" string
-        |> requiredAttribute "feedback_id" (map FeedbackId parseInt)
+        |> requiredAttribute "feedback_id" (map FeedbackId int)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 
@@ -650,7 +655,7 @@ groupDraftDecoder =
         |> required "id" (map DraftId parseInt)
         |> requiredAttribute "content" string
         |> requiredAttribute "status" draftStatusDecoder
-        |> requiredAttribute "rotation_group_id" (map RotationGroupId parseInt)
+        |> requiredAttribute "rotation_group_id" (map RotationGroupId int)
         |> relationship "comments" (list <| field "id" <| map CommentId parseInt) []
         |> relationship "grades" (list <| field "id" <| map GradeId parseInt) []
         |> relationship "child_drafts" (list <| field "id" <| map DraftId parseInt) []
@@ -665,8 +670,8 @@ studentDraftDecoder =
         |> required "id" (map DraftId parseInt)
         |> requiredAttribute "content" string
         |> requiredAttribute "status" draftStatusDecoder
-        |> requiredAttribute "student_id" (map UserId parseInt)
-        |> requiredAttribute "parent_draft_id" (map DraftId parseInt)
+        |> requiredAttribute "student_id" (map UserId int)
+        |> requiredAttribute "parent_draft_id" (map DraftId int)
         |> relationship "comments" (list <| field "id" <| map CommentId parseInt) []
         |> relationship "grades" (list <| field "id" <| map GradeId parseInt) []
         |> relationship "student_categories" (list <| field "id" <| map CategoryId parseInt) []
@@ -702,8 +707,8 @@ commentDecoder =
     Decode.succeed Comment
         |> required "id" (map CommentId parseInt)
         |> requiredAttribute "content" string
-        |> requiredAttribute "draft_id" (map DraftId parseInt)
-        |> requiredAttribute "user_id" (map UserId parseInt)
+        |> requiredAttribute "draft_id" (map DraftId int)
+        |> requiredAttribute "user_id" (map UserId int)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 
@@ -738,8 +743,8 @@ gradeDecoder =
         |> required "id" (map GradeId parseInt)
         |> requiredAttribute "score" int
         |> optionalMaybe "note" (nullable string)
-        |> requiredAttribute "category_id" (map CategoryId parseInt)
-        |> requiredAttribute "draft_id" (map DraftId parseInt)
+        |> requiredAttribute "category_id" (map CategoryId int)
+        |> requiredAttribute "draft_id" (map DraftId int)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 
@@ -771,7 +776,7 @@ emailDecoder =
     Decode.succeed Email
         |> required "id" (map EmailId parseInt)
         |> requiredAttribute "status" string
-        |> requiredAttribute "draft_id" (map DraftId parseInt)
+        |> requiredAttribute "draft_id" (map DraftId int)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 
@@ -800,8 +805,8 @@ studentFeedbackDecoder : Decoder StudentFeedback
 studentFeedbackDecoder =
     Decode.succeed StudentFeedback
         |> required "id" (map StudentFeedbackId parseInt)
-        |> requiredAttribute "draft_id" (map DraftId parseInt)
-        |> requiredAttribute "feedback_id" (map FeedbackId parseInt)
+        |> requiredAttribute "draft_id" (map DraftId int)
+        |> requiredAttribute "feedback_id" (map FeedbackId int)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 
@@ -831,9 +836,9 @@ studentExplanationDecoder : Decoder StudentExplanation
 studentExplanationDecoder =
     Decode.succeed StudentExplanation
         |> required "id" (map StudentExplanationId parseInt)
-        |> requiredAttribute "draft_id" (map DraftId parseInt)
-        |> requiredAttribute "feedback_id" (map FeedbackId parseInt)
-        |> requiredAttribute "explanation_id" (map ExplanationId parseInt)
+        |> requiredAttribute "draft_id" (map DraftId int)
+        |> requiredAttribute "feedback_id" (map FeedbackId int)
+        |> requiredAttribute "explanation_id" (map ExplanationId int)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 

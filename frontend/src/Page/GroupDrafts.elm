@@ -1,14 +1,20 @@
-module Page.Draft exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
+module Page.GroupDrafts exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import API exposing (APIData, Error(..))
-import API.Drafts exposing (..)
+import API.Feedback exposing (..)
+import Bootstrap.Card as Card
+import Bootstrap.Card.Block as Block
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Bootstrap.ListGroup as ListGroup
+import Bootstrap.Text as Text
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Modal as Modal
 import Components.Table as Table
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 import RemoteData exposing (RemoteData(..))
 import Route
 import Session as Session exposing (Session)
@@ -18,32 +24,35 @@ import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
 
 type alias Model =
     { session : Session
-    , draft : APIData GroupDraft 
-    , draftId : DraftId
+    , rotationGroupId : RotationGroupId
+
+    , rotationGroup : APIData RotationGroup
+    , users : APIData (List User)
     }
 
 
 type Msg
     = GotSession Session
-    | GotDraft (APIData GroupDraft)
 
 
-init : DraftId -> Session -> ( Model, Cmd Msg )
-init draftId session =
+init : Session -> RotationGroupId -> ( Model, Cmd Msg )
+init session rotationGroupId =
     if Session.isAuthenticated session then
         ( { session = session
-          , draft = Loading
-          , draftId = draftId
+          , rotationGroupId = rotationGroupId
+          , rotationGroup = Loading
+          , users = Loading
           }
-        , groupDraft session draftId GotDraft
+        , Cmd.none
         )
 
     else
         ( { session = session
-          , draft = NotAsked
-          , draftId = draftId
+          , rotationGroupId = rotationGroupId
+          , rotationGroup = NotAsked
+          , users = NotAsked
           }
-        , Route.replaceUrl (Session.navKey session) (Route.Login )
+        , Route.replaceUrl (Session.navKey session) Route.Login
         )
 
 
@@ -56,22 +65,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotSession session ->
-            init model.draftId session
-
-        GotDraft draft ->
-            API.handleRemoteError draft { model | draft = draft } Cmd.none
+            init session model.rotationGroupId
 
 
 view : Model -> { title : String, content : Html Msg }
 view model =
-    { title = "Drafts"
+    { title = "Group Drafts"
     , content =
-        div []
-            [ div []
-                [ div [ class "flex justify-between items-center mx-4" ]
-                    [ h1 [ class "text-4xl text-gray-400 font-display" ] [ text "Drafts" ]
-                    ]
-                ]
+        Grid.container []
+            [ Grid.simpleRow [Grid.col [] [h2 [] [text ""]]]
             ]
     }
 

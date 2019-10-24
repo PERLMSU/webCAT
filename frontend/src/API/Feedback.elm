@@ -8,6 +8,7 @@ import Json.Encode as Encode
 import Session exposing (Session)
 import Time as Time
 import Types exposing (..)
+import Either exposing (..)
 
 
 encodeMaybe : (a -> Encode.Value) -> Maybe a -> Encode.Value
@@ -38,14 +39,19 @@ type alias CategoryForm =
     }
 
 
-formFromCategory : Category -> CategoryForm
-formFromCategory data =
-    { name = data.name
-    , description = Maybe.withDefault "" data.description
-
-    -- Related data
-    , parentCategoryId = data.parentCategoryId
-    }
+initCategoryForm : Maybe Category -> CategoryForm
+initCategoryForm maybeCategory =
+    case maybeCategory of
+        Just data ->
+            { name = data.name
+            , description = Maybe.withDefault "" data.description
+            , parentCategoryId = data.parentCategoryId
+            }
+        Nothing ->
+            { name = ""
+            , description = ""
+            , parentCategoryId = Nothing
+            }
 
 
 encodeCategoryForm : CategoryForm -> Encode.Value
@@ -73,6 +79,35 @@ deleteCategory session id toMsg =
 
 -- Observations
 
+type alias ObservationForm =
+    { content : String
+    , type_ : ObservationType
+    , categoryId : CategoryId
+    }
+
+initObservationForm : Either Observation CategoryId -> ObservationForm
+initObservationForm either =
+    case either of
+        Left observation ->
+            { content = observation.content
+            , type_ = observation.type_
+            , categoryId = observation.categoryId
+            }
+        Right id ->
+            { content = ""
+            , type_ = Neutral
+            , categoryId = id
+            }
+
+
+
+encodeObservationForm : ObservationForm -> Encode.Value
+encodeObservationForm form =
+    Encode.object
+        [ ("content", Encode.string form.content)
+        , ("type", (observationTypeToString >> Encode.string) form.type_)
+        , ("categoryId", (unwrapCategoryId >> Encode.int) form.categoryId)
+        ]
 
 observations : Session -> Maybe CategoryId -> (APIData (List Observation) -> msg) -> Cmd msg
 observations session maybeCategoryId toMsg =

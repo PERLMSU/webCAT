@@ -55,8 +55,7 @@ view model =
     { title = "Profile"
     , content =
         div []
-            [ Common.panel
-                []
+            [ 
             ]
     }
 

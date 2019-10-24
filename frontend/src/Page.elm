@@ -8,7 +8,7 @@ import Html.Attributes exposing (attribute, class, classList, href, id, src, sty
 import Html.Events exposing (onClick)
 import Route exposing (Route)
 import Session exposing (Session)
-import Types exposing (User)
+import Types exposing (..)
 
 
 type Page
@@ -19,6 +19,7 @@ type Page
     | Users
     | DraftClassrooms
     | DraftRotations
+    | GroupDrafts
     | Draft
     | EditFeedback
     | Profile
@@ -60,13 +61,21 @@ viewMenu page user =
         navItem route text_ =
             li [ classList [ ( "nav-item", True ), ( "active", isActive page route ) ] ] [ a [ class "nav-link", Route.href route ] [ text text_ ] ]
     in
-    nav [ class "navbar navbar-expand-md navbar-dark bg-dark mb-4" ]
+    nav [ class "navbar navbar-expand-md navbar-dark bg-primary mb-4" ]
         [ a [ href "#", class "navbar-brand" ] [ text "WebCAT" ]
         , div [ class "collapse navbar-collapse", id "navbarCollapse" ]
-            [ ul [ class "navbar-nav mr-auto" ]
-                [ navItem Route.Dashboard "Dashboard"
-                , navItem Route.DraftClassrooms "Feedback Editor"
-                ]
+            [ ul [ class "navbar-nav mr-auto" ] <|
+                case user.role of
+                    LearningAssistant ->
+                        [ navItem Route.DraftClassrooms "Feedback Editor" ]
+
+                    Student ->
+                        []
+
+                    _ ->
+                        [ navItem Route.Dashboard "Dashboard"
+                        , navItem Route.DraftClassrooms "Feedback Editor"
+                        ]
             , a [ Route.href Route.Profile, class "d-flex flex-row align-items-center" ]
                 [ img
                     [ Endpoint.src <| Endpoint.profilePicture user.id
@@ -84,10 +93,7 @@ viewMenu page user =
 isActive : Page -> Route -> Bool
 isActive page route =
     case ( page, route ) of
-        ( Classrooms, Route.Classrooms ) ->
-            True
-
-        ( Users, Route.Users ) ->
+        ( Dashboard, Route.Dashboard ) ->
             True
 
         ( DraftClassrooms, Route.DraftClassrooms ) ->

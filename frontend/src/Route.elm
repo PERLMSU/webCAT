@@ -54,6 +54,7 @@ type Route
       -- Feedback System
     | DraftClassrooms
     | DraftRotations SectionId
+    | GroupDrafts RotationGroupId
     | Draft DraftId
     | EditFeedback DraftId (Maybe CategoryId)
       -- Profile
@@ -190,6 +191,7 @@ parser =
                     </> oneOf
                             [ Parser.map DraftClassrooms top
                             , Parser.map DraftRotations (s "sections" </> Parser.map SectionId int)
+                            , Parser.map GroupDrafts (s "groups" </> Parser.map RotationGroupId int)
                             , Parser.map Draft (Parser.map DraftId int)
                             , Parser.map EditFeedback (Parser.map DraftId int </> s "feedback" <?> idQueryParser CategoryId "categoryId")
                             ]
@@ -291,6 +293,9 @@ routeToString route =
 
         DraftRotations (SectionId id) ->
             appAbsolute [ "drafts", "sections", String.fromInt id ] []
+
+        GroupDrafts (RotationGroupId id) ->
+            appAbsolute [ "drafts", "groups", String.fromInt id ] []
 
         Draft (DraftId id) ->
             appAbsolute [ "drafts", String.fromInt id ] []

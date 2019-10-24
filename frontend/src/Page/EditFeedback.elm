@@ -258,9 +258,9 @@ viewCategories model categories =
             li [ class "text-l text-gray-500" ] [ button [ onClick (SubCategorySelected category.id) ] [ text category.name ] ]
 
         viewCategory category =
-            Common.panel
+            div []
                 [ div [ class "mx-4 my-2 flex" ]
-                    [ Common.header category.name ]
+                    [ text category.name ]
                 , h3 [ class "text-xl text-gray-400 ml-4" ] [ text "Sub-categories" ]
                 , ul [ class "mx-4" ] []
                 --, ul [ class "mx-4" ] <| List.map viewSubcategory <| List.sortBy .name <| unwrapMaybeDefault unwrapCategories category.subCategories
@@ -282,7 +282,7 @@ view model =
                     text ""
 
                 Loading ->
-                    Common.panel [ Common.loading ]
+                    div [] [ Common.loading ]
 
                 Success c ->
                     viewCategories model c

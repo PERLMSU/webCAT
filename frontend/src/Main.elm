@@ -12,6 +12,8 @@ import Page.Classrooms as Classrooms
 import Page.Dashboard as Dashboard
 import Page.Draft as Draft
 import Page.DraftClassrooms as DraftClassrooms
+import Page.DraftRotations as DraftRotations
+import Page.GroupDrafts as GroupDrafts
 import Page.EditFeedback as EditFeedback
 import Page.Login as Login
 import Page.NotFound as NotFound
@@ -59,6 +61,8 @@ type Model
     | Classrooms Classrooms.Model
     | Users Users.Model
     | DraftClassrooms DraftClassrooms.Model
+    | DraftRotations DraftRotations.Model
+    | GroupDrafts GroupDrafts.Model
     | EditFeedback EditFeedback.Model
     | Draft Draft.Model
     | Dashboard Dashboard.Model
@@ -78,6 +82,8 @@ type Msg
     | GotClassroomsMsg Classrooms.Msg
     | GotUsersMsg Users.Msg
     | GotDraftClassroomsMsg DraftClassrooms.Msg
+    | GotDraftRotationsMsg DraftRotations.Msg
+    | GotGroupDraftsMsg GroupDrafts.Msg
     | GotEditFeedbackMsg EditFeedback.Msg
     | GotDraftMsg Draft.Msg
     | GotDashboardMsg Dashboard.Msg
@@ -94,32 +100,38 @@ toSession page =
         NotFound session ->
             session
 
-        Login login ->
-            Login.toSession login
+        Login model ->
+            Login.toSession model
 
-        ResetPassword reset ->
-            ResetPassword.toSession reset
+        ResetPassword model ->
+            ResetPassword.toSession model
 
-        Classrooms classrooms ->
-            Classrooms.toSession classrooms
+        Classrooms model ->
+            Classrooms.toSession model
 
-        Users users ->
-            Users.toSession users
+        Users model ->
+            Users.toSession model
 
-        DraftClassrooms classrooms ->
-            DraftClassrooms.toSession classrooms
+        DraftClassrooms model ->
+            DraftClassrooms.toSession model
 
-        EditFeedback feedback ->
-            EditFeedback.toSession feedback
+        DraftRotations model ->
+            DraftRotations.toSession model
 
-        Draft draft ->
-            Draft.toSession draft
+        GroupDrafts model ->
+            GroupDrafts.toSession model
 
-        Profile profile ->
-            Profile.toSession profile
+        EditFeedback model ->
+            EditFeedback.toSession model
 
-        Dashboard dashboard ->
-            Dashboard.toSession dashboard
+        Draft model ->
+            Draft.toSession model
+
+        Profile model ->
+            Profile.toSession model
+
+        Dashboard model ->
+            Dashboard.toSession model
 
 
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -162,6 +174,14 @@ changeRouteTo maybeRoute model =
             DraftClassrooms.init session
                 |> updateWith DraftClassrooms GotDraftClassroomsMsg model
 
+        Just (Route.DraftRotations sectionId) ->
+            DraftRotations.init session sectionId
+                |> updateWith DraftRotations GotDraftRotationsMsg model
+
+        Just (Route.GroupDrafts rotationGroupId) ->
+            GroupDrafts.init session rotationGroupId
+                |> updateWith GroupDrafts GotGroupDraftsMsg model
+
         Just (Route.EditFeedback draftId maybeCategoryId) ->
             EditFeedback.init session draftId maybeCategoryId
                 |> updateWith EditFeedback GotEditFeedbackMsg model
@@ -179,65 +199,73 @@ changeRouteTo maybeRoute model =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case ( msg, model ) of
+update appMsg appModel =
+    case ( appMsg, appModel ) of
         ( ClickedLink urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model
-                    , Nav.pushUrl (Session.navKey (toSession model)) (Url.toString url)
+                    ( appModel
+                    , Nav.pushUrl (Session.navKey (toSession appModel)) (Url.toString url)
                     )
 
                 Browser.External href ->
-                    ( model
+                    ( appModel
                     , Nav.load href
                     )
 
         ( ChangedUrl url, _ ) ->
-            changeRouteTo (Route.fromUrl url) model
+            changeRouteTo (Route.fromUrl url) appModel
 
         ( ChangedRoute route, _ ) ->
-            changeRouteTo route model
+            changeRouteTo route appModel
 
-        ( GotLoginMsg subMsg, Login login ) ->
-            Login.update subMsg login
-                |> updateWith Login GotLoginMsg model
+        ( GotLoginMsg msg, Login model ) ->
+            Login.update msg model
+                |> updateWith Login GotLoginMsg appModel
 
-        ( GotResetPasswordMsg subMsg, ResetPassword reset ) ->
-            ResetPassword.update subMsg reset
-                |> updateWith ResetPassword GotResetPasswordMsg model
+        ( GotResetPasswordMsg msg, ResetPassword model ) ->
+            ResetPassword.update msg model
+                |> updateWith ResetPassword GotResetPasswordMsg appModel
 
-        ( GotClassroomsMsg subMsg, Classrooms classrooms ) ->
-            Classrooms.update subMsg classrooms
-                |> updateWith Classrooms GotClassroomsMsg model
+        ( GotClassroomsMsg msg, Classrooms model ) ->
+            Classrooms.update msg model
+                |> updateWith Classrooms GotClassroomsMsg appModel
 
-        ( GotDashboardMsg subMsg, Dashboard dashboard ) ->
-            Dashboard.update subMsg dashboard
-                |> updateWith Dashboard GotDashboardMsg model
+        ( GotDashboardMsg msg, Dashboard model ) ->
+            Dashboard.update msg model
+                |> updateWith Dashboard GotDashboardMsg appModel
 
-        ( GotUsersMsg subMsg, Users users ) ->
-            Users.update subMsg users
-                |> updateWith Users GotUsersMsg model
+        ( GotUsersMsg msg, Users model ) ->
+            Users.update msg model
+                |> updateWith Users GotUsersMsg appModel
 
-        ( GotDraftClassroomsMsg subMsg, DraftClassrooms classrooms ) ->
-            DraftClassrooms.update subMsg classrooms
-                |> updateWith DraftClassrooms GotDraftClassroomsMsg model
+        ( GotDraftClassroomsMsg msg, DraftClassrooms model ) ->
+            DraftClassrooms.update msg model
+                |> updateWith DraftClassrooms GotDraftClassroomsMsg appModel
 
-        ( GotEditFeedbackMsg subMsg, EditFeedback feedback ) ->
-            EditFeedback.update subMsg feedback
-                |> updateWith EditFeedback GotEditFeedbackMsg model
+        ( GotDraftRotationsMsg msg, DraftRotations model ) ->
+            DraftRotations.update msg model
+                |> updateWith DraftRotations GotDraftRotationsMsg appModel
 
-        ( GotDraftMsg subMsg, Draft draft ) ->
-            Draft.update subMsg draft
-                |> updateWith Draft GotDraftMsg model
+        ( GotGroupDraftsMsg msg, GroupDrafts model ) ->
+            GroupDrafts.update msg model
+                |> updateWith GroupDrafts GotGroupDraftsMsg appModel
 
-        ( GotProfileMsg subMsg, Profile profile ) ->
-            Profile.update subMsg profile
-                |> updateWith Profile GotProfileMsg model
+        ( GotEditFeedbackMsg msg, EditFeedback model ) ->
+            EditFeedback.update msg model
+                |> updateWith EditFeedback GotEditFeedbackMsg appModel
+
+        ( GotDraftMsg msg, Draft model ) ->
+            Draft.update msg model
+                |> updateWith Draft GotDraftMsg appModel
+
+        ( GotProfileMsg msg, Profile model ) ->
+            Profile.update msg model
+                |> updateWith Profile GotProfileMsg appModel
 
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
-            ( model, Cmd.none )
+            ( appModel, Cmd.none )
 
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
@@ -252,40 +280,46 @@ updateWith toModel toMsg model ( subModel, subCmd ) =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    case model of
+subscriptions appModel =
+    case  appModel of
         NotFound _ ->
             Sub.none
 
         Redirect _ ->
-            Session.changes GotSession (Session.navKey (toSession model))
+            Session.changes GotSession (Session.navKey (toSession appModel))
 
-        Login login ->
-            Sub.map GotLoginMsg (Login.subscriptions login)
+        Login model ->
+            Sub.map GotLoginMsg (Login.subscriptions model)
 
-        ResetPassword reset ->
-            Sub.map GotResetPasswordMsg (ResetPassword.subscriptions reset)
+        ResetPassword model ->
+            Sub.map GotResetPasswordMsg (ResetPassword.subscriptions model)
 
-        Classrooms classrooms ->
-            Sub.map GotClassroomsMsg (Classrooms.subscriptions classrooms)
+        Classrooms model ->
+            Sub.map GotClassroomsMsg (Classrooms.subscriptions model)
 
-        DraftClassrooms classrooms ->
-            Sub.map GotDraftClassroomsMsg (DraftClassrooms.subscriptions classrooms)
+        DraftClassrooms model ->
+            Sub.map GotDraftClassroomsMsg (DraftClassrooms.subscriptions model)
 
-        EditFeedback feedback ->
-            Sub.map GotEditFeedbackMsg (EditFeedback.subscriptions feedback)
+        DraftRotations model ->
+            Sub.map GotDraftRotationsMsg (DraftRotations.subscriptions model)
 
-        Draft draft ->
-            Sub.map GotDraftMsg (Draft.subscriptions draft)
+        GroupDrafts model ->
+            Sub.map GotGroupDraftsMsg (GroupDrafts.subscriptions model)
 
-        Profile profile ->
-            Sub.map GotProfileMsg (Profile.subscriptions profile)
+        EditFeedback model ->
+            Sub.map GotEditFeedbackMsg (EditFeedback.subscriptions model)
 
-        Dashboard dashboard ->
-            Sub.map GotDashboardMsg (Dashboard.subscriptions dashboard)
+        Draft model ->
+            Sub.map GotDraftMsg (Draft.subscriptions model)
 
-        Users users ->
-            Sub.map GotUsersMsg (Users.subscriptions users)
+        Profile model ->
+            Sub.map GotProfileMsg (Profile.subscriptions model)
+
+        Dashboard model ->
+            Sub.map GotDashboardMsg (Dashboard.subscriptions model)
+
+        Users model ->
+            Sub.map GotUsersMsg (Users.subscriptions model)
 
 
 
@@ -293,10 +327,10 @@ subscriptions model =
 
 
 view : Model -> Document Msg
-view model =
+view appModel =
     let
         maybeUser =
-            Maybe.map API.credentialUser (Session.credential (toSession model))
+            Maybe.map API.credentialUser (Session.credential (toSession appModel))
     in
     case maybeUser of
         Just user ->
@@ -310,7 +344,7 @@ view model =
                     , body = List.map (Html.map toMsg) body
                     }
             in
-            case model of
+            case appModel of
                 Redirect _ ->
                     Page.viewPublic Blank.view
 
@@ -324,26 +358,32 @@ view model =
                 ResetPassword _ ->
                     Page.viewPublic NotFound.view
 
-                Dashboard dashboard ->
-                    viewPage Page.Dashboard GotDashboardMsg (Dashboard.view dashboard)
+                Dashboard model ->
+                    viewPage Page.Dashboard GotDashboardMsg (Dashboard.view model)
 
-                Classrooms classrooms ->
-                    viewPage Page.Classrooms GotClassroomsMsg (Classrooms.view classrooms)
+                Classrooms model ->
+                    viewPage Page.Classrooms GotClassroomsMsg (Classrooms.view model)
 
-                DraftClassrooms classrooms ->
-                    viewPage Page.DraftClassrooms GotDraftClassroomsMsg (DraftClassrooms.view classrooms)
+                DraftClassrooms model ->
+                    viewPage Page.DraftClassrooms GotDraftClassroomsMsg (DraftClassrooms.view model)
 
-                EditFeedback feedback ->
-                    viewPage Page.EditFeedback GotEditFeedbackMsg (EditFeedback.view feedback)
+                DraftRotations model ->
+                    viewPage Page.DraftRotations GotDraftRotationsMsg (DraftRotations.view model)
 
-                Draft draft ->
-                    viewPage Page.Draft GotDraftMsg (Draft.view draft)
+                GroupDrafts model ->
+                    viewPage Page.GroupDrafts GotGroupDraftsMsg (GroupDrafts.view model)
 
-                Profile profile ->
-                    viewPage Page.Profile GotProfileMsg (Profile.view profile)
+                EditFeedback model ->
+                    viewPage Page.EditFeedback GotEditFeedbackMsg (EditFeedback.view model)
 
-                Users users ->
-                    viewPage Page.Users GotUsersMsg (Users.view users)
+                Draft model ->
+                    viewPage Page.Draft GotDraftMsg (Draft.view model)
+
+                Profile model ->
+                    viewPage Page.Profile GotProfileMsg (Profile.view model)
+
+                Users model ->
+                    viewPage Page.Users GotUsersMsg (Users.view model)
 
         Nothing ->
             let
@@ -356,7 +396,7 @@ view model =
                     , body = List.map (Html.map toMsg) body
                     }
             in
-            case model of
+            case appModel of
                 Login login ->
                     viewPage GotLoginMsg (Login.view login)
 

@@ -1,7 +1,7 @@
 module Page.Classrooms exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import API exposing (APIData, Error(..))
-import API.Classrooms exposing (ClassroomForm, listClassrooms, deleteClassroom, updateClassroom, formFromClassroom, createClassroom)
+import API.Classrooms exposing (ClassroomForm, listClassrooms, deleteClassroom, updateClassroom, initClassroomForm, createClassroom)
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Modal as Modal
@@ -66,7 +66,7 @@ init session =
         ( { session = session
           , classrooms = Loading
           , modalState = Hidden
-          , classroomForm = initialForm Nothing
+          , classroomForm = initClassroomForm Nothing
           , formErrors = []
           }
         , listClassrooms session GotClassrooms
@@ -76,7 +76,7 @@ init session =
         ( { session = session
           , classrooms = NotAsked
           , modalState = Hidden
-          , classroomForm = initialForm Nothing
+          , classroomForm = initClassroomForm Nothing
           , formErrors = []
           }
         , Route.replaceUrl (Session.navKey session) Route.Login
@@ -136,10 +136,10 @@ view model =
                         viewDeleteModal model classroom data
         in
         div []
-            [ Common.panel
+            [ div []
                 [ div [ class "flex justify-between items-center mx-4" ]
                     [ h1 [ class "text-4xl text-gray-400 font-display" ] [ text "Classrooms" ]
-                    , Common.successButton "New" NewClassroomClicked
+                    --, Common.successButton "New" NewClassroomClicked
                     ]
                 , rendered
                 ]
@@ -179,7 +179,7 @@ viewModal model maybeClassroom remoteClassroom =
                             , Form.textInput "description" Description model.formErrors DescriptionChanged model.classroomForm.description
                             ]
                         ]
-                    , Common.successButton "Submit" submitAction
+                    --, Common.successButton "Submit" submitAction
                     ]
 
                 Loading ->
@@ -202,7 +202,7 @@ viewModal model maybeClassroom remoteClassroom =
                             , Form.textInput "description" Description model.formErrors DescriptionChanged model.classroomForm.description
                             ]
                         ]
-                    , Common.successButton "Submit" submitAction
+                    -- , Common.successButton "Submit" submitAction
                     ]
     in
     Modal.view { onClose = ModalClosed, title = title }
@@ -226,7 +226,7 @@ viewDeleteModal model classroom remoteClassroom =
                         , li [] [ text "Observations" ]
                         , li [] [ text "Feedback" ]
                         ]
-                    , Common.dangerButton "Delete" <| DeleteClassroomSubmit classroom
+                    --, Common.dangerButton "Delete" <| DeleteClassroomSubmit classroom
                     ]
 
                 Loading ->
@@ -241,7 +241,7 @@ viewDeleteModal model classroom remoteClassroom =
                         , li [] [ text "Observations" ]
                         , li [] [ text "Feedback" ]
                         ]
-                    , Common.dangerButton "Delete" <| DeleteClassroomSubmit classroom
+                    --, Common.dangerButton "Delete" <| DeleteClassroomSubmit classroom
                     ]
     in
     Modal.view { onClose = ModalClosed, title = "Delete Classroom?" }
@@ -267,13 +267,13 @@ update msg model =
             updateForm (\form -> { form | description = val }) model
 
         TableEditClicked classroom ->
-            ( { model | classroomForm = initialForm (Just classroom), modalState = EditVisible classroom NotAsked }, Cmd.none )
+            ( { model | classroomForm = initClassroomForm (Just classroom), modalState = EditVisible classroom NotAsked }, Cmd.none )
 
         NewClassroomClicked ->
-            ( { model | classroomForm = initialForm Nothing, modalState = NewVisible NotAsked }, Cmd.none )
+            ( { model | classroomForm = initClassroomForm Nothing, modalState = NewVisible NotAsked }, Cmd.none )
 
         ModalClosed ->
-            ( { model | classroomForm = initialForm Nothing, modalState = Hidden }, Cmd.none )
+            ( { model | classroomForm = initClassroomForm Nothing, modalState = Hidden }, Cmd.none )
 
         EditClassroomSubmit classroom ->
             case validate validator model.classroomForm of
@@ -295,7 +295,7 @@ update msg model =
         GotClassroomUpdate data ->
             case data of
                 Success classroom ->
-                    updateClassroomList { model | classroomForm = initialForm Nothing, modalState = Hidden } classroom
+                    updateClassroomList { model | classroomForm = initClassroomForm Nothing, modalState = Hidden } classroom
 
                 NotAsked ->
                     ( model, Cmd.none )
@@ -323,7 +323,7 @@ update msg model =
         GotClassroomCreate data ->
             case data of
                 Success _ ->
-                    ( { model | classroomForm = initialForm Nothing, modalState = Hidden, classrooms = Loading }, listClassrooms model.session GotClassrooms )
+                    ( { model | classroomForm = initClassroomForm Nothing, modalState = Hidden, classrooms = Loading }, listClassrooms model.session GotClassrooms )
 
                 _ ->
                     updateModalState model data
@@ -382,16 +382,6 @@ updateModalState model remoteClassroom =
 
         DeleteVisible classroom _ ->
             ( { model | modalState = DeleteVisible classroom remoteClassroom }, Cmd.none )
-
-
-initialForm : Maybe Classroom -> ClassroomForm
-initialForm maybeClassroom =
-    case maybeClassroom of
-        Nothing ->
-            ClassroomForm "" "" ""
-
-        Just classroom ->
-            formFromClassroom classroom
 
 
 updateForm : (ClassroomForm -> ClassroomForm) -> Model -> ( Model, Cmd Msg )

@@ -4,6 +4,12 @@ import API exposing (APIData, Error(..))
 import API.Classrooms exposing (..)
 import API.Drafts exposing (..)
 import Alert exposing (Alert, dismiss)
+import Bootstrap.Card as Card
+import Bootstrap.Card.Block as Block
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Bootstrap.ListGroup as ListGroup
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Modal as Modal
@@ -14,9 +20,11 @@ import Html.Events exposing (..)
 import RemoteData exposing (RemoteData(..))
 import Route
 import Session as Session exposing (Session)
+import Task
+import Time
 import Types exposing (..)
 import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
-import Time
+
 
 type alias Model =
     { session : Session
@@ -24,6 +32,7 @@ type alias Model =
     , semesters : APIData (List Semester)
     , sections : APIData (List Section)
     , alerts : List Alert
+    , timezone : Time.Zone
     }
 
 
@@ -34,6 +43,8 @@ type Msg
     | GotRotationGroup (APIData RotationGroup)
     | GotSemesters (APIData (List Semester))
     | GotSections (APIData (List Section))
+      -- Time
+    | GotTimezone Time.Zone
       -- Alert dismissal
     | DismissAlert Alert
 
@@ -44,23 +55,25 @@ init session =
         Just cred ->
             let
                 model =
-                    { session = session, classrooms = Loading, semesters = Loading, sections = Loading, alerts = [] }
+                    { session = session, classrooms = Loading, semesters = Loading, sections = Loading, alerts = [], timezone = Time.utc }
 
                 user =
                     API.credentialUser cred
 
-                isAdmin = user.role == Admin
+                isAdmin =
+                    user.role == Admin
 
-                isAssistant = user.role == LearningAssistant
+                isAssistant =
+                    user.role == LearningAssistant
             in
             if isAdmin then
-                ( model, Cmd.batch <| [ semesters session GotSemesters, listClassrooms session GotClassrooms ] )
+                ( model, Cmd.batch <| [ Task.perform GotTimezone Time.here, semesters session GotSemesters, listClassrooms session GotClassrooms ] )
 
             else if isAssistant then
-                ( model, Cmd.batch <| semesters session GotSemesters :: List.map (\id -> getRotationGroup session id GotRotationGroup) user.rotationGroups )
+                ( model, Cmd.batch <| [ Task.perform GotTimezone Time.here, semesters session GotSemesters ] ++ List.map (\id -> getRotationGroup session id GotRotationGroup) user.rotationGroups )
 
             else
-                ( model, Route.replaceUrl (Session.navKey session) (Route.Login ) )
+                ( model, Route.replaceUrl (Session.navKey session) Route.Login )
 
         Nothing ->
             ( { session = session
@@ -68,8 +81,9 @@ init session =
               , classrooms = NotAsked
               , semesters = NotAsked
               , sections = NotAsked
+              , timezone = Time.utc
               }
-            , Route.replaceUrl (Session.navKey session) (Route.Login )
+            , Route.replaceUrl (Session.navKey session) Route.Login
             )
 
 
@@ -83,6 +97,9 @@ update msg model =
     case msg of
         GotSession session ->
             init session
+
+        GotTimezone zone ->
+            ( { model | timezone = zone }, Cmd.none )
 
         GotClassroom result ->
             case result of
@@ -108,7 +125,7 @@ update msg model =
                     ( { model | classrooms = result }, Cmd.none )
 
         GotSemesters result ->
-            ( { model | semesters = RemoteData.map ((List.sortBy (.endDate >> Time.posixToMillis)) >> List.reverse) result }, Cmd.none )
+            ( { model | semesters = RemoteData.map (List.sortBy (.endDate >> Time.posixToMillis) >> List.reverse) result }, Cmd.none )
 
         GotSections result ->
             case result of
@@ -131,11 +148,7 @@ update msg model =
                     ( model, getClassroom model.session rotationGroup.classroom GotClassroom )
 
                 Failure error ->
-                    let
-                        { title, message } =
-                            API.getErrorBody error
-                    in
-                    ( { model | alerts = (Alert.Danger title <| Maybe.withDefault "" message) :: model.alerts }, Cmd.none )
+                    ( { model | alerts = Alert.fromAPIError error :: model.alerts }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -153,6 +166,7 @@ hasLoaded : RemoteData e a -> Bool
 hasLoaded data =
     RemoteData.isSuccess data || RemoteData.isSuccess data
 
+
 viewSemesters : Model -> Html Msg
 viewSemesters model =
     case model.semesters of
@@ -163,23 +177,47 @@ viewSemesters model =
                         Success classrooms ->
                             let
                                 renderSection section =
-                                    li [] [a [Route.href <| Route.DraftRotations section.id] [text section.number]]
+                                    ListGroup.li [] [ a [ Route.href <| Route.DraftRotations section.id ] [ text <| "Section " ++ section.number ] ]
+
                                 renderClassroom semesterId classroom =
-                                   div [class "bg-light-slate rounded-sm shadow-md p-4 flex flex-col w-full"]
-                                        [ Common.header classroom.courseCode
-                                        , Common.subheader classroom.name
-                                        , ul [] <| List.map renderSection <| List.filter (\s->s.classroomId==classroom.id && s.semesterId == semesterId) sections
+                                    let
+                                        renderedSections =
+                                            List.map renderSection <| List.filter (\s -> s.classroomId == classroom.id && s.semesterId == semesterId) sections
+
+                                        cardContent =
+                                            if List.isEmpty renderedSections then
+                                                Card.block [ Block.warning ] [ Block.titleH4 [] [ text "No sections for classroom" ] ]
+
+                                            else
+                                                Card.listGroup renderedSections
+                                    in
+                                    Grid.col []
+                                        [ Card.config []
+                                            |> Card.headerH3 [] [ text classroom.courseCode, text " - ", text classroom.name ]
+                                            |> cardContent
+                                            |> Card.view
                                         ]
+
                                 renderSemester semester =
-                                    div []
-                                        [ Common.header semester.name
-                                        , div [] <| List.map (renderClassroom semester.id) <| List.filter (\{id}-> List.any (\s->s.classroomId==id && s.semesterId == semester.id) sections ) classrooms]
-                                        
+                                    Grid.row [] <|
+                                        [ Grid.col []
+                                            [ h3 [] [ text <| semester.name ++ " " ++ (Time.toYear model.timezone >> String.fromInt) semester.startDate ]
+                                            ]
+                                        , Grid.colBreak []
+                                        ]
+                                            ++ (List.map (renderClassroom semester.id) <| List.filter (\{ id } -> List.any (\s -> s.classroomId == id && s.semesterId == semester.id) sections) classrooms)
                             in
-                                div [] <| List.map renderSemester semesters
-                        _ -> text ""
-                _ -> text ""
-        _ -> text ""
+                            Grid.container [] <| List.map renderSemester semesters
+
+                        _ ->
+                            text ""
+
+                _ ->
+                    text ""
+
+        _ ->
+            text ""
+
 
 view : Model -> { title : String, content : Html Msg }
 view model =

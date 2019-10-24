@@ -148,10 +148,10 @@ view model =
                         viewDeleteModal model user data
         in
         div []
-            [ Common.panel
+            [ div []
                 [ div [ class "flex justify-between items-center mx-4" ]
                     [ h1 [ class "text-4xl text-gray-400 font-display" ] [ text "Users" ]
-                    , Common.successButton "New" NewUserClicked
+                    --, Common.successButton "New" NewUserClicked
                     ]
                 , rendered
                 ]
@@ -195,7 +195,7 @@ viewModal model maybeUser remoteUser =
                             , Form.textInput "email" Email model.formErrors EmailChanged model.userForm.email
                             ]
                         ]
-                    , Common.successButton "Submit" submitAction
+                    --, Common.successButton "Submit" submitAction
                     ]
 
                 Loading ->
@@ -222,7 +222,7 @@ viewModal model maybeUser remoteUser =
                             , Form.textInput "email" Email model.formErrors EmailChanged model.userForm.email
                             ]
                         ]
-                    , Common.successButton "Submit" submitAction
+                    --, Common.successButton "Submit" submitAction
                     ]
     in
     Modal.view { onClose = ModalClosed, title = title }
@@ -240,7 +240,7 @@ viewDeleteModal model user remoteUser =
                     [ div [ class "text-2xl text-italic text-danger" ] [ text <| API.errorBodyToString <| API.getErrorBody e ]
                     , div [ class "text-gray-400" ] [ text <| "Are you sure you want to delete " ++ user.email ++ "?" ]
                     , div [ class "text-xl text-danger" ] [ text "Deleting this user is permanent" ]
-                    , Common.dangerButton "Delete" <| DeleteUserSubmit user
+                    --, Common.dangerButton "Delete" <| DeleteUserSubmit user
                     ]
 
                 Loading ->
@@ -249,7 +249,7 @@ viewDeleteModal model user remoteUser =
                 _ ->
                     [ div [ class "text-gray-400" ] [ text <| "Are you sure you want to delete " ++ user.email ++ "?" ]
                     , div [ class "text-xl text-danger" ] [ text "Deleting this user is permanent" ]
-                    , Common.dangerButton "Delete" <| DeleteUserSubmit user
+                    --, Common.dangerButton "Delete" <| DeleteUserSubmit user
                     ]
     in
     Modal.view { onClose = ModalClosed, title = "Delete User?" }

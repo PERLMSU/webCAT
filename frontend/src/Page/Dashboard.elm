@@ -3,24 +3,43 @@ module Page.Dashboard exposing (Model, Msg(..), init, subscriptions, toSession, 
 import API exposing (..)
 import API.Classrooms exposing (..)
 import API.Feedback exposing (..)
+import Bootstrap.Button as Button
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Modal as Modal
 import Components.Common as Common
+import Components.Select as Select
 import Components.Table as Table
 import Date
+import Either exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import List.Extra as ListExtra
 import RemoteData exposing (..)
 import Route
 import Session exposing (Session)
 import Task
 import Time
 import Types exposing (..)
+import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
+
+
+type ModalState
+    = Hidden
+    | ClassroomFormVisible (Maybe ClassroomId) ClassroomForm (APIData Classroom) Modal.Visibility
+    | SemesterFormVisible (Maybe SemesterId) SemesterForm (APIData Semester) Modal.Visibility
+    | CategoryFormVisible (Maybe CategoryId) CategoryForm (APIData Category) Modal.Visibility
+    | ClassroomDeleteVisible Classroom (APIData ()) Modal.Visibility
+    | SemesterDeleteVisible Semester (APIData ()) Modal.Visibility
+    | CategoryDeleteVisible Category (APIData ()) Modal.Visibility
 
 
 type alias Model =
     { session : Session
     , timezone : Maybe Time.Zone
+    , time : Maybe Time.Posix
 
     -- Remote data
     , classrooms : APIData (List Classroom)
@@ -28,24 +47,8 @@ type alias Model =
     , categories : APIData (List Category)
 
     -- Modals
-    , editClassroomVisibility : Modal.Visibility
-    , deleteClassroomVisibility : Modal.Visibility
-    , editSemesterVisibility : Modal.Visibility
-    , deleteSemesterVisibility : Modal.Visibility
-    , editCategoryVisibility : Modal.Visibility
-    , deleteCategoryVisibility : Modal.Visibility
-
-    -- Classroom Form
-    , classroomForm : ClassroomForm
-    , classroomFormErrors : List ( FormField, String )
-                            
-    -- Semester Form
-    , semesterForm : SemesterForm
-    , semesterFormErrors : List ( FormField, String )
-
-    -- Category Form
-    , categoryForm : CategoryForm
-    , categoryFormErrors : List ( FormField, String )
+    , modalState : ModalState
+    , formErrors : List ( FormField, String )
     }
 
 
@@ -55,43 +58,41 @@ type FormField
     | Description String
     | StartDate Time.Posix
     | EndDate Time.Posix
+    | ParentCategoryId (Maybe CategoryId)
 
 
 type Msg
     = GotSession Session
     | GotClassrooms (APIData (List Classroom))
+    | GotClassroomFormResult (APIData Classroom)
+    | GotClassroomDeleteResult (APIData ())
     | GotSemesters (APIData (List Semester))
+    | GotSemesterFormResult (APIData Semester)
+    | GotSemesterDeleteResult (APIData ())
     | GotCategories (APIData (List Category))
+    | GotCategoryFormResult (APIData Category)
+    | GotCategoryDeleteResult (APIData ())
       -- Classroom table
     | ClassroomClicked Classroom
     | ClassroomNewClicked
     | ClassroomEditClicked Classroom
     | ClassroomDeleteClicked Classroom
-    | ClassroomFormModalClose
-    | ClassroomFormModalAnimate Modal.Visibility
-    | ClassroomFormUpdate FormField
-    | ClassroomDeleteModalClose
-    | ClassroomDeleteModalAnimate Modal.Visibility
       -- Semester table
     | SemesterClicked Semester
     | SemesterNewClicked
     | SemesterEditClicked Semester
     | SemesterDeleteClicked Semester
-    | SemesterFormModalClose
-    | SemesterFormModalAnimate Modal.Visibility
-    | SemesterFormUpdate FormField
-    | SemesterDeleteModalClose
-    | SemesterDeleteModalAnimate Modal.Visibility
       -- Category
     | CategoryClicked Category
     | CategoryNewClicked
     | CategoryEditClicked Category
     | CategoryDeleteClicked Category
-    | CategoryFormModalClose
-    | CategoryFormModalAnimate Modal.Visibility
-    | CategoryFormUpdate FormField
-    | CategoryDeleteModalClose
-    | CategoryDeleteModalAnimate Modal.Visibility
+      -- Modal and form
+    | ModalAnimate Modal.Visibility
+    | ModalClose
+    | FormUpdate FormField
+    | FormSubmitClicked
+    | DeleteSubmitClicked
       -- Date stuff
     | GotTimezone Time.Zone
     | GotTime Time.Posix
@@ -102,22 +103,13 @@ init session =
     case Session.credential session of
         Nothing ->
             ( { session = session
-              , classrooms = NotAsked
-              , semesters = NotAsked
-              , categories = NotAsked
+              , classrooms = Loading
+              , semesters = Loading
+              , categories = Loading
               , timezone = Nothing
-              , editClassroomVisibility = Modal.hiddenAnimated
-              , deleteClassroomVisibility = Modal.hiddenAnimated
-              , editSemesterVisibility = Modal.hiddenAnimated
-              , deleteSemesterVisibility = Modal.hiddenAnimated
-              , editCategoryVisibility = Modal.hiddenAnimated
-              , deleteCategoryVisibility = Modal.hiddenAnimated
-              , classroomForm = {courseCode = "", name = "", description = "" }
-              , classroomFormErrors = []
-              , semesterForm = {name = "", description = "", startDate = Time.millisToPosix 0, endDate = Time.millisToPosix 0 }
-              , semesterFormErrors = []
-              , categoryForm = {name = "", description = "", parentCategoryId = Nothing}
-              , categoryFormErrors = []
+              , time = Nothing
+              , modalState = Hidden
+              , formErrors = []
               }
             , Route.replaceUrl (Session.navKey session) Route.Login
             )
@@ -128,18 +120,9 @@ init session =
               , semesters = Loading
               , categories = Loading
               , timezone = Nothing
-              , editClassroomVisibility = Modal.hiddenAnimated
-              , deleteClassroomVisibility = Modal.hiddenAnimated
-              , editSemesterVisibility = Modal.hiddenAnimated
-              , deleteSemesterVisibility = Modal.hiddenAnimated
-              , editCategoryVisibility = Modal.hiddenAnimated
-              , deleteCategoryVisibility = Modal.hiddenAnimated
-              , classroomForm = {courseCode = "", name = "", description = "" }
-              , classroomFormErrors = []
-              , semesterForm = {name = "", description = "", startDate = Time.millisToPosix 0, endDate = Time.millisToPosix 0 }
-              , semesterFormErrors = []
-              , categoryForm = {name = "", description = "", parentCategoryId = Nothing}
-              , categoryFormErrors = []
+              , time = Nothing
+              , modalState = Hidden
+              , formErrors = []
               }
             , Cmd.batch
                 [ listClassrooms session GotClassrooms
@@ -234,6 +217,124 @@ viewCategories model =
         ]
 
 
+viewCategoryModal : Model -> Either ( Maybe CategoryId, CategoryForm, APIData Category ) ( Category, APIData () ) -> Modal.Visibility -> Html Msg
+viewCategoryModal model either visibility =
+    case either of
+        Left ( maybeId, form, remote ) ->
+            let
+                selectConfig =
+                    { id = "parentCategoryId"
+                    , selection =
+                        case model.categories of
+                            Success categories ->
+                                case form.parentCategoryId of
+                                    Just id ->
+                                        ListExtra.find (\c -> c.id == id) categories
+
+                                    Nothing ->
+                                        Nothing
+
+                            _ ->
+                                Nothing
+                    , options =
+                        case model.categories of
+                            Success categories ->
+                                List.filter (\c -> c.parentCategoryId == Nothing) categories
+
+                            _ ->
+                                []
+                    , onSelectionChanged = Maybe.map .id >> ParentCategoryId >> FormUpdate
+                    , render = .name
+                    , decoder = categoryDecoder
+                    }
+
+                feedback field =
+                    case ListExtra.find (\( f, m ) -> f == field) model.formErrors of
+                        Just ( _, message ) ->
+                            Form.invalidFeedback [] [ text "aaa" ]
+
+                        Nothing ->
+                            text "nothing"
+            in
+            Modal.config ModalClose
+                |> Modal.withAnimation ModalAnimate
+                |> Modal.large
+                |> Modal.hideOnBackdropClick True
+                |> Modal.h3 []
+                    [ case maybeId of
+                        Nothing ->
+                            text "New Category"
+
+                        Just _ ->
+                            text "Edit Category"
+                    ]
+                |> Modal.body []
+                    [ case remote of
+                        Loading ->
+                            Common.loading
+
+                        _ ->
+                            Form.form []
+                                [ Form.group []
+                                    [ Form.label [ for "name" ] [ text "Name" ]
+                                    , Input.text
+                                        [ Input.id "name"
+                                        , Input.value form.name
+                                        , Input.onInput (Name >> FormUpdate)
+                                        ]
+                                    , feedback (Name form.name)
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "description" ] [ text "Description" ]
+                                    , Textarea.textarea
+                                        [ Textarea.rows 3
+                                        , Textarea.id "description"
+                                        , Textarea.value form.description
+                                        , Textarea.onInput (Description >> FormUpdate)
+                                        ]
+                                    , Form.help [] [ text "Optional description for the category" ]
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "parentCategoryId" ] [ text "Parent Category" ]
+                                    , Select.view selectConfig
+                                    , Form.help [] [ text "Which category is this category's logical parent" ]
+                                    ]
+                                ]
+                    ]
+                |> Modal.footer []
+                    [ Button.button
+                        [ Button.outlinePrimary
+                        , Button.attrs [ onClick FormSubmitClicked ]
+                        ]
+                        [ text "Submit" ]
+                    , Button.button
+                        [ Button.outlineSecondary
+                        , Button.attrs [ onClick ModalClose ]
+                        ]
+                        [ text "Cancel" ]
+                    ]
+                |> Modal.view visibility
+
+        Right ( category, remote ) ->
+            Modal.config ModalClose
+                |> Modal.withAnimation ModalAnimate
+                |> Modal.small
+                |> Modal.hideOnBackdropClick True
+                |> Modal.h3 [] [ text "Delete Category" ]
+                |> Modal.body []
+                    [ p [] [ text <| "Are you sure you want to delete category " ++ category.name ]
+                    , p [] [ text "Deleting this category will also delete its observations, feedback items, and explanations." ]
+                    ]
+                |> Modal.footer []
+                    [ Button.button
+                        [ Button.outlineDanger
+                        , Button.attrs [ onClick DeleteSubmitClicked ]
+                        ]
+                        [ text "Delete" ]
+                    ]
+                |> Modal.view visibility
+
+
 view : Model -> { title : String, content : Html Msg }
 view model =
     { title = "Dashboard"
@@ -246,6 +347,19 @@ view model =
             [ card <| viewClassrooms model
             , card <| viewSemesters model
             , card <| viewCategories model
+            , case model.modalState of
+                --ClassroomFormVisible _ form remote visibility -> viewClassroomModal (Left (form, remote)) visibility
+                --ClassroomDeleteVisible classroom remote visibility -> viewClassroomModal (Right (classroom, remote)) visibility
+                --SemesterFormVisible maybeId form remote visibility ->  viewSemesterModal (Left (form, remote)) visibility
+                --SemesterDeleteVisible semester remote visibility ->  viewSemesterModal (Right (semester, remote)) visibility
+                CategoryFormVisible maybeId form remote visibility ->
+                    viewCategoryModal model (Left ( maybeId, form, remote )) visibility
+
+                CategoryDeleteVisible category remote visibility ->
+                    viewCategoryModal model (Right ( category, remote )) visibility
+
+                _ ->
+                    text ""
             ]
     }
 
@@ -265,35 +379,260 @@ update msg model =
         GotCategories response ->
             handleRemoteError response { model | categories = response } Cmd.none
 
+        GotTimezone tz ->
+            ( { model | timezone = Just tz }, Cmd.none )
+
+        GotTime time ->
+            ( { model | time = Just time }, Cmd.none )
+
         ClassroomClicked classroom ->
             ( model, Route.pushUrl (Session.navKey model.session) (Route.Classroom classroom.id) )
 
+        ClassroomNewClicked ->
+            ( { model | modalState = ClassroomFormVisible Nothing (initClassroomForm Nothing) NotAsked Modal.shown }, Cmd.none )
+
         ClassroomEditClicked classroom ->
-            Debug.todo "ClassroomEditClicked"
+            ( { model | modalState = ClassroomFormVisible (Just classroom.id) (initClassroomForm <| Just classroom) NotAsked Modal.shown }, Cmd.none )
 
         ClassroomDeleteClicked classroom ->
-            Debug.todo "ClassroomDeleteClicked"
+            ( { model | modalState = ClassroomDeleteVisible classroom NotAsked Modal.shown }, Cmd.none )
+
+        ModalClose ->
+            case model.modalState of
+                ClassroomFormVisible id form classroom _ ->
+                    ( { model | modalState = ClassroomFormVisible id form classroom Modal.hidden }, Cmd.none )
+
+                ClassroomDeleteVisible id result _ ->
+                    ( { model | modalState = ClassroomDeleteVisible id result Modal.hidden }, Cmd.none )
+
+                SemesterFormVisible id form semester _ ->
+                    ( { model | modalState = SemesterFormVisible id form semester Modal.hidden }, Cmd.none )
+
+                SemesterDeleteVisible id result _ ->
+                    ( { model | modalState = SemesterDeleteVisible id result Modal.hidden }, Cmd.none )
+
+                CategoryFormVisible id form category _ ->
+                    ( { model | modalState = CategoryFormVisible id form category Modal.hidden }, Cmd.none )
+
+                CategoryDeleteVisible id result _ ->
+                    ( { model | modalState = CategoryDeleteVisible id result Modal.hidden }, Cmd.none )
+
+                Hidden ->
+                    ( model, Cmd.none )
+
+        ModalAnimate visibility ->
+            case model.modalState of
+                ClassroomFormVisible id form classroom _ ->
+                    ( { model | modalState = ClassroomFormVisible id form classroom visibility }, Cmd.none )
+
+                ClassroomDeleteVisible id result _ ->
+                    ( { model | modalState = ClassroomDeleteVisible id result visibility }, Cmd.none )
+
+                SemesterFormVisible id form semester _ ->
+                    ( { model | modalState = SemesterFormVisible id form semester visibility }, Cmd.none )
+
+                SemesterDeleteVisible id result _ ->
+                    ( { model | modalState = SemesterDeleteVisible id result visibility }, Cmd.none )
+
+                CategoryFormVisible id form category _ ->
+                    ( { model | modalState = CategoryFormVisible id form category visibility }, Cmd.none )
+
+                CategoryDeleteVisible id result _ ->
+                    ( { model | modalState = CategoryDeleteVisible id result visibility }, Cmd.none )
+
+                Hidden ->
+                    ( model, Cmd.none )
+
+        FormUpdate field ->
+            case model.modalState of
+                ClassroomFormVisible id form classroom visibility ->
+                    let
+                        updatedForm =
+                            case field of
+                                CourseCode courseCode ->
+                                    { form | courseCode = courseCode }
+
+                                Description description ->
+                                    { form | description = description }
+
+                                _ ->
+                                    form
+                    in
+                    ( { model | modalState = ClassroomFormVisible id updatedForm classroom visibility }, Cmd.none )
+
+                SemesterFormVisible id form semester visibility ->
+                    let
+                        updatedForm =
+                            case field of
+                                Name name ->
+                                    { form | name = name }
+
+                                Description description ->
+                                    { form | description = description }
+
+                                StartDate date ->
+                                    { form | startDate = date }
+
+                                EndDate date ->
+                                    { form | endDate = date }
+
+                                _ ->
+                                    form
+                    in
+                    ( { model | modalState = SemesterFormVisible id updatedForm semester visibility }, Cmd.none )
+
+                CategoryFormVisible id form category visibility ->
+                    let
+                        updatedForm =
+                            case field of
+                                Name name ->
+                                    { form | name = name }
+
+                                Description description ->
+                                    { form | description = description }
+
+                                ParentCategoryId categoryId ->
+                                    { form | parentCategoryId = categoryId }
+
+                                _ ->
+                                    form
+                    in
+                    ( { model | modalState = CategoryFormVisible id updatedForm category visibility }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         SemesterClicked semester ->
             ( model, Route.pushUrl (Session.navKey model.session) (Route.Semester semester.id) )
 
+        SemesterNewClicked ->
+            ( { model | modalState = SemesterFormVisible Nothing (initSemesterForm Nothing model.time) NotAsked Modal.shown }, Cmd.none )
+
         SemesterEditClicked semester ->
-            Debug.todo "SemesterEditClicked"
+            ( { model | modalState = SemesterFormVisible (Just semester.id) (initSemesterForm (Just semester) model.time) NotAsked Modal.shown }, Cmd.none )
 
         SemesterDeleteClicked semester ->
-            Debug.todo "SemesterDeleteClicked"
+            ( { model | modalState = SemesterDeleteVisible semester NotAsked Modal.shown }, Cmd.none )
 
         CategoryClicked category ->
             ( model, Route.pushUrl (Session.navKey model.session) (Route.Category category.id) )
 
         CategoryEditClicked category ->
-            Debug.todo "CategoryEditClicked"
+            ( { model | modalState = CategoryFormVisible (Just category.id) (initCategoryForm <| Just category) NotAsked Modal.shown }, Cmd.none )
 
         CategoryDeleteClicked category ->
-            Debug.todo "CategoryDeleteClicked"
+            ( { model | modalState = CategoryDeleteVisible category NotAsked Modal.shown }, Cmd.none )
 
-        GotTimezone tz ->
-            ( { model | timezone = Just tz }, Cmd.none )
+        CategoryNewClicked ->
+            ( { model | modalState = CategoryFormVisible Nothing (initCategoryForm Nothing) NotAsked Modal.shown }, Cmd.none )
+
+        FormSubmitClicked ->
+            case model.modalState of
+                CategoryFormVisible maybeId form result visibility ->
+                    let
+                        validator =
+                            Validate.all [ ifBlank .name ( Name form.name, "Name cannot be blank" ) ]
+                    in
+                    case validate validator form of
+                        Ok _ ->
+                            let
+                                updatedModel =
+                                    { model | formErrors = [], modalState = CategoryFormVisible maybeId form Loading visibility }
+                            in
+                            case maybeId of
+                                Just id ->
+                                    ( updatedModel, updateCategory model.session id form GotCategoryFormResult )
+
+                                Nothing ->
+                                    ( updatedModel, createCategory model.session form GotCategoryFormResult )
+
+                        Err errors ->
+                            ( { model | formErrors = errors }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        GotClassroomFormResult result ->
+            let
+                ( updatedModel, cmd ) =
+                    case model.modalState of
+                        ClassroomFormVisible maybeId form _ visibility ->
+                            case result of
+                                Success _ ->
+                                    ( { model | modalState = ClassroomFormVisible maybeId form result Modal.hidden }, categories model.session Nothing GotCategories )
+
+                                _ ->
+                                    ( { model | modalState = ClassroomFormVisible maybeId form result visibility }, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
+            in
+            API.handleRemoteError result updatedModel Cmd.none
+
+        GotClassroomDeleteResult result ->
+            let
+                updatedModel =
+                    case model.modalState of
+                        ClassroomDeleteVisible classroom _ visibility ->
+                            { model | modalState = ClassroomDeleteVisible classroom result visibility }
+
+                        _ ->
+                            model
+            in
+            API.handleRemoteError result updatedModel Cmd.none
+
+        GotSemesterFormResult result ->
+            let
+                updatedModel =
+                    case model.modalState of
+                        SemesterFormVisible maybeId form _ visibility ->
+                            { model | modalState = SemesterFormVisible maybeId form result visibility }
+
+                        _ ->
+                            model
+            in
+            API.handleRemoteError result updatedModel Cmd.none
+
+        GotSemesterDeleteResult result ->
+            let
+                updatedModel =
+                    case model.modalState of
+                        SemesterDeleteVisible semester _ visibility ->
+                            { model | modalState = SemesterDeleteVisible semester result visibility }
+
+                        _ ->
+                            model
+            in
+            API.handleRemoteError result updatedModel Cmd.none
+
+        GotCategoryFormResult result ->
+            let
+                updatedModel =
+                    case model.modalState of
+                        CategoryFormVisible maybeId form _ visibility ->
+                            { model | modalState = CategoryFormVisible maybeId form result visibility }
+
+                        _ ->
+                            model
+            in
+            API.handleRemoteError result updatedModel Cmd.none
+
+        GotCategoryDeleteResult result ->
+            let
+                updatedModel =
+                    case model.modalState of
+                        CategoryDeleteVisible category _ visibility ->
+                            { model | modalState = CategoryDeleteVisible category result visibility }
+
+                        _ ->
+                            model
+            in
+            API.handleRemoteError result updatedModel Cmd.none
+
+        DeleteSubmitClicked ->
+            case model.modalState of
+                _ ->
+                    ( model, Cmd.none )
 
 
 
@@ -302,4 +641,27 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Session.changes GotSession (Session.navKey model.session)
+    Sub.batch
+        [ Session.changes GotSession (Session.navKey model.session)
+        , case model.modalState of
+            ClassroomFormVisible _ _ _ visibility ->
+                Modal.subscriptions visibility ModalAnimate
+
+            ClassroomDeleteVisible _ _ visibility ->
+                Modal.subscriptions visibility ModalAnimate
+
+            SemesterFormVisible _ _ _ visibility ->
+                Modal.subscriptions visibility ModalAnimate
+
+            SemesterDeleteVisible _ _ visibility ->
+                Modal.subscriptions visibility ModalAnimate
+
+            CategoryFormVisible _ _ _ visibility ->
+                Modal.subscriptions visibility ModalAnimate
+
+            CategoryDeleteVisible _ _ visibility ->
+                Modal.subscriptions visibility ModalAnimate
+
+            Hidden ->
+                Sub.none
+        ]
