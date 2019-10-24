@@ -65,7 +65,7 @@ defmodule WebCAT.Repo.Migrations.NewDraftSystem do
     alter table(:users) do
       remove(:performer_id, references(Terminator.Performer.table()), default: 1)
 
-      add_req(:role, :role)
+      add_req(:role, :role, default: "admin")
     end
 
     drop table(:terminator_performers_roles)

@@ -7,7 +7,7 @@ defmodule WebCAT.Repo.Migrations.SemesterBreakup do
     end
 
     alter table(:sections) do
-      add(:classroom_id, references(:classrooms, on_delete: :delete_all), null: false)
+      add(:classroom_id, references(:classrooms, on_delete: :delete_all), null: false, default: 1)
     end
   end
 end
