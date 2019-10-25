@@ -612,6 +612,7 @@ draftStatusToString status =
 type alias GroupDraft =
     { id : DraftId
     , content : String
+    , notes : Maybe String
     , status : DraftStatus
 
     -- Foreign keys
@@ -633,6 +634,7 @@ type alias GroupDraft =
 type alias StudentDraft =
     { id : DraftId
     , content : String
+    , notes : Maybe String
     , status : DraftStatus
 
     -- Foreign keys
@@ -655,6 +657,7 @@ groupDraftDecoder =
     Decode.succeed GroupDraft
         |> required "id" (map DraftId parseInt)
         |> requiredAttribute "content" string
+        |> requiredAttribute "notes" (nullable string)
         |> requiredAttribute "status" draftStatusDecoder
         |> requiredAttribute "rotation_group_id" (map RotationGroupId int)
         |> relationship "comments" (list <| field "id" <| map CommentId parseInt) []
@@ -671,6 +674,7 @@ studentDraftDecoder =
     Decode.succeed StudentDraft
         |> required "id" (map DraftId parseInt)
         |> requiredAttribute "content" string
+        |> optionalAttribute "notes" (nullable string)
         |> requiredAttribute "status" draftStatusDecoder
         |> requiredAttribute "student_id" (map UserId int)
         |> requiredAttribute "parent_draft_id" (map DraftId int)

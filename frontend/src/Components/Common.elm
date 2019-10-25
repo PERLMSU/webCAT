@@ -79,4 +79,4 @@ iconButton style icon_ toMsg =
 -}
 loading : Html msg
 loading =
-    div [ class "text-center d-block" ] [ i [ class "fa-3x fal fa-atom fa-spin" ] [] ]
+    div [ class "text-center d-block" ] [ div [ class "spinner-border", attribute "role" "status" ] [ span [ class "sr-only" ] [ text "Loading..." ] ] ]

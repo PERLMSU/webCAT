@@ -35,7 +35,7 @@ view user page { title, content } =
                     [ div [ class "container d-flex flex-row justify-content-center" ]
                         [ span [ class "mx-2" ] [ text "Version 1.0.0-dev" ]
                         , span [ class "mx-2" ] [ text "|" ]
-                        , span [ class "mx-2" ] [ text "Built on 2019-8-20 at 4:34am EDT" ]
+                        , span [ class "mx-2" ] [ text "Built on 2019-10-25 at 8:50am EST" ]
                         ]
                     ]
         in

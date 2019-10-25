@@ -66,7 +66,7 @@ init session =
                     user.role == LearningAssistant
             in
             if isAdmin then
-                ( model, Cmd.batch <| [ Task.perform GotTimezone Time.here, semesters session GotSemesters, listClassrooms session GotClassrooms ] )
+                ( model, Cmd.batch <| [ Task.perform GotTimezone Time.here, semesters session GotSemesters, classrooms session GotClassrooms ] )
 
             else if isAssistant then
                 ( model, Cmd.batch <| [ Task.perform GotTimezone Time.here, semesters session GotSemesters ] ++ List.map (\id -> getRotationGroup session id GotRotationGroup) user.rotationGroups )

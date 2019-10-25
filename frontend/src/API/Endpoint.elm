@@ -244,13 +244,13 @@ observations maybeCategoryId =
 -- Feedback
 
 
-feedback : FeedbackId -> Endpoint
-feedback id =
+feedbackItem : FeedbackId -> Endpoint
+feedbackItem id =
     url [ "feedback", String.fromInt <| unwrapFeedbackId id ] []
 
 
-feedbackItem : Maybe ObservationId -> Endpoint
-feedbackItem maybeObservationId =
+feedback : Maybe ObservationId -> Endpoint
+feedback maybeObservationId =
     url [ "feedback" ] <| toList <| Maybe.map (unwrapObservationId >> intFilter "observation_id") maybeObservationId
 
 
@@ -361,4 +361,4 @@ studentExplanations draftId feedbackId explanationId =
         explanationIdQuery =
             Maybe.map (unwrapExplanationId >> intFilter "explanation_id") explanationId
     in
-    url [ "student_feedback" ] <| values [ draftIdQuery, feedbackIdQuery, explanationIdQuery ]
+    url [ "student_explanation" ] <| values [ draftIdQuery, feedbackIdQuery, explanationIdQuery ]

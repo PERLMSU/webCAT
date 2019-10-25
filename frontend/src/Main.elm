@@ -133,7 +133,7 @@ changeRouteTo maybeRoute model =
             ( NotFound session, Cmd.none )
 
         Just Route.Root ->
-            ( model, Route.replaceUrl (Session.navKey session) Route.Classrooms )
+            ( model, Route.replaceUrl (Session.navKey session) Route.Dashboard )
 
         Just Route.Login ->
             Login.init session

@@ -15,7 +15,7 @@ fetch_deps:
 clean:
 	@echo "This will remove all of the files in _build and node_modules"
 	sudo rm -f $(artifact)
-	sudo rm -rf _build/prod .mix frontend/node_modules
+	sudo rm -rf _build .mix frontend/node_modules
 deploy:
 	ssh $(remote_user)@$(remote_host) mkdir -p $(remote_dir)
 	scp $(artifact) "$(remote_user)@$(remote_host):$(remote_dir)/server.tar.gz"

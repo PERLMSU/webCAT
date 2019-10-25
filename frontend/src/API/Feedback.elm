@@ -65,12 +65,12 @@ encodeCategoryForm form =
 
 updateCategory : Session -> CategoryId -> CategoryForm -> (APIData Category -> msg) -> Cmd msg
 updateCategory session id form toMsg =
-    API.putRemote (Endpoint.category id) (Session.credential session) (jsonBody <| encodeCategoryForm form) categoryDecoder toMsg
+    API.putRemote (Endpoint.category id) (Session.credential session) (jsonBody <| encodeCategoryForm form) (singleDecoder categoryDecoder) toMsg
 
 
 createCategory : Session -> CategoryForm -> (APIData Category -> msg) -> Cmd msg
 createCategory session form toMsg =
-    API.postRemote (Endpoint.categories Nothing) (Session.credential session) (jsonBody <| encodeCategoryForm form) categoryDecoder toMsg
+    API.postRemote (Endpoint.categories Nothing) (Session.credential session) (jsonBody <| encodeCategoryForm form) (singleDecoder categoryDecoder) toMsg
 
 
 deleteCategory : Session -> CategoryId -> (APIData () -> msg) -> Cmd msg
@@ -113,10 +113,125 @@ observations : Session -> Maybe CategoryId -> (APIData (List Observation) -> msg
 observations session maybeCategoryId toMsg =
     API.getRemote (Endpoint.observations maybeCategoryId) (Session.credential session) (multiDecoder observationDecoder) toMsg
 
+
+getObservation : Session -> ObservationId -> (APIData (Observation) -> msg) -> Cmd msg
+getObservation session id toMsg =
+    API.getRemote (Endpoint.observation id) (Session.credential session) (singleDecoder observationDecoder) toMsg
+
+createObservation : Session -> ObservationForm -> (APIData Observation -> msg) -> Cmd msg
+createObservation session form toMsg =
+    API.postRemote (Endpoint.observations Nothing) (Session.credential session) (jsonBody <| encodeObservationForm form) (singleDecoder observationDecoder) toMsg
+
+
+updateObservation : Session -> ObservationId -> ObservationForm -> (APIData (Observation) -> msg) -> Cmd msg
+updateObservation session id form toMsg =
+    API.putRemote (Endpoint.observation id) (Session.credential session) ((encodeObservationForm >> jsonBody) form) (singleDecoder observationDecoder) toMsg
+
+deleteObservation : Session -> ObservationId -> (APIData () -> msg) -> Cmd msg
+deleteObservation session id toMsg =
+    API.deleteRemote (Endpoint.observation id) (Session.credential session) toMsg
+
+
 -- Feedback
+
+type alias FeedbackForm =
+    { content : String
+    , observationId : ObservationId
+    }
+
+initFeedbackForm : Either Feedback ObservationId -> FeedbackForm
+initFeedbackForm either =
+    case either of
+        Left fb ->
+            { content = fb.content
+            , observationId = fb.observationId
+            }
+        Right id ->
+            { content = ""
+            , observationId = id
+            }
+
+
+
+encodeFeedbackForm : FeedbackForm -> Encode.Value
+encodeFeedbackForm form =
+    Encode.object
+        [ ("content", Encode.string form.content)
+        , ("observationId", (unwrapObservationId >> Encode.int) form.observationId)
+        ]
+
+feedback : Session -> Maybe ObservationId -> (APIData (List Feedback) -> msg) -> Cmd msg
+feedback session maybeObservationId toMsg =
+    API.getRemote (Endpoint.feedback maybeObservationId) (Session.credential session) (multiDecoder feedbackDecoder) toMsg
+
+
+getFeedback : Session -> FeedbackId -> (APIData (Feedback) -> msg) -> Cmd msg
+getFeedback session id toMsg =
+    API.getRemote (Endpoint.feedbackItem id) (Session.credential session) (singleDecoder feedbackDecoder) toMsg
+
+createFeedback : Session -> FeedbackForm -> (APIData Feedback -> msg) -> Cmd msg
+createFeedback session form toMsg =
+    API.postRemote (Endpoint.feedback Nothing) (Session.credential session) (jsonBody <| encodeFeedbackForm form) (singleDecoder feedbackDecoder) toMsg
+
+
+updateFeedback : Session -> FeedbackId -> FeedbackForm -> (APIData (Feedback) -> msg) -> Cmd msg
+updateFeedback session id form toMsg =
+    API.putRemote (Endpoint.feedbackItem id) (Session.credential session) ((encodeFeedbackForm >> jsonBody) form) (singleDecoder feedbackDecoder) toMsg
+
+deleteFeedback : Session -> FeedbackId -> (APIData () -> msg) -> Cmd msg
+deleteFeedback session id toMsg =
+    API.deleteRemote (Endpoint.feedbackItem id) (Session.credential session) toMsg
 
 
 -- Explanations
+
+type alias ExplanationForm =
+    { content : String
+    , feedbackId : FeedbackId
+    }
+
+initExplanationForm : Either Explanation FeedbackId -> ExplanationForm
+initExplanationForm either =
+    case either of
+        Left explanation ->
+            { content = explanation.content
+            , feedbackId = explanation.feedbackId
+            }
+        Right id ->
+            { content = ""
+            , feedbackId = id
+            }
+
+
+
+encodeExplanationForm : ExplanationForm -> Encode.Value
+encodeExplanationForm form =
+    Encode.object
+        [ ("content", Encode.string form.content)
+        , ("feedbackId", (unwrapFeedbackId >> Encode.int) form.feedbackId)
+        ]
+
+explanations : Session -> Maybe FeedbackId -> (APIData (List Explanation) -> msg) -> Cmd msg
+explanations session maybeFeedbackId toMsg =
+    API.getRemote (Endpoint.explanations maybeFeedbackId) (Session.credential session) (multiDecoder explanationDecoder) toMsg
+
+
+getExplanation : Session -> ExplanationId -> (APIData (Explanation) -> msg) -> Cmd msg
+getExplanation session id toMsg =
+    API.getRemote (Endpoint.explanation id) (Session.credential session) (singleDecoder explanationDecoder) toMsg
+
+createExplanation : Session -> ExplanationForm -> (APIData Explanation -> msg) -> Cmd msg
+createExplanation session form toMsg =
+    API.postRemote (Endpoint.explanations Nothing) (Session.credential session) (jsonBody <| encodeExplanationForm form) (singleDecoder explanationDecoder) toMsg
+
+
+updateExplanation : Session -> ExplanationId -> ExplanationForm -> (APIData (Explanation) -> msg) -> Cmd msg
+updateExplanation session id form toMsg =
+    API.putRemote (Endpoint.explanation id) (Session.credential session) ((encodeExplanationForm >> jsonBody) form) (singleDecoder explanationDecoder) toMsg
+
+deleteExplanation : Session -> ExplanationId -> (APIData () -> msg) -> Cmd msg
+deleteExplanation session id toMsg =
+    API.deleteRemote (Endpoint.explanation id) (Session.credential session) toMsg
 
 
 -- Student Feedback

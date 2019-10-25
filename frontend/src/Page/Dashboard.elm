@@ -9,6 +9,7 @@ import Bootstrap.Form.Input as Input
 import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Modal as Modal
 import Components.Common as Common
+import Components.Multiselect as Multiselect
 import Components.Select as Select
 import Components.Table as Table
 import Date
@@ -59,6 +60,7 @@ type FormField
     | StartDate Time.Posix
     | EndDate Time.Posix
     | ParentCategoryId (Maybe CategoryId)
+    | CategoryIds (List CategoryId)
 
 
 type Msg
@@ -125,7 +127,7 @@ init session =
               , formErrors = []
               }
             , Cmd.batch
-                [ listClassrooms session GotClassrooms
+                [ classrooms session GotClassrooms
                 , semesters session GotSemesters
                 , categories session Nothing GotCategories
                 , Task.perform GotTimezone Time.here
@@ -151,7 +153,12 @@ viewClassrooms model =
             }
     in
     div [ class "p-2" ]
-        [ h1 [ class "" ] [ text "Classrooms" ]
+        [ div [ class "row" ]
+            [ div [ class "col-lg-11" ]
+                [ h1 [ class "" ] [ text "Classrooms" ]
+                ]
+            , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick ClassroomNewClicked ] [ text "New" ] ]
+            ]
         , hr [] []
         , case model.classrooms of
             Success classrooms ->
@@ -177,7 +184,12 @@ viewSemesters model =
             }
     in
     div [ class "p-2" ]
-        [ h1 [ class "" ] [ text "Semesters" ]
+        [ div [ class "row" ]
+            [ div [ class "col-lg-11" ]
+                [ h1 [ class "" ] [ text "Semesters" ]
+                ]
+            , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick ClassroomNewClicked ] [ text "New" ] ]
+            ]
         , hr [] []
         , case model.semesters of
             Success semesters ->
@@ -203,8 +215,12 @@ viewCategories model =
             }
     in
     div [ class "p-2" ]
-        [ h1 [ class "" ] [ text "Categories" ]
-        , hr [] []
+        [ div [ class "row" ]
+            [ div [ class "col-lg-11" ]
+                [ h1 [ class "" ] [ text "Categories" ]
+                ]
+            , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick CategoryNewClicked ] [ text "New" ] ]
+            ]
         , case model.categories of
             Success categories ->
                 Table.view tableConfig categories
@@ -217,6 +233,209 @@ viewCategories model =
         ]
 
 
+viewClassroomModal : Model -> Either ( Maybe ClassroomId, ClassroomForm, APIData Classroom ) ( Classroom, APIData () ) -> Modal.Visibility -> Html Msg
+viewClassroomModal model either visibility =
+    case either of
+        Left ( maybeId, form, remote ) ->
+            let
+                selectConfig =
+                    { id = "categories"
+                    , itemId = .id
+                    , unwrapId = unwrapCategoryId
+                    , toItemId = CategoryId
+                    , selection =
+                        case model.categories of
+                            Success categories ->
+                                List.filter (\c -> List.member c.id form.categories) categories
+
+                            _ ->
+                                []
+                    , options =
+                        case model.categories of
+                            Success categories ->
+                                List.filter (\c -> c.parentCategoryId == Nothing) categories
+
+                            _ ->
+                                []
+                    , onSelectionChanged = CategoryIds >> FormUpdate
+                    , render = .name
+                    }
+
+                feedback field =
+                    case ListExtra.find (\( f, m ) -> f == field) model.formErrors of
+                        Just ( _, message ) ->
+                            Form.invalidFeedback [] [ text message ]
+
+                        Nothing ->
+                            text ""
+            in
+            Modal.config ModalClose
+                |> Modal.withAnimation ModalAnimate
+                |> Modal.large
+                |> Modal.hideOnBackdropClick True
+                |> Modal.h3 []
+                    [ case maybeId of
+                        Nothing ->
+                            text "New Classroom"
+
+                        Just _ ->
+                            text "Edit Classroom"
+                    ]
+                |> Modal.body []
+                    [ case remote of
+                        Loading ->
+                            Common.loading
+
+                        _ ->
+                            Form.form []
+                                [ Form.group []
+                                    [ Form.label [ for "courseCode" ] [ text "Course Code" ]
+                                    , Input.text
+                                        [ Input.id "courseCode"
+                                        , Input.value form.courseCode
+                                        , Input.onInput (CourseCode >> FormUpdate)
+                                        ]
+                                    , feedback (CourseCode form.courseCode)
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "description" ] [ text "Description" ]
+                                    , Textarea.textarea
+                                        [ Textarea.rows 3
+                                        , Textarea.id "description"
+                                        , Textarea.value form.description
+                                        , Textarea.onInput (Description >> FormUpdate)
+                                        ]
+                                    , Form.help [] [ text "Optional description for the classroom" ]
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "categories" ] [ text "Categories" ]
+                                    , Multiselect.view selectConfig
+                                    , Form.help [] [ text "What top-level categories will be available for grading, giving feedback, etc." ]
+                                    ]
+                                ]
+                    ]
+                |> Modal.footer []
+                    [ Button.button
+                        [ Button.outlinePrimary
+                        , Button.attrs [ onClick FormSubmitClicked ]
+                        ]
+                        [ text "Submit" ]
+                    , Button.button
+                        [ Button.outlineSecondary
+                        , Button.attrs [ onClick ModalClose ]
+                        ]
+                        [ text "Cancel" ]
+                    ]
+                |> Modal.view visibility
+
+        Right ( classroom, remote ) ->
+            Modal.config ModalClose
+                |> Modal.withAnimation ModalAnimate
+                |> Modal.small
+                |> Modal.hideOnBackdropClick True
+                |> Modal.h3 [] [ text "Delete Classroom" ]
+                |> Modal.body []
+                    [ p [] [ text <| "Are you sure you want to delete classroom '" ++ classroom.name ++ "' ?" ]
+                    , p [] [ text "Deleting this classroom will also delete its sections, their rotations, and their rotation groups." ]
+                    , p [ class "text-danger" ] [ text "This is not reversible." ]
+                    ]
+                |> Modal.footer []
+                    [ Button.button
+                        [ Button.outlineDanger
+                        , Button.attrs [ onClick DeleteSubmitClicked ]
+                        ]
+                        [ text "Delete" ]
+                    ]
+                |> Modal.view visibility
+
+
+viewSemesterModal : Model -> Either ( Maybe SemesterId, SemesterForm, APIData Semester ) ( Semester, APIData () ) -> Modal.Visibility -> Html Msg
+viewSemesterModal model either visibility =
+    case either of
+        Left ( maybeId, form, remote ) ->
+            let
+                feedback field =
+                    case ListExtra.find (\( f, m ) -> f == field) model.formErrors of
+                        Just ( _, message ) ->
+                            Form.invalidFeedback [] [ text message ]
+
+                        Nothing ->
+                            text ""
+            in
+            Modal.config ModalClose
+                |> Modal.withAnimation ModalAnimate
+                |> Modal.large
+                |> Modal.hideOnBackdropClick True
+                |> Modal.h3 []
+                    [ case maybeId of
+                        Nothing ->
+                            text "New Semester"
+
+                        Just _ ->
+                            text "Edit Semester"
+                    ]
+                |> Modal.body []
+                    [ case remote of
+                        Loading ->
+                            Common.loading
+
+                        _ ->
+                            Form.form []
+                                [ Form.group []
+                                    [ Form.label [ for "name" ] [ text "Name" ]
+                                    , Input.text
+                                        [ Input.id "name"
+                                        , Input.value form.name
+                                        , Input.onInput (Name >> FormUpdate)
+                                        ]
+                                    , feedback (Name form.name)
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "description" ] [ text "Description" ]
+                                    , Textarea.textarea
+                                        [ Textarea.rows 3
+                                        , Textarea.id "description"
+                                        , Textarea.value form.description
+                                        , Textarea.onInput (Description >> FormUpdate)
+                                        ]
+                                    , Form.help [] [ text "Optional description for the semester" ]
+                                    ]
+                                ]
+                    ]
+                |> Modal.footer []
+                    [ Button.button
+                        [ Button.outlinePrimary
+                        , Button.attrs [ onClick FormSubmitClicked ]
+                        ]
+                        [ text "Submit" ]
+                    , Button.button
+                        [ Button.outlineSecondary
+                        , Button.attrs [ onClick ModalClose ]
+                        ]
+                        [ text "Cancel" ]
+                    ]
+                |> Modal.view visibility
+
+        Right ( semester, remote ) ->
+            Modal.config ModalClose
+                |> Modal.withAnimation ModalAnimate
+                |> Modal.small
+                |> Modal.hideOnBackdropClick True
+                |> Modal.h3 [] [ text "Delete Semester" ]
+                |> Modal.body []
+                    [ p [] [ text <| "Are you sure you want to delete semester '" ++ semester.name ++ "' ?" ]
+                    , p [ class "text-danger" ] [ text "This is not reversible." ]
+                    ]
+                |> Modal.footer []
+                    [ Button.button
+                        [ Button.outlineDanger
+                        , Button.attrs [ onClick DeleteSubmitClicked ]
+                        ]
+                        [ text "Delete" ]
+                    ]
+                |> Modal.view visibility
+
+
 viewCategoryModal : Model -> Either ( Maybe CategoryId, CategoryForm, APIData Category ) ( Category, APIData () ) -> Modal.Visibility -> Html Msg
 viewCategoryModal model either visibility =
     case either of
@@ -224,6 +443,9 @@ viewCategoryModal model either visibility =
             let
                 selectConfig =
                     { id = "parentCategoryId"
+                    , itemId = .id
+                    , unwrapId = unwrapCategoryId
+                    , toItemId = CategoryId
                     , selection =
                         case model.categories of
                             Success categories ->
@@ -243,18 +465,17 @@ viewCategoryModal model either visibility =
 
                             _ ->
                                 []
-                    , onSelectionChanged = Maybe.map .id >> ParentCategoryId >> FormUpdate
+                    , onSelectionChanged = ParentCategoryId >> FormUpdate
                     , render = .name
-                    , decoder = categoryDecoder
                     }
 
                 feedback field =
                     case ListExtra.find (\( f, m ) -> f == field) model.formErrors of
                         Just ( _, message ) ->
-                            Form.invalidFeedback [] [ text "aaa" ]
+                            Form.invalidFeedback [] [ text message ]
 
                         Nothing ->
-                            text "nothing"
+                            text ""
             in
             Modal.config ModalClose
                 |> Modal.withAnimation ModalAnimate
@@ -322,8 +543,9 @@ viewCategoryModal model either visibility =
                 |> Modal.hideOnBackdropClick True
                 |> Modal.h3 [] [ text "Delete Category" ]
                 |> Modal.body []
-                    [ p [] [ text <| "Are you sure you want to delete category " ++ category.name ]
+                    [ p [] [ text <| "Are you sure you want to delete category '" ++ category.name ++ "' ?" ]
                     , p [] [ text "Deleting this category will also delete its observations, feedback items, and explanations." ]
+                    , p [ class "text-danger" ] [ text "This is not reversible." ]
                     ]
                 |> Modal.footer []
                     [ Button.button
@@ -348,10 +570,18 @@ view model =
             , card <| viewSemesters model
             , card <| viewCategories model
             , case model.modalState of
-                --ClassroomFormVisible _ form remote visibility -> viewClassroomModal (Left (form, remote)) visibility
-                --ClassroomDeleteVisible classroom remote visibility -> viewClassroomModal (Right (classroom, remote)) visibility
-                --SemesterFormVisible maybeId form remote visibility ->  viewSemesterModal (Left (form, remote)) visibility
-                --SemesterDeleteVisible semester remote visibility ->  viewSemesterModal (Right (semester, remote)) visibility
+                ClassroomFormVisible maybeId form remote visibility ->
+                    viewClassroomModal model (Left ( maybeId, form, remote )) visibility
+
+                ClassroomDeleteVisible classroom remote visibility ->
+                    viewClassroomModal model (Right ( classroom, remote )) visibility
+
+                SemesterFormVisible maybeId form remote visibility ->
+                    viewSemesterModal model (Left ( maybeId, form, remote )) visibility
+
+                SemesterDeleteVisible semester remote visibility ->
+                    viewSemesterModal model (Right ( semester, remote )) visibility
+
                 CategoryFormVisible maybeId form remote visibility ->
                     viewCategoryModal model (Left ( maybeId, form, remote )) visibility
 
@@ -455,6 +685,9 @@ update msg model =
                                 Description description ->
                                     { form | description = description }
 
+                                CategoryIds ids ->
+                                    { form | categories = ids }
+
                                 _ ->
                                     form
                     in
@@ -549,6 +782,48 @@ update msg model =
                         Err errors ->
                             ( { model | formErrors = errors }, Cmd.none )
 
+                ClassroomFormVisible maybeId form result visibility ->
+                    let
+                        validator =
+                            Validate.all [ ifBlank .name ( Name form.name, "Name cannot be blank" ) ]
+                    in
+                    case validate validator form of
+                        Ok _ ->
+                            let
+                                updatedModel =
+                                    { model | formErrors = [], modalState = ClassroomFormVisible maybeId form Loading visibility }
+                            in
+                            case maybeId of
+                                Just id ->
+                                    ( updatedModel, updateClassroom model.session id form GotClassroomFormResult )
+
+                                Nothing ->
+                                    ( updatedModel, createClassroom model.session form GotClassroomFormResult )
+
+                        Err errors ->
+                            ( { model | formErrors = errors }, Cmd.none )
+
+                SemesterFormVisible maybeId form result visibility ->
+                    let
+                        validator =
+                            Validate.all [ ifBlank .name ( Name form.name, "Name cannot be blank" ) ]
+                    in
+                    case validate validator form of
+                        Ok _ ->
+                            let
+                                updatedModel =
+                                    { model | formErrors = [], modalState = SemesterFormVisible maybeId form Loading visibility }
+                            in
+                            case maybeId of
+                                Just id ->
+                                    ( updatedModel, updateSemester model.session id form GotSemesterFormResult )
+
+                                Nothing ->
+                                    ( updatedModel, createSemester model.session form GotSemesterFormResult )
+
+                        Err errors ->
+                            ( { model | formErrors = errors }, Cmd.none )
+
                 _ ->
                     ( model, Cmd.none )
 
@@ -571,66 +846,100 @@ update msg model =
 
         GotClassroomDeleteResult result ->
             let
-                updatedModel =
+                ( updatedModel, cmd ) =
                     case model.modalState of
                         ClassroomDeleteVisible classroom _ visibility ->
-                            { model | modalState = ClassroomDeleteVisible classroom result visibility }
+                            case result of
+                                Success _ ->
+                                    ( { model | modalState = ClassroomDeleteVisible classroom result Modal.hidden }, classrooms model.session GotClassrooms )
+
+                                _ ->
+                                    ( { model | modalState = ClassroomDeleteVisible classroom result visibility }, Cmd.none )
 
                         _ ->
-                            model
+                            ( model, Cmd.none )
             in
             API.handleRemoteError result updatedModel Cmd.none
 
         GotSemesterFormResult result ->
             let
-                updatedModel =
+                ( updatedModel, command ) =
                     case model.modalState of
                         SemesterFormVisible maybeId form _ visibility ->
-                            { model | modalState = SemesterFormVisible maybeId form result visibility }
+                            case result of
+                                Success _ ->
+                                    ( { model | modalState = SemesterFormVisible maybeId form result Modal.hidden }, semesters model.session GotSemesters )
+
+                                _ ->
+                                    ( { model | modalState = SemesterFormVisible maybeId form result visibility }, Cmd.none )
 
                         _ ->
-                            model
+                            ( model, Cmd.none )
             in
-            API.handleRemoteError result updatedModel Cmd.none
+            API.handleRemoteError result updatedModel command
 
         GotSemesterDeleteResult result ->
             let
-                updatedModel =
+                ( updatedModel, command ) =
                     case model.modalState of
                         SemesterDeleteVisible semester _ visibility ->
-                            { model | modalState = SemesterDeleteVisible semester result visibility }
+                            case result of
+                                Success _ ->
+                                    ( { model | modalState = SemesterDeleteVisible semester result Modal.hidden }, semesters model.session GotSemesters )
+
+                                _ ->
+                                    ( { model | modalState = SemesterDeleteVisible semester result visibility }, Cmd.none )
 
                         _ ->
-                            model
+                            ( model, Cmd.none )
             in
-            API.handleRemoteError result updatedModel Cmd.none
+            API.handleRemoteError result updatedModel command
 
         GotCategoryFormResult result ->
             let
-                updatedModel =
+                ( updatedModel, command ) =
                     case model.modalState of
                         CategoryFormVisible maybeId form _ visibility ->
-                            { model | modalState = CategoryFormVisible maybeId form result visibility }
+                            case result of
+                                Success _ ->
+                                    ( { model | modalState = CategoryFormVisible maybeId form result Modal.hidden }, categories model.session Nothing GotCategories )
+
+                                _ ->
+                                    ( { model | modalState = CategoryFormVisible maybeId form result visibility }, Cmd.none )
 
                         _ ->
-                            model
+                            ( model, Cmd.none )
             in
-            API.handleRemoteError result updatedModel Cmd.none
+            API.handleRemoteError result updatedModel command
 
         GotCategoryDeleteResult result ->
             let
-                updatedModel =
+                ( updatedModel, command ) =
                     case model.modalState of
                         CategoryDeleteVisible category _ visibility ->
-                            { model | modalState = CategoryDeleteVisible category result visibility }
+                            case result of
+                                Success _ ->
+                                    ( { model | modalState = CategoryDeleteVisible category result Modal.hidden }, categories model.session Nothing GotCategories )
+
+                                _ ->
+                                    ( { model | modalState = CategoryDeleteVisible category result visibility }, Cmd.none )
 
                         _ ->
-                            model
+                            ( model, Cmd.none )
             in
-            API.handleRemoteError result updatedModel Cmd.none
+            API.handleRemoteError result updatedModel command
 
         DeleteSubmitClicked ->
             case model.modalState of
+                ClassroomDeleteVisible data _ visibility ->
+                    ( { model | modalState = ClassroomDeleteVisible data Loading visibility }, deleteClassroom model.session data.id GotClassroomDeleteResult )
+
+                SemesterDeleteVisible data _ visibility ->
+                    ( { model | modalState = SemesterDeleteVisible data Loading visibility }, deleteSemester model.session data.id GotSemesterDeleteResult )
+
+                CategoryDeleteVisible data _ visibility ->
+                    ( { model | modalState = CategoryDeleteVisible data Loading visibility }, deleteCategory model.session data.id GotCategoryDeleteResult )
+
                 _ ->
                     ( model, Cmd.none )
 
