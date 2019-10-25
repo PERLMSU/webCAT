@@ -18,6 +18,7 @@ defmodule WebCATWeb.DraftView do
       classroom: ClassroomView,
       group_categories: CategoryView,
       student_categories: CategoryView,
+      group_users: UserView,
     ]
   end
 

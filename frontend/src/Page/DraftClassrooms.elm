@@ -12,7 +12,6 @@ import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
-import Components.Modal as Modal
 import Components.Table as Table
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -104,7 +103,7 @@ update msg model =
         GotClassroom result ->
             case result of
                 RemoteData.Success classroom ->
-                    if hasLoaded model.classrooms then
+                    if RemoteData.isSuccess model.classrooms then
                         ( { model | classrooms = RemoteData.map (\l -> classroom :: l) model.classrooms }, Cmd.none )
 
                     else
@@ -130,7 +129,7 @@ update msg model =
         GotSections result ->
             case result of
                 RemoteData.Success sections ->
-                    if hasLoaded model.sections then
+                    if RemoteData.isSuccess model.sections then
                         ( { model | sections = RemoteData.map (\l -> sections ++ l) model.sections }, Cmd.none )
 
                     else
@@ -161,10 +160,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Session.changes GotSession (Session.navKey model.session)
 
-
-hasLoaded : RemoteData e a -> Bool
-hasLoaded data =
-    RemoteData.isSuccess data || RemoteData.isSuccess data
 
 
 viewSemesters : Model -> Html Msg

@@ -622,6 +622,7 @@ type alias GroupDraft =
     , grades : List GradeId
     , studentDrafts : List DraftId
     , categories : List CategoryId
+    , users : List UserId
 
     -- Timestamp data
     , insertedAt : Time.Posix
@@ -660,6 +661,7 @@ groupDraftDecoder =
         |> relationship "grades" (list <| field "id" <| map GradeId parseInt) []
         |> relationship "child_drafts" (list <| field "id" <| map DraftId parseInt) []
         |> relationship "group_categories" (list <| field "id" <| map CategoryId parseInt) []
+        |> relationship "group_users" (list <| field "id" <| map UserId parseInt) []
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 

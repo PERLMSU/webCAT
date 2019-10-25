@@ -5,10 +5,10 @@ defmodule WebCAT.Repo.Migrations.NewDraftSystem do
   def change do
     alter table(:drafts) do
       add(:notes, :text)
-      add(:parent_draft_id, references(:drafts))
+      add(:parent_draft_id, references(:drafts, on_delete: :delete_all))
 
       modify(:rotation_group_id, references(:rotation_groups), null: true)
-      modify(:student_id, references(:users, on_delete: :nilify_all), null: true)
+      modify(:student_id, references(:users, on_delete: :delete_all), null: true)
 
       # Remove reviewer in favor of just doing review requests
       remove(:reviewer_id, references(:users), default: nil)

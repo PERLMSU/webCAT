@@ -1,4 +1,4 @@
-module Components.Common exposing (Style(..), icon, iconButton, loading)
+module Components.Common exposing (Style(..), icon, iconButton, iconTooltip, loading)
 
 import Bootstrap.Button as Button
 import Html exposing (..)
@@ -13,6 +13,11 @@ type Style
     | Danger
     | Warning
     | Info
+
+
+iconTooltip : String -> String -> Html msg
+iconTooltip icon_ content =
+    i [ class <| "far fa-" ++ icon_, attribute "data-toggle" "tooltip", attribute "data-placement" "top", title content ] []
 
 
 icon : Style -> String -> Html msg
@@ -68,6 +73,7 @@ iconButton style icon_ toMsg =
     in
     Button.button [ textColor, Button.onClick toMsg ]
         [ i [ class ("far fa-" ++ icon_) ] [] ]
+
 
 {-| View a loading spinner. Only one style for now.
 -}

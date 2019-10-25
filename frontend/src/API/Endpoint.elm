@@ -1,4 +1,4 @@
-module API.Endpoint exposing (Endpoint, categories, category, classroom, classrooms, comment, comments, draft, drafts, explanation, explanations, feedback, feedbackItem, grade, grades, href, login, observation, observations, password_reset, password_reset_finish, profile, request, rotation, rotationGroup, rotationGroups, rotations, section, sectionImport, sections, semester, semesters, src, studentExplanation, studentExplanations, studentFeedback, studentFeedbackItem, unwrap, url, user, users, profilePicture, userProfilePicture)
+module API.Endpoint exposing (Endpoint, categories, category, classroom, classrooms, comment, comments, draft, drafts, explanation, explanations, feedback, feedbackItem, grade, grades, href, login, observation, observations, password_reset, password_reset_finish, profile, profilePicture, request, rotation, rotationGroup, rotationGroups, rotations, section, sectionImport, sections, semester, semesters, src, studentExplanation, studentExplanations, studentFeedback, studentFeedbackItem, unwrap, url, user, userProfilePicture, users)
 
 import Html exposing (Attribute)
 import Html.Attributes as Attributes
@@ -68,6 +68,16 @@ mediaUrl paths queryParams =
     Endpoint <| Url.Builder.absolute ("media" :: paths) queryParams
 
 
+intFilter : String -> Int -> QueryParameter
+intFilter name param =
+    int ("filter[" ++ name ++ "]") param
+
+
+stringFilter : String -> String -> QueryParameter
+stringFilter name param =
+    string ("filter[" ++ name ++ "]") param
+
+
 
 -- ENDPOINTS
 
@@ -79,7 +89,7 @@ profilePicture userId =
 
 login : Maybe String -> Endpoint
 login token =
-    url [ "auth", "login" ] <| Maybe.Extra.toList <| Maybe.map (string "token") token
+    url [ "auth", "login" ] <| toList <| Maybe.map (string "token") token
 
 
 password_reset : Endpoint
@@ -157,10 +167,10 @@ sections : Maybe ClassroomId -> Maybe SemesterId -> Endpoint
 sections classroomId semesterId =
     let
         classroomIdQuery =
-            Maybe.map (unwrapClassroomId >> int "classroom_id") classroomId
+            Maybe.map (unwrapClassroomId >> intFilter "classroom_id") classroomId
 
         semesterIdQuery =
-            Maybe.map (unwrapSemesterId >> int "semester_id") semesterId
+            Maybe.map (unwrapSemesterId >> intFilter "semester_id") semesterId
     in
     url [ "sections" ] <| values [ classroomIdQuery, semesterIdQuery ]
 
@@ -181,7 +191,7 @@ rotation id =
 
 rotations : Maybe SectionId -> Endpoint
 rotations maybeSectionId =
-    url [ "rotations" ] <| Maybe.Extra.toList <| Maybe.map (unwrapSectionId >> int "section_id") maybeSectionId
+    url [ "rotations" ] <| toList <| Maybe.map (unwrapSectionId >> intFilter "section_id") maybeSectionId
 
 
 
@@ -195,7 +205,7 @@ rotationGroup id =
 
 rotationGroups : Maybe RotationId -> Endpoint
 rotationGroups maybeRotationId =
-    url [ "rotation_groups" ] <| Maybe.Extra.toList <| Maybe.map (unwrapRotationId >> int "rotation_id") maybeRotationId
+    url [ "rotation_groups" ] <| toList <| Maybe.map (unwrapRotationId >> intFilter "rotation_id") maybeRotationId
 
 
 
@@ -211,7 +221,7 @@ categories : Maybe CategoryId -> Endpoint
 categories maybeParentCategoryId =
     let
         parentParam =
-            Maybe.map (unwrapCategoryId >> int "parent_category_id") maybeParentCategoryId
+            Maybe.map (unwrapCategoryId >> intFilter "parent_category_id") maybeParentCategoryId
     in
     url [ "categories" ] <| values [ parentParam ]
 
@@ -227,7 +237,7 @@ observation id =
 
 observations : Maybe CategoryId -> Endpoint
 observations maybeCategoryId =
-    url [ "observations" ] <| Maybe.Extra.toList <| Maybe.map (unwrapCategoryId >> int "category_id") maybeCategoryId
+    url [ "observations" ] <| toList <| Maybe.map (unwrapCategoryId >> intFilter "category_id") maybeCategoryId
 
 
 
@@ -241,7 +251,7 @@ feedback id =
 
 feedbackItem : Maybe ObservationId -> Endpoint
 feedbackItem maybeObservationId =
-    url [ "feedback" ] <| Maybe.Extra.toList <| Maybe.map (unwrapObservationId >> int "observation_id") maybeObservationId
+    url [ "feedback" ] <| toList <| Maybe.map (unwrapObservationId >> intFilter "observation_id") maybeObservationId
 
 
 
@@ -255,7 +265,7 @@ explanation id =
 
 explanations : Maybe FeedbackId -> Endpoint
 explanations maybeFeedbackId =
-    url [ "explanations" ] <| Maybe.Extra.toList <| Maybe.map (unwrapFeedbackId >> int "feedback_id") maybeFeedbackId
+    url [ "explanations" ] <| toList <| Maybe.map (unwrapFeedbackId >> intFilter "feedback_id") maybeFeedbackId
 
 
 
@@ -267,19 +277,22 @@ draft id =
     url [ "drafts", String.fromInt <| unwrapDraftId id ] []
 
 
-drafts : Maybe DraftStatus -> Maybe UserId -> Maybe RotationGroupId -> Endpoint
-drafts maybeStatus maybeStudentId maybeRotationGroupId =
+drafts : Maybe DraftStatus -> Maybe UserId -> Maybe RotationGroupId -> Maybe DraftId -> Endpoint
+drafts maybeStatus maybeStudentId maybeRotationGroupId maybeParentDraftId =
     let
         statusParam =
-            Maybe.map (draftStatusToString >> string "status") maybeStatus
+            Maybe.map (draftStatusToString >> stringFilter "status") maybeStatus
 
         studentParam =
-            Maybe.map (unwrapUserId >> int "student_id") maybeStudentId
+            Maybe.map (unwrapUserId >> intFilter "student_id") maybeStudentId
 
         groupParam =
-            Maybe.map (unwrapRotationGroupId >> int "rotation_group_id") maybeRotationGroupId
+            Maybe.map (unwrapRotationGroupId >> intFilter "rotation_group_id") maybeRotationGroupId
+
+        parentParam =
+            Maybe.map (unwrapDraftId >> intFilter "parent_draft_id") maybeParentDraftId
     in
-    url [ "drafts" ] <| values [ statusParam, studentParam, groupParam ]
+    url [ "drafts" ] <| values [ statusParam, studentParam, groupParam, parentParam ]
 
 
 
@@ -293,7 +306,7 @@ comment id =
 
 comments : Maybe DraftId -> Endpoint
 comments draftId =
-    url [ "comments" ] <| toList <| Maybe.map (unwrapDraftId >> int "draft_id") draftId
+    url [ "comments" ] <| toList <| Maybe.map (unwrapDraftId >> intFilter "draft_id") draftId
 
 
 
@@ -307,7 +320,7 @@ grade gradeId =
 
 grades : Maybe DraftId -> Endpoint
 grades draftId =
-    url [ "drafts" ] <| toList <| Maybe.map (unwrapDraftId >> int "draft_id") draftId
+    url [ "drafts" ] <| toList <| Maybe.map (unwrapDraftId >> intFilter "draft_id") draftId
 
 
 
@@ -323,10 +336,10 @@ studentFeedback : Maybe DraftId -> Maybe FeedbackId -> Endpoint
 studentFeedback draftId feedbackId =
     let
         draftIdQuery =
-            Maybe.map (unwrapDraftId >> int "draft_id") draftId
+            Maybe.map (unwrapDraftId >> intFilter "draft_id") draftId
 
         feedbackIdQuery =
-            Maybe.map (unwrapFeedbackId >> int "feedback_id") feedbackId
+            Maybe.map (unwrapFeedbackId >> intFilter "feedback_id") feedbackId
     in
     url [ "student_feedback" ] <| values [ draftIdQuery, feedbackIdQuery ]
 
@@ -340,12 +353,12 @@ studentExplanations : Maybe DraftId -> Maybe FeedbackId -> Maybe ExplanationId -
 studentExplanations draftId feedbackId explanationId =
     let
         draftIdQuery =
-            Maybe.map (unwrapDraftId >> int "draft_id") draftId
+            Maybe.map (unwrapDraftId >> intFilter "draft_id") draftId
 
         feedbackIdQuery =
-            Maybe.map (unwrapFeedbackId >> int "feedback_id") feedbackId
+            Maybe.map (unwrapFeedbackId >> intFilter "feedback_id") feedbackId
 
         explanationIdQuery =
-            Maybe.map (unwrapExplanationId >> int "explanation_id") explanationId
+            Maybe.map (unwrapExplanationId >> intFilter "explanation_id") explanationId
     in
     url [ "student_feedback" ] <| values [ draftIdQuery, feedbackIdQuery, explanationIdQuery ]

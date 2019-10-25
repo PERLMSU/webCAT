@@ -1,6 +1,7 @@
 Promise.all([
     import("./js/simplemde.js"),
     import("./js/selectize.js"),
+    import("./js/tooltip.js"),
 ]).then(() => import("./src/Main.elm")).then(({Elm}) => {
     var storageKey = "webcat_session_store";
     var flags = localStorage.getItem(storageKey);

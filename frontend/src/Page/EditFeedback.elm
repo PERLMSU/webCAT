@@ -5,7 +5,6 @@ import API.Feedback exposing (..)
 import API.Drafts exposing (..)
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
-import Components.Modal as Modal
 import Components.Table as Table
 import Html exposing (..)
 import Html.Attributes exposing (..)

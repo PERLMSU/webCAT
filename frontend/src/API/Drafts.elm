@@ -25,7 +25,11 @@ groupDraft session draftId toMsg =
 
 groupDrafts : Session -> Maybe RotationGroupId -> (APIData (List GroupDraft) -> msg) -> Cmd msg
 groupDrafts session maybeGroup toMsg =
-    API.getRemote (Endpoint.drafts Nothing Nothing maybeGroup) (Session.credential session) (multiDecoder groupDraftDecoder) toMsg
+    API.getRemote (Endpoint.drafts Nothing Nothing maybeGroup Nothing) (Session.credential session) (multiDecoder groupDraftDecoder) toMsg
+
+studentDrafts : Session -> Maybe DraftId -> (APIData (List StudentDraft) -> msg) -> Cmd msg
+studentDrafts session maybeDraftId toMsg =
+    API.getRemote (Endpoint.drafts Nothing Nothing Nothing maybeDraftId) (Session.credential session) (multiDecoder studentDraftDecoder) toMsg
 
 
 studentDraft : Session -> DraftId -> (APIData StudentDraft -> msg) -> Cmd msg
@@ -80,26 +84,26 @@ encodeStudentDraftForm form =
         [ ( "content", Encode.string form.content )
         , ( "status", (draftStatusToString >> Encode.string) form.status )
         , ( "student_id", (unwrapUserId >> Encode.int) form.studentId )
-        , ( "partent_draft_id", (unwrapDraftId >> Encode.int) form.parentDraftId )
+        , ( "parent_draft_id", (unwrapDraftId >> Encode.int) form.parentDraftId )
         ]
 
 
 updateGroupDraft : Session -> DraftId -> GroupDraftForm -> (APIData GroupDraft -> msg) -> Cmd msg
 updateGroupDraft session id form toMsg =
-    API.putRemote (Endpoint.draft id) (Session.credential session) (jsonBody <| encodeGroupDraftForm form) groupDraftDecoder toMsg
+    API.putRemote (Endpoint.draft id) (Session.credential session) (jsonBody <| encodeGroupDraftForm form) (singleDecoder groupDraftDecoder) toMsg
 
 updateStudentDraft : Session -> DraftId -> StudentDraftForm -> (APIData StudentDraft -> msg) -> Cmd msg
 updateStudentDraft session id form toMsg =
-    API.putRemote (Endpoint.draft id) (Session.credential session) (jsonBody <| encodeStudentDraftForm form) studentDraftDecoder toMsg
+    API.putRemote (Endpoint.draft id) (Session.credential session) (jsonBody <| encodeStudentDraftForm form) (singleDecoder studentDraftDecoder) toMsg
 
 
 createGroupDraft : Session -> GroupDraftForm -> (APIData GroupDraft -> msg) -> Cmd msg
 createGroupDraft session form toMsg =
-    API.postRemote (Endpoint.drafts Nothing Nothing Nothing) (Session.credential session) (jsonBody <| encodeGroupDraftForm form) groupDraftDecoder toMsg
+    API.postRemote (Endpoint.drafts Nothing Nothing Nothing Nothing) (Session.credential session) (jsonBody <| encodeGroupDraftForm form) (singleDecoder groupDraftDecoder) toMsg
 
 createStudentDraft : Session -> StudentDraftForm -> (APIData StudentDraft -> msg) -> Cmd msg
 createStudentDraft session form toMsg =
-    API.postRemote (Endpoint.drafts Nothing Nothing Nothing) (Session.credential session) (jsonBody <| encodeStudentDraftForm form) studentDraftDecoder toMsg
+    API.postRemote (Endpoint.drafts Nothing Nothing Nothing Nothing) (Session.credential session) (jsonBody <| encodeStudentDraftForm form) (singleDecoder studentDraftDecoder) toMsg
 
 
 deleteDraft : Session -> DraftId -> (APIData () -> msg) -> Cmd msg
@@ -110,7 +114,7 @@ deleteDraft session id toMsg =
 
 grades : Session -> DraftId -> (APIData (List Grade) -> msg) -> Cmd msg
 grades session draftId toMsg =
-    API.getRemote (Endpoint.grades <| Just draftId) (Session.credential session) (Decode.list gradeDecoder) toMsg
+    API.getRemote (Endpoint.grades <| Just draftId) (Session.credential session) (multiDecoder gradeDecoder) toMsg
 
 type alias GradeForm =
     { score : Int
@@ -138,11 +142,11 @@ encodeGradeForm form =
 
 createGrade : Session -> GradeForm -> (APIData Grade -> msg) -> Cmd msg
 createGrade session form toMsg =
-    API.postRemote (Endpoint.grades Nothing) (Session.credential session) (jsonBody <| encodeGradeForm form) gradeDecoder toMsg
+    API.postRemote (Endpoint.grades Nothing) (Session.credential session) (jsonBody <| encodeGradeForm form) (singleDecoder gradeDecoder) toMsg
 
 updateGrade : Session -> GradeId -> GradeForm -> (APIData Grade -> msg) -> Cmd msg
 updateGrade session id form toMsg =
-    API.putRemote (Endpoint.grade id) (Session.credential session) (jsonBody <| encodeGradeForm form) gradeDecoder toMsg
+    API.putRemote (Endpoint.grade id) (Session.credential session) (jsonBody <| encodeGradeForm form) (singleDecoder gradeDecoder) toMsg
 
 -- Comments
 
@@ -173,9 +177,9 @@ encodeCommentForm form =
 
 createComment : Session -> CommentForm -> (APIData Comment -> msg) -> Cmd msg
 createComment session form toMsg =
-    API.postRemote (Endpoint.comments Nothing) (Session.credential session) (jsonBody <| encodeCommentForm form) commentDecoder toMsg
+    API.postRemote (Endpoint.comments Nothing) (Session.credential session) (jsonBody <| encodeCommentForm form) (singleDecoder commentDecoder) toMsg
 
 updateComment : Session -> CommentId -> CommentForm -> (APIData Comment -> msg) -> Cmd msg
 updateComment session id form toMsg =
-    API.putRemote (Endpoint.comment id) (Session.credential session) (jsonBody <| encodeCommentForm form) commentDecoder toMsg
+    API.putRemote (Endpoint.comment id) (Session.credential session) (jsonBody <| encodeCommentForm form) (singleDecoder commentDecoder) toMsg
 

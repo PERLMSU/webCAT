@@ -22,6 +22,7 @@ defmodule WebCAT.Feedback.Draft do
     has_one(:classroom, through: ~w(rotation_group rotation section classroom)a)
     has_many(:group_categories, through: ~w(rotation_group rotation section classroom categories)a)
     has_many(:student_categories, through: ~w(parent_draft rotation_group rotation section classroom categories)a)
+    has_many(:group_users, through: ~w(rotation_group users)a)
 
     timestamps(type: :utc_datetime)
   end

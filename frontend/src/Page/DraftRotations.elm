@@ -13,7 +13,6 @@ import Bootstrap.Text as Text
 import Bootstrap.ListGroup as ListGroup
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
-import Components.Modal as Modal
 import Components.Table as Table
 import Date
 import Html exposing (..)

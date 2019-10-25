@@ -8,18 +8,16 @@ import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Page
 import Page.Blank as Blank
-import Page.Classrooms as Classrooms
 import Page.Dashboard as Dashboard
 import Page.Draft as Draft
 import Page.DraftClassrooms as DraftClassrooms
 import Page.DraftRotations as DraftRotations
-import Page.GroupDrafts as GroupDrafts
 import Page.EditFeedback as EditFeedback
+import Page.GroupDrafts as GroupDrafts
 import Page.Login as Login
 import Page.NotFound as NotFound
 import Page.Profile as Profile
 import Page.ResetPassword as ResetPassword
-import Page.Users as Users
 import Route exposing (Route(..))
 import Session exposing (Session)
 import Task
@@ -58,8 +56,6 @@ type Model
     | NotFound Session
     | Login Login.Model
     | ResetPassword ResetPassword.Model
-    | Classrooms Classrooms.Model
-    | Users Users.Model
     | DraftClassrooms DraftClassrooms.Model
     | DraftRotations DraftRotations.Model
     | GroupDrafts GroupDrafts.Model
@@ -79,8 +75,6 @@ type Msg
     | ClickedLink Browser.UrlRequest
     | GotLoginMsg Login.Msg
     | GotResetPasswordMsg ResetPassword.Msg
-    | GotClassroomsMsg Classrooms.Msg
-    | GotUsersMsg Users.Msg
     | GotDraftClassroomsMsg DraftClassrooms.Msg
     | GotDraftRotationsMsg DraftRotations.Msg
     | GotGroupDraftsMsg GroupDrafts.Msg
@@ -105,12 +99,6 @@ toSession page =
 
         ResetPassword model ->
             ResetPassword.toSession model
-
-        Classrooms model ->
-            Classrooms.toSession model
-
-        Users model ->
-            Users.toSession model
 
         DraftClassrooms model ->
             DraftClassrooms.toSession model
@@ -158,17 +146,9 @@ changeRouteTo maybeRoute model =
         Just Route.Logout ->
             ( model, API.logout )
 
-        Just Route.Classrooms ->
-            Classrooms.init session
-                |> updateWith Classrooms GotClassroomsMsg model
-
         Just Route.Dashboard ->
             Dashboard.init session
                 |> updateWith Dashboard GotDashboardMsg model
-
-        Just Route.Users ->
-            Users.init session
-                |> updateWith Users GotUsersMsg model
 
         Just Route.DraftClassrooms ->
             DraftClassrooms.init session
@@ -227,17 +207,9 @@ update appMsg appModel =
             ResetPassword.update msg model
                 |> updateWith ResetPassword GotResetPasswordMsg appModel
 
-        ( GotClassroomsMsg msg, Classrooms model ) ->
-            Classrooms.update msg model
-                |> updateWith Classrooms GotClassroomsMsg appModel
-
         ( GotDashboardMsg msg, Dashboard model ) ->
             Dashboard.update msg model
                 |> updateWith Dashboard GotDashboardMsg appModel
-
-        ( GotUsersMsg msg, Users model ) ->
-            Users.update msg model
-                |> updateWith Users GotUsersMsg appModel
 
         ( GotDraftClassroomsMsg msg, DraftClassrooms model ) ->
             DraftClassrooms.update msg model
@@ -281,7 +253,7 @@ updateWith toModel toMsg model ( subModel, subCmd ) =
 
 subscriptions : Model -> Sub Msg
 subscriptions appModel =
-    case  appModel of
+    case appModel of
         NotFound _ ->
             Sub.none
 
@@ -293,9 +265,6 @@ subscriptions appModel =
 
         ResetPassword model ->
             Sub.map GotResetPasswordMsg (ResetPassword.subscriptions model)
-
-        Classrooms model ->
-            Sub.map GotClassroomsMsg (Classrooms.subscriptions model)
 
         DraftClassrooms model ->
             Sub.map GotDraftClassroomsMsg (DraftClassrooms.subscriptions model)
@@ -317,9 +286,6 @@ subscriptions appModel =
 
         Dashboard model ->
             Sub.map GotDashboardMsg (Dashboard.subscriptions model)
-
-        Users model ->
-            Sub.map GotUsersMsg (Users.subscriptions model)
 
 
 
@@ -361,9 +327,6 @@ view appModel =
                 Dashboard model ->
                     viewPage Page.Dashboard GotDashboardMsg (Dashboard.view model)
 
-                Classrooms model ->
-                    viewPage Page.Classrooms GotClassroomsMsg (Classrooms.view model)
-
                 DraftClassrooms model ->
                     viewPage Page.DraftClassrooms GotDraftClassroomsMsg (DraftClassrooms.view model)
 
@@ -381,9 +344,6 @@ view appModel =
 
                 Profile model ->
                     viewPage Page.Profile GotProfileMsg (Profile.view model)
-
-                Users model ->
-                    viewPage Page.Users GotUsersMsg (Users.view model)
 
         Nothing ->
             let

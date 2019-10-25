@@ -9,9 +9,13 @@ build-image:
 	docker build -f Dockerfile.build -t elixir-ubuntu:latest .
 build:
 	docker run -v $$(pwd):/opt/build --rm -it elixir-ubuntu:latest /opt/build/bin/build
+fetch_deps:
+	mix deps.get
+	(cd frontend && yarn)
 clean:
-	rm -f $(artifact)
-	rm -rf _build/prod .mix
+	@echo "This will remove all of the files in _build and node_modules"
+	sudo rm -f $(artifact)
+	sudo rm -rf _build/prod .mix frontend/node_modules
 deploy:
 	ssh $(remote_user)@$(remote_host) mkdir -p $(remote_dir)
 	scp $(artifact) "$(remote_user)@$(remote_host):$(remote_dir)/server.tar.gz"

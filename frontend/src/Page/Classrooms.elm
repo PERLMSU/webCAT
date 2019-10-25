@@ -4,7 +4,6 @@ import API exposing (APIData, Error(..))
 import API.Classrooms exposing (ClassroomForm, listClassrooms, deleteClassroom, updateClassroom, initClassroomForm, createClassroom)
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
-import Components.Modal as Modal
 import Components.Table as Table
 import Html exposing (..)
 import Html.Attributes exposing (..)
