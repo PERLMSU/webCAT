@@ -12,6 +12,7 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
+import Bootstrap.Utilities.Flex as Flex
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Table as Table
@@ -19,7 +20,9 @@ import Date
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import List.Extra as ListExtra
 import RemoteData exposing (RemoteData(..))
+import RemoteData.Extra exposing (priorityApply, priorityMap)
 import Route
 import Session as Session exposing (Session)
 import Task
@@ -163,7 +166,18 @@ update msg model =
             ( { model | timezone = zone }, Cmd.none )
 
         GotStudentDrafts result ->
-            API.handleRemoteError result { model | studentDrafts = result } <| groupDraft model.session model.draftId GotDraft
+            let
+                commands =
+                    [ groupDraft model.session model.draftId GotDraft
+                    , studentFeedback model.session model.draftId GotStudentFeedback
+                    , studentExplanations model.session model.draftId Nothing GotStudentExplanations
+                    ]
+                        ++ RemoteData.unwrap [] (List.map (\draft -> grades model.session draft.id GotGrades)) result
+                        ++ RemoteData.unwrap [] (List.map (\draft -> comments model.session draft.id GotComments)) result
+                        ++ RemoteData.unwrap [] (List.map (\draft -> studentFeedback model.session draft.id GotStudentFeedback)) result
+                        ++ RemoteData.unwrap [] (List.map (\draft -> studentExplanations model.session draft.id Nothing GotStudentExplanations)) result
+            in
+            API.handleRemoteError result { model | studentDrafts = result } <| Cmd.batch commands
 
         GotRotationGroup result ->
             API.handleRemoteError result { model | rotationGroup = result } Cmd.none
@@ -181,117 +195,30 @@ update msg model =
             API.handleRemoteError result { model | explanations = result } Cmd.none
 
         GotGrades result ->
-            case result of
-                Success grades ->
-                    ( { model
-                        | grades =
-                            RemoteData.map
-                                (\l ->
-                                    if List.isEmpty l then
-                                        grades
-
-                                    else
-                                        l ++ grades
-                                )
-                                model.grades
-                      }
-                    , Cmd.none
-                    )
-
-                _ ->
-                    API.handleRemoteError result { model | grades = result } Cmd.none
+            API.handleRemoteError result { model | grades = priorityApply (\grades modelGrades -> grades ++ modelGrades) result model.grades } Cmd.none
 
         GotComments result ->
-            case result of
-                Success comments ->
-                    ( { model
-                        | comments =
-                            RemoteData.map
-                                (\l ->
-                                    if List.isEmpty l then
-                                        comments
-
-                                    else
-                                        l ++ comments
-                                )
-                                model.comments
-                      }
-                    , Cmd.none
-                    )
-
-                _ ->
-                    API.handleRemoteError result { model | comments = result } Cmd.none
+            API.handleRemoteError result { model | comments = priorityApply (\comments modelComments -> comments ++ modelComments) result model.comments } Cmd.none
 
         GotStudentFeedback result ->
-            case result of
-                Success studentFeedback ->
-                    ( { model
-                        | studentFeedback =
-                            RemoteData.map
-                                (\l ->
-                                    if List.isEmpty l then
-                                        studentFeedback
-
-                                    else
-                                        l ++ studentFeedback
-                                )
-                                model.studentFeedback
-                      }
-                    , Cmd.none
-                    )
-
-                _ ->
-                    API.handleRemoteError result { model | studentFeedback = result } Cmd.none
+            API.handleRemoteError result { model | studentFeedback = priorityApply (\feedback modelFeedback -> feedback ++ modelFeedback) result model.studentFeedback } Cmd.none
 
         GotStudentExplanations result ->
-            case result of
-                Success studentExplanations ->
-                    ( { model
-                        | studentExplanations =
-                            RemoteData.map
-                                (\l ->
-                                    if List.isEmpty l then
-                                        studentExplanations
-
-                                    else
-                                        l ++ studentExplanations
-                                )
-                                model.studentExplanations
-                      }
-                    , Cmd.none
-                    )
-
-                _ ->
-                    API.handleRemoteError result { model | studentExplanations = result } Cmd.none
+            API.handleRemoteError result { model | studentExplanations = priorityApply (\explanations modelExplanations -> explanations ++ modelExplanations) result model.studentExplanations } Cmd.none
 
         GotStudent result ->
             let
                 mapped =
-                    case model.students of
-                        Success students ->
-                            RemoteData.map
-                                (\student ->
-                                    if student.role == Student then
-                                        student :: students
+                    priorityMap List.singleton
+                        (\student students ->
+                            if student.role == Student then
+                                student :: students
 
-                                    else
-                                        students
-                                )
-                                result
-
-                        Loading ->
-                            RemoteData.map
-                                (\student ->
-                                    if student.role == Student then
-                                        [ student ]
-
-                                    else
-                                        []
-                                )
-                                result
-
-                        _ ->
-                            model.students
+                            else
+                                students
+                        )
+                        result
+                        model.students
 
                 command =
                     case result of
@@ -317,12 +244,94 @@ update msg model =
             API.handleRemoteError result { model | students = mapped } command
 
         GotCreatedStudentDraft result ->
-            case result of
-                Success draft ->
-                    ( { model | studentDrafts = RemoteData.map ((::) draft) model.studentDrafts }, Cmd.none )
+            API.handleRemoteError result { model | studentDrafts = priorityMap List.singleton (::) result model.studentDrafts } Cmd.none
+
+
+viewFeedback : Model -> DraftId -> Html Msg
+viewFeedback model draftId =
+    let
+        renderExplanation explanation =
+            ListGroup.li []
+                [ div [Flex.block, Flex.row, Flex.justifyBetween]
+                      [ p [] [text explanation.content]
+                      , case RemoteData.unwrap Nothing (ListExtra.find (\studentExplanation -> studentExplanation.explanationId == explanation.id)) model.studentExplanations of
+                        Nothing ->
+                            span [ class "text-danger" ] [ text "Unknown Time" ]
+
+                        Just studentFeedback ->
+                            span [ class "text-info" ] [ text <| Date.posixToDate model.timezone studentFeedback.insertedAt ++ " @ " ++ Date.posixToClockTime model.timezone studentFeedback.insertedAt ]
+                      ]
+                ]
+
+        renderFeedback feedback =
+            ListGroup.li []
+                [ div [ Flex.row, Flex.block, Flex.justifyBetween ]
+                    [ p [] [ text feedback.content ]
+                    , case RemoteData.unwrap Nothing (ListExtra.find (\studentFeedback -> studentFeedback.feedbackId == feedback.id)) model.studentFeedback of
+                        Nothing ->
+                            span [ class "text-danger" ] [ text "Unknown Time" ]
+
+                        Just studentFeedback ->
+                            span [ class "text-info" ] [ text <| Date.posixToDate model.timezone studentFeedback.insertedAt ++ " @ " ++ Date.posixToClockTime model.timezone studentFeedback.insertedAt ]
+                    ]
+                , case model.explanations of
+                    Success explanations ->
+                        ListGroup.ul <| List.map renderExplanation <| RemoteData.unwrap [] (\studentExplanation -> List.filter (\explanation -> List.any (\item -> item.explanationId == explanation.id && item.draftId == draftId && item.feedbackId == feedback.id) studentExplanation) explanations) model.studentExplanations
+
+                    Failure error ->
+                        (API.getErrorBody >> API.errorBodyToString >> text) error
+
+                    _ ->
+                        Common.loading
+                ]
+
+        renderObservation observation =
+            ListGroup.li []
+                [ text observation.content
+                , case model.feedback of
+                    Success feedback ->
+                        ListGroup.ul <| List.map renderFeedback <| RemoteData.unwrap [] (\studentFeedback -> List.filter (\feedbackItem -> List.any (\item -> item.feedbackId == feedbackItem.id && item.draftId == draftId && item.observation == observation.id) studentFeedback) feedback) model.studentFeedback
+
+                    Failure error ->
+                        (API.getErrorBody >> API.errorBodyToString >> text) error
+
+                    _ ->
+                        Common.loading
+                ]
+
+        renderCategory category =
+            ListGroup.li []
+                [ text category.name
+                , case model.observations of
+                    Success observations ->
+                        ListGroup.ul <| List.map renderObservation <| RemoteData.unwrap [] (\studentFeedback -> List.filter (\observation -> List.any (\item -> item.observation == observation.id && item.draftId == draftId) studentFeedback) observations) model.studentFeedback
+
+                    Failure error ->
+                        (API.getErrorBody >> API.errorBodyToString >> text) error
+
+                    _ ->
+                        Common.loading
+                ]
+    in
+    Card.config []
+        |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
+            [ h3 []
+                [ text "Feedback "
+                , Common.iconTooltip "question-circle" "Record feedback about the group here"
+                ]
+            , Button.linkButton [ Button.success, Button.attrs [ Route.href (Route.EditFeedback draftId Nothing) ] ] [ text "Edit Feedback" ]
+            ]
+        |> (case model.categories of
+                Success categories ->
+                    Card.listGroup <| List.map renderCategory <| RemoteData.unwrap [] (\feedback -> List.filter (\category -> List.any (\item -> item.category == category.id && item.draftId == draftId) feedback) categories) model.studentFeedback
+
+                Failure error ->
+                    Card.block [] [ Block.text [] <| (API.getErrorBody >> API.errorBodyToString >> text >> List.singleton) error ]
 
                 _ ->
-                    API.handleRemoteError result model Cmd.none
+                    Card.block [] [ Block.custom Common.loading ]
+           )
+        |> Card.view
 
 
 viewGroupDraft : Model -> Html Msg
@@ -345,7 +354,7 @@ viewGroupDraft model =
         , Grid.col [ Col.md12 ]
             [ Grid.simpleRow
                 [ Grid.col [ Col.md6 ]
-                    []
+                    [ viewFeedback model model.draftId ]
                 , Grid.col [ Col.md6 ]
                     []
                 ]
@@ -355,7 +364,10 @@ viewGroupDraft model =
 
 viewStudentDraft : Model -> StudentDraft -> Html Msg
 viewStudentDraft model draft =
-    Grid.simpleRow []
+    Grid.simpleRow
+        [ Grid.col [Col.md6 ]
+              [viewFeedback model draft.id]
+        ]
 
 
 view : Model -> { title : String, content : Html Msg }

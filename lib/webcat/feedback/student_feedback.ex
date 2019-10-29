@@ -11,6 +11,9 @@ defmodule WebCAT.Feedback.StudentFeedback do
     belongs_to(:draft, Draft, primary_key: true)
     belongs_to(:feedback, Feedback, primary_key: true)
 
+    has_one(:observation, through: ~w(feedback observation)a)
+    has_one(:category, through: ~w(feedback observation category)a)
+
     timestamps(type: :utc_datetime)
   end
 

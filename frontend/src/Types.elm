@@ -1,4 +1,4 @@
-module Types exposing (..)
+module Types exposing (Category, CategoryId(..), Classroom, ClassroomId(..), Comment, CommentId(..), DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Feedback, FeedbackId(..), Grade, GradeId(..), GroupDraft, Observation, ObservationId(..), ObservationType(..), Role(..), Rotation, RotationGroup, RotationGroupId(..), RotationId(..), Section, SectionId(..), Semester, SemesterId(..), Semesters(..), StudentDraft, StudentExplanation, StudentExplanationId(..), StudentFeedback, StudentFeedbackId(..), User, UserId(..), categoryDecoder, classroomDecoder, commentDecoder, credUserDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, groupDraftDecoder, multiDecoder, observationDecoder, observationTypeDecoder, observationTypeToString, optionalAttribute, optionalMaybe, relationship, requiredAttribute, requiredRelationship, requiredType, roleDecoder, roleToString, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, singleDecoder, studentDraftDecoder, studentExplanationDecoder, studentFeedbackDecoder, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapStudentExplanationId, unwrapStudentFeedbackId, unwrapUserId, userDecoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Extra exposing (parseInt)
@@ -236,8 +236,13 @@ unwrapUserId (UserId id) =
     id
 
 
+type Role
+    = Admin
+    | Faculty
+    | TeachingAssistant
+    | LearningAssistant
+    | Student
 
-type  Role = Admin | Faculty | TeachingAssistant | LearningAssistant | Student
 
 roleDecoder : Decoder Role
 roleDecoder =
@@ -315,7 +320,7 @@ userDecoder =
         |> requiredAttribute "last_name" string
         |> optionalAttribute "nickname" (nullable string)
         |> requiredAttribute "active" bool
-        |> requiredAttribute "role" (roleDecoder)
+        |> requiredAttribute "role" roleDecoder
         |> relationship "classrooms" (list <| field "id" <| map ClassroomId parseInt) []
         |> relationship "sections" (list <| field "id" <| map SectionId parseInt) []
         |> relationship "rotation_groups" (list <| field "id" <| map RotationGroupId parseInt) []
@@ -333,7 +338,7 @@ credUserDecoder =
         |> required "last_name" string
         |> optionalMaybe "nickname" (nullable string)
         |> required "active" bool
-        |> required "role" (roleDecoder)
+        |> required "role" roleDecoder
         |> required "classrooms" (list <| map ClassroomId int)
         |> required "sections" (list <| map SectionId int)
         |> required "rotation_groups" (list <| map RotationGroupId int)
@@ -444,11 +449,19 @@ observationTypeDecoder =
                         Decode.fail <| "Unknown observation type: " ++ else_
             )
 
+
 observationTypeToString : ObservationType -> String
-observationTypeToString type_ = case type_ of
-                                    Positive -> "positive"
-                                    Neutral -> "neutral"
-                                    Negative -> "negative"
+observationTypeToString type_ =
+    case type_ of
+        Positive ->
+            "positive"
+
+        Neutral ->
+            "neutral"
+
+        Negative ->
+            "negative"
+
 
 type alias Observation =
     { id : ObservationId
@@ -801,6 +814,10 @@ type alias StudentFeedback =
     , draftId : DraftId
     , feedbackId : FeedbackId
 
+    -- Related data
+    , category : CategoryId
+    , observation : ObservationId
+
     -- Timestamp data
     , insertedAt : Time.Posix
     , updatedAt : Time.Posix
@@ -813,6 +830,8 @@ studentFeedbackDecoder =
         |> required "id" (map StudentFeedbackId parseInt)
         |> requiredAttribute "draft_id" (map DraftId int)
         |> requiredAttribute "feedback_id" (map FeedbackId int)
+        |> requiredRelationship "category" (field "id" <| map CategoryId parseInt)
+        |> requiredRelationship "observation" (field "id" <| map ObservationId parseInt)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 
@@ -832,6 +851,10 @@ type alias StudentExplanation =
     , feedbackId : FeedbackId
     , explanationId : ExplanationId
 
+    -- Related data
+    , category : CategoryId
+    , observation : ObservationId
+
     -- Timestamp data
     , insertedAt : Time.Posix
     , updatedAt : Time.Posix
@@ -845,6 +868,8 @@ studentExplanationDecoder =
         |> requiredAttribute "draft_id" (map DraftId int)
         |> requiredAttribute "feedback_id" (map FeedbackId int)
         |> requiredAttribute "explanation_id" (map ExplanationId int)
+        |> requiredRelationship "category" (field "id" <| map CategoryId parseInt)
+        |> requiredRelationship "observation" (field "id" <| map ObservationId parseInt)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)
         |> requiredAttribute "updated_at" (map Time.millisToPosix int)
 

@@ -33,22 +33,5 @@ view model =
         [ Attributes.id model.id
         , Attributes.property "options" <| Encode.list encode model.options
         , Attributes.property "selected" <| Encode.list encode model.selection
-        , Events.on "selectionChanged" <| Decode.map model.onSelectionChanged <| loggingDecoder <| Decode.at ["target", "selected"] <| Decode.list (Decode.map model.toItemId parseInt)]
+        , Events.on "selectionChanged" <| Decode.map model.onSelectionChanged <| Decode.at ["target", "selected"] <| Decode.list (Decode.map model.toItemId parseInt)]
         []
-
-loggingDecoder : Decode.Decoder a -> Decode.Decoder a
-loggingDecoder realDecoder =
-  Decode.value
-    |> Decode.andThen
-      (\event ->
-        case Decode.decodeValue realDecoder event of
-          Ok decoded ->
-            Decode.succeed decoded
-
-          Err error ->
-            error
-              |> Decode.errorToString
-              |> Debug.log "decoding error"
-              |> Decode.fail
-      )
-

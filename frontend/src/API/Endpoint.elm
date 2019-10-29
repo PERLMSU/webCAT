@@ -320,7 +320,7 @@ grade gradeId =
 
 grades : Maybe DraftId -> Endpoint
 grades draftId =
-    url [ "drafts" ] <| toList <| Maybe.map (unwrapDraftId >> intFilter "draft_id") draftId
+    url [ "grades" ] <| toList <| Maybe.map (unwrapDraftId >> intFilter "draft_id") draftId
 
 
 
@@ -361,4 +361,4 @@ studentExplanations draftId feedbackId explanationId =
         explanationIdQuery =
             Maybe.map (unwrapExplanationId >> intFilter "explanation_id") explanationId
     in
-    url [ "student_explanation" ] <| values [ draftIdQuery, feedbackIdQuery, explanationIdQuery ]
+    url [ "student_explanations" ] <| values [ draftIdQuery, feedbackIdQuery, explanationIdQuery ]
