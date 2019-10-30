@@ -2,8 +2,6 @@ defmodule WebCATWeb.UserView do
   use WebCATWeb, :view
   use JSONAPI.View, type: "user", collection: "users"
 
-  alias WebCAT.Accounts.User
-
   def fields,
     do: ~w(email first_name last_name middle_name nickname active role inserted_at updated_at)a
 

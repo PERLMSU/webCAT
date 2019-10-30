@@ -1,8 +1,6 @@
 defmodule WebCAT.Feedback.Draft do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
-  alias WebCAT.Repo
   alias WebCAT.Accounts.User
 
   schema "drafts" do

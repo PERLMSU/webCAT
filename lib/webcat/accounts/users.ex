@@ -8,7 +8,6 @@ defmodule WebCAT.Accounts.Users do
   alias Ecto.Changeset
   alias Ecto.Multi
   import Ecto.Query
-  alias WebCAT.Rotations.Classroom
   alias WebCAT.CRUD
 
   @doc """

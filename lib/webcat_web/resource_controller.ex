@@ -1,5 +1,5 @@
 defmodule WebCATWeb.ResourceController do
-  @module_doc """
+  @moduledoc """
   Gets you all of the basic CRUD routes necessary for main functionality.
   Relationship routes are up to you to define.
   """

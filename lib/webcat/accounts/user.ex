@@ -3,11 +3,9 @@ defmodule WebCAT.Accounts.User do
   Schema for user accounts
   """
   use Ecto.Schema
-  import Ecto.Query
   import Ecto.Changeset
   alias WebCAT.Rotations.{Classroom, Semester, Section, Rotation, RotationGroup}
-  alias WebCAT.Accounts.User
-  alias WebCAT.Repo
+  import WebCAT.Repo.Utils
 
   schema "users" do
     field(:email, :string)
@@ -45,34 +43,10 @@ defmodule WebCAT.Accounts.User do
     |> validate_required(@required)
     |> unique_constraint(:email)
     |> validate_inclusion(:role, ~w(admin faculty teaching_assistant learning_assistant student))
-    |> put_classrooms(Map.get(attrs, "classrooms"))
+    |> put_relation(:classrooms, Classroom, Map.get(attrs, "classrooms", []))
+    |> put_relation(:semesters, Semester, Map.get(attrs, "semesters", []))
+    |> put_relation(:sections, Section, Map.get(attrs, "sections", []))
+    |> put_relation(:rotations, Rotation, Map.get(attrs, "rotations", []))
+    |> put_relation(:rotation_groups, RotationGroup, Map.get(attrs, "rotation_groups", []))
   end
-
-  defp put_classrooms(%{valid?: true} = changeset, classrooms) when is_list(classrooms) do
-    ids =
-      classrooms
-      |> Enum.map(fn classroom ->
-        case classroom do
-          %{id: id} ->
-            id
-
-          id when is_integer(id) ->
-            id
-
-          id when is_binary(id) ->
-            String.to_integer(id)
-
-          _ ->
-            nil
-        end
-      end)
-      |> Enum.reject(&is_nil/1)
-
-    # Heed the warning in draft.ex before copying this behavior
-    changeset
-    |> Map.put(:data, Map.put(changeset.data, :classrooms, []))
-    |> put_assoc(:classrooms, Repo.all(from(c in Classroom, where: c.id in ^ids)))
-  end
-
-  defp put_classrooms(changeset, _), do: changeset
 end

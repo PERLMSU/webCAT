@@ -1,9 +1,8 @@
 defmodule WebCAT.Rotations.Classroom do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
   alias WebCAT.Accounts.User
-  alias WebCAT.Repo
+  import WebCAT.Repo.Utils
 
   schema "classrooms" do
     field(:course_code, :string)
@@ -34,21 +33,5 @@ defmodule WebCAT.Rotations.Classroom do
     |> unique_constraint(:course_code, name: :classrooms_course_code_index)
     |> put_relation(:users, WebCAT.Accounts.User, Map.get(attrs, "users", []))
     |> put_relation(:categories, WebCAT.Feedback.Category, Map.get(attrs, "categories", []))
-  end
-
-  defp put_relation(%{valid?: true} = changeset, name, schema, ids) do
-    if not Enum.empty?(ids) do
-      data =
-        schema
-        |> where([s], s.id in ^ids)
-        |> Repo.all()
-      put_assoc(changeset, name, data)
-    else
-      changeset
-    end
-  end
-
-  defp put_relation(changeset, _, _, _) do
-    changeset
   end
 end

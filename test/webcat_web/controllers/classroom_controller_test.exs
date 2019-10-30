@@ -42,8 +42,7 @@ defmodule WebCATWeb.ClassroomControllerTest do
   describe "create/3" do
     test "responds normally to a well formed request", %{conn: conn} do
       {:ok, user} = login_admin()
-
-      data = Factory.string_params_with_assocs(:classroom) |> Map.drop(~w(users categories))
+      data = Factory.string_params_for(:classroom) |> Map.drop(~w(users categories))
 
       res =
         conn

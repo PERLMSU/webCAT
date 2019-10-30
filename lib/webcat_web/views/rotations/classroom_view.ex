@@ -1,5 +1,4 @@
 defmodule WebCATWeb.ClassroomView do
-  alias WebCAT.Rotations.Classroom
   alias WebCATWeb.{SectionView, CategoryView, UserView}
 
   use WebCATWeb, :view

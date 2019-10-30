@@ -1,4 +1,4 @@
-defmodule WebCATWeb.Router.Helpers do
+defmodule WebCATWeb.Router.ExtraHelpers do
   defmacro api_resource(path, controller, opts \\ []) do
     quote do
       resources(

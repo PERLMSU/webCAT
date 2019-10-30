@@ -3,7 +3,6 @@ defmodule WebCAT.Import.Students do
   alias Ecto.Multi
   alias WebCAT.Accounts.User
   import Ecto.Changeset
-  alias Terminator.{Performer, Role}
   alias WebCAT.Rotations.Section
 
 

@@ -44,7 +44,7 @@ defmodule WebCATWeb.AuthController do
 
   def start_password_reset(conn, params) do
     with {:params, %{"email" => email}} <- {:params, params},
-         {:email, {:ok, reset}} <- {:email, PasswordResets.start_reset(email)} do
+         {:email, {:ok, _reset}} <- {:email, PasswordResets.start_reset(email)} do
       send_resp(conn, :no_content, "")
     else
       {:params, _} ->

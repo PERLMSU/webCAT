@@ -30,7 +30,7 @@ defmodule WebCAT.Accounts.Notification do
 
   def seen(id) do
     from(n in __MODULE__, where: n.id == ^id, update: [set: [seen: true]])
-    |> WebCAT.Repo.update_all([])
+    |> Repo.update_all([])
 
     :ok
   end

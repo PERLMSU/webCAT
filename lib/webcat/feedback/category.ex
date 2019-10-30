@@ -1,7 +1,7 @@
 defmodule WebCAT.Feedback.Category do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
+  import WebCAT.Repo.Utils
 
   schema "categories" do
     field(:name, :string)
@@ -28,34 +28,6 @@ defmodule WebCAT.Feedback.Category do
     |> validate_required(@required)
     |> foreign_key_constraint(:parent_category_id)
     |> unique_constraint(:name)
-    |> put_classrooms(Map.get(attrs, "classrooms"))
+    |> put_relation(:classrooms, WebCAT.Rotations.Classroom, Map.get(attrs, "classrooms", []))
   end
-
-  defp put_classrooms(%{valid?: true} = changeset, classrooms) when is_list(classrooms) do
-    ids =
-      classrooms
-      |> Enum.map(fn classroom ->
-      case classroom do
-        %{id: id} ->
-          id
-
-        id when is_integer(id) ->
-          id
-
-        id when is_binary(id) ->
-          String.to_integer(id)
-
-        _ ->
-          nil
-      end
-    end)
-    |> Enum.reject(&is_nil/1)
-
-      changeset
-      |> Map.put(:data, Map.put(changeset.data, :classrooms, []))
-      |> put_assoc(changeset, :classrooms, Repo.all(from(c in WebCAT.Rotations.Classroom, where: c.id in ^ids)))
-  end
-
-  defp put_classrooms(changeset, _), do: changeset
-
 end
