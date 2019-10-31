@@ -25,7 +25,7 @@ posixToClockTime zone posix =
 
         minute =
             if Time.toMinute zone posix < 10 then
-                "0" +ute zone >> String.fromInt) posix
+                "0" ++ (Time.toMinute zone >> String.fromInt) posix
             else
                 (Time.toMinute zone >> String.fromInt) posix
     in
