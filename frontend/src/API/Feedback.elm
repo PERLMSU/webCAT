@@ -244,7 +244,12 @@ studentFeedback session draftId toMsg =
 
 createStudentFeedback : Session -> DraftId -> FeedbackId -> (APIResult StudentFeedback -> msg) -> Cmd msg
 createStudentFeedback session draftId feedbackId toMsg =
-    API.post (Endpoint.studentFeedback (Just draftId) (Just feedbackId)) (Session.credential session) emptyBody (singleDecoder studentFeedbackDecoder) toMsg
+    let
+        encodedBody = Encode.object [ ("draft_id", (unwrapDraftId >> Encode.int) draftId)
+                                    , ("feedback_id", (unwrapFeedbackId >> Encode.int) feedbackId)
+                                    ]
+    in
+    API.post (Endpoint.studentFeedback Nothing Nothing) (Session.credential session) (jsonBody encodedBody) (singleDecoder studentFeedbackDecoder) toMsg
 
 
 deleteStudentFeedback : Session -> StudentFeedbackId -> (APIResult () -> msg) -> Cmd msg
@@ -261,7 +266,13 @@ studentExplanations session draftId feedbackId toMsg =
 
 createStudentExplanation : Session -> DraftId -> FeedbackId -> ExplanationId -> (APIResult StudentExplanation -> msg) -> Cmd msg
 createStudentExplanation session draftId feedbackId explanationId toMsg =
-    API.post (Endpoint.studentExplanations (Just draftId) (Just feedbackId) (Just explanationId)) (Session.credential session) emptyBody (singleDecoder studentExplanationDecoder) toMsg
+    let
+        encodedBody = Encode.object [ ("draft_id", (unwrapDraftId >> Encode.int) draftId)
+                                    , ("feedback_id", (unwrapFeedbackId >> Encode.int) feedbackId)
+                                    , ("explanation_id", (unwrapExplanationId >> Encode.int) explanationId)
+                                    ]
+    in
+    API.post (Endpoint.studentExplanations Nothing Nothing Nothing) (Session.credential session) (jsonBody encodedBody) (singleDecoder studentExplanationDecoder) toMsg
 
 
 deleteStudentExplanation : Session -> StudentExplanationId -> (APIResult () -> msg) -> Cmd msg

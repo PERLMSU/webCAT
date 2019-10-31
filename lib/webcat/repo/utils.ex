@@ -5,7 +5,7 @@ defmodule WebCAT.Repo.Utils do
 
   def put_relation(changeset, name, schema, ids) do
     with %{valid?: true} <- changeset,
-         [_head | _tail] <- ids do
+         true <- is_list(ids) do
       data =
         schema
         |> where([s], s.id in ^(Enum.filter(ids, &is_integer/1)))

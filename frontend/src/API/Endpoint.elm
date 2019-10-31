@@ -221,9 +221,11 @@ categories : Maybe CategoryId -> Endpoint
 categories maybeParentCategoryId =
     let
         parentParam =
-            Maybe.map (unwrapCategoryId >> intFilter "parent_category_id") maybeParentCategoryId
+            case maybeParentCategoryId of
+                Nothing -> stringFilter "parent_category_id" "null"
+                Just id -> (unwrapCategoryId >> intFilter "parent_category_id") id
     in
-    url [ "categories" ] <| values [ parentParam ]
+    url [ "categories" ] <| [ parentParam ]
 
 
 
@@ -346,7 +348,7 @@ studentFeedback draftId feedbackId =
 
 studentExplanation : StudentExplanationId -> Endpoint
 studentExplanation id =
-    url [ "student_explanation", String.fromInt <| unwrapStudentExplanationId id ] []
+    url [ "student_explanations", String.fromInt <| unwrapStudentExplanationId id ] []
 
 
 studentExplanations : Maybe DraftId -> Maybe FeedbackId -> Maybe ExplanationId -> Endpoint

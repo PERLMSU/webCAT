@@ -9,8 +9,10 @@ defmodule WebCAT.CRUD do
   List all of the schema
   """
   def list(schema, options \\ []) do
-    schema
-    |> where(^fetch_opt(options, :filter, []))
+    Enum.reduce(fetch_opt(options, :filter, []), schema, fn
+      {k, "null"}, query -> from(s in query, where: is_nil(field(s, ^k)))
+      {k, v}, query -> from(s in query, where: field(s, ^k) == ^v)
+    end)
     |> preload(^fetch_opt(options, :include, schema.__schema__(:associations)))
     |> order_by(^fetch_opt(options, :sort, []))
     |> select(^fetch_opt(options, :fields, schema.__schema__(:fields)))
@@ -39,6 +41,16 @@ defmodule WebCAT.CRUD do
     schema.__struct__
     |> schema.changeset(params)
     |> Repo.insert(on_conflict: Keyword.get(options, :on_conflict, :raise))
+    |> case do
+      {:ok, result} ->
+        loaded =
+          Repo.preload(result, fetch_opt(options, :include, schema.__schema__(:associations)))
+
+        {:ok, loaded}
+
+      {:error, _} = it ->
+        it
+    end
   end
 
   @doc """

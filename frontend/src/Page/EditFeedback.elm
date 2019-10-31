@@ -1,27 +1,47 @@
 module Page.EditFeedback exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import API exposing (APIData, APIResult, Error(..))
-import API.Feedback exposing (..)
 import API.Drafts exposing (..)
+import API.Feedback exposing (..)
+import Bootstrap.Button as Button
+import Bootstrap.Card as Card
+import Bootstrap.Card.Block as Block
+import Bootstrap.Form as Form
+import Bootstrap.Form.Checkbox as Checkbox
+import Bootstrap.Form.Textarea as Textarea
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Bootstrap.ListGroup as ListGroup
+import Bootstrap.Utilities.Flex as Flex
+import Bootstrap.Utilities.Size as Size
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Table as Table
+import Either exposing (Either(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import List.Extra as ListExtra
 import RemoteData exposing (RemoteData(..))
+import RemoteData.Extra exposing (priorityApply, priorityMap)
 import Route
 import Session as Session exposing (Session)
 import Types exposing (..)
 import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
-import Either exposing (Either(..))
+
 
 type alias Model =
     { session : Session
     , draftId : DraftId
     , parentCategoryId : Maybe CategoryId
+
     -- Remote data
+    , draft : APIData (Either GroupDraft StudentDraft)
     , categories : APIData (List Category)
+    , observations : APIData (List Observation)
+    , feedback : APIData (List Feedback)
+    , explanations : APIData (List Explanation)
     , studentFeedback : APIData (List StudentFeedback)
     , studentExplanations : APIData (List StudentExplanation)
     }
@@ -31,8 +51,12 @@ type Msg
     = GotSession Session
     | GotStudentFeedback (APIData (List StudentFeedback))
     | GotStudentExplanations (APIData (List StudentExplanation))
-    | GotCategories (APIData (List Category))
     | GotCategory (APIData Category)
+    | GotCategories (APIData (List Category))
+    | GotObservations (APIData (List Observation))
+    | GotFeedback (APIData (List Feedback))
+    | GotExplanations (APIData (List Explanation))
+      -- Feedback change results
     | GotAddFeedbackResult (APIResult StudentFeedback)
     | GotDeleteFeedbackResult FeedbackId (APIResult ())
     | GotAddExplanationResult (APIResult StudentExplanation)
@@ -42,12 +66,26 @@ type Msg
       -- Checkboxes
     | FeedbackChecked FeedbackId Bool
     | ExplanationChecked FeedbackId ExplanationId Bool
-     -- Init stuff
+      -- Init stuff
     | GotDraft (APIData (Either GroupDraft StudentDraft))
 
 
 init : Session -> DraftId -> Maybe CategoryId -> ( Model, Cmd Msg )
 init session draftId maybeCategoryId =
+    let
+        model =
+            { session = session
+            , draftId = draftId
+            , parentCategoryId = maybeCategoryId
+            , draft = Loading
+            , studentFeedback = Loading
+            , studentExplanations = Loading
+            , categories = Loading
+            , observations = Loading
+            , feedback = Loading
+            , explanations = Loading
+            }
+    in
     if Session.isAuthenticated session then
         let
             feedbackCommands =
@@ -57,36 +95,18 @@ init session draftId maybeCategoryId =
         in
         case maybeCategoryId of
             Just parentCategoryId ->
-                ( { session = session
-                  , draftId = draftId
-                  , parentCategoryId = maybeCategoryId
-                  , studentFeedback = Loading
-                  , studentExplanations = Loading
-                  , categories = Loading
-                  }
+                ( model
                 , Cmd.batch <| category session parentCategoryId GotCategory :: feedbackCommands
                 )
 
             Nothing ->
-                ( { session = session
-                  , draftId = draftId
-                  , parentCategoryId = maybeCategoryId
-                  , studentFeedback = Loading
-                  , studentExplanations = Loading
-                  , categories = Loading
-                  }
+                ( model
                 , Cmd.batch <| draft session draftId GotDraft :: feedbackCommands
                 )
 
     else
-        ( { session = session
-          , draftId = draftId
-          , parentCategoryId = maybeCategoryId
-          , categories = NotAsked
-          , studentFeedback = NotAsked
-          , studentExplanations = NotAsked
-          }
-        , Route.replaceUrl (Session.navKey session) (Route.Login )
+        ( model
+        , Route.replaceUrl (Session.navKey session) Route.Login
         )
 
 
@@ -101,8 +121,14 @@ update msg model =
         GotSession session ->
             init session model.draftId model.parentCategoryId
 
-        GotCategories categories ->
-            ( { model | categories = categories }, Cmd.none )
+        GotObservations result ->
+            API.handleRemoteError result { model | observations = priorityApply (++) result model.observations } <| Cmd.batch <| RemoteData.unwrap [] (List.map (\observation -> feedback model.session (Just observation.id) GotFeedback)) result
+
+        GotFeedback result ->
+            API.handleRemoteError result { model | feedback = priorityApply (++) result model.feedback } <| Cmd.batch <| RemoteData.unwrap [] (List.map (\feedback -> explanations model.session (Just feedback.id) GotExplanations)) result
+
+        GotExplanations result ->
+            API.handleRemoteError result { model | explanations = priorityApply (++) result model.explanations } Cmd.none
 
         GotStudentFeedback feedback ->
             ( { model | studentFeedback = feedback }, Cmd.none )
@@ -110,29 +136,67 @@ update msg model =
         GotStudentExplanations explanations ->
             ( { model | studentExplanations = explanations }, Cmd.none )
 
-        GotCategory category ->
-            ( { model | categories = RemoteData.map List.singleton category }, Cmd.none )
+        GotCategory result ->
+            let
+                newModel =
+                    { model | categories = priorityMap List.singleton (::) result model.categories }
+
+                commands =
+                    [ RemoteData.unwrap Cmd.none (\category -> observations model.session (Just category.id) GotObservations) result
+                    , RemoteData.unwrap Cmd.none (\category -> categories model.session (Just category.id) GotCategories) result
+                    ]
+            in
+            API.handleRemoteError result newModel <| Cmd.batch commands
+
+        GotCategories result ->
+            API.handleRemoteError result { model | categories = priorityApply (++) result model.categories } <| Cmd.batch <| RemoteData.unwrap [] (List.map (\category -> observations model.session (Just category.id) GotObservations)) result
 
         SubCategorySelected id ->
             ( model, Route.pushUrl (Session.navKey model.session) (Route.EditFeedback model.draftId (Just id)) )
 
         FeedbackChecked feedbackId isChecked ->
-            case isChecked of
-                True ->
-                    ( model, createStudentFeedback model.session model.draftId feedbackId GotAddFeedbackResult )
+            case model.studentFeedback of
+                Success studentFeedback ->
+                    case isChecked of
+                        True ->
+                            case ListExtra.find (.feedbackId >> (==) feedbackId) studentFeedback of
+                                Just _ ->
+                                    (model, Cmd.none)
+                                Nothing ->
+                                    ( model, createStudentFeedback model.session model.draftId feedbackId GotAddFeedbackResult )
 
-                False ->
-                    --( model, deleteStudentFeedback model.session model.draftId feedbackId (GotDeleteFeedbackResult feedbackId) )
-                    (model, Cmd.none)
+                        False ->
+                            case ListExtra.find (.feedbackId >> (==) feedbackId) studentFeedback of
+                                Just item ->
+                                    ( model, deleteStudentFeedback model.session item.id (GotDeleteFeedbackResult feedbackId) )
+
+                                Nothing ->
+                                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         ExplanationChecked feedbackId explanationId isChecked ->
-            case isChecked of
-                True ->
-                    ( model, createStudentExplanation model.session model.draftId feedbackId explanationId GotAddExplanationResult )
+            case model.studentExplanations of
+                Success studentExplanations ->
+                    case isChecked of
+                        True ->
+                            case ListExtra.find (.explanationId >> (==) explanationId) studentExplanations of
+                                Just _ ->
+                                    (model, Cmd.none)
+                                Nothing ->
+                                    ( model, createStudentExplanation model.session model.draftId feedbackId explanationId GotAddExplanationResult )
 
-                False ->
-                    -- ( model, deleteStudentExplanation model.session model.draftId feedbackId explanationId (GotDeleteExplanationResult explanationId) )
-                    (model, Cmd.none)
+                        False ->
+                            case ListExtra.find (.explanationId >> (==) explanationId) studentExplanations of
+                                Just item ->
+                                    ( model, deleteStudentExplanation model.session item.id (GotDeleteExplanationResult explanationId) )
+
+                                Nothing ->
+                                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         GotAddFeedbackResult result ->
             case result of
@@ -140,6 +204,10 @@ update msg model =
                     ( { model | studentFeedback = RemoteData.map ((::) value) model.studentFeedback }, Cmd.none )
 
                 Err error ->
+                    let
+                        _ =
+                            Debug.log "err" error
+                    in
                     -- TODO: Work out global message passing for errors to the main process
                     ( model, Cmd.none )
 
@@ -147,8 +215,8 @@ update msg model =
             case result of
                 Ok _ ->
                     ( { model
-                        | studentFeedback = RemoteData.map (List.filter (\fb -> fb.feedbackId /= id)) model.studentFeedback
-                        , studentExplanations = RemoteData.map (List.filter (\ex -> ex.feedbackId /= id)) model.studentExplanations
+                        | studentFeedback = RemoteData.map (ListExtra.filterNot (.feedbackId >> (==) id)) model.studentFeedback
+                        , studentExplanations = RemoteData.map (ListExtra.filterNot (.feedbackId >> (==) id)) model.studentExplanations
                       }
                     , Cmd.none
                     )
@@ -169,22 +237,28 @@ update msg model =
         GotDeleteExplanationResult id result ->
             case result of
                 Ok _ ->
-                    ( { model | studentExplanations = RemoteData.map (List.filter (\ex -> ex.explanationId /= id)) model.studentExplanations }, Cmd.none )
+                    ( { model | studentExplanations = RemoteData.map (ListExtra.filterNot (.explanationId >> (==) id)) model.studentExplanations }, Cmd.none )
 
                 Err error ->
                     -- TODO: Work out global message passing for errors to the main process
                     ( model, Cmd.none )
 
         GotDraft result ->
-           case result of
-               Success draft ->
-                   case draft of
-                       Left groupDraft -> (model, Cmd.batch <| List.map (\id-> category model.session id GotCategory) groupDraft.categories)
-                       Right studentDraft -> (model, Cmd.none)
-               Failure error ->
-                   -- TODO: Work out showing error states way better
-                   (model, Cmd.none)
-               _ -> (model, Cmd.none)
+            case result of
+                Success draft ->
+                    case draft of
+                        Left groupDraft ->
+                            ( model, Cmd.batch <| List.map (\id -> category model.session id GotCategory) groupDraft.categories )
+
+                        Right studentDraft ->
+                            ( model, Cmd.batch <| List.map (\id -> category model.session id GotCategory) studentDraft.categories )
+
+                Failure error ->
+                    -- TODO: Work out showing error states way better
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 hasFeedbackItem : Model -> FeedbackId -> Bool
@@ -207,88 +281,80 @@ hasExplanation model id =
             False
 
 
-viewCategories : Model -> List Category -> Html Msg
+viewCategories : Model -> List Category -> List (Grid.Column Msg)
 viewCategories model categories =
     let
-        unwrapMaybeDefault fun maybe =
-            Maybe.withDefault [] <| Maybe.map fun maybe
-
         viewExplanation explanation =
-            li []
-                [ div [ class "py-1 flex flex-row content-center" ]
-                    [ input
-                        [ type_ "checkbox"
-                        , class "self-center leading-tight mr-2"
-                        , onCheck <| ExplanationChecked explanation.feedbackId explanation.id
-                        , checked <| hasExplanation model explanation.id
+            ListGroup.li []
+                [ Checkbox.checkbox
+                        [ Checkbox.onCheck <| ExplanationChecked explanation.feedbackId explanation.id
+                        , Checkbox.checked <| hasExplanation model explanation.id
 
                         -- Only enable if the parent feedback item is checked
-                        , disabled <| not <| hasFeedbackItem model explanation.feedbackId
-                        ]
-                        []
-                    , span [] [ text explanation.content ]
+                        , Checkbox.disabled <| not <| hasFeedbackItem model explanation.feedbackId
+                        ] explanation.content
                     ]
-                ]
 
         viewFeedback feedback =
-            li []
-                [ div [ class "py-1 flex flex-row content-center" ]
-                    [ input
-                        [ type_ "checkbox"
-                        , class "self-center leading-tight mr-2"
-                        , onCheck <| FeedbackChecked feedback.id
-                        , checked <| hasFeedbackItem model feedback.id
+            ListGroup.li []
+                [ div []
+                    [ Checkbox.checkbox
+                        [ Checkbox.onCheck <| FeedbackChecked feedback.id
+                        , Checkbox.checked <| hasFeedbackItem model feedback.id
                         ]
-                        []
-                    , span [] [ text feedback.content ]
+                        feedback.content
+                    , ListGroup.ul <| List.map viewExplanation (List.sortBy .content <| RemoteData.unwrap [] (List.filter (.feedbackId >> (==) feedback.id)) model.explanations)
                     ]
-                , ul [ class "ml-4" ] []
-                --, ul [ class "ml-4" ] <| List.map viewExplanation <| unwrapMaybeDefault unwrapExplanations feedback.explanations
+                      
                 ]
 
         viewObservation observation =
-            li [ class "text-l text-gray-500" ]
-                [ text observation.content
-                , ul [ class "ml-4" ] []
-                --, ul [ class "ml-4" ] <| List.map viewFeedback <| unwrapMaybeDefault unwrapFeedback observation.feedback
-                ]
+            Block.custom <|
+                div [] <|
+                    [ p [] [ text observation.content ]
+                    , ListGroup.ul <| List.map viewFeedback (List.sortBy .content <| RemoteData.unwrap [] (List.filter (.observationId >> (==) observation.id)) model.feedback)
+                    ]
 
         viewSubcategory category =
-            li [ class "text-l text-gray-500" ] [ button [ onClick (SubCategorySelected category.id) ] [ text category.name ] ]
+            Block.link [ Route.href (Route.EditFeedback model.draftId (Just category.id)) ] [ text category.name ]
 
         viewCategory category =
-            div []
-                [ div [ class "mx-4 my-2 flex" ]
-                    [ text category.name ]
-                , h3 [ class "text-xl text-gray-400 ml-4" ] [ text "Sub-categories" ]
-                , ul [ class "mx-4" ] []
-                --, ul [ class "mx-4" ] <| List.map viewSubcategory <| List.sortBy .name <| unwrapMaybeDefault unwrapCategories category.subCategories
-                , h3 [ class "text-xl text-gray-400 ml-4" ] [ text "Observations" ]
-                , ul [ class "mx-4" ] []
-                --, ul [ class "mx-4" ] <| List.map viewObservation <| List.sortBy .content <| unwrapMaybeDefault unwrapObservations category.observations
+            Grid.col []
+                [ Card.config []
+                    |> Card.headerH2 [] [ text category.name ]
+                    |> Card.block []
+                        (Block.titleH4 [] [ text "Sub-Categories" ]
+                            :: List.map viewSubcategory (List.sortBy .name <| RemoteData.unwrap [] (List.filter (.parentCategoryId >> (==) (Just category.id))) model.categories)
+                        )
+                    |> Card.block []
+                        (Block.titleH4 [] [ text "Observations" ]
+                            :: List.map viewObservation (List.sortBy .content <| RemoteData.unwrap [] (List.filter (.categoryId >> (==) category.id)) model.observations)
+                        )
+                    |> Card.view
                 ]
     in
-    div [] <| List.map viewCategory <| List.sortBy .name categories
+    case model.parentCategoryId of
+        Just categoryId ->
+            List.map viewCategory <| List.filter (.id >> (==) categoryId) categories
+
+        Nothing ->
+            List.map viewCategory <| List.sortBy .name <| List.filter (.parentCategoryId >> (==) Nothing) categories
 
 
 view : Model -> { title : String, content : Html Msg }
 view model =
     { title = "Edit Feedback"
     , content =
-        div []
-            [ case model.categories of
-                NotAsked ->
-                    text ""
+        Grid.container [] <|
+            case model.categories of
+                Success categories ->
+                    [ Grid.simpleRow <| viewCategories model categories ]
 
-                Loading ->
-                    div [] [ Common.loading ]
+                Failure error ->
+                    [ Grid.simpleRow [ Grid.col [] [ h3 [ class "text-danger" ] [ (API.getErrorBody >> API.errorBodyToString >> text) error ] ] ] ]
 
-                Success c ->
-                    viewCategories model c
-
-                Failure e ->
-                    div [ class "mx-4 my-2 flex" ] [ div [ class "text-danger text-bold" ] [ text <| API.errorBodyToString <| API.getErrorBody e ] ]
-            ]
+                _ ->
+                    [ Grid.simpleRow [ Grid.col [] [ Common.loading ] ] ]
     }
 
 

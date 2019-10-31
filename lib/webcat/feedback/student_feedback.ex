@@ -6,7 +6,7 @@ defmodule WebCAT.Feedback.StudentFeedback do
 
   @primary_key false
   schema "student_feedback" do
-    field(:id, :integer, auto_generate: true)
+    field(:id, :integer, auto_generate: true, read_after_writes: true)
 
     belongs_to(:draft, Draft, primary_key: true)
     belongs_to(:feedback, Feedback, primary_key: true)

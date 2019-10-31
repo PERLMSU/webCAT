@@ -7,14 +7,15 @@ defmodule WebCATWeb.StudentFeedbackControllerTest do
       feedback = Factory.insert(:feedback)
       Factory.insert_list(3, :student_feedback, feedback: feedback)
 
-      result =
+      res =
         conn
         |> Auth.sign_in(user)
         |> get(Routes.student_feedback_path(conn, :index, filter: %{feedback_id: feedback.id}))
         |> json_response(:ok)
 
-      assert Enum.count(result["data"]) == 3
+      assert Enum.count(res["data"]) == 3
     end
+
 
     test "fails when a user isn't authenticated", %{conn: conn} do
       conn

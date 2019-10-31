@@ -5,7 +5,7 @@ defmodule WebCATWeb.StudentExplanationView do
   alias WebCATWeb.{DraftView, CategoryView, ObservationView, FeedbackView, ExplanationView}
 
   def fields,
-    do: ~w(inserted_at updated_at)a ++ ~w(draft_id feedback_id explanation_id)a
+    do: ~w(id inserted_at updated_at)a ++ ~w(draft_id feedback_id explanation_id)a
 
   def relationships,
     do: [

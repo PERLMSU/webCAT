@@ -8,11 +8,14 @@ import API.Users exposing (..)
 import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
+import Bootstrap.Form as Form
+import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Utilities.Flex as Flex
+import Bootstrap.Utilities.Size as Size
 import Components.Common as Common exposing (Style(..))
 import Components.Form as Form
 import Components.Table as Table
@@ -252,15 +255,15 @@ viewFeedback model draftId =
     let
         renderExplanation explanation =
             ListGroup.li []
-                [ div [Flex.block, Flex.row, Flex.justifyBetween]
-                      [ p [] [text explanation.content]
-                      , case RemoteData.unwrap Nothing (ListExtra.find (\studentExplanation -> studentExplanation.explanationId == explanation.id)) model.studentExplanations of
+                [ div [ Flex.block, Flex.row, Flex.justifyBetween ]
+                    [ p [] [ text explanation.content ]
+                    , case RemoteData.unwrap Nothing (ListExtra.find (\studentExplanation -> studentExplanation.explanationId == explanation.id)) model.studentExplanations of
                         Nothing ->
                             span [ class "text-danger" ] [ text "Unknown Time" ]
 
                         Just studentFeedback ->
                             span [ class "text-info" ] [ text <| Date.posixToDate model.timezone studentFeedback.insertedAt ++ " @ " ++ Date.posixToClockTime model.timezone studentFeedback.insertedAt ]
-                      ]
+                    ]
                 ]
 
         renderFeedback feedback =
@@ -313,7 +316,7 @@ viewFeedback model draftId =
                         Common.loading
                 ]
     in
-    Card.config []
+    Card.config [ Card.attrs [ Size.h100 ] ]
         |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
             [ h3 []
                 [ text "Feedback "
@@ -356,7 +359,65 @@ viewGroupDraft model =
                 [ Grid.col [ Col.md6 ]
                     [ viewFeedback model model.draftId ]
                 , Grid.col [ Col.md6 ]
-                    []
+                    [ Grid.simpleRow
+                        [ Grid.col [ Col.md12 ]
+                            [ Card.config []
+                                |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
+                                    [ h3 []
+                                        [ text "Group Draft"
+                                        ]
+                                    , h5 []
+                                        [ Common.iconTooltip "question-circle" "Record feedback about the group here"
+                                        ]
+                                    ]
+                                |> Card.block []
+                                    [ Block.custom <|
+                                        Form.form []
+                                            [ Form.group []
+                                                [ Textarea.textarea
+                                                    [ Textarea.id "groupDraftContent"
+                                                    , Textarea.rows 8
+                                                    , Textarea.value model.groupDraftForm.content
+                                                    , Textarea.attrs [ placeholder "Write the feedback for the whole group here." ]
+                                                    ]
+                                                ]
+                                            ]
+                                    ]
+                                |> Card.view
+                            ]
+                        ]
+                    , Grid.simpleRow
+                        [ Grid.col [ Col.md12 ]
+                            [ Card.config []
+                                |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
+                                    [ h3 []
+                                        [ text "Group Notes"
+                                        ]
+                                    , h5 []
+                                        [ Common.iconTooltip "question-circle" "Record your notes about the group here"
+                                        ]
+                                    ]
+                                |> Card.block []
+                                    [ Block.custom <|
+                                        Form.form []
+                                            [ Form.group []
+                                                [ Textarea.textarea
+                                                    [ Textarea.id "groupDraftNotes"
+                                                    , Textarea.rows 8
+                                                    , Textarea.value model.groupDraftForm.notes
+                                                    , Textarea.attrs [ placeholder "Write the notes for the whole group here. Nothing in these notes will be present in the draft the group sees." ]
+                                                    , if True then
+                                                          Textarea.success
+                                                      else
+                                                          Textarea.danger
+                                                    ]
+                                                ]
+                                            ]
+                                    ]
+                                |> Card.view
+                            ]
+                        ]
+                    ]
                 ]
             ]
         ]
@@ -365,8 +426,8 @@ viewGroupDraft model =
 viewStudentDraft : Model -> StudentDraft -> Html Msg
 viewStudentDraft model draft =
     Grid.simpleRow
-        [ Grid.col [Col.md6 ]
-              [viewFeedback model draft.id]
+        [ Grid.col [ Col.md6 ]
+            [ viewFeedback model draft.id ]
         ]
 
 

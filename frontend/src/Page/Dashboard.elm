@@ -829,12 +829,12 @@ update msg model =
 
         GotClassroomFormResult result ->
             let
-                ( updatedModel, cmd ) =
+                ( updatedModel, command ) =
                     case model.modalState of
                         ClassroomFormVisible maybeId form _ visibility ->
                             case result of
                                 Success _ ->
-                                    ( { model | modalState = ClassroomFormVisible maybeId form result Modal.hidden }, categories model.session Nothing GotCategories )
+                                    ( { model | modalState = ClassroomFormVisible maybeId form result Modal.hidden }, classrooms model.session GotClassrooms )
 
                                 _ ->
                                     ( { model | modalState = ClassroomFormVisible maybeId form result visibility }, Cmd.none )
@@ -842,11 +842,11 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
             in
-            API.handleRemoteError result updatedModel Cmd.none
+            API.handleRemoteError result updatedModel command
 
         GotClassroomDeleteResult result ->
             let
-                ( updatedModel, cmd ) =
+                ( updatedModel, command ) =
                     case model.modalState of
                         ClassroomDeleteVisible classroom _ visibility ->
                             case result of
@@ -859,7 +859,7 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
             in
-            API.handleRemoteError result updatedModel Cmd.none
+            API.handleRemoteError result updatedModel command
 
         GotSemesterFormResult result ->
             let
