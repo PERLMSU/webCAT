@@ -118,7 +118,7 @@ update msg model =
             API.handleRemoteError result { model | groupDrafts = RemoteData.map (List.sortBy (.insertedAt >> Time.posixToMillis) >> List.reverse) result } Cmd.none
 
         NewDraftClicked ->
-            ( { model | newDraft = Loading }, createGroupDraft model.session { content = "Insert Draft Content Here", status = Unreviewed, rotationGroupId = model.rotationGroupId } NewDraftResult )
+            ( { model | newDraft = Loading }, createGroupDraft model.session { content = "Insert Draft Content Here", notes = "", status = Unreviewed, rotationGroupId = Just model.rotationGroupId } NewDraftResult )
 
         NewDraftResult result ->
             case result of
