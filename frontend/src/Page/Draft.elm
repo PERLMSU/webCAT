@@ -3,6 +3,7 @@ module Page.Draft exposing (Model, Msg(..), init, subscriptions, toSession, upda
 import API exposing (APIData, Error(..))
 import API.Classrooms exposing (..)
 import API.Drafts exposing (..)
+import API.Endpoint as Endpoint
 import API.Feedback exposing (..)
 import API.Users exposing (..)
 import Bootstrap.Button as Button
@@ -10,6 +11,7 @@ import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form as Form
 import Bootstrap.Form.Input as Input
+import Bootstrap.Form.Select as Select
 import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
@@ -18,7 +20,6 @@ import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Size as Size
 import Components.Common as Common exposing (Style(..))
-import Components.Form as Form
 import Components.Table as Table
 import Date
 import Debounce exposing (..)
@@ -49,7 +50,7 @@ type alias Model =
     , rotationGroup : APIData RotationGroup
     , groupDraft : APIData GroupDraft
     , studentDrafts : APIData (List StudentDraft)
-    , students : APIData (List User)
+    , users : APIData (List User)
     , categories : APIData (List Category)
     , observations : APIData (List Observation)
     , feedback : APIData (List Feedback)
@@ -63,7 +64,7 @@ type alias Model =
     , groupDraftForm : GroupDraftForm
     , studentDraftForms : List ( DraftId, StudentDraftForm )
     , gradeForms : List ( GradeId, GradeForm )
-    , commentForm : Maybe CommentForm
+    , commentForms : List ( DraftId, CommentForm )
 
     -- Form debouncers
     , groupDraftFormDebounce : Debounce GroupDraftForm
@@ -94,7 +95,7 @@ type Msg
     | GotStudentDrafts (APIData (List StudentDraft))
     | GotGrades DraftId (APIData (List Grade))
     | GotComments (APIData (List Comment))
-    | GotStudent (APIData User)
+    | GotUser (APIData User)
       -- Created data
     | GotCreatedStudentDraft (APIData StudentDraft)
       -- Debounce messages
@@ -105,22 +106,24 @@ type Msg
     | GroupDraftFormInput DraftFormField
     | StudentDraftFormInput DraftId DraftFormField
     | GradeFormInput GradeId GradeFormField
-    | CommentFormInput CommentFormField
+    | CommentFormInput DraftId CommentFormField
       -- Button handlers
-    | CommentSubmitClicked
+    | CommentFormFocused DraftId
+    | CommentSubmitClicked DraftId
     | CommentDeleteClicked CommentId
       -- Form remote data handlers
     | GotGroupDraftUpdate (APIData GroupDraft)
     | GotStudentDraftUpdate DraftId (APIData StudentDraft)
     | GotGradeCreate (APIData Grade)
     | GotGradeUpdate GradeId (APIData Grade)
-    | GotCommentCreate (APIData Comment)
+    | GotCommentCreate DraftId (APIData Comment)
     | GotCommentDelete CommentId (APIData ())
 
 
 type DraftFormField
     = DraftNotes String
     | DraftContent String
+    | Status DraftStatus
 
 
 type GradeFormField
@@ -140,7 +143,9 @@ init rotationGroupId draftId session =
             , groupDraft = Loading
             , rotationGroup = Loading
             , studentDrafts = Loading
-            , students = Loading
+
+            {- Ensure that the user current user is loaded -}
+            , users = (Maybe.map (API.credentialUser >> List.singleton >> Success) >> Maybe.withDefault Loading) <| Session.credential session
             , categories = Loading
             , observations = Loading
             , feedback = Loading
@@ -160,7 +165,7 @@ init rotationGroupId draftId session =
             , studentDraftFormDebouncers = []
             , gradeForms = []
             , gradeFormDebouncers = []
-            , commentForm = Nothing
+            , commentForms = []
 
             -- Form remote data
             , groupDraftUpdate = NotAsked
@@ -230,7 +235,7 @@ update msg model =
                     case result of
                         Success draft ->
                             getRotationGroup model.session draft.rotationGroupId GotRotationGroup
-                                :: List.map (\id -> user model.session id GotStudent) draft.users
+                                :: List.map (\id -> user model.session id GotUser) draft.users
                                 ++ List.map (\id -> category model.session id GotCategory) draft.categories
 
                         _ ->
@@ -309,7 +314,11 @@ update msg model =
                     List.map (\category -> createGrade model.session (gradeToForm <| Right ( category.id, draftId )) GotGradeCreate) categoriesWithoutGrades
 
         GotComments result ->
-            API.handleRemoteError result { model | comments = priorityApply (++) result model.comments } Cmd.none
+            let
+                commands =
+                    RemoteData.unwrap [] (List.map (\comment -> user model.session comment.userId GotUser)) result
+            in
+            API.handleRemoteError result { model | comments = priorityApply (++) result model.comments } <| Cmd.batch commands
 
         GotStudentFeedback result ->
             API.handleRemoteError result { model | studentFeedback = priorityApply (++) result model.studentFeedback } Cmd.none
@@ -317,20 +326,12 @@ update msg model =
         GotStudentExplanations result ->
             API.handleRemoteError result { model | studentExplanations = priorityApply (++) result model.studentExplanations } Cmd.none
 
-        GotStudent result ->
+        GotUser result ->
             let
                 mapped =
-                    priorityMap List.singleton
-                        (\student students ->
-                            if student.role == Student then
-                                student :: students
+                    priorityMap List.singleton (::) result model.users
 
-                            else
-                                students
-                        )
-                        result
-                        model.students
-
+                {- See if the student draft exists, create it if not -}
                 command =
                     case result of
                         Success student ->
@@ -352,7 +353,7 @@ update msg model =
                         _ ->
                             Cmd.none
             in
-            API.handleRemoteError result { model | students = mapped } command
+            API.handleRemoteError result { model | users = mapped } command
 
         GotCreatedStudentDraft result ->
             API.handleRemoteError result { model | studentDrafts = priorityMap List.singleton (::) result model.studentDrafts } Cmd.none
@@ -401,6 +402,9 @@ update msg model =
                         DraftNotes value ->
                             { groupDraftForm | notes = value }
 
+                        Status value ->
+                            { groupDraftForm | status = value }
+
                 ( debounce, cmd ) =
                     Debounce.push groupDraftDebounceConfig form model.groupDraftFormDebounce
             in
@@ -426,6 +430,9 @@ update msg model =
 
                                 DraftNotes value ->
                                     { form | notes = value }
+
+                                Status value ->
+                                    { form | status = value }
 
                         ( updatedDebounce, cmd ) =
                             Debounce.push (studentDraftDebounceConfig draftId) updatedForm debounce
@@ -469,19 +476,32 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        CommentFormInput field ->
-            let
-                updatedForm =
-                    case model.commentForm of
-                        Just form ->
-                            case field of
-                                CommentContent value ->
-                                    Just { form | content = value }
+        CommentFormFocused draftId ->
+            case Maybe.map API.credentialUser <| Session.credential model.session of
+                Just user ->
+                    case ListExtra.find (Tuple.first >> (==) draftId) model.commentForms of
+                        Just _ ->
+                            ( model, Cmd.none )
 
                         Nothing ->
-                            Nothing
-            in
-            ( { model | commentForm = updatedForm }, Cmd.none )
+                            ( { model | commentForms = ( draftId, commentToForm <| Right ( user.id, draftId ) ) :: model.commentForms }, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        CommentFormInput draftId field ->
+            case ListExtra.find (Tuple.first >> (==) draftId) model.commentForms of
+                Just ( _, form ) ->
+                    case field of
+                        CommentContent value ->
+                            let
+                                updatedForm =
+                                    { form | content = value }
+                            in
+                            ( { model | commentForms = ListExtra.setIf (Tuple.first >> (==) draftId) ( draftId, updatedForm ) model.commentForms }, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         GotGroupDraftUpdate result ->
             ( { model | groupDraftUpdate = result }, Cmd.none )
@@ -494,10 +514,10 @@ update msg model =
                 Nothing ->
                     ( { model | studentDraftUpdates = ( draftId, result ) :: model.studentDraftUpdates }, Cmd.none )
 
-        CommentSubmitClicked ->
-            case model.commentForm of
-                Just form ->
-                    ( model, createComment model.session form GotCommentCreate )
+        CommentSubmitClicked draftId ->
+            case ListExtra.find (Tuple.first >> (==) draftId) model.commentForms of
+                Just ( _, form ) ->
+                    ( model, createComment model.session form (GotCommentCreate draftId) )
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -531,13 +551,12 @@ update msg model =
                 }
                 Cmd.none
 
-        GotCommentCreate result ->
+        GotCommentCreate draftId result ->
             case result of
                 Success comment ->
                     ( { model
                         | comments = RemoteData.map ((::) comment) model.comments
-                        , commentResult = NotAsked
-                        , commentForm = Nothing
+                        , commentForms = ListExtra.filterNot (Tuple.first >> (==) draftId) model.commentForms
                       }
                     , Cmd.none
                     )
@@ -642,9 +661,9 @@ viewFeedback model draftId =
         |> Card.view
 
 
-viewGroupDraft : Model -> Html Msg
+viewGroupDraft : Model -> List (Html Msg)
 viewGroupDraft model =
-    Grid.simpleRow
+    [ Grid.simpleRow
         [ case model.rotationGroup of
             Success rotationGroup ->
                 Grid.col []
@@ -746,10 +765,73 @@ viewGroupDraft model =
                                 |> Card.view
                             ]
                         ]
+
+                    {- Draft status -}
+                    , case Maybe.map API.credentialUser <| Session.credential model.session of
+                        Just user ->
+                            let
+                                parseStatus str =
+                                    case str of
+                                        "reviewing" ->
+                                            Reviewing
+
+                                        "needs_revision" ->
+                                            NeedsRevision
+
+                                        "approved" ->
+                                            Approved
+
+                                        "emailed" ->
+                                            Emailed
+
+                                        _ ->
+                                            Unreviewed
+                            in
+                            {- Everyone but students and LAs can edit the draft status -}
+                            if not <| List.member user.role [ Student, LearningAssistant ] then
+                                Grid.simpleRow
+                                    [ Grid.col [ Col.md12 ]
+                                        [ Card.config []
+                                            |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
+                                                [ h3 []
+                                                    [ text "Draft Status"
+                                                    ]
+                                                , h5 []
+                                                    [ Common.iconTooltip "question-circle" "Change the status of the draft here"
+                                                    ]
+                                                ]
+                                            |> Card.block []
+                                                [ Block.custom <|
+                                                    Select.select
+                                                        [ Select.onChange (parseStatus >> Status >> GroupDraftFormInput)
+                                                        , Select.attrs [ value <| draftStatusToString model.groupDraftForm.status ]
+                                                        ]
+                                                        [ Select.item [ value "unreviewed" ] [ text "Unreviewed" ]
+                                                        , Select.item [ value "reviewing" ] [ text "Reviewing" ]
+                                                        , Select.item [ value "needs_revision" ] [ text "Needs Revision" ]
+                                                        , Select.item [ value "approved" ] [ text "Approved" ]
+                                                        , Select.item [ value "emailed" ] [ text "Emailed" ]
+                                                        ]
+                                                ]
+                                            |> Card.view
+                                        ]
+                                    ]
+
+                            else
+                                text ""
+
+                        Nothing ->
+                            text ""
                     ]
                 ]
             ]
         ]
+    , Grid.simpleRow
+        [ Grid.col [ Col.md12 ]
+            [ viewComments model model.draftId (RemoteData.unwrap [] (List.filter (.draftId >> (==) model.draftId)) model.comments)
+            ]
+        ]
+    ]
 
 
 viewCategoryGrade : Grade -> GradeForm -> Category -> ListGroup.Item Msg
@@ -775,6 +857,82 @@ viewCategoryGrade grade form category =
                 ]
             ]
         ]
+
+
+viewComments : Model -> DraftId -> List Comment -> Html Msg
+viewComments model draftId comments =
+    let
+        viewComment comment =
+            let
+                name =
+                    case ListExtra.find (.id >> (==) comment.userId) <| RemoteData.withDefault [] model.users of
+                        Just user ->
+                            user.firstName ++ " " ++ user.lastName
+
+                        Nothing ->
+                            "Error - user not loaded"
+            in
+            ListGroup.li []
+                [ li [ class "media" ]
+                    [ img
+                        [ class "mr-3"
+                        , Endpoint.src <| Endpoint.profilePicture comment.userId
+                        , class "rounded-circle"
+                        , style "width" "4rem"
+                        , style "height" "4rem"
+                        , alt <| "Profile picture for " ++ name
+                        ]
+                        []
+                    , div [ class "media-body" ]
+                        [ div [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
+                            [ h3 [] [ text name ]
+                            , case Maybe.map API.credentialUser <| Session.credential model.session of
+                                Just user ->
+                                    if comment.userId == user.id then
+                                        Button.button [ Button.danger, Button.onClick (CommentDeleteClicked comment.id) ]
+                                            [ text "Delete comment" ]
+
+                                    else
+                                        text ""
+
+                                Nothing ->
+                                    text ""
+                            ]
+                        , p [] [ text comment.content ]
+                        , p [] [ text <| "Posted at " ++ Date.posixToClockTime model.timezone comment.insertedAt ]
+                        ]
+                    ]
+                ]
+    in
+    Card.config []
+        |> Card.header [] [ h3 [] [ text "Comments" ] ]
+        |> (if List.length comments > 0 then
+                Card.listGroup (List.map viewComment comments)
+
+            else
+                Card.block [] [ Block.custom <| text "No comments yet" ]
+           )
+        |> Card.block []
+            [ Block.custom <|
+                Form.form []
+                    [ Form.group []
+                        [ Form.label [] [ text "Post a comment" ]
+                        , Textarea.textarea
+                            [ Textarea.value <|
+                                case ListExtra.find (Tuple.first >> (==) draftId) model.commentForms of
+                                    Just ( _, form ) ->
+                                        form.content
+
+                                    Nothing ->
+                                        ""
+                            , Textarea.onInput (CommentContent >> CommentFormInput draftId)
+                            , Textarea.attrs [ onFocus <| CommentFormFocused draftId ]
+                            ]
+                        , Button.button [ Button.primary, Button.onClick (CommentSubmitClicked draftId) ] [ text "Submit" ]
+                        ]
+                    ]
+            ]
+        |> Card.view
 
 
 viewStudentDraft : Model -> StudentDraft -> List (Html Msg)
@@ -819,7 +977,7 @@ viewStudentDraft model draft =
     in
     [ Grid.simpleRow
         [ Grid.col [ Col.md12 ]
-            [ case ListExtra.find (.id >> (==) draft.studentId) (RemoteData.withDefault [] model.students) of
+            [ case ListExtra.find (.id >> (==) draft.studentId) (RemoteData.withDefault [] model.users) of
                 Just student ->
                     h3 [] [ text <| student.firstName ++ " " ++ student.lastName ]
 
@@ -923,6 +1081,8 @@ viewStudentDraft model draft =
                                 |> Card.view
                             ]
                         ]
+
+                    {- Grades -}
                     , Grid.simpleRow
                         [ Grid.col [ Col.md12 ]
                             [ Card.config []
@@ -938,8 +1098,70 @@ viewStudentDraft model draft =
                                 |> Card.view
                             ]
                         ]
+
+                    {- Draft status -}
+                    , case Maybe.map API.credentialUser <| Session.credential model.session of
+                        Just user ->
+                            let
+                                parseStatus str =
+                                    case str of
+                                        "reviewing" ->
+                                            Reviewing
+
+                                        "needs_revision" ->
+                                            NeedsRevision
+
+                                        "approved" ->
+                                            Approved
+
+                                        "emailed" ->
+                                            Emailed
+
+                                        _ ->
+                                            Unreviewed
+                            in
+                            {- Everyone but students and LAs can edit the draft status -}
+                            if not <| List.member user.role [ Student, LearningAssistant ] then
+                                Grid.simpleRow
+                                    [ Grid.col [ Col.md12 ]
+                                        [ Card.config []
+                                            |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
+                                                [ h3 []
+                                                    [ text "Draft Status"
+                                                    ]
+                                                , h5 []
+                                                    [ Common.iconTooltip "question-circle" "Change the status of the draft here"
+                                                    ]
+                                                ]
+                                            |> Card.block []
+                                                [ Block.custom <|
+                                                    Select.select
+                                                        [ Select.onChange (parseStatus >> Status >> StudentDraftFormInput draft.id)
+                                                        , Select.attrs [ value <| draftStatusToString form.status ]
+                                                        ]
+                                                        [ Select.item [ value "unreviewed" ] [ text "Unreviewed" ]
+                                                        , Select.item [ value "reviewing" ] [ text "Reviewing" ]
+                                                        , Select.item [ value "needs_revision" ] [ text "Needs Revision" ]
+                                                        , Select.item [ value "approved" ] [ text "Approved" ]
+                                                        , Select.item [ value "emailed" ] [ text "Emailed" ]
+                                                        ]
+                                                ]
+                                            |> Card.view
+                                        ]
+                                    ]
+
+                            else
+                                text ""
+
+                        Nothing ->
+                            text ""
                     ]
                 ]
+            ]
+        ]
+    , Grid.simpleRow
+        [ Grid.col [ Col.md12 ]
+            [ viewComments model draft.id (RemoteData.unwrap [] (List.filter (.draftId >> (==) draft.id)) model.comments)
             ]
         ]
     ]
@@ -957,7 +1179,7 @@ view model =
     , content =
         Grid.container [] <|
             viewGroupDraft model
-                :: (case model.studentDrafts of
+                ++ (case model.studentDrafts of
                         Success drafts ->
                             List.concat <| List.map (viewStudentDraft model) <| List.sortBy (.id >> unwrapDraftId) drafts
 
