@@ -77,7 +77,7 @@ suite =
                         , DraftRotations (SectionId 1)
                         , EditFeedback (DraftId 1) (Just <| CategoryId 1)
                         , EditFeedback (DraftId 1) Nothing
-                        , Draft <| DraftId 1
+                        , Draft (RotationGroupId 1) (DraftId 1)
 
                         -- Profile
                         , Profile

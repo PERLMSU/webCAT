@@ -1,8 +1,8 @@
-module API.Drafts exposing (CommentForm, GradeForm, GroupDraftForm, StudentDraftForm, commentToForm, comments, createComment, createGrade, createGroupDraft, createStudentDraft, deleteDraft, draft, encodeCommentForm, encodeGradeForm, encodeGroupDraftForm, encodeMaybe, encodeStudentDraftForm, gradeToForm, grades, groupDraft, groupDraftToForm, groupDrafts, studentDraft, studentDraftToForm, studentDrafts, updateComment, updateGrade, updateGroupDraft, updateStudentDraft)
+module API.Drafts exposing (CommentForm, GradeForm, GroupDraftForm, StudentDraftForm, commentToForm, comments, createComment, createGrade, createGroupDraft, createStudentDraft, deleteDraft, draft, encodeCommentForm, encodeGradeForm, encodeGroupDraftForm, encodeMaybe, encodeStudentDraftForm, gradeToForm, grades, groupDraft, groupDraftToForm, groupDrafts, studentDraft, studentDraftToForm, studentDrafts, updateComment, updateGrade, updateGroupDraft, updateStudentDraft, deleteComment)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
-import Either exposing (Either)
+import Either exposing (Either(..))
 import Either.Decode exposing (either)
 import Http exposing (jsonBody)
 import Json.Decode as Decode exposing (Decoder)
@@ -41,21 +41,21 @@ studentDraft session draftId toMsg =
     API.getRemote (Endpoint.draft draftId) (Session.credential session) (singleDecoder studentDraftDecoder) toMsg
 
 
-groupDraftToForm : Maybe GroupDraft -> GroupDraftForm
-groupDraftToForm maybeDraft =
-    case maybeDraft of
-        Just d ->
+groupDraftToForm : Either GroupDraft RotationGroupId -> GroupDraftForm
+groupDraftToForm either =
+    case either of
+        Left d ->
             { content = d.content
             , notes = Maybe.withDefault "" d.notes
             , status = d.status
-            , rotationGroupId = Just d.rotationGroupId
+            , rotationGroupId = d.rotationGroupId
             }
 
-        Nothing ->
+        Right id ->
             { content = ""
             , notes = ""
             , status = Unreviewed
-            , rotationGroupId = Nothing
+            , rotationGroupId = id
             }
 
 
@@ -65,27 +65,27 @@ type alias GroupDraftForm =
     , notes : String
 
     -- Foreign keys
-    , rotationGroupId : Maybe RotationGroupId
+    , rotationGroupId : RotationGroupId
     }
 
 
-studentDraftToForm : Maybe StudentDraft -> StudentDraftForm
-studentDraftToForm maybeDraft =
-    case maybeDraft of
-        Just d ->
+studentDraftToForm : Either StudentDraft ( UserId, DraftId ) -> StudentDraftForm
+studentDraftToForm either =
+    case either of
+        Left d ->
             { content = d.content
             , notes = Maybe.withDefault "" d.notes
             , status = d.status
-            , studentId = Just d.studentId
-            , parentDraftId = Just d.parentDraftId
+            , studentId = d.studentId
+            , parentDraftId = d.parentDraftId
             }
 
-        Nothing ->
+        Right ( userId, draftId ) ->
             { content = ""
             , notes = ""
             , status = Unreviewed
-            , studentId = Nothing
-            , parentDraftId = Nothing
+            , studentId = userId
+            , parentDraftId = draftId
             }
 
 
@@ -95,13 +95,14 @@ type alias StudentDraftForm =
     , status : DraftStatus
 
     -- Foreign keys
-    , studentId : Maybe UserId
-    , parentDraftId : Maybe DraftId
+    , studentId : UserId
+    , parentDraftId : DraftId
     }
 
 
 encodeMaybe : (a -> Encode.Value) -> Maybe a -> Encode.Value
-encodeMaybe encoder maybe = Maybe.withDefault Encode.null <| Maybe.map encoder maybe
+encodeMaybe encoder maybe =
+    Maybe.withDefault Encode.null <| Maybe.map encoder maybe
 
 
 encodeGroupDraftForm : GroupDraftForm -> Encode.Value
@@ -110,7 +111,7 @@ encodeGroupDraftForm form =
         [ ( "content", Encode.string form.content )
         , ( "notes", Encode.string form.notes )
         , ( "status", (draftStatusToString >> Encode.string) form.status )
-        , ( "rotation_group_id", encodeMaybe (unwrapRotationGroupId >> Encode.int) form.rotationGroupId )
+        , ( "rotation_group_id", (unwrapRotationGroupId >> Encode.int) form.rotationGroupId )
         ]
 
 
@@ -120,8 +121,8 @@ encodeStudentDraftForm form =
         [ ( "content", Encode.string form.content )
         , ( "notes", Encode.string form.notes )
         , ( "status", (draftStatusToString >> Encode.string) form.status )
-        , ( "student_id", encodeMaybe (unwrapUserId >> Encode.int) form.studentId )
-        , ( "parent_draft_id", encodeMaybe (unwrapDraftId >> Encode.int) form.parentDraftId )
+        , ( "student_id", (unwrapUserId >> Encode.int) form.studentId )
+        , ( "parent_draft_id", (unwrapDraftId >> Encode.int) form.parentDraftId )
         ]
 
 
@@ -167,13 +168,22 @@ type alias GradeForm =
     }
 
 
-gradeToForm : Grade -> GradeForm
-gradeToForm g =
-    { score = g.score
-    , note = Maybe.withDefault "" g.note
-    , categoryId = g.categoryId
-    , draftId = g.draftId
-    }
+gradeToForm : Either Grade ( CategoryId, DraftId ) -> GradeForm
+gradeToForm either =
+    case either of
+        Left g ->
+            { score = g.score
+            , note = Maybe.withDefault "" g.note
+            , categoryId = g.categoryId
+            , draftId = g.draftId
+            }
+
+        Right ( categoryId, draftId ) ->
+            { score = 0
+            , note = ""
+            , categoryId = categoryId
+            , draftId = draftId
+            }
 
 
 encodeGradeForm : GradeForm -> Encode.Value
@@ -212,12 +222,19 @@ type alias CommentForm =
     }
 
 
-commentToForm : Comment -> CommentForm
-commentToForm c =
-    { content = c.content
-    , userId = c.userId
-    , draftId = c.draftId
-    }
+commentToForm : Either Comment (UserId, DraftId) -> CommentForm
+commentToForm either =
+    case either of
+        Left c ->
+            { content = c.content
+            , userId = c.userId
+            , draftId = c.draftId
+            }
+        Right (userId, draftId) ->
+            { content = ""
+            , userId = userId
+            , draftId = draftId
+            }
 
 
 encodeCommentForm : CommentForm -> Encode.Value
@@ -237,3 +254,8 @@ createComment session form toMsg =
 updateComment : Session -> CommentId -> CommentForm -> (APIData Comment -> msg) -> Cmd msg
 updateComment session id form toMsg =
     API.putRemote (Endpoint.comment id) (Session.credential session) (jsonBody <| encodeCommentForm form) (singleDecoder commentDecoder) toMsg
+
+deleteComment : Session -> CommentId -> (APIData () -> msg) -> Cmd msg
+deleteComment session id toMsg =
+    API.deleteRemote (Endpoint.comment id) (Session.credential session) toMsg
+

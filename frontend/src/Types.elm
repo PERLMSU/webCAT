@@ -761,7 +761,7 @@ gradeDecoder =
     Decode.succeed Grade
         |> required "id" (map GradeId parseInt)
         |> requiredAttribute "score" int
-        |> optionalMaybe "note" (nullable string)
+        |> optionalAttribute "note" (nullable string)
         |> requiredAttribute "category_id" (map CategoryId int)
         |> requiredAttribute "draft_id" (map DraftId int)
         |> requiredAttribute "inserted_at" (map Time.millisToPosix int)

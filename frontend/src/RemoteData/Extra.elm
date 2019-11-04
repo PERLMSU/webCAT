@@ -1,4 +1,5 @@
-module RemoteData.Extra exposing (priorityApply, priorityMap)
+module RemoteData.Extra exposing (priorityApply, priorityMap, priorityUnwrap)
+                                
 
 import RemoteData exposing (RemoteData(..), map, succeed)
 
@@ -43,3 +44,18 @@ priorityMap defaultFun fun dataA dataB =
 
         _ ->
             map defaultFun dataA
+
+
+priorityUnwrap : c -> (a -> c) -> (a -> b -> c) -> RemoteData e a -> RemoteData e b -> c
+priorityUnwrap default defaultFun fun dataA dataB =
+    case dataA of
+        Success a1 ->
+            case dataB of
+                Success a2 ->
+                    fun a1 a2
+
+                _ ->
+                    defaultFun a1
+
+        _ ->
+            default

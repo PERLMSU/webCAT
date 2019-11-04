@@ -118,12 +118,12 @@ update msg model =
             API.handleRemoteError result { model | groupDrafts = RemoteData.map (List.sortBy (.insertedAt >> Time.posixToMillis) >> List.reverse) result } Cmd.none
 
         NewDraftClicked ->
-            ( { model | newDraft = Loading }, createGroupDraft model.session { content = "Insert Draft Content Here", notes = "", status = Unreviewed, rotationGroupId = Just model.rotationGroupId } NewDraftResult )
+            ( { model | newDraft = Loading }, createGroupDraft model.session { content = "Insert Draft Content Here", notes = "", status = Unreviewed, rotationGroupId = model.rotationGroupId } NewDraftResult )
 
         NewDraftResult result ->
             case result of
                 Success newDraft ->
-                    ( { model | newDraft = result }, Route.pushUrl (Session.navKey model.session) (Route.Draft newDraft.id) )
+                    ( { model | newDraft = result }, Route.pushUrl (Session.navKey model.session) (Route.Draft newDraft.rotationGroupId newDraft.id) )
 
                 Failure _ ->
                     API.handleRemoteError result { model | alertVisibility = Alert.shown, newDraft = result } Cmd.none
@@ -233,7 +233,7 @@ view model =
                                 [ Block.titleH5 [] [ text <| "Last updated " ++ Date.posixToDate model.timezone draft.updatedAt ++ " at " ++ Date.posixToClockTime model.timezone draft.updatedAt ]
                                 , Block.custom <|
                                     div []
-                                        [ Button.linkButton [ Button.info, Button.attrs [ Route.href (Route.Draft draft.id) ] ] [ text "Edit" ]
+                                        [ Button.linkButton [ Button.info, Button.attrs [ Route.href (Route.Draft draft.rotationGroupId draft.id) ] ] [ text "Edit" ]
                                         , Button.button [ Button.danger, Button.onClick <| DeleteDraftClicked draft.id ] [ text "Delete" ]
                                         ]
                                 ]

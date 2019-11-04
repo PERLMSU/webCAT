@@ -166,8 +166,8 @@ changeRouteTo maybeRoute model =
             EditFeedback.init session draftId maybeCategoryId
                 |> updateWith EditFeedback GotEditFeedbackMsg model
 
-        Just (Route.Draft draftId) ->
-            Draft.init draftId session
+        Just (Route.Draft rotationGroupId draftId) ->
+            Draft.init rotationGroupId draftId session
                 |> updateWith Draft GotDraftMsg model
 
         Just Route.Profile ->

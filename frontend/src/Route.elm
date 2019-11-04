@@ -55,7 +55,7 @@ type Route
     | DraftClassrooms
     | DraftRotations SectionId
     | GroupDrafts RotationGroupId
-    | Draft DraftId
+    | Draft RotationGroupId DraftId
     | EditFeedback DraftId (Maybe CategoryId)
       -- Profile
     | Profile
@@ -192,7 +192,7 @@ parser =
                             [ Parser.map DraftClassrooms top
                             , Parser.map DraftRotations (s "sections" </> Parser.map SectionId int)
                             , Parser.map GroupDrafts (s "groups" </> Parser.map RotationGroupId int)
-                            , Parser.map Draft (Parser.map DraftId int)
+                            , Parser.map Draft (s "groups" </> Parser.map RotationGroupId int </> Parser.map DraftId int)
                             , Parser.map EditFeedback (Parser.map DraftId int </> s "feedback" <?> idQueryParser CategoryId "categoryId")
                             ]
                 , Parser.map Profile (s "profile")
@@ -297,8 +297,8 @@ routeToString route =
         GroupDrafts (RotationGroupId id) ->
             appAbsolute [ "drafts", "groups", String.fromInt id ] []
 
-        Draft (DraftId id) ->
-            appAbsolute [ "drafts", String.fromInt id ] []
+        Draft (RotationGroupId rotationGroupId) (DraftId draftId) ->
+            appAbsolute [ "drafts", "groups", String.fromInt rotationGroupId, String.fromInt draftId ] []
 
         EditFeedback (DraftId draftId) maybeCategoryId ->
             appAbsolute [ "drafts", String.fromInt draftId, "feedback" ] (Maybe.withDefault [] (Maybe.map (\(CategoryId id) -> [ Builder.int "categoryId" id ]) maybeCategoryId))
