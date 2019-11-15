@@ -1,19 +1,14 @@
-module API.Feedback exposing (..)
+module API.Feedback exposing (CategoryForm, ExplanationForm, FeedbackForm, ObservationForm, categories, category, createCategory, createExplanation, createFeedback, createObservation, createStudentExplanation, createStudentFeedback, deleteCategory, deleteExplanation, deleteFeedback, deleteObservation, deleteStudentExplanation, deleteStudentFeedback, explanations, feedback, getExplanation, getFeedback, getObservation, initCategoryForm, initExplanationForm, initFeedbackForm, initObservationForm, observations, studentExplanations, studentFeedback, updateCategory, updateExplanation, updateFeedback, updateObservation)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
+import Either exposing (..)
 import Http exposing (emptyBody, jsonBody)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Session exposing (Session)
 import Time as Time
 import Types exposing (..)
-import Either exposing (..)
-
-
-encodeMaybe : (a -> Encode.Value) -> Maybe a -> Encode.Value
-encodeMaybe fn maybe =
-    Maybe.withDefault Encode.null <| Maybe.map fn maybe
 
 
 
@@ -47,6 +42,7 @@ initCategoryForm maybeCategory =
             , description = Maybe.withDefault "" data.description
             , parentCategoryId = data.parentCategoryId
             }
+
         Nothing ->
             { name = ""
             , description = ""
@@ -77,13 +73,17 @@ deleteCategory : Session -> CategoryId -> (APIData () -> msg) -> Cmd msg
 deleteCategory session id toMsg =
     API.deleteRemote (Endpoint.category id) (Session.credential session) toMsg
 
+
+
 -- Observations
+
 
 type alias ObservationForm =
     { content : String
     , type_ : ObservationType
     , categoryId : CategoryId
     }
+
 
 initObservationForm : Either Observation CategoryId -> ObservationForm
 initObservationForm either =
@@ -93,6 +93,7 @@ initObservationForm either =
             , type_ = observation.type_
             , categoryId = observation.categoryId
             }
+
         Right id ->
             { content = ""
             , type_ = Neutral
@@ -100,44 +101,49 @@ initObservationForm either =
             }
 
 
-
 encodeObservationForm : ObservationForm -> Encode.Value
 encodeObservationForm form =
     Encode.object
-        [ ("content", Encode.string form.content)
-        , ("type", (observationTypeToString >> Encode.string) form.type_)
-        , ("categoryId", (unwrapCategoryId >> Encode.int) form.categoryId)
+        [ ( "content", Encode.string form.content )
+        , ( "type", (observationTypeToString >> Encode.string) form.type_ )
+        , ( "categoryId", (unwrapCategoryId >> Encode.int) form.categoryId )
         ]
+
 
 observations : Session -> Maybe CategoryId -> (APIData (List Observation) -> msg) -> Cmd msg
 observations session maybeCategoryId toMsg =
     API.getRemote (Endpoint.observations maybeCategoryId) (Session.credential session) (multiDecoder observationDecoder) toMsg
 
 
-getObservation : Session -> ObservationId -> (APIData (Observation) -> msg) -> Cmd msg
+getObservation : Session -> ObservationId -> (APIData Observation -> msg) -> Cmd msg
 getObservation session id toMsg =
     API.getRemote (Endpoint.observation id) (Session.credential session) (singleDecoder observationDecoder) toMsg
+
 
 createObservation : Session -> ObservationForm -> (APIData Observation -> msg) -> Cmd msg
 createObservation session form toMsg =
     API.postRemote (Endpoint.observations Nothing) (Session.credential session) (jsonBody <| encodeObservationForm form) (singleDecoder observationDecoder) toMsg
 
 
-updateObservation : Session -> ObservationId -> ObservationForm -> (APIData (Observation) -> msg) -> Cmd msg
+updateObservation : Session -> ObservationId -> ObservationForm -> (APIData Observation -> msg) -> Cmd msg
 updateObservation session id form toMsg =
     API.putRemote (Endpoint.observation id) (Session.credential session) ((encodeObservationForm >> jsonBody) form) (singleDecoder observationDecoder) toMsg
+
 
 deleteObservation : Session -> ObservationId -> (APIData () -> msg) -> Cmd msg
 deleteObservation session id toMsg =
     API.deleteRemote (Endpoint.observation id) (Session.credential session) toMsg
 
 
+
 -- Feedback
+
 
 type alias FeedbackForm =
     { content : String
     , observationId : ObservationId
     }
+
 
 initFeedbackForm : Either Feedback ObservationId -> FeedbackForm
 initFeedbackForm either =
@@ -146,49 +152,55 @@ initFeedbackForm either =
             { content = fb.content
             , observationId = fb.observationId
             }
+
         Right id ->
             { content = ""
             , observationId = id
             }
 
 
-
 encodeFeedbackForm : FeedbackForm -> Encode.Value
 encodeFeedbackForm form =
     Encode.object
-        [ ("content", Encode.string form.content)
-        , ("observationId", (unwrapObservationId >> Encode.int) form.observationId)
+        [ ( "content", Encode.string form.content )
+        , ( "observationId", (unwrapObservationId >> Encode.int) form.observationId )
         ]
+
 
 feedback : Session -> Maybe ObservationId -> (APIData (List Feedback) -> msg) -> Cmd msg
 feedback session maybeObservationId toMsg =
     API.getRemote (Endpoint.feedback maybeObservationId) (Session.credential session) (multiDecoder feedbackDecoder) toMsg
 
 
-getFeedback : Session -> FeedbackId -> (APIData (Feedback) -> msg) -> Cmd msg
+getFeedback : Session -> FeedbackId -> (APIData Feedback -> msg) -> Cmd msg
 getFeedback session id toMsg =
     API.getRemote (Endpoint.feedbackItem id) (Session.credential session) (singleDecoder feedbackDecoder) toMsg
+
 
 createFeedback : Session -> FeedbackForm -> (APIData Feedback -> msg) -> Cmd msg
 createFeedback session form toMsg =
     API.postRemote (Endpoint.feedback Nothing) (Session.credential session) (jsonBody <| encodeFeedbackForm form) (singleDecoder feedbackDecoder) toMsg
 
 
-updateFeedback : Session -> FeedbackId -> FeedbackForm -> (APIData (Feedback) -> msg) -> Cmd msg
+updateFeedback : Session -> FeedbackId -> FeedbackForm -> (APIData Feedback -> msg) -> Cmd msg
 updateFeedback session id form toMsg =
     API.putRemote (Endpoint.feedbackItem id) (Session.credential session) ((encodeFeedbackForm >> jsonBody) form) (singleDecoder feedbackDecoder) toMsg
+
 
 deleteFeedback : Session -> FeedbackId -> (APIData () -> msg) -> Cmd msg
 deleteFeedback session id toMsg =
     API.deleteRemote (Endpoint.feedbackItem id) (Session.credential session) toMsg
 
 
+
 -- Explanations
+
 
 type alias ExplanationForm =
     { content : String
     , feedbackId : FeedbackId
     }
+
 
 initExplanationForm : Either Explanation FeedbackId -> ExplanationForm
 initExplanationForm either =
@@ -197,41 +209,45 @@ initExplanationForm either =
             { content = explanation.content
             , feedbackId = explanation.feedbackId
             }
+
         Right id ->
             { content = ""
             , feedbackId = id
             }
 
 
-
 encodeExplanationForm : ExplanationForm -> Encode.Value
 encodeExplanationForm form =
     Encode.object
-        [ ("content", Encode.string form.content)
-        , ("feedbackId", (unwrapFeedbackId >> Encode.int) form.feedbackId)
+        [ ( "content", Encode.string form.content )
+        , ( "feedbackId", (unwrapFeedbackId >> Encode.int) form.feedbackId )
         ]
+
 
 explanations : Session -> Maybe FeedbackId -> (APIData (List Explanation) -> msg) -> Cmd msg
 explanations session maybeFeedbackId toMsg =
     API.getRemote (Endpoint.explanations maybeFeedbackId) (Session.credential session) (multiDecoder explanationDecoder) toMsg
 
 
-getExplanation : Session -> ExplanationId -> (APIData (Explanation) -> msg) -> Cmd msg
+getExplanation : Session -> ExplanationId -> (APIData Explanation -> msg) -> Cmd msg
 getExplanation session id toMsg =
     API.getRemote (Endpoint.explanation id) (Session.credential session) (singleDecoder explanationDecoder) toMsg
+
 
 createExplanation : Session -> ExplanationForm -> (APIData Explanation -> msg) -> Cmd msg
 createExplanation session form toMsg =
     API.postRemote (Endpoint.explanations Nothing) (Session.credential session) (jsonBody <| encodeExplanationForm form) (singleDecoder explanationDecoder) toMsg
 
 
-updateExplanation : Session -> ExplanationId -> ExplanationForm -> (APIData (Explanation) -> msg) -> Cmd msg
+updateExplanation : Session -> ExplanationId -> ExplanationForm -> (APIData Explanation -> msg) -> Cmd msg
 updateExplanation session id form toMsg =
     API.putRemote (Endpoint.explanation id) (Session.credential session) ((encodeExplanationForm >> jsonBody) form) (singleDecoder explanationDecoder) toMsg
+
 
 deleteExplanation : Session -> ExplanationId -> (APIData () -> msg) -> Cmd msg
 deleteExplanation session id toMsg =
     API.deleteRemote (Endpoint.explanation id) (Session.credential session) toMsg
+
 
 
 -- Student Feedback
@@ -245,9 +261,11 @@ studentFeedback session draftId toMsg =
 createStudentFeedback : Session -> DraftId -> FeedbackId -> (APIResult StudentFeedback -> msg) -> Cmd msg
 createStudentFeedback session draftId feedbackId toMsg =
     let
-        encodedBody = Encode.object [ ("draft_id", (unwrapDraftId >> Encode.int) draftId)
-                                    , ("feedback_id", (unwrapFeedbackId >> Encode.int) feedbackId)
-                                    ]
+        encodedBody =
+            Encode.object
+                [ ( "draft_id", (unwrapDraftId >> Encode.int) draftId )
+                , ( "feedback_id", (unwrapFeedbackId >> Encode.int) feedbackId )
+                ]
     in
     API.post (Endpoint.studentFeedback Nothing Nothing) (Session.credential session) (jsonBody encodedBody) (singleDecoder studentFeedbackDecoder) toMsg
 
@@ -257,7 +275,9 @@ deleteStudentFeedback session id toMsg =
     API.delete (Endpoint.studentFeedbackItem id) (Session.credential session) toMsg
 
 
+
 -- Student Explanations
+
 
 studentExplanations : Session -> DraftId -> Maybe FeedbackId -> (APIData (List StudentExplanation) -> msg) -> Cmd msg
 studentExplanations session draftId feedbackId toMsg =
@@ -267,10 +287,12 @@ studentExplanations session draftId feedbackId toMsg =
 createStudentExplanation : Session -> DraftId -> FeedbackId -> ExplanationId -> (APIResult StudentExplanation -> msg) -> Cmd msg
 createStudentExplanation session draftId feedbackId explanationId toMsg =
     let
-        encodedBody = Encode.object [ ("draft_id", (unwrapDraftId >> Encode.int) draftId)
-                                    , ("feedback_id", (unwrapFeedbackId >> Encode.int) feedbackId)
-                                    , ("explanation_id", (unwrapExplanationId >> Encode.int) explanationId)
-                                    ]
+        encodedBody =
+            Encode.object
+                [ ( "draft_id", (unwrapDraftId >> Encode.int) draftId )
+                , ( "feedback_id", (unwrapFeedbackId >> Encode.int) feedbackId )
+                , ( "explanation_id", (unwrapExplanationId >> Encode.int) explanationId )
+                ]
     in
     API.post (Endpoint.studentExplanations Nothing Nothing Nothing) (Session.credential session) (jsonBody encodedBody) (singleDecoder studentExplanationDecoder) toMsg
 
@@ -278,3 +300,12 @@ createStudentExplanation session draftId feedbackId explanationId toMsg =
 deleteStudentExplanation : Session -> StudentExplanationId -> (APIResult () -> msg) -> Cmd msg
 deleteStudentExplanation session id toMsg =
     API.delete (Endpoint.studentExplanation id) (Session.credential session) toMsg
+
+
+
+-- Private utilities
+
+
+encodeMaybe : (a -> Encode.Value) -> Maybe a -> Encode.Value
+encodeMaybe fn =
+    Maybe.map fn >> Maybe.withDefault Encode.null

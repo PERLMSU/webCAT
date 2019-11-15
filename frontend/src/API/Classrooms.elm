@@ -1,19 +1,27 @@
-module API.Classrooms exposing (..)
+module API.Classrooms exposing (ClassroomForm, RotationForm, SectionForm, SemesterForm, classrooms, createClassroom, createRotation, createSection, createSemester, deleteClassroom, deleteRotation, deleteSection, deleteSemester, encodeClassroomForm, encodeRotationForm, encodeSectionForm, encodeSemesterForm, getClassroom, getRotation, getRotationGroup, getSection, getSemester, initClassroomForm, initRotationForm, initSectionForm, initSemesterForm, rotationGroups, rotations, sections, semesters, updateClassroom, updateRotation, updateSection, updateSemester)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
-import Http exposing (jsonBody)
+import Either exposing (..)
+import File exposing (..)
+import Http exposing (fileBody, jsonBody)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Session exposing (Session)
 import Time as Time
 import Types exposing (..)
-import Either exposing (..)
+
 
 
 -- Classrooms
+
+
 type alias ClassroomForm =
-    { courseCode : String, name : String, description : String, categories : List CategoryId }
+    { courseCode : String
+    , name : String
+    , description : String
+    , categories : List CategoryId
+    }
 
 
 initClassroomForm : Maybe Classroom -> ClassroomForm
@@ -23,7 +31,8 @@ initClassroomForm maybeClassroom =
             { courseCode = ""
             , name = ""
             , description = ""
-            , categories = []}
+            , categories = []
+            }
 
         Just classroom ->
             { courseCode = classroom.courseCode
@@ -31,7 +40,6 @@ initClassroomForm maybeClassroom =
             , description = Maybe.withDefault "" classroom.description
             , categories = classroom.categories
             }
-
 
 
 classrooms : Session -> (APIData (List Classroom) -> msg) -> Cmd msg
@@ -42,7 +50,6 @@ classrooms session toMsg =
 getClassroom : Session -> ClassroomId -> (APIData Classroom -> msg) -> Cmd msg
 getClassroom session id toMsg =
     API.getRemote (Endpoint.classroom id) (Session.credential session) (singleDecoder classroomDecoder) toMsg
-
 
 
 encodeClassroomForm : ClassroomForm -> Encode.Value
@@ -74,10 +81,9 @@ deleteClassroom session id toMsg =
 -- Semesters
 
 
-
-
 type alias SemesterForm =
     { name : String, description : String, startDate : Time.Posix, endDate : Time.Posix }
+
 
 initSemesterForm : Maybe Semester -> Maybe Time.Posix -> SemesterForm
 initSemesterForm maybeSemester maybeTime =
@@ -85,9 +91,10 @@ initSemesterForm maybeSemester maybeTime =
         Just semester ->
             { name = semester.name
             , description = Maybe.withDefault "" semester.description
-            , startDate =  semester.startDate
-            , endDate =  semester.endDate
+            , startDate = semester.startDate
+            , endDate = semester.endDate
             }
+
         Nothing ->
             { name = ""
             , description = ""
@@ -95,14 +102,17 @@ initSemesterForm maybeSemester maybeTime =
             , endDate = Maybe.withDefault (Time.millisToPosix 0) maybeTime
             }
 
+
 encodeSemesterForm : SemesterForm -> Encode.Value
 encodeSemesterForm form =
     Encode.object
         [ ( "name", Encode.string form.name )
         , ( "description", Encode.string form.description )
-        , ( "startDate", (Time.posixToMillis >> Encode.int) form.startDate)
-        , ( "endDate", (Time.posixToMillis >> Encode.int) form.endDate)
+        , ( "start_date", (Time.posixToMillis >> Encode.int) form.startDate )
+        , ( "end_date", (Time.posixToMillis >> Encode.int) form.endDate )
         ]
+
+
 semesters : Session -> (APIData (List Semester) -> msg) -> Cmd msg
 semesters session toMsg =
     API.getRemote Endpoint.semesters (Session.credential session) (multiDecoder semesterDecoder) toMsg
@@ -128,40 +138,46 @@ deleteSemester session id toMsg =
     API.deleteRemote (Endpoint.semester id) (Session.credential session) toMsg
 
 
+
 -- Sections
 
-type alias SectionForm =
-    { number: String, description : String, semesterId : Maybe SemesterId, classroomId : Maybe ClassroomId }
 
-initSectionForm : Maybe Section -> SectionForm
+type alias SectionForm =
+    { number : String, description : String, semesterId : Maybe SemesterId, classroomId : Maybe ClassroomId }
+
+
+initSectionForm : Either Section ClassroomId -> SectionForm
 initSectionForm maybeSection =
     case maybeSection of
-        Just section ->
+        Left section ->
             { number = section.number
             , description = Maybe.withDefault "" section.description
             , classroomId = Just section.classroomId
-            , semesterId = Just section.semesterId 
+            , semesterId = Just section.semesterId
             }
-        Nothing ->
+
+        Right classroomId ->
             { number = ""
             , description = ""
-            , classroomId = Nothing
+            , classroomId = Just classroomId
             , semesterId = Nothing
             }
+
 
 encodeSectionForm : SectionForm -> Encode.Value
 encodeSectionForm form =
     Encode.object
         [ ( "number", Encode.string form.number )
         , ( "description", Encode.string form.description )
-        , ( "classroomId", encodeMaybe (unwrapClassroomId >> Encode.int) form.classroomId)
-        , ( "semesterId", encodeMaybe (unwrapSemesterId >> Encode.int) form.semesterId)
+        , ( "classroom_id", encodeMaybe (unwrapClassroomId >> Encode.int) form.classroomId )
+        , ( "semester_id", encodeMaybe (unwrapSemesterId >> Encode.int) form.semesterId )
         ]
 
 
 sections : Session -> Maybe ClassroomId -> Maybe SemesterId -> (APIData (List Section) -> msg) -> Cmd msg
 sections session classroomId semesterId toMsg =
     API.getRemote (Endpoint.sections classroomId semesterId) (Session.credential session) (multiDecoder sectionDecoder) toMsg
+
 
 getSection : Session -> SectionId -> (APIData Section -> msg) -> Cmd msg
 getSection session id toMsg =
@@ -183,9 +199,23 @@ deleteSection session id toMsg =
     API.deleteRemote (Endpoint.section id) (Session.credential session) toMsg
 
 
+importUsersClassroom : Session -> SectionId -> File -> (APIData (List User) -> msg) -> Cmd msg
+importUsersClassroom session id file toMsg =
+    API.postRemote (Endpoint.sectionImport id) (Session.credential session) (fileBody file) (multiDecoder userDecoder) toMsg
+
+
+
 -- Rotations
+
+
 type alias RotationForm =
-    { number : Int, description : String, startDate : Time.Posix, endDate : Time.Posix, sectionId: SectionId }
+    { number : Int
+    , description : String
+    , startDate : Time.Posix
+    , endDate : Time.Posix
+    , sectionId : SectionId
+    }
+
 
 initRotationForm : Either Rotation SectionId -> Maybe Time.Posix -> RotationForm
 initRotationForm either maybeTime =
@@ -193,32 +223,35 @@ initRotationForm either maybeTime =
         Left rotation ->
             { number = rotation.number
             , description = Maybe.withDefault "" rotation.description
-            , sectionId =  rotation.sectionId
-            , startDate =  rotation.startDate
-            , endDate =  rotation.endDate
+            , sectionId = rotation.sectionId
+            , startDate = rotation.startDate
+            , endDate = rotation.endDate
             }
+
         Right id ->
             { number = 0
             , description = ""
             , startDate = Maybe.withDefault (Time.millisToPosix 0) maybeTime
             , endDate = Maybe.withDefault (Time.millisToPosix 0) maybeTime
-            , sectionId =  id
+            , sectionId = id
             }
+
 
 encodeRotationForm : RotationForm -> Encode.Value
 encodeRotationForm form =
     Encode.object
         [ ( "number", Encode.int form.number )
         , ( "description", Encode.string form.description )
-        , ( "startDate", (Time.posixToMillis >> Encode.int) form.startDate)
-        , ( "endDate", (Time.posixToMillis >> Encode.int) form.endDate)
-        , ( "sectionId", (unwrapSectionId >> Encode.int) form.sectionId)
+        , ( "start_date", (Time.posixToMillis >> Encode.int) form.startDate )
+        , ( "end_date", (Time.posixToMillis >> Encode.int) form.endDate )
+        , ( "section_id", (unwrapSectionId >> Encode.int) form.sectionId )
         ]
 
 
 rotations : Session -> Maybe SectionId -> (APIData (List Rotation) -> msg) -> Cmd msg
 rotations session sectionId toMsg =
     API.getRemote (Endpoint.rotations sectionId) (Session.credential session) (multiDecoder rotationDecoder) toMsg
+
 
 getRotation : Session -> RotationId -> (APIData Rotation -> msg) -> Cmd msg
 getRotation session id toMsg =
@@ -240,12 +273,66 @@ deleteRotation session id toMsg =
     API.deleteRemote (Endpoint.rotation id) (Session.credential session) toMsg
 
 
+
 -- Rotation Groups
+
+
+type alias RotationGroupForm =
+    { number : Int
+    , description : String
+    , rotationId : RotationId
+    , users : List UserId
+    }
+
+
+initRotationGroupForm : Either RotationGroup RotationId -> RotationGroupForm
+initRotationGroupForm either =
+    case either of
+        Left group ->
+            { number = group.number
+            , description = Maybe.withDefault "" group.description
+            , rotationId = group.rotationId
+            , users = group.users
+            }
+
+        Right id ->
+            { number = 0
+            , description = ""
+            , rotationId = id
+            , users = []
+            }
+
+
+encodeRotationGroupForm : RotationGroupForm -> Encode.Value
+encodeRotationGroupForm form =
+    Encode.object
+        [ ( "number", Encode.int form.number )
+        , ( "description", Encode.string form.description )
+        , ( "rotation_id", (unwrapRotationId >> Encode.int) form.rotationId )
+        , ( "users", Encode.list (unwrapUserId >> Encode.int) form.users )
+        ]
+
 
 rotationGroups : Session -> Maybe RotationId -> (APIData (List RotationGroup) -> msg) -> Cmd msg
 rotationGroups session rotationId toMsg =
     API.getRemote (Endpoint.rotationGroups rotationId) (Session.credential session) (multiDecoder rotationGroupDecoder) toMsg
 
+
 getRotationGroup : Session -> RotationGroupId -> (APIData RotationGroup -> msg) -> Cmd msg
 getRotationGroup session id toMsg =
     API.getRemote (Endpoint.rotationGroup id) (Session.credential session) (singleDecoder rotationGroupDecoder) toMsg
+
+
+createRotationGroup : Session -> RotationGroupForm -> (APIData RotationGroup -> msg) -> Cmd msg
+createRotationGroup session form toMsg =
+    API.postRemote (Endpoint.rotationGroups Nothing) (Session.credential session) (jsonBody <| encodeRotationGroupForm form) (singleDecoder rotationGroupDecoder) toMsg
+
+
+updateRotationGroup : Session -> RotationGroupId -> RotationGroupForm -> (APIData RotationGroup -> msg) -> Cmd msg
+updateRotationGroup session id form toMsg =
+    API.putRemote (Endpoint.rotationGroup id) (Session.credential session) (jsonBody <| encodeRotationGroupForm form) (singleDecoder rotationGroupDecoder) toMsg
+
+
+deleteRotationGroup : Session -> RotationGroupId -> (APIData () -> msg) -> Cmd msg
+deleteRotationGroup session id toMsg =
+    API.deleteRemote (Endpoint.rotationGroup id) (Session.credential session) toMsg

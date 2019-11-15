@@ -149,7 +149,7 @@ unwrapRotationId (RotationId id) =
 
 
 type alias Rotation =
-    { rotationId : RotationId
+    { id : RotationId
     , number : Int
     , description : Maybe String
     , startDate : Time.Posix

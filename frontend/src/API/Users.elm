@@ -1,4 +1,4 @@
-module API.Users exposing (UserForm, deleteUser, editUser, encodeUserForm, newUser, user, users)
+module API.Users exposing (UserForm, deleteUser, editUser, encodeUserForm, newUser, getUser, users, initUserForm)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -14,8 +14,8 @@ import Types exposing (..)
 -- Users
 
 
-user : Session -> UserId -> (APIData User -> msg) -> Cmd msg
-user session id toMsg =
+getUser : Session -> UserId -> (APIData User -> msg) -> Cmd msg
+getUser session id toMsg =
     API.getRemote (Endpoint.user id) (Session.credential session) (singleDecoder userDecoder) toMsg
 
 
@@ -38,6 +38,36 @@ type alias UserForm =
     }
 
 
+initUserForm : Maybe User -> UserForm
+initUserForm maybeUser =
+    case maybeUser of
+        Just user ->
+            { email = user.email
+            , firstName = user.firstName
+            , middleName = Maybe.withDefault "" user.middleName
+            , lastName = user.lastName
+            , nickname = Maybe.withDefault "" user.nickname
+            , active = user.active
+            , classrooms = user.classrooms
+            , sections = user.sections
+            , rotationGroups = user.rotationGroups
+            , role = user.role
+            }
+
+        Nothing ->
+            { email = ""
+            , firstName = ""
+            , middleName = ""
+            , lastName = ""
+            , nickname = ""
+            , active = False
+            , classrooms = []
+            , sections = []
+            , rotationGroups = []
+            , role = Student
+            }
+
+
 encodeUserForm : UserForm -> Encode.Value
 encodeUserForm form =
     Encode.object
@@ -50,7 +80,7 @@ encodeUserForm form =
         , ( "classrooms", Encode.list (unwrapClassroomId >> Encode.int) form.classrooms )
         , ( "sections", Encode.list (unwrapSectionId >> Encode.int) form.sections )
         , ( "rotation_groups", Encode.list (unwrapRotationGroupId >> Encode.int) form.rotationGroups )
-        , ( "roles", (roleToString >> Encode.string) form.role)
+        , ( "roles", (roleToString >> Encode.string) form.role )
         ]
 
 
@@ -67,4 +97,3 @@ newUser session form toMsg =
 deleteUser : Session -> UserId -> (APIData () -> msg) -> Cmd msg
 deleteUser session id toMsg =
     API.deleteRemote (Endpoint.user id) (Session.credential session) toMsg
-
