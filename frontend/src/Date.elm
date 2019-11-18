@@ -2,7 +2,6 @@ module Date exposing (posixToClockTime, posixToDate)
 
 import Time exposing (..)
 
-
 posixToClockTime : Time.Zone -> Time.Posix -> String
 posixToClockTime zone posix =
     let

@@ -13,7 +13,6 @@ import Types exposing (..)
 
 type Page
     = Other
-    | Dashboard
     | Login
     | Classrooms
     | Users
@@ -23,6 +22,15 @@ type Page
     | Draft
     | EditFeedback
     | Profile
+    | Dashboard
+    | Classroom
+    | Section
+    | Rotation
+    | RotationGroup
+    | Semester
+    | Category
+    | Observation
+    | Explanation
 
 
 view : User -> Page -> { title : String, content : Html msg } -> Document msg
@@ -35,7 +43,7 @@ view user page { title, content } =
                     [ div [ class "container d-flex flex-row justify-content-center" ]
                         [ span [ class "mx-2" ] [ text "Version 1.0.0-dev" ]
                         , span [ class "mx-2" ] [ text "|" ]
-                        , span [ class "mx-2" ] [ text "Built on 2019-10-25 at 8:50am EST" ]
+                        , span [ class "mx-2" ] [ text "Built on 2019-11-4 at 8:50am EST" ]
                         ]
                     ]
         in

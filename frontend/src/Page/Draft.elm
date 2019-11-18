@@ -235,7 +235,7 @@ update msg model =
                     case result of
                         Success draft ->
                             getRotationGroup model.session draft.rotationGroupId GotRotationGroup
-                                :: List.map (\id -> user model.session id GotUser) draft.users
+                                :: List.map (\id -> getUser model.session id GotUser) draft.users
                                 ++ List.map (\id -> category model.session id GotCategory) draft.categories
 
                         _ ->
@@ -316,7 +316,7 @@ update msg model =
         GotComments result ->
             let
                 commands =
-                    RemoteData.unwrap [] (List.map (\comment -> user model.session comment.userId GotUser)) result
+                    RemoteData.unwrap [] (List.map (\comment -> getUser model.session comment.userId GotUser)) result
             in
             API.handleRemoteError result { model | comments = priorityApply (++) result model.comments } <| Cmd.batch commands
 

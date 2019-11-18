@@ -18,6 +18,15 @@ import Page.Login as Login
 import Page.NotFound as NotFound
 import Page.Profile as Profile
 import Page.ResetPassword as ResetPassword
+import Page.Classroom as Classroom
+import Page.Section as Section
+import Page.Rotation as Rotation
+-- import Page.RotationGroup as RotationGroup
+-- import Page.Semester as Semester
+-- import Page.Category as Category
+-- import Page.Observation as Observation
+-- import Page.Feedback as Feedback
+-- import Page.Explanation as Explanation
 import Route exposing (Route(..))
 import Session exposing (Session)
 import Task
@@ -62,6 +71,15 @@ type Model
     | EditFeedback EditFeedback.Model
     | Draft Draft.Model
     | Dashboard Dashboard.Model
+    | Classroom Classroom.Model
+    | Section Section.Model
+    | Rotation Rotation.Model
+    -- | RotationGroup RotationGroup.Model
+    -- | Semester Semester.Model
+    -- | Category Category.Model
+    -- | Observation Observation.Model
+    -- | Feedback Feedback.Model
+    -- | Explanation Explanation.Model
     | Profile Profile.Model
 
 
@@ -81,6 +99,15 @@ type Msg
     | GotEditFeedbackMsg EditFeedback.Msg
     | GotDraftMsg Draft.Msg
     | GotDashboardMsg Dashboard.Msg
+    | GotClassroomMsg Classroom.Msg
+    | GotSectionMsg Section.Msg
+    | GotRotationMsg Rotation.Msg
+    -- | GotRotationGroupMsg RotationGroup.Msg
+    -- | GotSemesterMsg Semester.Msg
+    -- | GotCategoryMsg Category.Msg
+    -- | GotObservationMsg Observation.Msg
+    -- | GotFeedbackMsg Feedback.Msg
+    -- | GotExplanationMsg Explanation.Msg
     | GotProfileMsg Profile.Msg
     | GotSession Session
 
@@ -121,6 +148,33 @@ toSession page =
         Dashboard model ->
             Dashboard.toSession model
 
+        Classroom model ->
+            Classroom.toSession model
+
+        Section model ->
+            Section.toSession model
+
+        Rotation model ->
+            Rotation.toSession model
+
+        -- RotationGroup model ->
+        --     RotationGroup.toSession model
+
+        -- Semester model ->
+        --     Semester.toSession model
+
+        -- Category model ->
+        --     Category.toSession model
+
+        -- Observation model ->
+        --     Observation.toSession model
+
+        -- Feedback model ->
+        --     Feedback.toSession model
+
+        -- Explanation model ->
+        --     Explanation.toSession model
+
 
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute model =
@@ -149,6 +203,42 @@ changeRouteTo maybeRoute model =
         Just Route.Dashboard ->
             Dashboard.init session
                 |> updateWith Dashboard GotDashboardMsg model
+
+        Just (Route.Classroom classroomId) ->
+            Classroom.init session classroomId
+                |> updateWith Classroom GotClassroomMsg model
+
+        Just (Route.Section sectionId) ->
+            Section.init session sectionId
+                |> updateWith Section GotSectionMsg model
+
+        Just (Route.Rotation rotationId) ->
+            Rotation.init session rotationId
+                |> updateWith Rotation GotRotationMsg model
+
+        -- Just (Route.RotationGroup rotationGroupId) ->
+        --     RotationGroup.init session rotationGroupId
+        --         |> updateWith RotationGroup GotRotationGroupMsg model
+
+        -- Just (Route.Semester semesterId) ->
+        --     Semester.init session semesterId
+        --         |> updateWith Semester GotSemesterMsg model
+
+        -- Just (Route.Category categoryId) ->
+        --     Category.init session categoryId
+        --         |> updateWith Category GotCategoryMsg model
+
+        -- Just (Route.Observation observationId) ->
+        --     Observation.init session observationId
+        --         |> updateWith Observation GotObservationMsg model
+
+        -- Just (Route.Feedback feedbackId) ->
+        --     Feedback.init session feedbackId
+        --         |> updateWith Feedback GotFeedbackMsg model
+
+        -- Just (Route.Explanation explanationId) ->
+        --     Explanation.init session explanationId
+        --         |> updateWith Explanation GotExplanationMsg model
 
         Just Route.DraftClassrooms ->
             DraftClassrooms.init session
@@ -210,6 +300,42 @@ update appMsg appModel =
         ( GotDashboardMsg msg, Dashboard model ) ->
             Dashboard.update msg model
                 |> updateWith Dashboard GotDashboardMsg appModel
+
+        ( GotClassroomMsg msg, Classroom model ) ->
+            Classroom.update msg model
+                |> updateWith Classroom GotClassroomMsg appModel
+
+        ( GotSectionMsg msg, Section model ) ->
+            Section.update msg model
+                |> updateWith Section GotSectionMsg appModel
+
+        ( GotRotationMsg msg, Rotation model ) ->
+            Rotation.update msg model
+                |> updateWith Rotation GotRotationMsg appModel
+
+        -- ( GotRotationGroupMsg msg, RotationGroup model ) ->
+        --     RotationGroup.update msg model
+        --         |> updateWith RotationGroup GotRotationGroupMsg appModel
+
+        -- ( GotSemesterMsg msg, Semester model ) ->
+        --     Semester.update msg model
+        --         |> updateWith Semester GotSemesterMsg appModel
+
+        -- ( GotCategoryMsg msg, Category model ) ->
+        --     Category.update msg model
+        --         |> updateWith Category GotCategoryMsg appModel
+
+        -- ( GotObservationMsg msg, Observation model ) ->
+        --     Observation.update msg model
+        --         |> updateWith Observation GotObservationMsg appModel
+
+        -- ( GotFeedbackMsg msg, Feedback model ) ->
+        --     Feedback.update msg model
+        --         |> updateWith Feedback GotFeedbackMsg appModel
+
+        -- ( GotExplanationMsg msg, Explanation model ) ->
+        --     Explanation.update msg model
+        --         |> updateWith Explanation GotExplanationMsg appModel
 
         ( GotDraftClassroomsMsg msg, DraftClassrooms model ) ->
             DraftClassrooms.update msg model
@@ -287,6 +413,33 @@ subscriptions appModel =
         Dashboard model ->
             Sub.map GotDashboardMsg (Dashboard.subscriptions model)
 
+        Classroom model ->
+            Sub.map GotClassroomMsg (Classroom.subscriptions model)
+
+        Section model ->
+            Sub.map GotSectionMsg (Section.subscriptions model)
+
+        Rotation model ->
+            Sub.map GotRotationMsg (Rotation.subscriptions model)
+
+        -- RotationGroup model ->
+        --     Sub.map GotRotationGroupMsg (RotationGroup.subscriptions model)
+
+        -- Semester model ->
+        --     Sub.map GotSemesterMsg (Semester.subscriptions model)
+
+        -- Category model ->
+        --     Sub.map GotCategoryMsg (Category.subscriptions model)
+
+        -- Observation model ->
+        --     Sub.map GotObservationMsg (Observation.subscriptions model)
+
+        -- Feedback model ->
+        --     Sub.map GotFeedbackMsg (Feedback.subscriptions model)
+
+        -- Explanation model ->
+        --     Sub.map GotExplanationMsg (Explanation.subscriptions model)
+
 
 
 -- VIEW
@@ -326,6 +479,33 @@ view appModel =
 
                 Dashboard model ->
                     viewPage Page.Dashboard GotDashboardMsg (Dashboard.view model)
+
+                Classroom model ->
+                    viewPage Page.Classroom GotClassroomMsg (Classroom.view model)
+
+                Section model ->
+                    viewPage Page.Section GotSectionMsg (Section.view model)
+
+                Rotation model ->
+                    viewPage Page.Rotation GotRotationMsg (Rotation.view model)
+
+                -- RotationGroup model ->
+                --     viewPage Page.RotationGroup GotRotationGroupMsg (RotationGroup.view model)
+
+                -- Semester model ->
+                --     viewPage Page.Semester GotSemesterMsg (Semester.view model)
+
+                -- Category model ->
+                --     viewPage Page.Category GotCategoryMsg (Category.view model)
+
+                -- Observation model ->
+                --     viewPage Page.Observation GotObservationMsg (Observation.view model)
+
+                -- Feedback model ->
+                --     viewPage Page.Feedback GotFeedbackMsg (Feedback.view model)
+
+                -- Explanation model ->
+                --     viewPage Page.Explanation GotExplanationMsg (Explanation.view model)
 
                 DraftClassrooms model ->
                     viewPage Page.DraftClassrooms GotDraftClassroomsMsg (DraftClassrooms.view model)

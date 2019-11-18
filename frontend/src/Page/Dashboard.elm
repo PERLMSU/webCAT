@@ -188,7 +188,7 @@ viewSemesters model =
             [ div [ class "col-lg-11" ]
                 [ h1 [ class "" ] [ text "Semesters" ]
                 ]
-            , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick ClassroomNewClicked ] [ text "New" ] ]
+            , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick SemesterNewClicked ] [ text "New" ] ]
             ]
         , hr [] []
         , case model.semesters of
