@@ -204,10 +204,6 @@ update msg model =
                     ( { model | studentFeedback = RemoteData.map ((::) value) model.studentFeedback }, Cmd.none )
 
                 Err error ->
-                    let
-                        _ =
-                            Debug.log "err" error
-                    in
                     -- TODO: Work out global message passing for errors to the main process
                     ( model, Cmd.none )
 
@@ -316,7 +312,7 @@ viewCategories model categories =
                     ]
 
         viewSubcategory category =
-            Block.link [ Route.href (Route.EditFeedback model.draftId (Just category.id)) ] [ text category.name ]
+            Block.custom <| a [ Route.href (Route.EditFeedback model.draftId (Just category.id)) ] [ text category.name ]
 
         viewCategory category =
             Grid.col []

@@ -22,6 +22,8 @@ import Components.Select as Select
 import Components.Table as Table
 import Date
 import Either exposing (..)
+import File exposing (File)
+import File.Select as FileSelect
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -34,7 +36,7 @@ import Session exposing (Session)
 import Task
 import Time
 import Types exposing (..)
-import Validate exposing (Validator, ifBlank, ifInvalidEmail, ifNothing, validate)
+import Validate exposing (Validator, ifBlank, ifFalse, ifInvalidEmail, ifNothing, validate)
 
 
 type ModalState
@@ -43,7 +45,7 @@ type ModalState
     | RotationFormVisible (Maybe RotationId) RotationForm (APIData Rotation) Modal.Visibility
     | SectionDeleteVisible Section (APIData ()) Modal.Visibility
     | RotationDeleteVisible Rotation (APIData ()) Modal.Visibility
-    | SectionImportVisible SectionId (APIData (List User)) Modal.Visibility
+    | SectionImportVisible SectionId (Maybe File) (APIData (List User)) Modal.Visibility
 
 
 type alias Model =
@@ -74,8 +76,8 @@ type SectionFormField
 type RotationFormField
     = RotationNumber Int
     | RotationDescription String
-    | StartDate Time.Posix
-    | EndDate Time.Posix
+    | RotationStartDate String
+    | RotationEndDate String
     | RotationSectionId (Maybe SectionId)
 
 
@@ -89,6 +91,7 @@ type Msg
       -- Section buttons
     | SectionEditClicked Section
     | SectionDeleteClicked Section
+    | SectionImportClicked SectionId
       -- Rotation table
     | RotationClicked Rotation
     | RotationNewClicked
@@ -101,11 +104,14 @@ type Msg
     | RotationFormUpdate RotationFormField
     | FormSubmitClicked
     | DeleteSubmitClicked
+    | FileUploadClicked
+    | FileLoaded File
       -- Form results
     | GotSectionFormResult (APIData Section)
     | GotSectionDeleteResult (APIData ())
     | GotRotationFormResult (APIData Rotation)
     | GotRotationDeleteResult (APIData ())
+    | GotImportedUsers (APIData (List User))
       -- Date stuff
     | GotTimezone Time.Zone
     | GotTime Time.Posix
@@ -360,7 +366,7 @@ viewRotationModal model either visibility =
                                     [ Form.label [ for "startDate" ] [ text "Start Date" ]
                                     , Input.date
                                         [ Input.id "startDate"
-                                        , Input.onInput (Iso8601.toTime >> Result.toMaybe >> Maybe.withDefault (Time.millisToPosix 0) >> StartDate >> RotationFormUpdate)
+                                        , Input.onInput (RotationStartDate >> RotationFormUpdate)
                                         , Input.value <| String.slice 0 10 <| Iso8601.fromTime form.startDate
                                         ]
                                     , Form.help [] [ text "When the rotation is set to start" ]
@@ -369,7 +375,7 @@ viewRotationModal model either visibility =
                                     [ Form.label [ for "endDate" ] [ text "End Date" ]
                                     , Input.date
                                         [ Input.id "endDate"
-                                        , Input.onInput (Iso8601.toTime >> Result.toMaybe >> Maybe.withDefault (Time.millisToPosix 0) >> EndDate >> RotationFormUpdate)
+                                        , Input.onInput (RotationEndDate >> RotationFormUpdate)
                                         , Input.value <| String.slice 0 10 <| Iso8601.fromTime form.endDate
                                         ]
                                     , Form.help [] [ text "When the rotation is set to end" ]
@@ -430,8 +436,8 @@ viewSection model =
         |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
             [ h3 [] [ text <| "Section: " ++ number ]
             , div []
-                [ Button.button [ Button.info, {- Button.onClick (SectionImportClicked model.sectionId), -} Button.disabled True ] [ text "Import Students" ]
-                , span [] [text "  "]
+                [ Button.button [ Button.info, Button.onClick (SectionImportClicked model.sectionId) ] [ text "Import Students" ]
+                , span [] [ text "  " ]
                 , RemoteData.unwrap (text "") (\section -> Button.button [ Button.success, Button.onClick (SectionEditClicked section) ] [ text "Edit" ]) model.section
                 ]
             ]
@@ -440,6 +446,40 @@ viewSection model =
             , ListGroup.li [] [ text <| "Description: " ++ description ]
             ]
         |> Card.view
+
+
+viewImportModal : Model -> SectionId -> Maybe File -> APIData (List User) -> Modal.Visibility -> Html Msg
+viewImportModal model id maybeFile remote visibility =
+    Modal.config ModalClose
+        |> Modal.withAnimation ModalAnimate
+        |> Modal.large
+        |> Modal.hideOnBackdropClick True
+        |> Modal.h3 [] [ text "Import Students" ]
+        |> Modal.body []
+            [ Form.form []
+                [ Form.group []
+                      [ Button.button [Button.onClick FileUploadClicked]
+                            [ case maybeFile of
+                                  Just file -> text <| File.name file
+                                  Nothing -> text "Please select a CSV to upload"
+                            ]
+
+                      ]
+                ]
+            ]
+        |> Modal.footer []
+            [ Button.button
+                [ Button.outlinePrimary
+                , Button.attrs [ onClick FormSubmitClicked ]
+                ]
+                [ text "Upload" ]
+            , Button.button
+                [ Button.outlineSecondary
+                , Button.attrs [ onClick ModalClose ]
+                ]
+                [ text "Cancel" ]
+            ]
+        |> Modal.view visibility
 
 
 view : Model -> { title : String, content : Html Msg }
@@ -466,7 +506,10 @@ view model =
                 RotationDeleteVisible rotation remote visibility ->
                     viewRotationModal model (Right ( rotation, remote )) visibility
 
-                _ ->
+                SectionImportVisible sectionId maybeFile remote visibility ->
+                    viewImportModal model sectionId maybeFile remote visibility
+
+                Hidden ->
                     text ""
             ]
     }
@@ -490,17 +533,34 @@ update msg model =
         GotSections response ->
             API.handleRemoteError response { model | sections = response } Cmd.none
 
+        GotImportedUsers response ->
+            (model, Cmd.none)
+
         GotTimezone tz ->
             ( { model | timezone = tz }, Cmd.none )
 
         GotTime time ->
             ( { model | time = Just time }, Cmd.none )
 
+        FileUploadClicked ->
+            ( model, FileSelect.file [ "text/csv" ] FileLoaded )
+
+        FileLoaded file ->
+            case model.modalState of
+                SectionImportVisible sectionId _ remote visibility ->
+                    ( { model | modalState = SectionImportVisible sectionId (Just file) remote visibility }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
         SectionEditClicked section ->
             ( { model | modalState = SectionFormVisible (Just section.id) (initSectionForm <| Left section) NotAsked Modal.shown }, Cmd.none )
 
         SectionDeleteClicked section ->
             ( { model | modalState = SectionDeleteVisible section NotAsked Modal.shown }, Cmd.none )
+
+        SectionImportClicked sectionId ->
+            ( { model | modalState = SectionImportVisible sectionId Nothing NotAsked Modal.shown }, Cmd.none )
 
         ModalClose ->
             case model.modalState of
@@ -516,8 +576,8 @@ update msg model =
                 RotationDeleteVisible id result _ ->
                     ( { model | modalState = RotationDeleteVisible id result Modal.hidden }, Cmd.none )
 
-                SectionImportVisible id result _ ->
-                    ( { model | modalState = SectionImportVisible id result Modal.hidden }, Cmd.none )
+                SectionImportVisible id maybeFile result _ ->
+                    ( { model | modalState = SectionImportVisible id maybeFile result Modal.hidden }, Cmd.none )
 
                 Hidden ->
                     ( model, Cmd.none )
@@ -536,8 +596,8 @@ update msg model =
                 RotationDeleteVisible id result _ ->
                     ( { model | modalState = RotationDeleteVisible id result visibility }, Cmd.none )
 
-                SectionImportVisible id result _ ->
-                    ( { model | modalState = SectionImportVisible id result visibility }, Cmd.none )
+                SectionImportVisible id maybeFile result _ ->
+                    ( { model | modalState = SectionImportVisible id maybeFile result visibility }, Cmd.none )
 
                 Hidden ->
                     ( model, Cmd.none )
@@ -574,11 +634,21 @@ update msg model =
                                 RotationDescription value ->
                                     { form | description = value }
 
-                                StartDate value ->
-                                    { form | startDate = value }
+                                RotationStartDate value ->
+                                    case (Iso8601.toTime >> Result.toMaybe) value of
+                                        Just date ->
+                                            { form | startDate = date }
 
-                                EndDate value ->
-                                    { form | endDate = value }
+                                        Nothing ->
+                                            form
+
+                                RotationEndDate value ->
+                                    case (Iso8601.toTime >> Result.toMaybe) value of
+                                        Just date ->
+                                            { form | startDate = date }
+
+                                        Nothing ->
+                                            form
 
                                 RotationSectionId maybeId ->
                                     case maybeId of
@@ -631,8 +701,7 @@ update msg model =
                 RotationFormVisible maybeId form result visibility ->
                     let
                         validator =
-                            Validate.all
-                                []
+                            Validate.all [ ifFalse (\f -> Time.posixToMillis f.endDate > Time.posixToMillis f.startDate) ( RotationEndDate (Iso8601.fromTime form.endDate), "End date must be after the start date" ) ]
                     in
                     case validate validator form of
                         Ok _ ->
@@ -649,6 +718,11 @@ update msg model =
 
                         Err errors ->
                             ( { model | rotationFormErrors = errors }, Cmd.none )
+
+                SectionImportVisible id maybeFile result visibility ->
+                    case maybeFile of
+                        Just file -> ({model | modalState = SectionImportVisible id maybeFile Loading visibility}, importUsersSection model.session id file GotImportedUsers )
+                        Nothing -> (model, Cmd.none)
 
                 _ ->
                     ( model, Cmd.none )
@@ -754,7 +828,7 @@ subscriptions model =
             RotationDeleteVisible _ _ visibility ->
                 Modal.subscriptions visibility ModalAnimate
 
-            SectionImportVisible _ _ visibility ->
+            SectionImportVisible _ _ _ visibility ->
                 Modal.subscriptions visibility ModalAnimate
 
             Hidden ->

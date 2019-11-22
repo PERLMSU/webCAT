@@ -5,6 +5,7 @@
     "scripts": {
         "build:dev": "NODE_ENV=development parcel build index.html -d ../priv/static/ --no-minify --no-content-hash --public-url /static/",
         "build": "parcel build index.html --no-source-maps -d ../priv/static/ --public-url /static/",
+        "clean": "rm -rf .cache/ node_modules/ elm-stuff/",
         "start": "parcel index.html",
         "watch": "parcel watch index.html -d ../priv/static --public-url /static/",
         "elm": "elm make src/Main.elm --output=/dev/null",

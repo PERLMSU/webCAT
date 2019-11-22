@@ -26,6 +26,7 @@ import Either exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Iso8601
 import List.Extra as ListExtra
 import RemoteData exposing (..)
 import RemoteData.Extra exposing (priorityApply, priorityMap, priorityUnwrap)
@@ -34,7 +35,7 @@ import Session exposing (Session)
 import Task
 import Time
 import Types exposing (..)
-import Validate exposing (Validator, ifBlank, ifInvalidEmail, ifNotInt, ifNothing, validate)
+import Validate exposing (Validator, ifBlank, ifFalse, ifInvalidEmail, ifNotInt, ifNothing, validate)
 
 
 type ModalState
@@ -69,6 +70,8 @@ type RotationFormField
     = RotationNumber String
     | RotationDescription String
     | RotationSectionId (Maybe SectionId)
+    | RotationStartDate String
+    | RotationEndDate String
 
 
 type RotationGroupFormField
@@ -85,7 +88,6 @@ type Msg
     | GotRotations (APIData (List Rotation))
     | GotSections (APIData (List Section))
     | GotRotationGroups (APIData (List RotationGroup))
-    | GotCategories (APIData (List Category))
     | GotUsers (APIData (List User))
       -- Rotation buttons
     | RotationEditClicked Rotation
@@ -141,7 +143,6 @@ init session rotationId =
                 , sections session Nothing Nothing GotSections
                 , users session GotUsers
                 , rotationGroups session (Just rotationId) GotRotationGroups
-                , categories session Nothing GotCategories
                 , Task.perform GotTimezone Time.here
                 , Task.perform GotTime Time.now
                 ]
@@ -167,7 +168,7 @@ viewRotationGroups model =
     div [ class "p-2" ]
         [ div [ class "row" ]
             [ div [ class "col-lg-11" ]
-                [ h4 [ class "" ] [ text "RotationGroups" ]
+                [ h4 [ class "" ] [ text "Rotation Groups" ]
                 ]
             , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick RotationGroupNewClicked ] [ text "New" ] ]
             ]
@@ -208,6 +209,14 @@ viewRotationModal model either visibility =
 
                         Nothing ->
                             text ""
+
+                inputCondition field =
+                    case ListExtra.find (\( f, m ) -> f == field) model.rotationFormErrors of
+                        Just _ ->
+                            [ Input.danger ]
+
+                        Nothing ->
+                            []
             in
             Modal.config ModalClose
                 |> Modal.withAnimation ModalAnimate
@@ -230,7 +239,7 @@ viewRotationModal model either visibility =
                             Form.form []
                                 [ Form.group []
                                     [ Form.label [ for "number" ] [ text "Number" ]
-                                    , Input.text
+                                    , Input.number
                                         [ Input.id "number"
                                         , Input.value <| String.fromInt form.number
                                         , Input.onInput (RotationNumber >> RotationFormUpdate)
@@ -246,6 +255,28 @@ viewRotationModal model either visibility =
                                         , Textarea.onInput (RotationDescription >> RotationFormUpdate)
                                         ]
                                     , Form.help [] [ text "Optional description for the rotation" ]
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "startDate" ] [ text "Start Date" ]
+                                    , Input.date <|
+                                        [ Input.id "startDate"
+                                        , Input.onInput (RotationStartDate >> RotationFormUpdate)
+                                        , Input.value <| String.slice 0 10 <| Iso8601.fromTime form.startDate
+                                        ]
+                                            ++ inputCondition (RotationStartDate <| Iso8601.fromTime form.startDate)
+                                    , Form.help [] [ text "When the rotation is set to start" ]
+                                    , feedback (RotationStartDate <| Iso8601.fromTime form.startDate)
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "endDate" ] [ text "End Date" ]
+                                    , Input.date <|
+                                        [ Input.id "endDate"
+                                        , Input.onInput (RotationEndDate >> RotationFormUpdate)
+                                        , Input.value <| String.slice 0 10 <| Iso8601.fromTime form.endDate
+                                        ]
+                                            ++ inputCondition (RotationEndDate <| Iso8601.fromTime form.endDate)
+                                    , feedback (RotationEndDate <| Iso8601.fromTime form.endDate)
+                                    , Form.help [] [ text "When the rotation is set to end" ]
                                     ]
                                 , Form.group []
                                     [ Form.label [ for "sectionId" ] [ text "Section" ]
@@ -275,7 +306,7 @@ viewRotationModal model either visibility =
                 |> Modal.hideOnBackdropClick True
                 |> Modal.h3 [] [ text "Delete Rotation" ]
                 |> Modal.body []
-                    [ p [] [ text <| "Are you sure you want to delete rotation '" ++ (String.fromInt rotation.number) ++ "' ?" ]
+                    [ p [] [ text <| "Are you sure you want to delete rotation '" ++ String.fromInt rotation.number ++ "' ?" ]
                     , p [] [ text "Deleting this rotation will also delete its rotationGroups, their rotations, and their rotation groups." ]
                     , p [ class "text-danger" ] [ text "This is not reversible." ]
                     ]
@@ -321,10 +352,10 @@ viewRotationGroupModal model either visibility =
                 |> Modal.h3 []
                     [ case maybeId of
                         Nothing ->
-                            text "New RotationGroup"
+                            text "New Rotation Group"
 
                         Just _ ->
-                            text "Edit RotationGroup"
+                            text "Edit Rotation Group"
                     ]
                 |> Modal.body []
                     [ case remote of
@@ -335,7 +366,7 @@ viewRotationGroupModal model either visibility =
                             Form.form []
                                 [ Form.group []
                                     [ Form.label [ for "number" ] [ text "Number" ]
-                                    , Input.text
+                                    , Input.number
                                         [ Input.id "number"
                                         , Input.value <| String.fromInt form.number
                                         , Input.onInput (RotationGroupNumber >> RotationGroupFormUpdate)
@@ -350,13 +381,13 @@ viewRotationGroupModal model either visibility =
                                         , Textarea.value form.description
                                         , Textarea.onInput (RotationGroupDescription >> RotationGroupFormUpdate)
                                         ]
-                                    , Form.help [] [ text "Optional description for the rotationGroup" ]
+                                    , Form.help [] [ text "Optional description for the rotation group" ]
                                     , feedback (RotationGroupDescription form.description)
                                     ]
                                 , Form.group []
                                     [ Form.label [ for "rotationId" ] [ text "Rotation" ]
                                     , Select.view selectConfig
-                                    , Form.help [] [ text "What Rotation does this Rotation Group belong to?" ]
+                                    , Form.help [] [ text "What Rotation does this rotation group belong to?" ]
                                     , feedback (RotationGroupRotationId <| Just form.rotationId)
                                     ]
                                 ]
@@ -382,7 +413,7 @@ viewRotationGroupModal model either visibility =
                 |> Modal.hideOnBackdropClick True
                 |> Modal.h3 [] [ text "Delete RotationGroup" ]
                 |> Modal.body []
-                    [ p [] [ text <| "Are you sure you want to delete rotationGroup '" ++ (String.fromInt rotationGroup.number) ++ "' ?" ]
+                    [ p [] [ text <| "Are you sure you want to delete rotationGroup '" ++ String.fromInt rotationGroup.number ++ "' ?" ]
                     , p [] [ text "Deleting this rotationGroup will also delete its rotationGroups, their rotations, and their rotation groups." ]
                     , p [ class "text-danger" ] [ text "This is not reversible." ]
                     ]
@@ -454,7 +485,10 @@ update msg model =
             init session model.rotationId
 
         GotRotation response ->
-            API.handleRemoteError response { model | rotation = response } Cmd.none
+            API.handleRemoteError response { model | rotation = response } <| RemoteData.unwrap Cmd.none (\r-> rotations model.session (Just r.sectionId) GotRotations) response
+
+        GotSections response ->
+            API.handleRemoteError response { model | sections = response } Cmd.none
 
         GotRotations response ->
             API.handleRemoteError response { model | rotations = response } Cmd.none
@@ -472,7 +506,7 @@ update msg model =
             ( { model | time = Just time }, Cmd.none )
 
         RotationEditClicked rotation ->
-            ( { model | modalState = RotationFormVisible (Just rotation.id) (nitRotationForm <| Just rotation) NotAsked Modal.shown }, Cmd.none )
+            ( { model | modalState = RotationFormVisible (Just rotation.id) (initRotationForm (Left rotation) model.time) NotAsked Modal.shown }, Cmd.none )
 
         RotationDeleteClicked rotation ->
             ( { model | modalState = RotationDeleteVisible rotation NotAsked Modal.shown }, Cmd.none )
@@ -518,12 +552,33 @@ update msg model =
                         updatedForm =
                             case field of
                                 RotationNumber data ->
-                                    { form | number = (String.toInt >> Maybe.withDefault 0) data }
+                                    case String.toInt data of
+                                        Just number ->
+                                            { form | number = number }
+
+                                        Nothing ->
+                                            form
 
                                 RotationDescription description ->
                                     { form | description = description }
 
-                                SectionId maybeId ->
+                                RotationStartDate value ->
+                                    case (Iso8601.toTime >> Result.toMaybe) value of
+                                        Just date ->
+                                            { form | startDate = date }
+
+                                        Nothing ->
+                                            form
+
+                                RotationEndDate value ->
+                                    case (Iso8601.toTime >> Result.toMaybe) value of
+                                        Just date ->
+                                            { form | endDate = date }
+
+                                        Nothing ->
+                                            form
+
+                                RotationSectionId maybeId ->
                                     case maybeId of
                                         Just data ->
                                             { form | sectionId = data }
@@ -543,18 +598,26 @@ update msg model =
                         updatedForm =
                             case field of
                                 RotationGroupNumber data ->
-                                    { form | number = (String.toInt >> Maybe.withDefault 0) data }
+                                    case String.toInt data of
+                                        Just number ->
+                                            { form | number = number }
+
+                                        Nothing ->
+                                            form
 
                                 RotationGroupDescription description ->
                                     { form | description = description }
 
-                                RotationId maybeId ->
+                                RotationGroupRotationId maybeId ->
                                     case maybeId of
                                         Just data ->
                                             { form | rotationId = data }
 
                                         Nothing ->
                                             form
+
+                                Users data ->
+                                    { form | users = data }
                     in
                     ( { model | modalState = RotationGroupFormVisible id updatedForm rotationGroup visibility }, Cmd.none )
 
@@ -578,7 +641,7 @@ update msg model =
                 RotationFormVisible maybeId form result visibility ->
                     let
                         validator =
-                            Validate.all [ ifNotInt .name ( RotationNumber form.name, "Number must be an integer" ) ]
+                            Validate.all [ ifFalse (\f -> Time.posixToMillis f.endDate > Time.posixToMillis f.startDate) ( RotationEndDate (Iso8601.fromTime form.endDate), "End date must be after the start date" ) ]
                     in
                     case validate validator form of
                         Ok _ ->

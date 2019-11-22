@@ -25,7 +25,7 @@ import Task
 import Time
 import Types exposing (..)
 import Validate exposing (Validator, ifBlank, ifInvalidEmail, validate)
-
+import Iso8601
 
 type ModalState
     = Hidden
@@ -57,8 +57,8 @@ type FormField
     = CourseCode String
     | Name String
     | Description String
-    | StartDate Time.Posix
-    | EndDate Time.Posix
+    | StartDate String
+    | EndDate String
     | ParentCategoryId (Maybe CategoryId)
     | CategoryIds (List CategoryId)
 
@@ -361,6 +361,14 @@ viewSemesterModal model either visibility =
 
                         Nothing ->
                             text ""
+
+                inputCondition field =
+                    case ListExtra.find (\( f, m ) -> f == field) model.formErrors of
+                        Just _ ->
+                            [ Input.danger ]
+
+                        Nothing ->
+                            []
             in
             Modal.config ModalClose
                 |> Modal.withAnimation ModalAnimate
@@ -400,6 +408,29 @@ viewSemesterModal model either visibility =
                                         ]
                                     , Form.help [] [ text "Optional description for the semester" ]
                                     ]
+                                , Form.group []
+                                    [ Form.label [ for "startDate" ] [ text "Start Date" ]
+                                    , Input.date <|
+                                        [ Input.id "startDate"
+                                        , Input.onInput (StartDate >> FormUpdate)
+                                        , Input.value <| String.slice 0 10 <| Iso8601.fromTime form.startDate
+                                        ]
+                                            ++ inputCondition (StartDate <| Iso8601.fromTime form.startDate)
+                                    , Form.help [] [ text "When the semester is set to start" ]
+                                    , feedback (StartDate <| Iso8601.fromTime form.startDate)
+                                    ]
+                                , Form.group []
+                                    [ Form.label [ for "endDate" ] [ text "End Date" ]
+                                    , Input.date <|
+                                        [ Input.id "endDate"
+                                        , Input.onInput (EndDate >> FormUpdate)
+                                        , Input.value <| String.slice 0 10 <| Iso8601.fromTime form.endDate
+                                        ]
+                                            ++ inputCondition (EndDate <| Iso8601.fromTime form.endDate)
+                                    , feedback (EndDate <| Iso8601.fromTime form.endDate)
+                                    , Form.help [] [ text "When the semester is set to end" ]
+                                    ]
+
                                 ]
                     ]
                 |> Modal.footer []
@@ -703,11 +734,21 @@ update msg model =
                                 Description description ->
                                     { form | description = description }
 
-                                StartDate date ->
-                                    { form | startDate = date }
+                                StartDate value ->
+                                    case (Iso8601.toTime >> Result.toMaybe) value of
+                                        Just date ->
+                                            { form | startDate = date }
 
-                                EndDate date ->
-                                    { form | endDate = date }
+                                        Nothing ->
+                                            form
+
+                                EndDate value ->
+                                    case (Iso8601.toTime >> Result.toMaybe) value of
+                                        Just date ->
+                                            { form | endDate = date }
+
+                                        Nothing ->
+                                            form
 
                                 _ ->
                                     form

@@ -1,10 +1,10 @@
-module API.Classrooms exposing (ClassroomForm, RotationForm, RotationGroupForm, SectionForm, SemesterForm, classrooms, createClassroom, createRotation, createRotationGroup, createSection, createSemester, deleteClassroom, deleteRotation, deleteRotationGroup, deleteSection, deleteSemester, getClassroom, getRotation, getRotationGroup, getSection, getSemester, importUsersClassroom, initClassroomForm, initRotationForm, initRotationGroupForm, initSectionForm, initSemesterForm, rotationGroups, rotations, sections, semesters, updateClassroom, updateRotation, updateRotationGroup, updateSection, updateSemester)
+module API.Classrooms exposing (ClassroomForm, RotationForm, RotationGroupForm, SectionForm, SemesterForm, classrooms, createClassroom, createRotation, createRotationGroup, createSection, createSemester, deleteClassroom, deleteRotation, deleteRotationGroup, deleteSection, deleteSemester, getClassroom, getRotation, getRotationGroup, getSection, getSemester, importUsersSection, initClassroomForm, initRotationForm, initRotationGroupForm, initSectionForm, initSemesterForm, rotationGroups, rotations, sections, semesters, updateClassroom, updateRotation, updateRotationGroup, updateSection, updateSemester)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
 import Either exposing (..)
 import File exposing (..)
-import Http exposing (fileBody, jsonBody)
+import Http exposing (fileBody, jsonBody, multipartBody, filePart)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Session exposing (Session)
@@ -199,9 +199,9 @@ deleteSection session id toMsg =
     API.deleteRemote (Endpoint.section id) (Session.credential session) toMsg
 
 
-importUsersClassroom : Session -> SectionId -> File -> (APIData (List User) -> msg) -> Cmd msg
-importUsersClassroom session id file toMsg =
-    API.postRemote (Endpoint.sectionImport id) (Session.credential session) (fileBody file) (multiDecoder userDecoder) toMsg
+importUsersSection : Session -> SectionId -> File -> (APIData (List User) -> msg) -> Cmd msg
+importUsersSection session id file toMsg =
+    API.postRemote (Endpoint.sectionImport id) (Session.credential session) (multipartBody [filePart "file" file]) (multiDecoder userDecoder) toMsg
 
 
 

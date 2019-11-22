@@ -21,8 +21,8 @@ import Page.ResetPassword as ResetPassword
 import Page.Classroom as Classroom
 import Page.Section as Section
 import Page.Rotation as Rotation
--- import Page.RotationGroup as RotationGroup
--- import Page.Semester as Semester
+import Page.RotationGroup as RotationGroup
+import Page.Semester as Semester
 -- import Page.Category as Category
 -- import Page.Observation as Observation
 -- import Page.Feedback as Feedback
@@ -74,8 +74,8 @@ type Model
     | Classroom Classroom.Model
     | Section Section.Model
     | Rotation Rotation.Model
-    -- | RotationGroup RotationGroup.Model
-    -- | Semester Semester.Model
+    | RotationGroup RotationGroup.Model
+    | Semester Semester.Model
     -- | Category Category.Model
     -- | Observation Observation.Model
     -- | Feedback Feedback.Model
@@ -102,8 +102,8 @@ type Msg
     | GotClassroomMsg Classroom.Msg
     | GotSectionMsg Section.Msg
     | GotRotationMsg Rotation.Msg
-    -- | GotRotationGroupMsg RotationGroup.Msg
-    -- | GotSemesterMsg Semester.Msg
+    | GotRotationGroupMsg RotationGroup.Msg
+    | GotSemesterMsg Semester.Msg
     -- | GotCategoryMsg Category.Msg
     -- | GotObservationMsg Observation.Msg
     -- | GotFeedbackMsg Feedback.Msg
@@ -157,11 +157,11 @@ toSession page =
         Rotation model ->
             Rotation.toSession model
 
-        -- RotationGroup model ->
-        --     RotationGroup.toSession model
+        RotationGroup model ->
+            RotationGroup.toSession model
 
-        -- Semester model ->
-        --     Semester.toSession model
+        Semester model ->
+            Semester.toSession model
 
         -- Category model ->
         --     Category.toSession model
@@ -216,13 +216,13 @@ changeRouteTo maybeRoute model =
             Rotation.init session rotationId
                 |> updateWith Rotation GotRotationMsg model
 
-        -- Just (Route.RotationGroup rotationGroupId) ->
-        --     RotationGroup.init session rotationGroupId
-        --         |> updateWith RotationGroup GotRotationGroupMsg model
+        Just (Route.RotationGroup rotationGroupId) ->
+            RotationGroup.init session rotationGroupId
+                |> updateWith RotationGroup GotRotationGroupMsg model
 
-        -- Just (Route.Semester semesterId) ->
-        --     Semester.init session semesterId
-        --         |> updateWith Semester GotSemesterMsg model
+        Just (Route.Semester semesterId) ->
+            Semester.init session semesterId
+                |> updateWith Semester GotSemesterMsg model
 
         -- Just (Route.Category categoryId) ->
         --     Category.init session categoryId
@@ -313,13 +313,13 @@ update appMsg appModel =
             Rotation.update msg model
                 |> updateWith Rotation GotRotationMsg appModel
 
-        -- ( GotRotationGroupMsg msg, RotationGroup model ) ->
-        --     RotationGroup.update msg model
-        --         |> updateWith RotationGroup GotRotationGroupMsg appModel
+        ( GotRotationGroupMsg msg, RotationGroup model ) ->
+            RotationGroup.update msg model
+                |> updateWith RotationGroup GotRotationGroupMsg appModel
 
-        -- ( GotSemesterMsg msg, Semester model ) ->
-        --     Semester.update msg model
-        --         |> updateWith Semester GotSemesterMsg appModel
+        ( GotSemesterMsg msg, Semester model ) ->
+            Semester.update msg model
+                |> updateWith Semester GotSemesterMsg appModel
 
         -- ( GotCategoryMsg msg, Category model ) ->
         --     Category.update msg model
@@ -422,11 +422,11 @@ subscriptions appModel =
         Rotation model ->
             Sub.map GotRotationMsg (Rotation.subscriptions model)
 
-        -- RotationGroup model ->
-        --     Sub.map GotRotationGroupMsg (RotationGroup.subscriptions model)
+        RotationGroup model ->
+            Sub.map GotRotationGroupMsg (RotationGroup.subscriptions model)
 
-        -- Semester model ->
-        --     Sub.map GotSemesterMsg (Semester.subscriptions model)
+        Semester model ->
+            Sub.map GotSemesterMsg (Semester.subscriptions model)
 
         -- Category model ->
         --     Sub.map GotCategoryMsg (Category.subscriptions model)
@@ -489,11 +489,11 @@ view appModel =
                 Rotation model ->
                     viewPage Page.Rotation GotRotationMsg (Rotation.view model)
 
-                -- RotationGroup model ->
-                --     viewPage Page.RotationGroup GotRotationGroupMsg (RotationGroup.view model)
+                RotationGroup model ->
+                    viewPage Page.RotationGroup GotRotationGroupMsg (RotationGroup.view model)
 
-                -- Semester model ->
-                --     viewPage Page.Semester GotSemesterMsg (Semester.view model)
+                Semester model ->
+                    viewPage Page.Semester GotSemesterMsg (Semester.view model)
 
                 -- Category model ->
                 --     viewPage Page.Category GotCategoryMsg (Category.view model)

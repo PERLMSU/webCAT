@@ -78,6 +78,7 @@ customElements.define('selectize-multi', class extends HTMLElement {
         element.setAttribute("multiple", true);
         this.appendChild(element);
         let $select = $(element).selectize({
+            plugins: ['remove_button'],
             options: this._options.map(({id, content}) => ({value: id, text: content})),
             items: this._items,
             onChange: (value) => {

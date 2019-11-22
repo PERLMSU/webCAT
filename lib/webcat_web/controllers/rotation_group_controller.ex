@@ -7,6 +7,6 @@ defmodule WebCATWeb.RotationGroupController do
     schema: RotationGroup,
     view: RotationGroupView,
     type: "rotation_group",
-    filter: ~w(number section_id),
-    sort: ~w(number section_id start_date end_date inserted_at updated_at)
+    filter: ~w(number rotation_id),
+    sort: ~w(number rotation_id inserted_at updated_at)
 end

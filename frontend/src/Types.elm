@@ -1,4 +1,4 @@
-module Types exposing (Category, CategoryId(..), Classroom, ClassroomId(..), Comment, CommentId(..), DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Feedback, FeedbackId(..), Grade, GradeId(..), GroupDraft, Observation, ObservationId(..), ObservationType(..), Role(..), Rotation, RotationGroup, RotationGroupId(..), RotationId(..), Section, SectionId(..), Semester, SemesterId(..), Semesters(..), StudentDraft, StudentExplanation, StudentExplanationId(..), StudentFeedback, StudentFeedbackId(..), User, UserId(..), categoryDecoder, classroomDecoder, commentDecoder, credUserDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, groupDraftDecoder, multiDecoder, observationDecoder, observationTypeDecoder, observationTypeToString, optionalAttribute, optionalMaybe, relationship, requiredAttribute, requiredRelationship, requiredType, roleDecoder, roleToString, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, singleDecoder, studentDraftDecoder, studentExplanationDecoder, studentFeedbackDecoder, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapStudentExplanationId, unwrapStudentFeedbackId, unwrapUserId, userDecoder)
+module Types exposing (Category, CategoryId(..), Classroom, ClassroomId(..), Comment, CommentId(..), DraftId(..), DraftStatus(..), Email, EmailId(..), Explanation, ExplanationId(..), Feedback, FeedbackId(..), Grade, GradeId(..), GroupDraft, Observation, ObservationId(..), ObservationType(..), Role(..), Rotation, RotationGroup, RotationGroupId(..), RotationId(..), Section, SectionId(..), Semester, SemesterId(..), Semesters(..), StudentDraft, StudentExplanation, StudentExplanationId(..), StudentFeedback, StudentFeedbackId(..), User, UserId(..), categoryDecoder, classroomDecoder, commentDecoder, credUserDecoder, draftStatusDecoder, draftStatusToString, emailDecoder, encodeMaybe, encodePosix, encodeUser, explanationDecoder, feedbackDecoder, gradeDecoder, groupDraftDecoder, multiDecoder, observationDecoder, observationTypeDecoder, observationTypeToString, optionalAttribute, optionalMaybe, relationship, requiredAttribute, requiredRelationship, requiredType, roleDecoder, roleToString, rotationDecoder, rotationGroupDecoder, sectionDecoder, semesterDecoder, singleDecoder, studentDraftDecoder, studentExplanationDecoder, studentFeedbackDecoder, unwrapCategoryId, unwrapClassroomId, unwrapCommentId, unwrapDraftId, unwrapEmailId, unwrapExplanationId, unwrapFeedbackId, unwrapGradeId, unwrapObservationId, unwrapRotationGroupId, unwrapRotationId, unwrapSectionId, unwrapSemesterId, unwrapStudentExplanationId, unwrapStudentFeedbackId, unwrapUserId, userDecoder, roleToReadableString)
 
 import Json.Decode as Decode exposing (Decoder, bool, decodeString, field, float, int, lazy, list, map, nullable, string)
 import Json.Decode.Extra exposing (parseInt)
@@ -287,6 +287,24 @@ roleToString role =
 
         Student ->
             "student"
+
+roleToReadableString : Role -> String
+roleToReadableString role =
+    case role of
+        Admin ->
+            "Admin"
+
+        Faculty ->
+            "Faculty"
+
+        TeachingAssistant ->
+            "Teaching Assistant"
+
+        LearningAssistant ->
+            "Learning Assistant"
+
+        Student ->
+            "Student"
 
 
 type alias User =
