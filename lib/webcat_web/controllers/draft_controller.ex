@@ -14,7 +14,7 @@ defmodule WebCATWeb.DraftController do
   def send_email(conn, user, %{"id" => id}) do
     with {:auth, true} <- {:auth, user.role in ~w(admin)},
          {:ok, draft} <-
-           CRUD.get(Draft, id, include: [:grades, child_drafts: ~w(student grades)a]) do
+           CRUD.get(Draft, id, include: [:grades, child_drafts: ~w(student grades parent_draft)a]) do
       emails =
         draft.child_drafts
         |> Enum.map(fn draft -> {draft, WebCATWeb.Email.draft(draft)} end)
