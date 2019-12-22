@@ -1,0 +1,35 @@
+name: CI
+
+on: push
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: webcat
+          POSTGRES_PASSWORD: webcat
+          POSTGRES_DB: webcat
+        ports:
+        - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    container:
+      image: elixir:1.9.1-alpine
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Dependencies
+      run: |
+        mix local.rebar --force
+        mix local.hex --force
+        mix deps.get
+    - name: Prepare Database
+      env:
+        MIX_ENV: test
+      run: |
+        mix ecto.setup
+        mix ecto.seed.test
+    - name: Run Tests
+      run: mix test
