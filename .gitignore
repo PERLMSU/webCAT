@@ -65,3 +65,7 @@ elm-stuff
 .cache
 
 ack
+
+# Local postgres
+db
+postgres
