@@ -11,17 +11,8 @@ config :logger, level: :warn
 
 # Configure your database
 config :webcat, WebCAT.Repo,
-  username: "webcat",
-  password: "webcat",
   database: "webcat_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
-
-config :terminator, Terminator.Repo,
-  username: "webcat",
-  password: "webcat",
-  database: "webcat_test",
-  hostname: "localhost",
+  username: "postgres",
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :webcat, WebCAT.Mailer, adapter: Bamboo.TestAdapter

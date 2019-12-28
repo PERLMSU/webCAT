@@ -1,0 +1,2 @@
+#!/bin/sh
+initdb --no-locale --encoding=UTF-8 && pg_start && createuser postgres --createdb

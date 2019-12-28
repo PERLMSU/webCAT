@@ -21,3 +21,6 @@ deploy:
 	ssh $(remote_user)@$(remote_host)	"pgrep beam >/dev/null && $(remote_dir)/bin/$(app_name) stop"
 	ssh $(remote_user)@$(remote_host) tar -xzf $(remote_dir)/server.tar.gz --overwrite -C $(remote_dir)
 	ssh $(remote_user)@$(remote_host) $(remote_dir)/bin/$(app_name) start
+set-env:
+	scp ./secrets.sh "$(remote_user)@$(remote_host):/etc/profile.d/secrets.sh"
+

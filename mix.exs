@@ -5,9 +5,9 @@ defmodule WebCAT.Mixfile do
     [
       app: :webcat,
       version: "1.0.0-dev",
-      elixir: "~> 1.8",
+      elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: ~w(phoenix gettext)a ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -50,7 +50,6 @@ defmodule WebCAT.Mixfile do
       {:ecto_sql, "~> 3.0"},
       {:postgrex, "~> 0.14.1"},
       # Security
-      {:terminator, github: "bbuscarino/terminator", branch: "dev"},
       {:cors_plug, "~> 1.5"},
       {:comeonin, "~> 4.0"},
       {:guardian, "~> 1.0"},

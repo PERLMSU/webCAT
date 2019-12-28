@@ -9,8 +9,6 @@ use Mix.Config
 config :webcat,
   ecto_repos: [WebCAT.Repo]
 
-config :terminator, repo: WebCAT.Repo
-
 # Configures the endpoint
 config :webcat, WebCATWeb.Endpoint,
   url: [host: "localhost"],

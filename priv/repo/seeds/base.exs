@@ -2,8 +2,6 @@ alias Ecto.Multi
 alias WebCAT.Repo
 alias WebCAT.Accounts.{User, PasswordCredential}
 
-alias Terminator.{Performer, Role}
-
 admin_changeset =
   User.changeset(%User{}, %{
     first_name: "Admin",

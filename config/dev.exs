@@ -46,17 +46,11 @@ config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
 config :webcat, WebCAT.Repo,
-  username: "webcat",
-  password: "webcat",
   database: "webcat_dev",
-  hostname: "localhost",
+  username: "postgres",
   pool_size: 10
 
-config :terminator, Terminator.Repo,
-  username: "webcat",
-  password: "webcat",
-  database: "webcat_dev",
-  hostname: "localhost",
-  pool_size: 10
-
-import_config "dev.secret.exs"
+config :webcat, WebCAT.Mailer,
+  adapter: Bamboo.SendGrid.SendGridAdapter,
+  api_key: {:system, "SENDGRID_API_KEY"},
+  sandbox: true

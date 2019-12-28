@@ -19,6 +19,28 @@ config :logger, level: :info
 config :cors_plug,
   origin: ["*"],
   max_age: 86_400,
-  methods: ["GET", "POST", "PATCH", "DELETE"]
+  methods: ~w(GET POST PATCH DELETE)
 
-import_config "prod.secret.exs"
+config :webcat, WebCAT.Repo,
+  ssl: true,
+  pool_size: 10
+
+config :webcat, WebCATWeb.Endpoint,
+  http: [port: 80],
+  url: [host: "forfect.app"],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  secret_key_base: {:system, "SECRET_KEY_BASE"},
+  https: [
+    port: 443,
+    otp_app: :webcat,
+    keyfile: {:system, "LETSENCRYPT_PRIVATE_PATH"},
+    certfile: {:system, "LETSENCRYPT_CERT_PATH"},
+  ],
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  server: true
+
+
+config :webcat, WebCAT.Mailer,
+  adapter: Bamboo.SendGrid.SendGridAdapter,
+  api_key: {:system, "SENDGRID_API_KEY"},
+  sandbox: false

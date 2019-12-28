@@ -1,16 +1,8 @@
 defmodule WebCAT.Repo.Migrations.Accounts do
   use Ecto.Migration
   import WebCAT.Repo.Helpers
-  import Terminator.Migrations
 
   def change do
-    # Terminator
-    performers()
-    roles()
-    performer_roles()
-    abilities()
-    entities()
-
     create table(:users) do
       add_req(:email, :text)
       add_req(:first_name, :text)
@@ -18,8 +10,6 @@ defmodule WebCAT.Repo.Migrations.Accounts do
       add(:middle_name, :text)
       add(:nickname, :text)
       add_req(:active, :boolean, default: true)
-
-      add_req(:performer_id, references(Terminator.Performer.table()))
 
       timestamps(type: :timestamptz)
     end
