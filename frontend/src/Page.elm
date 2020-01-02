@@ -30,6 +30,7 @@ type Page
     | Semester
     | Category
     | Observation
+    | Feedback
     | Explanation
 
 

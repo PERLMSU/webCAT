@@ -236,7 +236,7 @@ update msg model =
                         Success draft ->
                             getRotationGroup model.session draft.rotationGroupId GotRotationGroup
                                 :: List.map (\id -> getUser model.session id GotUser) draft.users
-                                ++ List.map (\id -> category model.session id GotCategory) draft.categories
+                                ++ List.map (\id -> getCategory model.session id GotCategory) draft.categories
 
                         _ ->
                             []

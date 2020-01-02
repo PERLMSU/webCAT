@@ -20,14 +20,15 @@ mkShell {
     ]);
 
   PGDATA = toString ./db;
-  PGHOST = toString ./postgres;
+  PG_SOCKET_DIR = toString ./postgres;
   NODE_MODULES = toString ./frontend/node_modules;
 
   shellHook = ''
     export PATH="$NODE_MODULES/.bin/:$PATH"
+    export PATH="./bin/:$PATH"
 
     if [ ! -d $PGHOST ]; then
-      mkdir -p $PGHOST
+      mkdir -p PG_SOCKET_DIR
     fi
 
     if [ ! -d $PGDATA ]; then

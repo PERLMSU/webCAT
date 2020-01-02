@@ -1,4 +1,4 @@
-module API.Feedback exposing (CategoryForm, ExplanationForm, FeedbackForm, ObservationForm, categories, category, createCategory, createExplanation, createFeedback, createObservation, createStudentExplanation, createStudentFeedback, deleteCategory, deleteExplanation, deleteFeedback, deleteObservation, deleteStudentExplanation, deleteStudentFeedback, explanations, feedback, getExplanation, getFeedback, getObservation, initCategoryForm, initExplanationForm, initFeedbackForm, initObservationForm, observations, studentExplanations, studentFeedback, updateCategory, updateExplanation, updateFeedback, updateObservation)
+module API.Feedback exposing (CategoryForm, ExplanationForm, FeedbackForm, ObservationForm, categories, getCategory, createCategory, createExplanation, createFeedback, createObservation, createStudentExplanation, createStudentFeedback, deleteCategory, deleteExplanation, deleteFeedback, deleteObservation, deleteStudentExplanation, deleteStudentFeedback, explanations, feedback, getExplanation, getFeedback, getObservation, initCategoryForm, initExplanationForm, initFeedbackForm, initObservationForm, observations, studentExplanations, studentFeedback, updateCategory, updateExplanation, updateFeedback, updateObservation)
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
@@ -20,8 +20,8 @@ categories session maybeParentCategoryId toMsg =
     API.getRemote (Endpoint.categories maybeParentCategoryId) (Session.credential session) (multiDecoder categoryDecoder) toMsg
 
 
-category : Session -> CategoryId -> (APIData Category -> msg) -> Cmd msg
-category session categoryId toMsg =
+getCategory : Session -> CategoryId -> (APIData Category -> msg) -> Cmd msg
+getCategory session categoryId toMsg =
     API.getRemote (Endpoint.category categoryId) (Session.credential session) (singleDecoder categoryDecoder) toMsg
 
 

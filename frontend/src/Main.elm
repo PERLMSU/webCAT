@@ -23,9 +23,9 @@ import Page.Section as Section
 import Page.Rotation as Rotation
 import Page.RotationGroup as RotationGroup
 import Page.Semester as Semester
--- import Page.Category as Category
--- import Page.Observation as Observation
--- import Page.Feedback as Feedback
+import Page.Category as Category
+import Page.Observation as Observation
+import Page.Feedback as Feedback
 -- import Page.Explanation as Explanation
 import Route exposing (Route(..))
 import Session exposing (Session)
@@ -76,9 +76,9 @@ type Model
     | Rotation Rotation.Model
     | RotationGroup RotationGroup.Model
     | Semester Semester.Model
-    -- | Category Category.Model
-    -- | Observation Observation.Model
-    -- | Feedback Feedback.Model
+    | Category Category.Model
+    | Observation Observation.Model
+    | Feedback Feedback.Model
     -- | Explanation Explanation.Model
     | Profile Profile.Model
 
@@ -104,9 +104,9 @@ type Msg
     | GotRotationMsg Rotation.Msg
     | GotRotationGroupMsg RotationGroup.Msg
     | GotSemesterMsg Semester.Msg
-    -- | GotCategoryMsg Category.Msg
-    -- | GotObservationMsg Observation.Msg
-    -- | GotFeedbackMsg Feedback.Msg
+    | GotCategoryMsg Category.Msg
+    | GotObservationMsg Observation.Msg
+    | GotFeedbackMsg Feedback.Msg
     -- | GotExplanationMsg Explanation.Msg
     | GotProfileMsg Profile.Msg
     | GotSession Session
@@ -163,17 +163,17 @@ toSession page =
         Semester model ->
             Semester.toSession model
 
-        -- Category model ->
-        --     Category.toSession model
+        Category model ->
+            Category.toSession model
 
-        -- Observation model ->
-        --     Observation.toSession model
+        Observation model ->
+            Observation.toSession model
 
-        -- Feedback model ->
-        --     Feedback.toSession model
+        Feedback model ->
+            Feedback.toSession model
 
-        -- Explanation model ->
-        --     Explanation.toSession model
+        -- -- Explanation model ->
+        -- --     Explanation.toSession model
 
 
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -224,17 +224,17 @@ changeRouteTo maybeRoute model =
             Semester.init session semesterId
                 |> updateWith Semester GotSemesterMsg model
 
-        -- Just (Route.Category categoryId) ->
-        --     Category.init session categoryId
-        --         |> updateWith Category GotCategoryMsg model
+        Just (Route.Category categoryId) ->
+            Category.init session categoryId
+                |> updateWith Category GotCategoryMsg model
 
-        -- Just (Route.Observation observationId) ->
-        --     Observation.init session observationId
-        --         |> updateWith Observation GotObservationMsg model
+        Just (Route.Observation observationId) ->
+            Observation.init session observationId
+                |> updateWith Observation GotObservationMsg model
 
-        -- Just (Route.Feedback feedbackId) ->
-        --     Feedback.init session feedbackId
-        --         |> updateWith Feedback GotFeedbackMsg model
+        Just (Route.FeedbackItem feedbackId) ->
+            Feedback.init session feedbackId
+                |> updateWith Feedback GotFeedbackMsg model
 
         -- Just (Route.Explanation explanationId) ->
         --     Explanation.init session explanationId
@@ -321,17 +321,17 @@ update appMsg appModel =
             Semester.update msg model
                 |> updateWith Semester GotSemesterMsg appModel
 
-        -- ( GotCategoryMsg msg, Category model ) ->
-        --     Category.update msg model
-        --         |> updateWith Category GotCategoryMsg appModel
+        ( GotCategoryMsg msg, Category model ) ->
+            Category.update msg model
+                |> updateWith Category GotCategoryMsg appModel
 
-        -- ( GotObservationMsg msg, Observation model ) ->
-        --     Observation.update msg model
-        --         |> updateWith Observation GotObservationMsg appModel
+        ( GotObservationMsg msg, Observation model ) ->
+            Observation.update msg model
+                |> updateWith Observation GotObservationMsg appModel
 
-        -- ( GotFeedbackMsg msg, Feedback model ) ->
-        --     Feedback.update msg model
-        --         |> updateWith Feedback GotFeedbackMsg appModel
+        ( GotFeedbackMsg msg, Feedback model ) ->
+            Feedback.update msg model
+                |> updateWith Feedback GotFeedbackMsg appModel
 
         -- ( GotExplanationMsg msg, Explanation model ) ->
         --     Explanation.update msg model
@@ -428,14 +428,14 @@ subscriptions appModel =
         Semester model ->
             Sub.map GotSemesterMsg (Semester.subscriptions model)
 
-        -- Category model ->
-        --     Sub.map GotCategoryMsg (Category.subscriptions model)
+        Category model ->
+            Sub.map GotCategoryMsg (Category.subscriptions model)
 
-        -- Observation model ->
-        --     Sub.map GotObservationMsg (Observation.subscriptions model)
+        Observation model ->
+            Sub.map GotObservationMsg (Observation.subscriptions model)
 
-        -- Feedback model ->
-        --     Sub.map GotFeedbackMsg (Feedback.subscriptions model)
+        Feedback model ->
+            Sub.map GotFeedbackMsg (Feedback.subscriptions model)
 
         -- Explanation model ->
         --     Sub.map GotExplanationMsg (Explanation.subscriptions model)
@@ -495,14 +495,14 @@ view appModel =
                 Semester model ->
                     viewPage Page.Semester GotSemesterMsg (Semester.view model)
 
-                -- Category model ->
-                --     viewPage Page.Category GotCategoryMsg (Category.view model)
+                Category model ->
+                    viewPage Page.Category GotCategoryMsg (Category.view model)
 
-                -- Observation model ->
-                --     viewPage Page.Observation GotObservationMsg (Observation.view model)
+                Observation model ->
+                    viewPage Page.Observation GotObservationMsg (Observation.view model)
 
-                -- Feedback model ->
-                --     viewPage Page.Feedback GotFeedbackMsg (Feedback.view model)
+                Feedback model ->
+                    viewPage Page.Feedback GotFeedbackMsg (Feedback.view model)
 
                 -- Explanation model ->
                 --     viewPage Page.Explanation GotExplanationMsg (Explanation.view model)

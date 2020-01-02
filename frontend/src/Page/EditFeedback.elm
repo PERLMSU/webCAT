@@ -96,7 +96,7 @@ init session draftId maybeCategoryId =
         case maybeCategoryId of
             Just parentCategoryId ->
                 ( model
-                , Cmd.batch <| category session parentCategoryId GotCategory :: feedbackCommands
+                , Cmd.batch <| getCategory session parentCategoryId GotCategory :: feedbackCommands
                 )
 
             Nothing ->
@@ -244,10 +244,10 @@ update msg model =
                 Success draft ->
                     case draft of
                         Left groupDraft ->
-                            ( model, Cmd.batch <| List.map (\id -> category model.session id GotCategory) groupDraft.categories )
+                            ( model, Cmd.batch <| List.map (\id -> getCategory model.session id GotCategory) groupDraft.categories )
 
                         Right studentDraft ->
-                            ( model, Cmd.batch <| List.map (\id -> category model.session id GotCategory) studentDraft.categories )
+                            ( model, Cmd.batch <| List.map (\id -> getCategory model.session id GotCategory) studentDraft.categories )
 
                 Failure error ->
                     -- TODO: Work out showing error states way better
