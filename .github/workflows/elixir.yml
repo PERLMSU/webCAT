@@ -25,9 +25,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-elixir@v1.0.0
-        with:
-          otp-version: 22.x
-          elixir-version: 1.9.x
+      with:
+        otp-version: 22.x
+        elixir-version: 1.9.x
     - run: |
         apt-get install git -y
         mix deps.get
