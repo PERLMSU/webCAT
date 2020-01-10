@@ -29,5 +29,6 @@ jobs:
           otp-version: 22.x
           elixir-version: 1.9.x
     - run: |
+        apt-get install git -y
         mix deps.get
         mix test
