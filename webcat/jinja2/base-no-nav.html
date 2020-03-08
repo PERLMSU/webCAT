@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Semantic UI CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.3/dist/semantic.min.css"
+          integrity="sha256-X47FgDCAI44wjsuI5uHDkwPT4mPb0blh3ezINVokLHA=" crossorigin="anonymous">
+    {% block sheets %}{% endblock %}
+    <title>{% block title %}WebCAT{% endblock %}</title>
+</head>
+<body>
+<div class="ui container">
+    {% block content %}{% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.3/dist/semantic.min.js"
+        integrity="sha256-Dv09sUOqHDkaWvPqBa0GQp6Csd9Q2SkkVP2xtzYgwc0=" crossorigin="anonymous"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

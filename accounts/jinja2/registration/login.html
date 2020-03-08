@@ -1,0 +1,61 @@
+{% extends "base-no-nav.html" %}
+{% block sheets %}
+    <style type="text/css">
+        body {
+            background-color: #DADADA;
+        }
+
+        body > .grid {
+            height: 100%;
+        }
+
+        .image {
+            margin-top: -100px;
+        }
+
+        .column {
+            max-width: 450px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui blue image header">
+                <img src="{{ static("images/logo.svg" ) }}" class="image">
+                <div class="content">{{ _('Log-in to your WebCAT account') }}</div>
+            </h2>
+            <form class="ui large form" method="post" action="{{ url('login') }}">
+                <div class="ui stacked segment">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="at icon"></i>
+                            {{ form.username }}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            {{ form.password }}
+                        </div>
+                    </div>
+                    <input class="ui fluid large blue submit button" type="submit" value="Login">
+                </div>
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </form>
+            {% if form.errors %}
+                <div class="ui error message">{{ _("Your email and password didn't match. Please try again.") }}</div>
+            {% endif %}
+            {% if next %}
+                {% if request.user.is_authenticated %}
+                    <div class="ui error message">{{ _("Your account doesn't have access to this page. To proceed, please login with an account that has access.") }}</div>
+                {% else %}
+                    <div class="ui error message">{{ _("Please login to see this page.") }}</div>
+                {% endif %}
+            {% endif %}
+            <div class="ui message">{{ _("Forgot your password?") }} <a
+                    href="{{ url('password_reset') }}">{{ _("Reset it") }}</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+<header class="ui top inverted menu">
+    <div class="right menu">
+        <a href="#" class="item">
+            <i class="inverted flag icon"></i>
+            {% if notifications %}
+                <div class="bottom floating circular ui orange label">{{ len(notifications) }}</div>
+            {% endif %}        </a>
+        <a href="#" class="item">
+            <i class="inverted glasses icon"></i>
+            {% if assignments %}
+                <div class="bottom floating circular ui orange label">{{ len(assignments) }}</div>
+            {% endif %}
+        </a>
+        {# Search bar #}
+        <div class="ui category search item">
+            <div class="ui inverted transparent icon input">
+                <input class="prompt" type="text" placeholder="Search">
+                <i class="search link icon"></i>
+            </div>
+            <div class="results"></div>
+        </div>
+        <div class="ui dropdown item" tabindex="0">
+            <div class="ui mini circular image">
+                {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}">
+                {% else %}
+                    <i class="circular user icon"></i>
+                {% endif %}
+            </div>
+            <div class="middle aligned content">
+                {% if request.user.first_name and request.user.last_name %}
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                {% else %}
+                    {{ request.user.email }}
+                {% endif %}
+            </div>
+            <i class="dropdown icon"></i>
+            <div class="menu" tabindex="-1">
+                <a href="{{ url("profile") }}" class="item">Settings</a>
+                <div class="divider"></div>
+                <div class="item">Sign Out</div>
+            </div>
+        </div>
+    </div>
+</header>

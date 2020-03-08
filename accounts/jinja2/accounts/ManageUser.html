@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+{#    <pre>{% filter force_escape %}{% debug %}{% endfilter %}</pre>#}
+<div class="ui segment">
+    <h2 class="ui center aligned icon header">
+      <i class="circular users icon"></i>
+    </h2>
+    <p>{{ user.first_name }} {{ user.last_name }}</p>
+</div>
+{% endblock %}
+
+{% block sheets %}
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 8px;
+}
+
+</style>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="ui segment">
+    <table class="ui single line table">
+        <thead>
+            <tr>
+                <th>Developer</th><th>Year</th><th>Role</th>
+            </tr>
+        </thead>
+        {% for user in users_array %}
+            <tbody>
+                <tr>
+                    <td> {{ user.0 }} </td>
+                    <td> {{ user.1 }} </td>
+                    <td> {{ user.2 }} </td>
+                </tr>
+            </tbody>
+        {%endfor%}
+    </table>
+</div>
+{% endblock %}
+
+{% block sheets %}
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 8px;
+}
+
+ui.single.line.table{
+    width: 30%;
+}
+</style>
+{% endblock %}

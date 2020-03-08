@@ -1,0 +1,55 @@
+# Note: use envsubst to replace $DOMAIN, $WEB_SERVICE_HOST, and $WEB_SERVICE_PORT
+
+upstream webcat {
+    server web:8000;
+}
+
+server {
+    listen 80;
+    server_name $DOMAIN;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443;
+    server_name $DOMAIN
+
+    gzip on;
+    gzip_min_length 1000;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
+
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location /static/ {
+        sendfile           on;
+        sendfile_max_chunk 1m;
+
+        alias /www/static/;
+    }
+
+    location /media/ {
+        sendfile           on;
+        sendfile_max_chunk 1m;
+
+        alias /www/media/;
+    }
+
+    location / {
+        proxy_pass http://webcat;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+}

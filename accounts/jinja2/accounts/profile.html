@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="ui segment">
+        <h1 class="ui center aligned dividing icon header">
+            {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" class="ui circular image"
+                     alt="{{ _("User profile picture") }}"/>
+            {% else %}
+                <i class="circular users icon"></i>
+            {% endif %}
+
+            <p>{{ user.first_name }} {{ user.last_name }}</p>
+        </h1>
+        <h2 class="ui header">
+            {{ _("General Information") }}
+        </h2>
+        <h3 class="ui header">{{ _("Email Address") }}: {{ user.email }} <i class="green check icon"></i></h3>
+        <h3 class="ui header">{{ _("Phone Number") }}:
+            {% if user.phone_number %}
+                {{ user.phone_number }}
+            {% else %}
+                <div class="disabled">{{ _("No phone number set") }}</div>
+            {% endif %}
+            <button class="ui small button"> {{ _("Verify") }} </button>
+        </h3>
+    </div>
+{% endblock %}
+
+{% block sheets %}
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+    </style>
+{% endblock %}

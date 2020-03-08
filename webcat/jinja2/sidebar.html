@@ -1,0 +1,37 @@
+<div class="ui sidebar left inverted vertical visible menu">
+    <a class="item"> <img class="ui small image" src="{{ static('images/logo.svg') }}"> Open Source Intel</a>
+    <a class="item" href="/dashboard/"> <i class="home icon"></i> Dashboard</a>
+    <a class="item"> <i class="bug icon"></i>Crawler Status</a>
+    <a class="item" href="/dashboard/search/"> <i class="search icon"></i> Search</a>
+    <a class="item" href="/accounts/profile/"> <i class="user icon"></i> Profile</a>
+    <a class="item" href="/dashboard/leaks/?status=new">
+        <i class="clock icon"></i> New Leaks
+        {% if models.Leak.objects.filter(status='new').count() > 0 %}
+            <div class="ui blue label">{{ models.Leak.objects.filter(status='new').count() }}</div>
+        {% endif %}
+    </a>
+    <a class="item" href="/dashboard/leaks/?status=high_confidence">
+        <i class="exclamation triangle icon"></i>High Confidence Leaks
+            {% if false==true %}
+            <div class="ui red label"></div>
+            {% endif %}
+    </a>
+    <a class="item" href="/dashboard/leaks/?status=threat">
+        <i class="exclamation icon"></i> Threats
+        {% if models.Leak.objects.filter(status='threat').count() > 0 %}
+            <div class="ui red label">{{ models.Leak.objects.filter(status='threat').count() }}</div>
+        {% endif %}
+    </a>
+    <a class="item" href="/dashboard/leaks/?status=benign">
+        <i class="thumbs up icon" ></i> Benign Leaks
+        {% if models.Leak.objects.filter(status='benign').count() > 0 %}
+            <div class="ui green label">{{ models.Leak.objects.filter(status='benign').count()}}</div>
+        {% endif %}
+    </a>
+    <a class="item" href="/dashboard/leaks/?status=resolved">
+        <i class="thumbs up icon" ></i> Resolved Leaks
+        {% if models.Leak.objects.filter(status='resolved').count() > 0 %}
+            <div class="ui label">{{ models.Leak.objects.filter(status='resolved').count()}}</div>
+        {% endif %}
+    </a>
+</div>

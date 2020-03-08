@@ -1,49 +1,22 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 
 with pkgs;
 
 let
   inherit (lib) optional optionals;
+  unstable = import (fetchTarball { url = "channel:nixpkgs-unstable"; }) { };
 
-  elixir = beam.packages.erlang.elixir;
-  nodejs = nodejs-10_x;
-  postgresql = postgresql_11;
-in
+  pythonEnv = unstable.poetry2nix.mkPoetryEnv {
+    poetrylock = ./poetry.lock;
+    python = python38;
+    overrides = [ (import ./overrides.nix { inherit lib; pkgs = unstable; }) ];
+  };
 
-mkShell {
-  buildInputs = [ elixir nodejs yarn git postgresql killall ]
-    ++ optional stdenv.isLinux inotify-tools # For file_system on Linux.
-    ++ optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
-      # For file_system on macOS.
-      CoreFoundation
-      CoreServices
-    ]);
-
-  PGDATA = toString ./db;
-  PG_SOCKET_DIR = toString ./postgres;
-  NODE_MODULES = toString ./frontend/node_modules;
+in mkShell {
+  buildInputs = [ pythonEnv python3Packages.setuptools killall ];
 
   shellHook = ''
-    export PATH="$NODE_MODULES/.bin/:$PATH"
+    # Add scripts to path
     export PATH="./bin/:$PATH"
-
-    if [ ! -d $PGHOST ]; then
-      mkdir -p PG_SOCKET_DIR
-    fi
-
-    if [ ! -d $PGDATA ]; then
-      echo 'Initializing postgresql database...'
-      initdb $PGDATA --auth=trust >/dev/null
-    fi
-
-    (cd frontend && yarn --silent)
-
-    # Warning for non-local running PostgreSQL instance.
-    if [ `ps aux | grep postgres | wc -l` -ne 1 ] && [ ! -f "$PGDATA/postmaster.pid" ]; then
-       printf "\n\e[31mA non-local PostgreSQL instance is already running. Be sure this is the one you want to use. If you're using Lorri, ignore this message.\e[0m\n\n"
-    else
-      pg_start
-      trap "pg_stop" EXIT
-    fi
   '';
 }

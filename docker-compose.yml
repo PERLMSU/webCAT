@@ -1,10 +1,19 @@
-version: '3'
+version: '3.7'
 services:
-  db:
-    image: postgres:11-alpine
+  postgres:
+    image: postgres:12-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: webcat
       POSTGRES_PASSWORD: webcat
     ports:
       - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  mjml:
+    image: liminspace/mjml-tcpserver:latest
+    restart: unless-stopped
+    ports:
+      - 28101:28101
+volumes:
+  postgres_data:

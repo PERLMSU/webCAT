@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+  web:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    image: webcat:latest
+    command: uvicorn webcat.asgi:application --host 0.0.0.0 --port 8000
+    volumes:
+      - static_volume:/www/static
+      - media_volume:/www/media
+    restart: always
+    ports:
+      - 8000
+    env_file:
+      - ./prod.env
+    depends_on:
+      - postgres
+      - mjml
+  nginx:
+    build: ./docker/nginx
+    image: webcat_nginx:latest
+    restart: always
+    command: /bin/bash -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done && nginx -g \"daemon off;\"'
+    volumes:
+      - static_volume:/www/static
+      - media_volume:/www/media
+      - ./.letsencrypt:/etc/letsencrypt
+      - ./.certbot:/var/www/certbot
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - web
+      - certbot
+  postgres:
+    image: postgres:12-alpine
+    restart: always
+    env_file:
+      - ./prod.env
+    ports:
+      - 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  mjml:
+    image: liminspace/mjml-tcpserver:latest
+    restart: always
+    ports:
+      - 28101
+  certbot:
+    image: certbot/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ./.certbot:/var/www/certbot
+      - ./.letsencrypt:/etc/letsencrypt
+volumes:
+  postgres_data:
+  media_volume:
+  static_volume:
