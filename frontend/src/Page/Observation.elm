@@ -146,28 +146,28 @@ toSession model =
     model.session
 
 
-viewObservations : Model -> Html Msg
-viewObservations model =
+viewFeedback : Model -> Html Msg
+viewFeedback model =
     let
         tableConfig =
             { render = \item -> [ item.content ]
             , headers = [ "Content" ]
-            , onClick = ObservationClicked
-            , onEdit = ObservationEditClicked
-            , onDelete = ObservationDeleteClicked
+            , onClick = FeedbackClicked
+            , onEdit = FeedbackEditClicked
+            , onDelete = FeedbackDeleteClicked
             }
     in
     div [ class "p-2" ]
         [ div [ class "row" ]
             [ div [ class "col-lg-11" ]
-                [ h4 [ class "" ] [ text "Observations" ]
+                [ h4 [ class "" ] [ text "Feedback" ]
                 ]
-            , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick ObservationNewClicked ] [ text "New" ] ]
+            , div [ class "col-lg-1" ] [ Button.button [ Button.success, Button.onClick FeedbackNewClicked ] [ text "New" ] ]
             ]
         , hr [] []
-        , case model.observations of
-            Success observations ->
-                Table.view tableConfig observations
+        , case model.feedback of
+            Success feedback ->
+                Table.view tableConfig feedback
 
             Failure e ->
                 text <| (API.getErrorBody >> API.errorBodyToString) e
@@ -400,7 +400,7 @@ viewObservation model =
     in
     Card.config []
         |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
-            [ h3 [] [ text <| "Feedback: " ++ content ]
+            [ h3 [] [ text <| "Observation: " ++ content ]
             , RemoteData.unwrap (text "") (\observation -> Button.button [ Button.success, Button.onClick (ObservationEditClicked observation) ] [ text "Edit" ]) model.observation
             ]
         |> Card.listGroup
@@ -419,7 +419,7 @@ view model =
         in
         Grid.container []
             [ card <| viewObservation model
-            , card <| viewObservations model
+            , card <| viewFeedback model
             , case model.modalState of
                 FeedbackFormVisible maybeId form remote visibility ->
                     viewFeedbackModal model (Left ( maybeId, form, remote )) visibility
@@ -450,6 +450,7 @@ update msg model =
 
         GotObservations response ->
             API.handleRemoteError response { model | observations = RemoteData.map (List.sortBy .content) response } Cmd.none
+        
         GotCategories response ->
             API.handleRemoteError response { model | categories = RemoteData.map (List.sortBy .name) response } Cmd.none
 

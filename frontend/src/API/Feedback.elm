@@ -2,13 +2,11 @@ module API.Feedback exposing (CategoryForm, ExplanationForm, FeedbackForm, Obser
 
 import API exposing (APIData, APIResult)
 import API.Endpoint as Endpoint
-import Either exposing (..)
-import Http exposing (emptyBody, jsonBody)
-import Json.Decode as Decode exposing (Decoder)
+import Either exposing (Either(..))
+import Http exposing (jsonBody)
 import Json.Encode as Encode
 import Session exposing (Session)
-import Time as Time
-import Types exposing (..)
+import Types exposing (CategoryId, Category, Feedback, ObservationType(..), DraftId, Observation, StudentFeedback, ObservationId, FeedbackId, unwrapDraftId, Explanation, ExplanationId, unwrapObservationId, observationTypeToString, unwrapCategoryId, observationDecoder, singleDecoder, multiDecoder, categoryDecoder,feedbackDecoder,explanationDecoder,unwrapFeedbackId, studentFeedbackDecoder, StudentFeedbackId, StudentExplanation, unwrapExplanationId, studentExplanationDecoder,StudentExplanationId)
 
 
 

@@ -47,7 +47,7 @@ type ModalState
 
 type alias Model =
     { session : Session
-    , observationId : ObservationId
+    , feedbackId : FeedbackId
     , timezone : Time.Zone
     , time : Maybe Time.Posix
 
@@ -71,7 +71,7 @@ type FeedbackFormField
 
 type ExplanationFormField
     = ExplanationContent String
-    | ExplanationObservationId (Maybe ObservationId)
+    | ExplanationFeedbackId (Maybe FeedbackId)
 
 
 type Msg
@@ -276,28 +276,18 @@ viewExplanationModal model either visibility =
     case either of
         Left ( maybeId, form, remote ) ->
             let
-                categorySelectConfig : Select.Model Category CategoryId Msg
-                categorySelectConfig =
-                    { id = "categoryId"
+                feedbackSelectConfig : Select.Model Feedback FeedbackId Msg
+                feedbackSelectConfig =
+                    { id = "feedbackId"
                     , itemId = .id
-                    , unwrapId = unwrapCategoryId
-                    , toItemId = CategoryId
-                    , selection = RemoteData.unwrap Nothing (ListExtra.find (.id >> (==) form.categoryId)) model.categories
-                    , options = RemoteData.withDefault [] model.categories
-                    , onSelectionChanged = ExplanationCategoryId >> ExplanationFormUpdate
-                    , render = .name
+                    , unwrapId = unwrapFeedbackId
+                    , toItemId = FeedbackId
+                    , selection = RemoteData.unwrap Nothing (ListExtra.find (.id >> (==) form.feedbackId)) model.feedback
+                    , options = RemoteData.withDefault [] model.feedback
+                    , onSelectionChanged = ExplanationFeedbackId >> ExplanationFormUpdate
+                    , render = .content
                     }
 
-                parseType str =
-                    case str of
-                        "positive" ->
-                            Positive
-
-                        "negative" ->
-                            Negative
-
-                        _ ->
-                            Neutral
 
                 feedback field =
                     case ListExtra.find (\( f, m ) -> f == field) model.explanationFormErrors of
@@ -329,7 +319,7 @@ viewExplanationModal model either visibility =
                                 [ Form.group []
                                     [ Form.label [ for "content" ] [ text "Content" ]
                                     , Input.text
-                                        [ Input.id "number"
+                                        [ Input.id "content"
                                         , Input.value form.content
                                         , Input.onInput (ExplanationContent >> ExplanationFormUpdate)
                                         ]
@@ -337,9 +327,9 @@ viewExplanationModal model either visibility =
                                     ]
                                 , Form.group []
                                     [ Form.label [ for "type" ] [ text "Type" ]
-                                    , Select.view categorySelectConfig
-                                    , Form.help [] [ text "What category does this explanation belong to?" ]
-                                    , feedback (ExplanationCategoryId <| Just form.categoryId)
+                                    , Select.view feedbackSelectConfig
+                                    , Form.help [] [ text "What feedback item does this explanation belong to?" ]
+                                    , feedback (ExplanationFeedbackId <| Just form.feedbackId)
                                     ]
                                 ]
                     ]
@@ -377,16 +367,16 @@ viewExplanationModal model either visibility =
                 |> Modal.view visibility
 
 
-viewObservation : Model -> Html Msg
-viewObservation model =
+viewFeedback : Model -> Html Msg
+viewFeedback model =
     let
         content =
-            RemoteData.unwrap "" .content model.observation
+            RemoteData.unwrap "" .content model.feedbackItem
     in
     Card.config []
         |> Card.header [ Flex.block, Flex.justifyBetween, Flex.alignItemsCenter ]
             [ h3 [] [ text <| "Feedback: " ++ content ]
-            , RemoteData.unwrap (text "") (\observation -> Button.button [ Button.success, Button.onClick (ObservationEditClicked observation) ] [ text "Edit" ]) model.observation
+            , RemoteData.unwrap (text "") (\observation -> Button.button [ Button.success, Button.onClick (FeedbackEditClicked observation) ] [ text "Edit" ]) model.feedbackItem
             ]
         |> Card.listGroup
             [ ListGroup.li [] [ text <| "content: " ++ content ]
@@ -403,7 +393,7 @@ view model =
                 Grid.simpleRow [ Grid.col [] [ inner ] ]
         in
         Grid.container []
-            [ card <| viewObservation model
+            [ card <| viewFeedback model
             , card <| viewExplanations model
             , case model.modalState of
                 FeedbackFormVisible maybeId form remote visibility ->
@@ -428,7 +418,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotSession session ->
-            init session model.observationId
+            init session model.feedbackId
 
         GotFeedbackItem response ->
             API.handleRemoteError response { model | feedbackItem = response } Cmd.none
@@ -452,7 +442,12 @@ update msg model =
             ( model, Route.pushUrl (Session.navKey model.session) (Route.FeedbackItem feedback.id) )
 
         FeedbackNewClicked ->
-            ( { model | modalState = FeedbackFormVisible Nothing (initFeedbackForm <| Right model.observationId) NotAsked Modal.shown }, Cmd.none )
+            case model.feedbackItem of
+                Success feedback ->
+                    ( { model | modalState = FeedbackFormVisible Nothing (initFeedbackForm <| Right feedback.observationId) NotAsked Modal.shown }, Cmd.none )
+                _ ->
+                    ( model, Cmd.none )
+
 
         FeedbackEditClicked feedback ->
             ( { model | modalState = FeedbackFormVisible (Just feedback.id) (initFeedbackForm <| Left feedback) NotAsked Modal.shown }, Cmd.none )
@@ -525,10 +520,10 @@ update msg model =
                                 ExplanationContent data ->
                                     { form | content = data }
 
-                                ExplanationObservationId maybeId ->
+                                ExplanationFeedbackId maybeId ->
                                     case maybeId of
                                         Just data ->
-                                            { form | observationId = data }
+                                            { form | feedbackId = data }
 
                                         Nothing ->
                                             form
@@ -542,18 +537,13 @@ update msg model =
             ( model, Route.pushUrl (Session.navKey model.session) (Route.Explanation explanation.id) )
 
         ExplanationNewClicked ->
-            case model.explanation of
-                Success explanation ->
-                    ( { model | modalState = ExplanationFormVisible Nothing (initExplanationForm <| Right explanation.categoryId) NotAsked Modal.shown }, Cmd.none )
-
-                _ ->
-                    ( model, Cmd.none )
+            ( { model | modalState = ExplanationFormVisible Nothing (initExplanationForm <| Right model.feedbackId) NotAsked Modal.shown }, Cmd.none )
 
         ExplanationEditClicked explanation ->
             ( { model | modalState = ExplanationFormVisible (Just explanation.id) (initExplanationForm <| Left explanation) NotAsked Modal.shown }, Cmd.none )
 
-        ObservationDeleteClicked observation ->
-            ( { model | modalState = ObservationDeleteVisible observation NotAsked Modal.shown }, Cmd.none )
+        ExplanationDeleteClicked explanation ->
+            ( { model | modalState = ExplanationDeleteVisible explanation NotAsked Modal.shown }, Cmd.none )
 
         FormSubmitClicked ->
             case model.modalState of
@@ -578,28 +568,28 @@ update msg model =
                         Err errors ->
                             ( { model | feedbackFormErrors = errors }, Cmd.none )
 
-                ObservationFormVisible maybeId form result visibility ->
+                ExplanationFormVisible maybeId form result visibility ->
                     let
                         validator =
                             Validate.all
-                                [ ifBlank .content ( ObservationContent form.content, "Content must not be blank" )
+                                [ ifBlank .content ( ExplanationContent form.content, "Content must not be blank" )
                                 ]
                     in
                     case validate validator form of
                         Ok _ ->
                             let
                                 updatedModel =
-                                    { model | observationFormErrors = [], modalState = ObservationFormVisible maybeId form Loading visibility }
+                                    { model | explanationFormErrors = [], modalState = ExplanationFormVisible maybeId form Loading visibility }
                             in
                             case maybeId of
                                 Just id ->
-                                    ( updatedModel, updateObservation model.session id form GotObservationFormResult )
+                                    ( updatedModel, updateExplanation model.session id form GotExplanationFormResult )
 
                                 Nothing ->
-                                    ( updatedModel, createObservation model.session form GotObservationFormResult )
+                                    ( updatedModel, createExplanation model.session form GotExplanationFormResult )
 
                         Err errors ->
-                            ( { model | observationFormErrors = errors }, Cmd.none )
+                            ( { model | explanationFormErrors = errors }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -610,8 +600,8 @@ update msg model =
                     case model.modalState of
                         FeedbackFormVisible maybeId form _ visibility ->
                             case result of
-                                Success _ ->
-                                    ( { model | modalState = FeedbackFormVisible maybeId form result Modal.hidden }, feedback model.session (Just model.observationId) GotFeedback )
+                                Success item ->
+                                    ( { model | modalState = FeedbackFormVisible maybeId form result Modal.hidden }, feedback model.session (Just item.observationId) GotFeedback )
 
                                 _ ->
                                     ( { model | modalState = FeedbackFormVisible maybeId form result visibility }, Cmd.none )
@@ -625,47 +615,47 @@ update msg model =
             let
                 ( updatedModel, command ) =
                     case model.modalState of
-                        FeedbackDeleteVisible category _ visibility ->
+                        FeedbackDeleteVisible item _ visibility ->
                             case result of
                                 Success _ ->
-                                    ( { model | modalState = FeedbackDeleteVisible category result Modal.hidden }, feedback model.session (Just model.observationId) GotFeedback )
+                                    ( { model | modalState = FeedbackDeleteVisible item result Modal.hidden }, feedback model.session (Just item.observationId) GotFeedback )
 
                                 _ ->
-                                    ( { model | modalState = FeedbackDeleteVisible category result visibility }, Cmd.none )
+                                    ( { model | modalState = FeedbackDeleteVisible item result visibility }, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
             in
             API.handleRemoteError result updatedModel command
 
-        GotObservationFormResult result ->
+        GotExplanationFormResult result ->
             let
                 ( updatedModel, command ) =
                     case model.modalState of
-                        ObservationFormVisible maybeId form _ visibility ->
+                        ExplanationFormVisible maybeId form _ visibility ->
                             case result of
-                                Success observation ->
-                                    ( { model | modalState = ObservationFormVisible maybeId form result Modal.hidden }, observations model.session (Just observation.categoryId) GotObservations )
+                                Success explanation ->
+                                    ( { model | modalState = ExplanationFormVisible maybeId form result Modal.hidden }, explanations model.session (Just explanation.feedbackId) GotExplanations )
 
                                 _ ->
-                                    ( { model | modalState = ObservationFormVisible maybeId form result visibility }, Cmd.none )
+                                    ( { model | modalState = ExplanationFormVisible maybeId form result visibility }, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
             in
             API.handleRemoteError result updatedModel command
 
-        GotObservationDeleteResult result ->
+        GotExplanationDeleteResult result ->
             let
                 ( updatedModel, command ) =
                     case model.modalState of
-                        ObservationDeleteVisible observation _ visibility ->
+                        ExplanationDeleteVisible explanation _ visibility ->
                             case result of
                                 Success _ ->
-                                    ( { model | modalState = ObservationDeleteVisible observation result Modal.hidden }, observations model.session (Just observation.categoryId) GotObservations )
+                                    ( { model | modalState = ExplanationDeleteVisible explanation result Modal.hidden }, explanations model.session (Just explanation.feedbackId) GotExplanations )
 
                                 _ ->
-                                    ( { model | modalState = ObservationDeleteVisible observation result visibility }, Cmd.none )
+                                    ( { model | modalState = ExplanationDeleteVisible explanation result visibility }, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
@@ -677,8 +667,8 @@ update msg model =
                 FeedbackDeleteVisible data _ visibility ->
                     ( { model | modalState = FeedbackDeleteVisible data Loading visibility }, deleteFeedback model.session data.id GotFeedbackDeleteResult )
 
-                ObservationDeleteVisible data _ visibility ->
-                    ( { model | modalState = ObservationDeleteVisible data Loading visibility }, deleteObservation model.session data.id GotObservationDeleteResult )
+                ExplanationDeleteVisible data _ visibility ->
+                    ( { model | modalState = ExplanationDeleteVisible data Loading visibility }, deleteExplanation model.session data.id GotExplanationDeleteResult )
 
                 _ ->
                     ( model, Cmd.none )
@@ -699,10 +689,10 @@ subscriptions model =
             FeedbackDeleteVisible _ _ visibility ->
                 Modal.subscriptions visibility ModalAnimate
 
-            ObservationFormVisible _ _ _ visibility ->
+            ExplanationFormVisible _ _ _ visibility ->
                 Modal.subscriptions visibility ModalAnimate
 
-            ObservationDeleteVisible _ _ visibility ->
+            ExplanationDeleteVisible _ _ visibility ->
                 Modal.subscriptions visibility ModalAnimate
 
             Hidden ->
