@@ -1,0 +1,2 @@
+#!/bin/sh
+pg_ctl -l "$PGDATA/server.log" -o "-c unix_socket_directories=$SOCKET_DIR" start

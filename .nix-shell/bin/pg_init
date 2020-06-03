@@ -1,0 +1,5 @@
+#!/bin/sh
+initdb --no-locale --encoding=UTF-8 -U webcat;
+pg_start;
+createdb -O webcat --username=webcat --host=$SOCKET_DIR webcat
+createdb -O webcat --username=webcat --host=$SOCKET_DIR webcat_test

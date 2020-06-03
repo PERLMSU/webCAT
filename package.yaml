@@ -97,3 +97,49 @@ flags:
     description: Turn on development settings, like auto-reload templates.
     manual: false
     default: false
+
+default-extensions:
+  # Lift standards-based limitations
+  - EmptyCase
+  - FlexibleContexts
+  - FlexibleInstances
+  - InstanceSigs
+  - MultiParamTypeClasses
+  # Syntatic conveniences
+  - LambdaCase
+  - MultiWayIf
+  - NamedFieldPuns
+  - TupleSections
+  # Deriving
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - GeneralizedNewtypeDeriving
+  - StandaloneDeriving
+  # Syntatic adjustments
+  - BangPatterns
+  - KindSignatures
+  - TypeOperators
+  # Strings lol
+  - OverloadedStrings
+  # Type annotations
+  - ScopedTypeVariables
+  - TypeApplications
+  # Type system extensions
+  - ConstraintKinds
+  - RankNTypes
+  # Intermediate syntax changes
+  - ApplicativeDo
+  - DefaultSignatures
+  - PatternSynonyms
+  # Intermediate type system extensions
+  - ExistentialQuantification
+  - FunctionalDependencies
+  - GADTs
+  # Advanced garbo
+  - DataKinds
+  - TypeFamilies
+  - TypeFamilyDependencies
